@@ -2,7 +2,7 @@
 Excalibur RPN Calculator
 
 Designed as an HP-like calculator for Windows.
-Win32-based and will run on any version of Windows from 98 up to Windows 11 and generally runs quite well unde Linux wine.
+Win32-based and will run on any version of Windows from 98 up to Windows 11 and generally runs quite well under Linux wine.
 
 Version 2.00 and 2.01 (essentially the same with an updated email address) were the last legacy versions available circa 2006.
 
