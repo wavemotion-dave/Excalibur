@@ -53,11 +53,11 @@
 
 double taxConstant = 1.05;
 
-int payMode = 0;                // Pay mode END
-int dateMode = 1;               // MM.DDYYYY
-int depreciationType = 0;       // Straight Line(1==SOYD, 2=DB)
-int finStore = 0;
-int finRecall = 0;
+uint8_t payMode = 0;                // Pay mode END
+uint8_t dateMode = 1;               // MM.DDYYYY
+uint8_t depreciationType = 0;       // Straight Line(1==SOYD, 2=DB)
+uint8_t finStore = 0;               // Financial Store flag
+uint8_t finRecall = 0;              // Financial Recall flag
 
 double fin_reg[FIN_REG_MAX];
 char finRegDesc[FIN_REG_MAX][18] = {
@@ -73,7 +73,9 @@ char finRegDesc[FIN_REG_MAX][18] = {
 };
 
 double cashFlow[MAX_CF];
-int CFn;
+uint8_t CFn;
+
+char finTmpStr[50];
 
 extern void BUSI_tax(void);
 extern void BUSI_percent(void);
@@ -116,7 +118,7 @@ extern void BUSI_INFL(void);
 extern void BUSI_EFF(void);
 extern void BUSI_Depr(void);
 
-struct funcStruct Business_funcs[MAX_FUNCS] = {
+struct funcStruct Financial_funcs[MAX_FUNCS] = {
     {FN1,   0,  UNI_TAX,    USES_F,     ALLOWREC,   ' ',    "TAX",      YES_L,  X_NEW,      BUSI_tax,           T_TAX,      H_TAX},
     {FN2,   0,  UNI_PERC,   USES_F,     ALLOWREC,   ' ',    " % ",      YES_L,  X_NEW,      BUSI_percent,       T_PERC,     H_PERC},
     {FN3,   0,  UNI_PERCC,  USES_F,     ALLOWREC,   ' ',    "%CHG",     YES_L,  X_NEW,      BUSI_percentChg,    T_PERCC,    H_PERCC},
@@ -161,14 +163,13 @@ struct funcStruct Business_funcs[MAX_FUNCS] = {
 
 void BUSI_tax(void)
 {
-    StackPush(StackPop() * taxConstant);      /* TBD, change tax const */
+    StackPush(StackPop() * taxConstant);
 }
 
 void BUSI_percent(void)
 {
     StackPush((StackPop() / 100.0F) * X);
 }
-
 
 void BUSI_percentChg(void)
 {
@@ -194,7 +195,6 @@ void BUSI_clearReg(void)
     CFn = 0;
 }
 
-
 void BUSI_store(void)
 {
     finRecall = 0;
@@ -205,7 +205,6 @@ void BUSI_store(void)
         UpdateSpareBar("STOF");
 }
 
-
 void BUSI_recall(void)
 {
     finStore = 0;
@@ -215,7 +214,6 @@ void BUSI_recall(void)
     else
         UpdateSpareBar("RCLF");
 }
-
 
 void BUSI_12div(void)
 {
@@ -308,25 +306,24 @@ void BUSI_pv(void)
 }
 
 
-BOOL CALLBACK fnDIALOG_11DlgProc(HWND, UINT, WPARAM, LPARAM);
+BOOL CALLBACK fnDIALOG_AmortProc(HWND, UINT, WPARAM, LPARAM);
 
 void BUSI_amort(void)
 {
-    DLGPROC lpfnfnDIALOG_11DlgProc;
+    DLGPROC lpfnDIALOG_AmortProc;
 
-    lpfnfnDIALOG_11DlgProc = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_11DlgProc, hInst);
+    lpfnDIALOG_AmortProc = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_AmortProc, hExcaliburInstance);
 
-    if ((DialogBox(hInst, (LPCSTR) "DIALOG_AMORT", calcMainWindow, lpfnfnDIALOG_11DlgProc)) == -1)
+    if ((DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_AMORT", calcMainWindow, lpfnDIALOG_AmortProc)) == -1)
     {
         MessageBox(NULL, "Unable to display dialog", "System Error", MB_SYSTEMMODAL | MB_ICONHAND | MB_OK);
     }
-    FreeProcInstance((FARPROC) lpfnfnDIALOG_11DlgProc);
+    FreeProcInstance((FARPROC) lpfnDIALOG_AmortProc);
 }
 
-BOOL CALLBACK fnDIALOG_11DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK fnDIALOG_AmortProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
 {
     int i;
-    char tmp[80];
     double pmt;
     double interest, principal, bulk;
     double finTemp1, finTemp2, finTemp3;
@@ -365,9 +362,9 @@ BOOL CALLBACK fnDIALOG_11DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
         pmt = -1.0 * pmt;
 
         principal = fin_reg[FIN_REG_PV];
-        sprintf(tmp, "%3d     %-9.2f %-9.2f  %-9.2f %-9.2f", 0, 0.0, 0.0, 0.0, principal);
-        makeInternational(tmp);
-        SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+        sprintf(finTmpStr, "%3d     %-9.2f %-9.2f  %-9.2f %-9.2f", 0, 0.0, 0.0, 0.0, principal);
+        makeInternational(finTmpStr);
+        SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) finTmpStr));
         finTemp1 = 0.0;
         finTemp2 = 0.0;
         finTemp3 = 0.0;
@@ -390,16 +387,16 @@ BOOL CALLBACK fnDIALOG_11DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
             if (interest < 0.005)
                 interest = 0.0;
 
-            sprintf(tmp, "%3d     %-9.2f %-9.2f  %-9.2f %-9.2f", i + 1, pmt, bulk, interest, principal);
-            makeInternational(tmp);
-            SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+            sprintf(finTmpStr, "%3d     %-9.2f %-9.2f  %-9.2f %-9.2f", i + 1, pmt, bulk, interest, principal);
+            makeInternational(finTmpStr);
+            SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) finTmpStr));
             finTemp1 += pmt;
             finTemp2 += bulk;
             finTemp3 += interest;
         }
-        sprintf(tmp, "Tot:    %-9.2f %-9.2f  %-9.2f", finTemp1, finTemp2, finTemp3);
-        makeInternational(tmp);
-        SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+        sprintf(finTmpStr, "Tot:    %-9.2f %-9.2f  %-9.2f", finTemp1, finTemp2, finTemp3);
+        makeInternational(finTmpStr);
+        SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) finTmpStr));
         return TRUE;
     case WM_COMMAND:
         switch(wParam)
@@ -413,9 +410,9 @@ BOOL CALLBACK fnDIALOG_11DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
             cptr = GlobalLock(tptr);
             lstrcpy(cptr, "");
             idx = 0;
-            while (SendDlgItemMessage(hDlg, 101, LB_GETTEXT, idx, (LONG) ((LPSTR) tmp)) != LB_ERR)
+            while (SendDlgItemMessage(hDlg, 101, LB_GETTEXT, idx, (LONG) ((LPSTR) finTmpStr)) != LB_ERR)
             {
-                lstrcat(cptr, (LPSTR) tmp);
+                lstrcat(cptr, (LPSTR) finTmpStr);
                 lstrcat(cptr, (LPSTR) "\r\n");
                 idx++;
             }
@@ -424,8 +421,8 @@ BOOL CALLBACK fnDIALOG_11DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
             GlobalUnlock(tptr);
             SetClipboardData(CF_TEXT, tptr);
             CloseClipboard();
-            sprintf(tmp, "The amortization schedule has been saved to the clipboard.");
-            MessageBox(hDlg, tmp, "Excalibur For Windows", MB_ICONINFORMATION | MB_OK);
+            sprintf(finTmpStr, "The amortization schedule has been saved to the clipboard.");
+            MessageBox(hDlg, finTmpStr, "Excalibur For Windows", MB_ICONINFORMATION | MB_OK);
             return TRUE;
 
         default:
@@ -767,7 +764,7 @@ unsigned long dateSerial(struct dateStruct dt)
     serial = 0;
     for (i = 1900; i < (dt.year); i++)
     {
-        serial += 365;          /* TBD, check leap years */
+        serial += 365;
         if (leapYear(i))
             serial++;
     }
@@ -811,14 +808,13 @@ unsigned long dateSerial360(struct dateStruct dt)
 
 void ConvertFloatToDate(double flt, struct dateStruct *dt)
 {
-    char tmp[30];
     char *ptr;
     char strval[4];
     unsigned long diff;
 
     dt->month = (long) flt;
-    sprintf(tmp, "%8.6f", flt);
-    ptr = strchr(tmp, '.');
+    sprintf(finTmpStr, "%8.6f", flt);
+    ptr = strchr(finTmpStr, '.');
     ptr++;
     strval[0] = *ptr;
     ptr++;
@@ -840,7 +836,6 @@ void ConvertFloatToDate(double flt, struct dateStruct *dt)
 void BUSI_date(void)
 {
     struct dateStruct d2;
-    char tmp[30];
     long numDays;
     unsigned long diff;
 
@@ -888,13 +883,13 @@ void BUSI_date(void)
         }
     }
     if (dateMode == 1)
-        sprintf(tmp, "%d.%02d%04d", d2.month, d2.day, d2.year);
+        sprintf(finTmpStr, "%d.%02d%04d", d2.month, d2.day, d2.year);
     else
-        sprintf(tmp, "%d.%02d%04d", d2.day, d2.month, d2.year);
+        sprintf(finTmpStr, "%d.%02d%04d", d2.day, d2.month, d2.year);
     diff = dateSerial(d2);
     diff = (diff % 7) + 1;
     StackPush((double) diff);
-    StackPush(atof(tmp));
+    StackPush(atof(finTmpStr));
 }
 
 void BUSI_days(void)
@@ -916,7 +911,6 @@ void BUSI_days(void)
 void BUSI_today(void)
 {
     char datestr[12];
-    char tmp[20];
     int day, month, year;
 
     _strdate(datestr);
@@ -928,13 +922,13 @@ void BUSI_today(void)
     else
         year += 1900;
     if (dateMode == 1)
-        sprintf(tmp, "%d.%02d%04d", month, day, year);
+        sprintf(finTmpStr, "%d.%02d%04d", month, day, year);
     else
-        sprintf(tmp, "%d.%02d%04d", day, month, year);
+        sprintf(finTmpStr, "%d.%02d%04d", day, month, year);
     if (Xedit == X_ENTER)
-        X = (double) atof(tmp);
+        X = (double) atof(finTmpStr);
     else
-        StackPush((double) atof(tmp));
+        StackPush((double) atof(finTmpStr));
 }
 
 
@@ -1050,19 +1044,19 @@ void BUSI_price(void)
     fin_reg[FIN_REG_PRICE] = X;
 }
 
-extern BOOL CALLBACK fnDIALOG_13DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
+extern BOOL CALLBACK fnDIALOG_FinancialProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
 void BUSI_payMode(void)
 {
-    DLGPROC lpfnfnDIALOG_13DlgProc;
-    lpfnfnDIALOG_13DlgProc = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_13DlgProc, hInst);
-    if ((DialogBox(hInst, (LPCSTR) "DIALOG_FINANCIAL", calcMainWindow, lpfnfnDIALOG_13DlgProc)) == -1)
+    DLGPROC lpfnDIALOG_FinancialProc;
+    lpfnDIALOG_FinancialProc = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_FinancialProc, hExcaliburInstance);
+    if ((DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_FINANCIAL", calcMainWindow, lpfnDIALOG_FinancialProc)) == -1)
     {
         MessageBox(NULL, "Unable to display dialog", "System Error", MB_SYSTEMMODAL | MB_ICONHAND | MB_OK);
     }
-    FreeProcInstance((FARPROC) lpfnfnDIALOG_13DlgProc);
+    FreeProcInstance((FARPROC) lpfnDIALOG_FinancialProc);
 }
 
-BOOL CALLBACK fnDIALOG_13DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK fnDIALOG_FinancialProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
 {
     DWORD bs;                   // Button Status
 
@@ -1213,8 +1207,7 @@ void BUSI_bond(void)
         RPN_error("Bond: Maturity date must be in X, Settlement date in Y");
         return;
     }
-
-
+    
     fPRICE = bondPrice(fBeginDate, fEndDate, fYIELD, fCPN, &fACCRU);
 
     StackPush(fACCRU);
@@ -1226,7 +1219,7 @@ void BUSI_ytm(void)
     double fPRICE, fACCRU;
     double fCPN;
     double fBeginDate, fEndDate;
-    double tmp, i;
+    double finTmpStr, i;
     int oldSign = 0;
     int newSign = 0;
     int found = FALSE;
@@ -1245,17 +1238,17 @@ void BUSI_ytm(void)
         return;
     }
 
-    tmp = bondPrice(fBeginDate, fEndDate, 0.0001 * 100.0, fCPN, &fACCRU);
-    if ((tmp - fPRICE) < 0.0)
+    finTmpStr = bondPrice(fBeginDate, fEndDate, 0.0001 * 100.0, fCPN, &fACCRU);
+    if ((finTmpStr - fPRICE) < 0.0)
         oldSign = -1;
     else
         oldSign = 1;
 
     for (i = 0.0001; i < 1.00; i += 0.0001)
     {
-        tmp = bondPrice(fBeginDate, fEndDate, i * 100.0, fCPN, &fACCRU);
+        finTmpStr = bondPrice(fBeginDate, fEndDate, i * 100.0, fCPN, &fACCRU);
 
-        if ((tmp - fPRICE) < 0.0)
+        if ((finTmpStr - fPRICE) < 0.0)
             newSign = -1;
         else
             newSign = 1;
@@ -1361,12 +1354,12 @@ struct CurrencyStruct CurrencyConv[MAX_CURRENCY_CONV] = {
   {"User Defined 3",        0.0000},
   {"User Defined 4",        0.0000},
   {"User Defined 5",        0.0000},
-  {"Unused", -1.0},
+  {"Unused",                -1.0},
 };
 
 struct CurrencyStruct CurrencyConvTmp;
-int currency1index = 0;
-int currency2index = 0;
+int32_t currency1index = 0;
+int32_t currency2index = 0;
 
 BOOL CALLBACK fnDIALOG_REDEFINECURRENCY(HWND, UINT, WPARAM, LPARAM);
 int cancelRedefineCurrency = 0;
@@ -1374,9 +1367,9 @@ void RedefineCurrency(void)
 {
     DLGPROC lpfnDIALOG_REDEFINECURRENCY;
 
-    lpfnDIALOG_REDEFINECURRENCY = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_REDEFINECURRENCY, hInst);
+    lpfnDIALOG_REDEFINECURRENCY = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_REDEFINECURRENCY, hExcaliburInstance);
 
-    if ((DialogBox(hInst, (LPCSTR) "DIALOG_REDEFINE_CURRENCY", calcMainWindow, lpfnDIALOG_REDEFINECURRENCY)) == -1)
+    if ((DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_REDEFINE_CURRENCY", calcMainWindow, lpfnDIALOG_REDEFINECURRENCY)) == -1)
     {
         MessageBox(NULL, "Unable to display dialog", "System Error", MB_SYSTEMMODAL | MB_ICONHAND | MB_OK);
     }
@@ -1385,14 +1378,12 @@ void RedefineCurrency(void)
 
 BOOL CALLBACK fnDIALOG_REDEFINECURRENCY(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
 {
-    char tmp[50];
-
     switch(wMessage)
     {
     case WM_INITDIALOG:
         SetDlgItemText(hDlg, IDC_EDIT1, CurrencyConvTmp.Country);
-        sprintf(tmp, "%.12g", CurrencyConvTmp.conv);
-        SetDlgItemText(hDlg, IDC_EDIT3, tmp);
+        sprintf(finTmpStr, "%.12g", CurrencyConvTmp.conv);
+        SetDlgItemText(hDlg, IDC_EDIT3, finTmpStr);
 
         return TRUE;
 
@@ -1403,9 +1394,9 @@ BOOL CALLBACK fnDIALOG_REDEFINECURRENCY(HWND hDlg, UINT wMessage, WPARAM wParam,
         case(IDOK):           // OK
             GetDlgItemText(hDlg, IDC_EDIT1, CurrencyConvTmp.Country, 19);
             CurrencyConvTmp.Country[20] = '\0';
-            GetDlgItemText(hDlg, IDC_EDIT3, tmp, 20);
-            tmp[20] = '\0';
-            CurrencyConvTmp.conv = atof(tmp);
+            GetDlgItemText(hDlg, IDC_EDIT3, finTmpStr, 20);
+            finTmpStr[20] = '\0';
+            CurrencyConvTmp.conv = atof(finTmpStr);
             EndDialog(hDlg, FALSE);
             return TRUE;
             break;
@@ -1438,9 +1429,9 @@ void BUSI_currency(void)
 {
     DLGPROC lpfnfnDIALOG_currency;
 
-    lpfnfnDIALOG_currency = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_currency, hInst);
+    lpfnfnDIALOG_currency = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_currency, hExcaliburInstance);
 
-    if ((DialogBox(hInst, (LPCSTR) "DIALOG_CURRENCY", calcMainWindow, lpfnfnDIALOG_currency)) == -1)
+    if ((DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_CURRENCY", calcMainWindow, lpfnfnDIALOG_currency)) == -1)
     {
         MessageBox(NULL, "Unable to display dialog", "System Error", MB_SYSTEMMODAL | MB_ICONHAND | MB_OK);
     }
@@ -1450,7 +1441,6 @@ void BUSI_currency(void)
 BOOL CALLBACK fnDIALOG_currency(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
 {
     int i;
-    char tmp[50];
     LRESULT item1, item2;
     double conv1, conv2;
     static int lbTabStops[1] = { 100 };
@@ -1463,10 +1453,10 @@ BOOL CALLBACK fnDIALOG_currency(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM 
         i = 0;
         for (;;)
         {
-            sprintf(tmp, "%s\t%-10.9g", CurrencyConv[i].Country, CurrencyConv[i].conv);
-            makeInternational(tmp);    // To swap commas and DPs if needed
-            SendDlgItemMessage(hDlg, ID_CURRENCY_BOX1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
-            SendDlgItemMessage(hDlg, ID_CURRENCY_BOX2, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+            sprintf(finTmpStr, "%s\t%-10.9g", CurrencyConv[i].Country, CurrencyConv[i].conv);
+            makeInternational(finTmpStr);    // To swap commas and DPs if needed
+            SendDlgItemMessage(hDlg, ID_CURRENCY_BOX1, LB_ADDSTRING, 0, (LONG) ((LPSTR) finTmpStr));
+            SendDlgItemMessage(hDlg, ID_CURRENCY_BOX2, LB_ADDSTRING, 0, (LONG) ((LPSTR) finTmpStr));
             i++;
             if (CurrencyConv[i].conv == -1.0)   // end of list
                 break;
@@ -1551,11 +1541,11 @@ BOOL CALLBACK fnDIALOG_currency(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM 
                         SendDlgItemMessage(hDlg, ID_CURRENCY_BOX1, LB_DELETESTRING, 0, 0);
                         SendDlgItemMessage(hDlg, ID_CURRENCY_BOX2, LB_DELETESTRING, 0, 0);
 
-                        sprintf(tmp, "%s\t%-10.9g", CurrencyConv[i].Country, CurrencyConv[i].conv);
-                        makeInternational(tmp);        // To swap commas and DPs if needed
+                        sprintf(finTmpStr, "%s\t%-10.9g", CurrencyConv[i].Country, CurrencyConv[i].conv);
+                        makeInternational(finTmpStr);        // To swap commas and DPs if needed
 
-                        SendDlgItemMessage(hDlg, ID_CURRENCY_BOX1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
-                        SendDlgItemMessage(hDlg, ID_CURRENCY_BOX2, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+                        SendDlgItemMessage(hDlg, ID_CURRENCY_BOX1, LB_ADDSTRING, 0, (LONG) ((LPSTR) finTmpStr));
+                        SendDlgItemMessage(hDlg, ID_CURRENCY_BOX2, LB_ADDSTRING, 0, (LONG) ((LPSTR) finTmpStr));
                         i++;
                         if (CurrencyConv[i].conv == -1.0)       // end of list
                             break;

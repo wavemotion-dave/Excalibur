@@ -38,8 +38,8 @@
 #include <float.h>
 #include "EXCAL.h"
 
-int userTimer = 0;
-unsigned long userTicks = 0;
+uint8_t  userTimer = 0;
+uint32_t userTicks = 0;
 
 extern void SCI_sin(void);
 extern void SCI_cos(void);
@@ -104,7 +104,7 @@ extern void Sci_TimerStop(void);
 extern void Sci_TimerClear(void);
 extern void Sci_TimerPush(void);
 
-struct funcStruct Sci_I_funcs[MAX_FUNCS] = {
+struct funcStruct Scientific_funcs[MAX_FUNCS] = {
     {FN1,       0,  UNI_SIN,    USES_F,     ALLOWREC,   ' ',    "SIN",      YES_L,  X_NEW,  SCI_sin,        T_SIN,        H_SIN},
     {FN2,       0,  UNI_COS,    USES_F,     ALLOWREC,   ' ',    "COS",      YES_L,  X_NEW,  SCI_cos,        T_COS,        H_COS},
     {FN3,       0,  UNI_TAN,    USES_F,     ALLOWREC,   ' ',    "TAN",      YES_L,  X_NEW,  SCI_tan,        T_TAN,        H_TAN},
@@ -150,7 +150,7 @@ struct funcStruct Sci_I_funcs[MAX_FUNCS] = {
 /* ------------- */
 /* SCI functions */
 /* ------------- */
-int hyperbolic = 0;
+uint8_t hyperbolic = 0;
 
 void SCI_hyp(void)
 {
@@ -476,9 +476,9 @@ void RedefineConst(void)
 {
     DLGPROC lpfnDIALOG_REDEFINECONST;
 
-    lpfnDIALOG_REDEFINECONST = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_REDEFINECONST, hInst);
+    lpfnDIALOG_REDEFINECONST = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_REDEFINECONST, hExcaliburInstance);
 
-    if ((DialogBox(hInst, (LPCSTR) "DIALOG_REDEFINE_CONST", calcMainWindow, lpfnDIALOG_REDEFINECONST)) == -1)
+    if ((DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_REDEFINE_CONST", calcMainWindow, lpfnDIALOG_REDEFINECONST)) == -1)
     {
         MessageBox(NULL, "Unable to display dialog", "System Error", MB_SYSTEMMODAL | MB_ICONHAND | MB_OK);
     }
@@ -538,39 +538,49 @@ BOOL CALLBACK fnDIALOG_REDEFINECONST(HWND hDlg, UINT wMessage, WPARAM wParam, LP
 }
 
 struct constTableStruct constantsUsed[MAX_CONSTS];
-struct constTableStruct constants[MAX_CONST_BANKS][MAX_CONSTS] = {
+struct constTableStruct constants[MAX_CONST_BANKS][MAX_CONSTS] = 
+{
+    // Bank 1
     {
-     {TRUE, "Pi", "",                           M_PI},
-     {TRUE, "Speed Of Light", "m/s",            299792458.0},
-     {TRUE, "Acceleration Gravity", "m/s²",     9.80665},
-     {TRUE, "Plank's Constant", "Js",           6.626E-34},
-     {TRUE, "Avogadro's Number", "Mol",         6.022045E+23},
-     {TRUE, "Electron Charge", "Col",           1.6021892E-19},
-     {TRUE, "Atomic Mass Unit", "Kg",           1.6606E-27},
-     {TRUE, "Electron Mass", "Kg",              9.109534E-31},
-     {TRUE, "Proton Mass", "Kg",                1.6722E-27},
-     {TRUE, "Electron-Proton Ratio", "",        1836.1},
-     {TRUE, "Ideal Gas Volume @ STP", "l/mol",  22.4136},
-     {TRUE, "Bohr Radius", "m",                 5.292E-11},
-     {TRUE, "Electron Volt", "J",               1.602E-19},
-     {TRUE, "Boltzman Constant", "JK-1",        1.380622e-23},
-     {TRUE, "Faraday's Constant", "Col",        9.65E4},
-     {TRUE, "Unit Atomic Energy", "MeV",        931.34},
-     {TRUE, "Universal Answer", "",             42.0},
-     {FALSE, "None", "",                        0.00}  // end of list...
-     },
+        {TRUE,  "Pi",                       "",             M_PI},
+        {TRUE,  "Speed Of Light",           "m/s",          299792458.0},
+        {TRUE,  "Acceleration Gravity",     "m/s²",         9.80665},
+        {TRUE,  "Plank's Constant",         "Js",           6.626E-34},
+        {TRUE,  "Avogadro's Number",        "mol",          6.022045E+23},
+        {TRUE,  "Electron Charge",          "col",          1.6021892E-19},
+        {TRUE,  "Atomic Mass Unit",         "kg",           1.6606E-27},
+        {TRUE,  "Electron Mass",            "kg",           9.109534E-31},
+        {TRUE,  "Proton Mass",              "kg",           1.6722E-27},
+        {TRUE,  "Electron-Proton Ratio",    "",             1836.1},
+        {TRUE,  "Ideal Gas Volume @ STP",   "l/mol",        22.4136},
+        {TRUE,  "Bohr Radius",              "m",            5.292E-11},
+        {TRUE,  "Electron Volt",            "J",            1.602E-19},
+        {TRUE,  "Boltzman Constant",        "JK-1",         1.380622e-23},
+        {TRUE,  "Faraday's Constant",       "col",          9.65E4},
+        {TRUE,  "Unit Atomic Energy",       "MeV",          931.34},
+        {TRUE,  "Universal Answer",         "",             42.0},
+        {FALSE, "None",                     "",             0.00}  // end of list...
+    },
+     
+    // Bank 2 
     {
-     {FALSE, "None", "",                        0.00}  // end of list...
-     },
-    {
-     {FALSE, "None", "",                        0.00}  // end of list...
-     },
-    {
-     {FALSE, "None", "",                        0.00}  // end of list...
-     },
-    {
-     {FALSE, "None", "",                        0.00}  // end of list...
-     },
+        {FALSE, "None",                     "",             0.00}  // end of list...
+    },                                                
+    
+    // Bank 3
+    {                                                  
+        {FALSE, "None",                     "",             0.00}  // end of list...
+    },                                                
+    
+    // Bank 4
+    {                                                  
+        {FALSE, "None",                     "",             0.00}  // end of list...
+    },                                                
+    
+    // Bank 5
+    {                                                  
+        {FALSE, "None",                     "",             0.00}  // end of list...
+    },
 };
 
 
@@ -627,21 +637,21 @@ BOOL CALLBACK constBankNamesProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
     return FALSE;
 }
 
-extern BOOL CALLBACK fnDIALOG_8DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
+extern BOOL CALLBACK fnDIALOG_Constants(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
 void SCI_const(void)
 {
-    DLGPROC lpfnfnDIALOG_8DlgProc;
+    DLGPROC lpfnDIALOG_ConstantsProc;
 
-    lpfnfnDIALOG_8DlgProc = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_8DlgProc, hInst);
+    lpfnDIALOG_ConstantsProc = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_Constants, hExcaliburInstance);
 
-    if ((DialogBox(hInst, (LPCSTR) "DIALOG_CONSTANTS", calcMainWindow, lpfnfnDIALOG_8DlgProc)) == -1)
+    if ((DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_CONSTANTS", calcMainWindow, lpfnDIALOG_ConstantsProc)) == -1)
     {
         MessageBox(NULL, "Unable to display dialog", "System Error", MB_SYSTEMMODAL | MB_ICONHAND | MB_OK);
     }
-    FreeProcInstance((FARPROC) lpfnfnDIALOG_8DlgProc);
+    FreeProcInstance((FARPROC) lpfnDIALOG_ConstantsProc);
 }
 
-BOOL CALLBACK fnDIALOG_8DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK fnDIALOG_Constants(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
 {
     int i, j;
     char tmp[50];
@@ -771,8 +781,7 @@ BOOL CALLBACK fnDIALOG_8DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM 
                                      constants[lastConstBank][i].value, constants[lastConstBank][i].units);
                             makeInternational(tmp);    // To swap commas and DPs if needed
                             SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
-                            memcpy(&constantsUsed[j],
-                                    &constants[lastConstBank][i], sizeof(constants[lastConstBank][i]));
+                            memcpy(&constantsUsed[j], &constants[lastConstBank][i], sizeof(constants[lastConstBank][i]));
                             j++;
                         }
                     }
@@ -828,8 +837,7 @@ BOOL CALLBACK fnDIALOG_8DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM 
                                      constants[lastConstBank][i].value, constants[lastConstBank][i].units);
                             makeInternational(tmp);    // To swap commas and DPs if needed
                             SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
-                            memcpy(&constantsUsed[j],
-                                    &constants[lastConstBank][i], sizeof(constants[lastConstBank][i]));
+                            memcpy(&constantsUsed[j], &constants[lastConstBank][i], sizeof(constants[lastConstBank][i]));
                             j++;
                         }
                     }
@@ -940,7 +948,7 @@ BOOL CALLBACK fnDIALOG_8DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM 
             SetFocus(GetDlgItem(hDlg, 101));
             return TRUE;
         case(107):            /* Redefine Bank Names */
-            DialogBox(hInst, (LPCSTR) "DIALOG_CONSTANT_BANK_NAMES", hDlg, constBankNamesProc);
+            DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_CONSTANT_BANK_NAMES", hDlg, constBankNamesProc);
             SetDlgItemText(hDlg, IDC_RADIO1, constantBankNames[0]);
             SetDlgItemText(hDlg, IDC_RADIO2, constantBankNames[1]);
             SetDlgItemText(hDlg, IDC_RADIO3, constantBankNames[2]);
@@ -1100,21 +1108,21 @@ void Sci_RoundYX(void)
     StackPush(temp);
 }
 
-extern BOOL CALLBACK fnDIALOG_6DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
+extern BOOL CALLBACK fnDIALOG_PrimesProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
 void Sci_prime(void)
 {
-    DLGPROC lpfnfnDIALOG_6DlgProc;
+    DLGPROC lpfnDIALOG_PrimesProc;
 
-    lpfnfnDIALOG_6DlgProc = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_6DlgProc, hInst);
+    lpfnDIALOG_PrimesProc = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_PrimesProc, hExcaliburInstance);
 
-    if ((DialogBox(hInst, (LPCSTR) "DIALOG_PRIMES", calcMainWindow, lpfnfnDIALOG_6DlgProc)) == -1)
+    if ((DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_PRIMES", calcMainWindow, lpfnDIALOG_PrimesProc)) == -1)
     {
         MessageBox(NULL, "Unable to display dialog", "System Error", MB_SYSTEMMODAL | MB_ICONHAND | MB_OK);
     }
-    FreeProcInstance((FARPROC) lpfnfnDIALOG_6DlgProc);
+    FreeProcInstance((FARPROC) lpfnDIALOG_PrimesProc);
 }
 
-BOOL CALLBACK fnDIALOG_6DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK fnDIALOG_PrimesProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
 {
     int i, j, prime, iprime;
     char tmp[30];
@@ -1187,18 +1195,18 @@ BOOL CALLBACK fnDIALOG_6DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM 
 }
 
 
-extern BOOL CALLBACK fnDIALOG_7DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
+extern BOOL CALLBACK fnDIALOG_ElementsProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
 void Sci_elements(void)
 {
-    DLGPROC lpfnfnDIALOG_7DlgProc;
+    DLGPROC lpfnDIALOG_ElementsProc;
 
-    lpfnfnDIALOG_7DlgProc = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_7DlgProc, hInst);
+    lpfnDIALOG_ElementsProc = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_ElementsProc, hExcaliburInstance);
 
-    if ((DialogBox(hInst, (LPCSTR) "DIALOG_ELEMENTS", calcMainWindow, lpfnfnDIALOG_7DlgProc)) == -1)
+    if ((DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_ELEMENTS", calcMainWindow, lpfnDIALOG_ElementsProc)) == -1)
     {
         MessageBox(NULL, "Unable to display dialog", "System Error", MB_SYSTEMMODAL | MB_ICONHAND | MB_OK);
     }
-    FreeProcInstance((FARPROC) lpfnfnDIALOG_7DlgProc);
+    FreeProcInstance((FARPROC) lpfnDIALOG_ElementsProc);
 }
 
 struct elementTableStruct
@@ -1314,7 +1322,7 @@ struct elementTableStruct elementTable[] = {
     {"None ",              -1,      0.00}
 };
 
-BOOL CALLBACK fnDIALOG_7DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK fnDIALOG_ElementsProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
 {
     int i;
     char tmp[40];
@@ -1383,30 +1391,30 @@ BOOL CALLBACK fnDIALOG_7DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM 
     return FALSE;
 }
 
-extern BOOL CALLBACK fnDIALOG_EWJDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
+extern BOOL CALLBACK fnDIALOG_ResistorProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
 void Sci_resist(void)
 {
 
-    DLGPROC lpfnfnDIALOG_EWJDlgProc;
+    DLGPROC lpfnDIALOG_ResistorProc;
 
-    lpfnfnDIALOG_EWJDlgProc = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_EWJDlgProc, hInst);
+    lpfnDIALOG_ResistorProc = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_ResistorProc, hExcaliburInstance);
 
-    if ((DialogBox(hInst, (LPCSTR) "DIALOG_RESISTOR", calcMainWindow, lpfnfnDIALOG_EWJDlgProc)) == -1)
+    if ((DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_RESISTOR", calcMainWindow, lpfnDIALOG_ResistorProc)) == -1)
     {
         MessageBox(NULL, "Unable to display dialog", "System Error", MB_SYSTEMMODAL | MB_ICONHAND | MB_OK);
     }
-    FreeProcInstance((FARPROC) lpfnfnDIALOG_EWJDlgProc);
+    FreeProcInstance((FARPROC) lpfnDIALOG_ResistorProc);
 }
 
 
-BOOL CALLBACK fnDIALOG_EWJDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK fnDIALOG_ResistorProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
 {
-    static double res_val_1st_band = 0.0;
-    static double res_val_2nd_band = 0.0;
-    static double res_val_3rd_band = 0.0;
-    static double res_val_mult_band = 0.0;
-    static double res_tolerance = 0.05;
-    static double res_val = 0.0;
+    static int res_val_1st_band  = 0;
+    static int res_val_2nd_band  = 0;
+    static int res_val_3rd_band  = 0;
+    static int res_val_mult_band = 0;
+    static double res_tolerance  = 0.05;
+    static double res_val        = 0.0;
     char tmp[50];
     int i;
 
@@ -1422,7 +1430,6 @@ BOOL CALLBACK fnDIALOG_EWJDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARA
         "GRY",
         "WHT"
     };
-
 
     switch(wMessage)
     {
@@ -1532,12 +1539,12 @@ BOOL CALLBACK fnDIALOG_EWJDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARA
         SendDlgItemMessage(hDlg, 153, WM_SETTEXT, 0, (LONG) ((LPSTR) tmp));
         sprintf(tmp, "%g%%", res_tolerance * 100);
         SendDlgItemMessage(hDlg, 151, WM_SETTEXT, 0, (LONG) ((LPSTR) tmp));
-#if 1                           /* tbd-dsb why are the color codes floats!?! */
-        SendDlgItemMessage(hDlg, 170, WM_SETTEXT, 0, (LONG) ((LPSTR) color_list[(int) res_val_1st_band]));
-        SendDlgItemMessage(hDlg, 171, WM_SETTEXT, 0, (LONG) ((LPSTR) color_list[(int) res_val_2nd_band]));
-        SendDlgItemMessage(hDlg, 172, WM_SETTEXT, 0, (LONG) ((LPSTR) color_list[(int) res_val_3rd_band]));
-        SendDlgItemMessage(hDlg, 173, WM_SETTEXT, 0, (LONG) ((LPSTR) color_list[(int) res_val_mult_band]));
-#endif
+
+        SendDlgItemMessage(hDlg, 170, WM_SETTEXT, 0, (LONG) ((LPSTR) color_list[res_val_1st_band]));
+        SendDlgItemMessage(hDlg, 171, WM_SETTEXT, 0, (LONG) ((LPSTR) color_list[res_val_2nd_band]));
+        SendDlgItemMessage(hDlg, 172, WM_SETTEXT, 0, (LONG) ((LPSTR) color_list[res_val_3rd_band]));
+        SendDlgItemMessage(hDlg, 173, WM_SETTEXT, 0, (LONG) ((LPSTR) color_list[res_val_mult_band]));
+
         return TRUE;
 
     case WM_SYSCOMMAND:
@@ -1556,9 +1563,9 @@ void Sci_metricPre(void)
 {
     DLGPROC lpMetricPrefixDlgProc;
 
-    lpMetricPrefixDlgProc = (DLGPROC) MakeProcInstance((FARPROC) MetricPrefixDlgProc, hInst);
+    lpMetricPrefixDlgProc = (DLGPROC) MakeProcInstance((FARPROC) MetricPrefixDlgProc, hExcaliburInstance);
 
-    if ((DialogBox(hInst, (LPCSTR) "DIALOG_METRICPRE", calcMainWindow, lpMetricPrefixDlgProc)) == -1)
+    if ((DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_METRICPRE", calcMainWindow, lpMetricPrefixDlgProc)) == -1)
     {
         MessageBox(NULL, "Unable to display dialog", "System Error", MB_SYSTEMMODAL | MB_ICONHAND | MB_OK);
     }

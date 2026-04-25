@@ -37,7 +37,6 @@
 #include <ctype.h>
 #include "EXCAL.h"
 
-
 /* Programming externs */
 extern void PROG_hex(void);
 extern void PROG_bin(void);
@@ -78,11 +77,11 @@ extern void PROG_2sComp(void);
 extern void PROG_MinW(void);
 extern void PROG_MaxW(void);
 extern void PROG_Mirror(void);
-extern void Prog_Merlyn(void);
+extern void Prog_IEEE(void);
 
-int binMode = 0;
+uint8_t binMode = 0;
 
-struct funcStruct Programming_funcs[MAX_FUNCS] = {
+struct funcStruct CompSci_funcs[MAX_FUNCS] = {
     {FN1,   0, UNI_DEC,     USES_L,     ALLOWREC,   ' ',    "DEC",      YES_L,  X_NEW,      PROG_dec,       T_DEC,      H_DEC},
     {FN2,   0, UNI_HEX,     USES_L,     ALLOWREC,   ' ',    "HEX",      YES_L,  X_NEW,      PROG_hex,       T_HEX,      H_HEX},
     {FN3,   0, UNI_BIN,     USES_L,     ALLOWREC,   ' ',    "BIN",      YES_L,  X_NEW,      PROG_bin,       T_BIN,      H_BIN},
@@ -122,7 +121,7 @@ struct funcStruct Programming_funcs[MAX_FUNCS] = {
     {FN37,  0, UNI_ASCII,   USES_L,     ALLOWREC,   ' ',    "ASCII",    NO_L,   X_NEW,      PROG_ascii,     T_ASCII,    H_ASCII},
     {FN38,  0, UNI_WSIZE,   USES_L,     ALLOWREC,   ' ',    "WSIZE",    YES_L,  X_NEW,      PROG_WordSize,  T_WORDSIZE, H_WORDSIZE},
     {FN39,  0, UNI_MIRROR,  USES_L,     ALLOWREC,   ' ',    "Mirror",   YES_L,  X_NEW,      PROG_Mirror,    T_MIRROR,   H_MIRROR},
-    {FN40,  0, UNI_MERLYN,  USES_F,     ALLOWREC,   ' ',    "Merlyn",   YES_L,  X_NEW,      Prog_Merlyn,    T_MERLYN,   H_MERLYN}
+    {FN40,  0, UNI_IEEE,    USES_F,     ALLOWREC,   ' ',    "IEEE",     YES_L,  X_NEW,      Prog_IEEE,      T_IEEE,     H_IEEE}
 };
 
 
@@ -235,7 +234,7 @@ void StackPushL(PROG_LONG temp)
 {
     stackPushes++;
 
-    if (stackLevels == 8)
+    if (extendedStack)
     {
         DL = maskStackStuff(CL);
         CL = maskStackStuff(BL);
@@ -259,7 +258,7 @@ PROG_LONG StackPopL(void)
     XL = maskStackStuff(YL);
     YL = maskStackStuff(ZL);
     ZL = maskStackStuff(TL);
-    if (stackLevels == 8)
+    if (extendedStack)
     {
         TL = maskStackStuff(AL);
         AL = maskStackStuff(BL);
@@ -567,64 +566,69 @@ void PROG_mod(void)
     }
 }
 
-extern BOOL CALLBACK fnDIALOG_4DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
+extern BOOL CALLBACK fnDIALOG_ASCIIProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
+
 void PROG_ascii(void)
 {
 
-    DLGPROC lpfnfnDIALOG_4DlgProc;
+    DLGPROC lpfnDIALOG_ASCIIProc;
 
-    lpfnfnDIALOG_4DlgProc = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_4DlgProc, hInst);
+    lpfnDIALOG_ASCIIProc = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_ASCIIProc, hExcaliburInstance);
 
-    if ((DialogBox(hInst, (LPCSTR) "DIALOG_ASCII", calcMainWindow, lpfnfnDIALOG_4DlgProc)) == -1)
+    if ((DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_ASCII", calcMainWindow, lpfnDIALOG_ASCIIProc)) == -1)
     {
         MessageBox(NULL, "Unable to display dialog", "System Error", MB_SYSTEMMODAL | MB_ICONHAND | MB_OK);
     }
-    FreeProcInstance((FARPROC) lpfnfnDIALOG_4DlgProc);
+    FreeProcInstance((FARPROC) lpfnDIALOG_ASCIIProc);
 }
 
 static char asciiStr[5];
-char *ASCII_Str(int i)
+char *ASCII_Str(int idx)
 {
-    if (i == 0) return "NUL";
-    if (i == 1) return "SOH";
-    if (i == 2) return "STX";
-    if (i == 3) return "ETX";
-    if (i == 4) return "EOT";
-    if (i == 5) return "ENQ";
-    if (i == 6) return "ACK";
-    if (i == 7) return "BEL";
-    if (i == 8) return "BS ";
-    if (i == 9) return "HT ";
-    if (i == 10) return "LF ";
-    if (i == 11) return "VT ";
-    if (i == 12) return "FF ";
-    if (i == 13) return "CR ";
-    if (i == 14) return "SO ";
-    if (i == 15) return "SI ";
-    if (i == 16) return "DLE";
-    if (i == 17) return "DC1";
-    if (i == 18) return "DC2";
-    if (i == 19) return "DC3";
-    if (i == 20) return "DC4";
-    if (i == 21) return "NAK";
-    if (i == 22) return "SYN";
-    if (i == 23) return "ETB";
-    if (i == 24) return "CAN";
-    if (i == 25) return "EM ";
-    if (i == 26) return "SUB";
-    if (i == 27) return "ESC";
-    if (i == 28) return "FS ";
-    if (i == 29) return "GS ";
-    if (i == 30) return "RS ";
-    if (i == 31) return "US ";
-    if (i == 32) return "SPC";
-
-    sprintf(asciiStr, "%c  ", (char)i);
-    if ((i != 127) && (i != 129) && (i != 141) && (i != 143) && (i != 144) && (i != 157)) return asciiStr;
-    else return "   ";
+    switch (idx)
+    {
+        case 0:  return "NUL";
+        case 1:  return "SOH";
+        case 2:  return "STX";
+        case 3:  return "ETX";
+        case 4:  return "EOT";
+        case 5:  return "ENQ";
+        case 6:  return "ACK";
+        case 7:  return "BEL";
+        case 8:  return "BS ";
+        case 9:  return "HT ";
+        case 10: return "LF ";
+        case 11: return "VT ";
+        case 12: return "FF ";
+        case 13: return "CR ";
+        case 14: return "SO ";
+        case 15: return "SI ";
+        case 16: return "DLE";
+        case 17: return "DC1";
+        case 18: return "DC2";
+        case 19: return "DC3";
+        case 20: return "DC4";
+        case 21: return "NAK";
+        case 22: return "SYN";
+        case 23: return "ETB";
+        case 24: return "CAN";
+        case 25: return "EM ";
+        case 26: return "SUB";
+        case 27: return "ESC";
+        case 28: return "FS ";
+        case 29: return "GS ";
+        case 30: return "RS ";
+        case 31: return "US ";
+        case 32: return "SPC";
+        
+        default:
+            sprintf(asciiStr, "%c  ", (char)idx);
+            if ((idx != 127) && (idx != 129) && (idx != 141) && (idx != 143) && (idx != 144) && (idx != 157)) return asciiStr;
+            else return "   ";
+    }
 }
 
-BOOL CALLBACK fnDIALOG_4DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK fnDIALOG_ASCIIProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
 {
     int i, j;
     char tmp[80];
@@ -735,7 +739,6 @@ void PROG_shrX(void)
     shiftVal &= (PROG_LONG) ~ mask;
     StackPushL(shiftVal);
 }
-
 
 
 void PROG_rlX(void)
@@ -882,9 +885,9 @@ void PROG_WordSize(void)
 {
     DLGPROC lpfnDIALOG_WordSizeProc;
 
-    lpfnDIALOG_WordSizeProc = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_WordSizeProc, hInst);
+    lpfnDIALOG_WordSizeProc = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_WordSizeProc, hExcaliburInstance);
 
-    if ((DialogBox(hInst, (LPCSTR) "DIALOG_WORDSIZE", calcMainWindow, lpfnDIALOG_WordSizeProc)) == -1)
+    if ((DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_WORDSIZE", calcMainWindow, lpfnDIALOG_WordSizeProc)) == -1)
     {
         MessageBox(NULL, "Unable to display dialog", "System Error", MB_SYSTEMMODAL | MB_ICONHAND | MB_OK);
     }
@@ -1078,146 +1081,62 @@ PROG_LONG biggestProgVal(void)
     }
 }
 
-int merlynVals[101];
-int merlynIdx = 0;
-int merlynGameState = 0;
-int userIdx = 0;
-
-void merlyn_Aux(HWND hDlg)
+/**
+ * Converts a 64-bit unsigned integer to a null-terminated binary string.
+ * @param n: The 64-bit integer to convert.
+ * @param out_str: A pointer to a char array of at least 65 bytes.
+ */
+void int64_to_binary(uint64_t n, char *out_str, uint8_t bits)
 {
     int i;
-    char tmp[30];
-
-    userIdx++;
-    if (userIdx == merlynIdx)
-    {
-        merlynVals[merlynIdx] = rand() % 4;
-        merlynIdx++;
-        if (merlynIdx == 100)
-        {
-            MessageBox(hDlg, "You have beaten the game of Merlyn!\nYour score was 100!", "Excalibur", MB_OK);
-            merlynIdx = 0;
-        }
-        userIdx = 0;
-        for (i = 0; i < merlynIdx; i++)
-        {
-            sprintf(tmp, " %d ", merlynVals[i]);
-            SetDlgItemText(hDlg, IDC_BUTTON1 + merlynVals[i], tmp);
-            Sleep(400);
-            SetDlgItemText(hDlg, IDC_BUTTON1 + merlynVals[i], "----");
-            Sleep(400);
-        }
+    for (i = (bits-1); i >= 0; i--) {
+        // Shift n right by 'i' positions and mask the last bit
+        // Then add '0' to convert the bit (0 or 1) to its ASCII character ('0' or '1')
+        out_str[(bits-1) - i] = ((uint8_t)(n >> i) & 1) + '0';
     }
+    out_str[bits] = '\0'; // null-terminate
 }
 
-BOOL CALLBACK MerlynDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK DlgProcIEEE(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
 {
-    int i;
-    char tmp[100];
+    char tmp[128];
+    char tmp2[80];
+    char tmp3[32];
+    float  val_float = 0.0;
+    double val_double = 0.0;
+    uint32_t val32 = 0;
+    uint64_t val64 = 0;
 
     switch(wMessage)
     {
     case WM_INITDIALOG:
-        merlynIdx = 0;
-        merlynGameState = 0;
+        SendMessage(GetDlgItem(hDlg, 101), WM_SETFONT, (WPARAM) hFixedFont, FALSE);
+        SendMessage(GetDlgItem(hDlg, 102), WM_SETFONT, (WPARAM) hFixedFont, FALSE);
+        SetDlgItemText(hDlg, 101, "32-bit:  Enter Number Above - Click Enter");
+        SetDlgItemText(hDlg, 102, "64-bit:  Enter Number Above - Click Enter");
         return TRUE;
+        
     case WM_COMMAND:
         switch(LOWORD(wParam))
         {
-        case(IDC_BUTTON1):
-            SetFocus(hDlg);
-            if (merlynIdx == 0)
-                break;
-            if (merlynVals[userIdx] == 0)
-            {
-                SetDlgItemText(hDlg, IDC_BUTTON1, " 0 ");
-                Sleep(150);
-                SetDlgItemText(hDlg, IDC_BUTTON1, "----");
-                Sleep(150);
-                merlyn_Aux(hDlg);
-            }
-            else
-            {
-                sprintf(tmp, "Sorry, you have lost the game of Merlyn!\nYour Score was %d", merlynIdx);
-                MessageBox(hDlg, tmp, "Excalibur", MB_OK);
-                merlynIdx = 0;
-                userIdx = 0;
-            }
-            break;
-        case(IDC_BUTTON2):
-            SetFocus(hDlg);
-            if (merlynIdx == 0)
-                break;
-            if (merlynVals[userIdx] == 1)
-            {
-                SetDlgItemText(hDlg, IDC_BUTTON2, " 1 ");
-                Sleep(150);
-                SetDlgItemText(hDlg, IDC_BUTTON2, "----");
-                Sleep(150);
-                merlyn_Aux(hDlg);
-            }
-            else
-            {
-                sprintf(tmp, "Sorry, you have lost the game of Merlyn!\nYour Score was %d", merlynIdx);
-                MessageBox(hDlg, tmp, "Excalibur", MB_OK);
-                merlynIdx = 0;
-                userIdx = 0;
-            }
-            break;
-        case(IDC_BUTTON3):
-            SetFocus(hDlg);
-            if (merlynIdx == 0)
-                break;
-            if (merlynVals[userIdx] == 2)
-            {
-                SetDlgItemText(hDlg, IDC_BUTTON3, " 2 ");
-                Sleep(150);
-                SetDlgItemText(hDlg, IDC_BUTTON3, "----");
-                Sleep(150);
-                merlyn_Aux(hDlg);
-            }
-            else
-            {
-                sprintf(tmp, "Sorry, you have lost the game of Merlyn!\nYour Score was %d", merlynIdx);
-                MessageBox(hDlg, tmp, "Excalibur", MB_OK);
-                merlynIdx = 0;
-                userIdx = 0;
-            }
-            break;
-        case(IDC_BUTTON4):
-            SetFocus(hDlg);
-            if (merlynIdx == 0)
-                break;
-            if (merlynVals[userIdx] == 3)
-            {
-                SetDlgItemText(hDlg, IDC_BUTTON4, " 3 ");
-                Sleep(150);
-                SetDlgItemText(hDlg, IDC_BUTTON4, "----");
-                Sleep(150);
-                merlyn_Aux(hDlg);
-            }
-            else
-            {
-                sprintf(tmp, "Sorry, you have lost the game of Merlyn!\nYour Score was %d", merlynIdx);
-                MessageBox(hDlg, tmp, "Excalibur", MB_OK);
-                merlynIdx = 0;
-                userIdx = 0;
-            }
-            break;
-        case(IDSTARTGAME):
-            merlynIdx = 0;
-            merlynVals[merlynIdx] = rand() % 4;
-            merlynIdx++;
-            userIdx = 0;
-            for (i = 0; i < merlynIdx; i++)
-            {
-                sprintf(tmp, " %d ", merlynVals[i]);
-                SetDlgItemText(hDlg, IDC_BUTTON1 + merlynVals[i], tmp);
-                Sleep(400);
-                SetDlgItemText(hDlg, IDC_BUTTON1 + merlynVals[i], "----");
-                Sleep(400);
-            }
+        case(105):           /* Enter */
+            GetDlgItemText(hDlg, IDC_EDIT1, tmp, 25);
+            
+            val_float = (float)atof(tmp);
+            val_double = (double)atof(tmp);
+            
+            memcpy(&val32, &val_float, 4);
+            int64_to_binary(val32, tmp2, 32);
+            sprintf(tmp, "32-bit:  0x%08X\n[%s]", (uint32_t)val32, tmp2);
+            SetDlgItemText(hDlg, 101, tmp);
+            
+            memcpy(&val64, &val_double, 8);
+            int64_to_binary(val64, tmp2, 64);
+            sprintf(tmp3, "0x%016I64X", (uint64_t)val64);
+            sprintf(tmp, "64-bit:  %s\n[%s]", tmp3, tmp2);
+            SetDlgItemText(hDlg, 102, tmp);            
             return TRUE;
+
         case(IDOK):           /* OK - Close */
             EndDialog(hDlg, FALSE);
             return TRUE;
@@ -1236,8 +1155,8 @@ BOOL CALLBACK MerlynDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPar
     return FALSE;
 }
 
-void Prog_Merlyn(void)
+void Prog_IEEE(void)
 {
-    DialogBox(hInst, (LPCSTR) "DIALOG_MERLYN", calcMainWindow, MerlynDlgProc);
+    DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_IEEE", calcMainWindow, DlgProcIEEE);
 }
 

@@ -58,7 +58,7 @@ extern void STAT_m(void);
 extern void STAT_xGuess(void);
 extern void STAT_yGuess(void);
 
-struct funcStruct Stat_funcs[MAX_FUNCS] = {
+struct funcStruct Statistics_funcs[MAX_FUNCS] = {
     {FN1,  0, UNI_SUMPLUS,  USES_F, ALLOWREC, ' ',   "SUM+",  YES_L,   X_ENTER, STAT_sumPlus,  T_SUMP,    H_SUMP},
     {FN2,  0, UNI_SUMMINUS, USES_F, ALLOWREC, ' ',   "SUM-",  YES_L,   X_ENTER, STAT_sumMinus, T_SUMM,    H_SUMM},
     {FN3,  0, UNI_SUMCLR,   USES_F, ALLOWREC, ' ',   "SCLR",  YES_L,   X_NULL,  STAT_sumCl,    T_SUMC,    H_SUMC},

@@ -117,133 +117,131 @@ typedef unsigned __int8     uint8_t;
 #define IDC_PUSHBUTTON6     110
 #define IDC_PUSHBUTTON5     109
 
-#define BITMAP_2            2
 #define MAX_FUNCS           40           // The 40th one is for help only
 
-#define FN1      132
-#define FN2      139
-#define FN3      146
-#define FN4      153
-
-#define FN5      133
-#define FN6      140
-#define FN7      147
-#define FN8      154
-
-#define FN9      134
-#define FN10     141
-#define FN11     148
-#define FN12     155
-
-#define FN13     135
-#define FN14     142
-#define FN15     149
-#define FN16     156
-
-#define FN17     136
-#define FN18     143
-#define FN19     150
-#define FN20     157
-
-#define FN21     137
-#define FN22     144
-#define FN23     151
-#define FN24     158
-
-#define FN25     138
-#define FN26     145
-#define FN27     152
-#define FN28     159
-
-#define FN29     160
-#define FN30     163
-#define FN31     166
-#define FN32     169
-
-#define FN33     161
-#define FN34     164
-#define FN35     167
-#define FN36     170
-
-#define FN37     162
-#define FN38     165
-#define FN39     168
-#define FN40     171
-
-
-#define RPN_DIGIT_0        101
-#define RPN_DIGIT_1        RPN_DIGIT_0 + 1
-#define RPN_DIGIT_2        RPN_DIGIT_1 + 1
-#define RPN_DIGIT_3        RPN_DIGIT_2 + 1
-#define RPN_DIGIT_4        RPN_DIGIT_3 + 1
-#define RPN_DIGIT_5        RPN_DIGIT_4 + 1
-#define RPN_DIGIT_6        RPN_DIGIT_5 + 1
-#define RPN_DIGIT_7        RPN_DIGIT_6 + 1
-#define RPN_DIGIT_8        RPN_DIGIT_7 + 1
-#define RPN_DIGIT_9        RPN_DIGIT_8 + 1
-#define RPN_DIGIT_DP       RPN_DIGIT_9 + 1
-#define RPN_CLEAR_X        RPN_DIGIT_DP + 1
-
-#define RPN_DIVIDE         RPN_CLEAR_X   + 1
-#define RPN_MULTIPLY       RPN_DIVIDE    + 1
-#define RPN_SUBTRACT       RPN_MULTIPLY  + 1
-#define RPN_PLUS           RPN_SUBTRACT  + 1
-
-#define RPN_ENTER          RPN_PLUS      + 1
-#define RPN_EXCH_X_Y       RPN_ENTER     + 1
-#define RPN_NEGATE         RPN_EXCH_X_Y  + 1
-#define RPN_E              RPN_NEGATE    + 1
-#define RPN_STO            RPN_E         + 1
-#define RPN_RCL            RPN_STO       + 1
-#define RPN_R_UP           RPN_RCL       + 1
-#define RPN_R_DN           RPN_R_UP      + 1
-#define RPN_LASTX          RPN_R_DN      + 1
-#define RPN_MODE           RPN_LASTX     + 1
-#define RPN_BKSP           RPN_MODE      + 1
-
-#define RPN_SCI            350
-#define RPN_STAT           RPN_SCI       + 1
-#define RPN_BUSI           RPN_STAT      + 1
-#define RPN_CONV           RPN_BUSI      + 1
-#define RPN_GEOM           RPN_CONV      + 1
-#define RPN_PROG           RPN_GEOM      + 1
-#define RPN_MISC           RPN_PROG      + 1
-#define RPN_CUST           RPN_MISC      + 1
-#define RPN_CMPLX          RPN_CUST      + 1
-#define RPN_PHY            RPN_CMPLX     + 1
-#define RPN_MACBANK        RPN_PHY       + 1
-
-#define RPN_CLEAR_ALL      190
-#define RPN_RCLA           192
-#define RPN_HELP           181
-#define RPN_PLAYBACK       182
-
-#define RPN_DROP           191
-#define RPN_LARG           185
-#define RPN_FRAC           186
-
-#define RPN_EDIT           187
-#define RPN_RCLB           188
-#define RPN_STOA           189
-#define RPN_STOB           193
-#define RPN_NOTES          194
-#define RPN_INV            195
-
-#define RPN_LAST_KEY       -1
+#define FN1                 132
+#define FN2                 139
+#define FN3                 146
+#define FN4                 153
+            
+#define FN5                 133
+#define FN6                 140
+#define FN7                 147
+#define FN8                 154
+            
+#define FN9                 134
+#define FN10                141
+#define FN11                148
+#define FN12                155
+            
+#define FN13                135
+#define FN14                142
+#define FN15                149
+#define FN16                156
+            
+#define FN17                136
+#define FN18                143
+#define FN19                150
+#define FN20                157
+            
+#define FN21                137
+#define FN22                144
+#define FN23                151
+#define FN24                158
+            
+#define FN25                138
+#define FN26                145
+#define FN27                152
+#define FN28                159
+            
+#define FN29                160
+#define FN30                163
+#define FN31                166
+#define FN32                169
+            
+#define FN33                161
+#define FN34                164
+#define FN35                167
+#define FN36                170
+            
+#define FN37                162
+#define FN38                165
+#define FN39                168
+#define FN40                171
 
 
-#define RPN_RECORD         400  // Macro record on/off button
-
+#define RPN_DIGIT_0         101
+#define RPN_DIGIT_1         RPN_DIGIT_0 + 1
+#define RPN_DIGIT_2         RPN_DIGIT_1 + 1
+#define RPN_DIGIT_3         RPN_DIGIT_2 + 1
+#define RPN_DIGIT_4         RPN_DIGIT_3 + 1
+#define RPN_DIGIT_5         RPN_DIGIT_4 + 1
+#define RPN_DIGIT_6         RPN_DIGIT_5 + 1
+#define RPN_DIGIT_7         RPN_DIGIT_6 + 1
+#define RPN_DIGIT_8         RPN_DIGIT_7 + 1
+#define RPN_DIGIT_9         RPN_DIGIT_8 + 1
+#define RPN_DIGIT_DP        RPN_DIGIT_9 + 1
+#define RPN_CLEAR_X         RPN_DIGIT_DP + 1
+    
+#define RPN_DIVIDE          RPN_CLEAR_X   + 1
+#define RPN_MULTIPLY        RPN_DIVIDE    + 1
+#define RPN_SUBTRACT        RPN_MULTIPLY  + 1
+#define RPN_PLUS            RPN_SUBTRACT  + 1
+    
+#define RPN_ENTER           RPN_PLUS      + 1
+#define RPN_EXCH_X_Y        RPN_ENTER     + 1
+#define RPN_NEGATE          RPN_EXCH_X_Y  + 1
+#define RPN_E               RPN_NEGATE    + 1
+#define RPN_STO             RPN_E         + 1
+#define RPN_RCL             RPN_STO       + 1
+#define RPN_R_UP            RPN_RCL       + 1
+#define RPN_R_DN            RPN_R_UP      + 1
+#define RPN_LASTX           RPN_R_DN      + 1
+#define RPN_MODE            RPN_LASTX     + 1
+#define RPN_BKSP            RPN_MODE      + 1
+    
+#define RPN_SCI             350
+#define RPN_STAT            RPN_SCI       + 1
+#define RPN_BUSI            RPN_STAT      + 1
+#define RPN_CONV            RPN_BUSI      + 1
+#define RPN_GEOM            RPN_CONV      + 1
+#define RPN_PROG            RPN_GEOM      + 1
+#define RPN_MISC            RPN_PROG      + 1
+#define RPN_CUST            RPN_MISC      + 1
+#define RPN_CMPLX           RPN_CUST      + 1
+#define RPN_PHY             RPN_CMPLX     + 1
+#define RPN_MACBANK         RPN_PHY       + 1
+    
+#define RPN_CLEAR_ALL       190
+#define RPN_RCLA            192
+#define RPN_HELP            181
+#define RPN_PLAYBACK        182
+    
+#define RPN_DROP            191
+#define RPN_LARG            185
+#define RPN_FRAC            186
+    
+#define RPN_EDIT            187
+#define RPN_RCLB            188
+#define RPN_STOA            189
+#define RPN_STOB            193
+#define RPN_NOTES           194
+#define RPN_INV             195
+    
+#define RPN_LAST_KEY        -1
+    
+#define RPN_RECORD          400  // Macro record on/off button
+    
+#define MAX_DIGITS          18
 
 #define X_NEW     01            /* Next keypress pushes stack and starts new edit */
 #define X_EDIT    02            /* Value is under edit */
 #define X_ENTER   03            /* Enter just pressed - next keypress replaces X */
 #define X_NULL    04
 
-#define MAX_IMPORT_CLIPBOARD_SIZE 10000
+#define MAX_IMPORT_CLIPBOARD_SIZE (1024 * 10)
 
 // Defines for menu item IDs
-#define   DIALOG_2                            DIALOG_2
 #define   IDM_OPEN                            101
 #define   IDM_SAVE                            102
 #define   IDM_EXIT                            103
@@ -251,24 +249,23 @@ typedef unsigned __int8     uint8_t;
 #define   IDM_COPYALLTOCLIPBOARD              105
 #define   IDM_SETTINGS                        106
 #define   IDM_DIRECTORIES                     107
-#define   IDM_SCIENTIFICI                     108
-#define   IDM_SCIENTIFICII                    109
-#define   IDM_BUSINESS                        110
-#define   IDM_CONVERSION                      111
-#define   IDM_PROGRAMMING                     112
-#define   IDM_ALWAYSONTOP                     113
-#define   IDM_EXCALIBURHELP                   114
-#define   IDM_ABOUTPROGRAM                    115
-#define   IDM_GEOMETRY                        116
-#define   IDM_MISC                            117
-#define   IDM_COMPLEX                         118
-#define   IDM_STATS                           119
-#define   IDM_USAGESTATS                      120
-#define   IDM_CUSTOM                          121
-#define   IDM_DEFINECUSTOM                    122
-#define   IDM_COPYCLIPBOARDTOX                123
-#define   IDM_PHYSICS                         124
-#define   IDM_MACROBANK                       125
+#define   IDM_SCIENTIFIC                      108
+#define   IDM_FINANCIAL                       109
+#define   IDM_CONVERSION                      110
+#define   IDM_COMPSCI                         111
+#define   IDM_ALWAYSONTOP                     112
+#define   IDM_EXCALIBURHELP                   113
+#define   IDM_ABOUTPROGRAM                    114
+#define   IDM_GEOMETRY                        115
+#define   IDM_MISC                            116
+#define   IDM_COMPLEX                         117
+#define   IDM_STATS                           118
+#define   IDM_USAGESTATS                      119
+#define   IDM_CUSTOM                          120
+#define   IDM_DEFINECUSTOM                    121
+#define   IDM_COPYCLIPBOARDTOX                122
+#define   IDM_PHYSICS                         123
+#define   IDM_MACROBANK                       124
 
 // Function prototypes for dialog and subdialog modules
 
@@ -302,7 +299,7 @@ struct keypadStruct
     char newXedit;              /* The new Xedit */
     void(*routine) (void);
     char keyTitle[26];
-    char keyHelp[200];
+    char keyHelp[128];
 };
 
 
@@ -315,6 +312,7 @@ struct keypadStruct
 #define USES_L  2
 #define USES_FL 3
 
+#define NOTES_SIZE 2048
 
 /* --------------------------- */
 /* Defines for the main dialog */
@@ -329,7 +327,7 @@ struct keypadStruct
 
 #define FUNC_BAR_TEXT_SCI_I    "SCIENTIFIC"
 #define FUNC_BAR_TEXT_CONV     "CONVERSION"
-#define FUNC_BAR_TEXT_BUIS     "BUSINESS"
+#define FUNC_BAR_TEXT_BUIS     "FINANCIAL"
 #define FUNC_BAR_TEXT_COMPSCI  "COMP SCI"
 #define FUNC_BAR_TEXT_GEOM     "GEOMETRY"
 #define FUNC_BAR_TEXT_CUSTOM   "CUSTOM BANK"
@@ -359,24 +357,24 @@ extern double FromRadians(double t);
 extern double ToRadians(double t);
 #endif
 
-#define PROG_LONG        unsigned long  /* We handle signed and other word sizes in ex_prog.c */
-#define PROG_SIGNEDLONG  long   /* Needed when we convert Signed to float... */
+#define PROG_LONG        uint32_t    /* We handle signed and other word sizes in ex_prog.c */
+#define PROG_SIGNEDLONG  int32_t     /* Needed when we convert Signed to float... */
 
-extern struct funcStruct Sci_I_funcs[];
-extern struct funcStruct Business_funcs[];
+extern struct funcStruct Scientific_funcs[];
+extern struct funcStruct Financial_funcs[];
 extern struct funcStruct Conversion_funcs[];
-extern struct funcStruct Programming_funcs[];
+extern struct funcStruct CompSci_funcs[];
 extern struct funcStruct Geometry_funcs[];
 extern struct funcStruct Custom_funcs[];
-extern struct funcStruct Prog2_funcs[];
+extern struct funcStruct Program1_funcs[];
+extern struct funcStruct Program2_funcs[];
 extern struct funcStruct Complex_funcs[];
-extern struct funcStruct Stat_funcs[];
+extern struct funcStruct Statistics_funcs[];
 extern struct funcStruct Physics_funcs[];
-extern struct funcStruct Prog1_funcs[];
-extern struct funcStruct MacroFuncs[];
 extern struct funcStruct Complex_funcs[];
+extern struct funcStruct MacroFuncs[];
 
-extern int Xedit;
+extern uint8_t Xedit;
 extern char Xstr[50];
 extern double X;                /* Main register X */
 extern double Y;                /* Main register Y */
@@ -399,14 +397,14 @@ extern PROG_LONG CL;
 extern PROG_LONG DL;
 extern PROG_LONG LASTXL;
 
-extern unsigned int indirectRegister;
+extern uint32_t indirectRegister;
 
 extern double taxConstant;
-extern int commaMode;
-extern int eexMode;
-extern int numLockMode;
+extern uint8_t commaMode;
+extern uint8_t eexMode;
+extern uint8_t numLockMode;
 
-extern HINSTANCE hInst;
+extern HINSTANCE hExcaliburInstance;
 extern HWND hWndSuperMain;
 extern HWND calcMainWindow;
 
@@ -414,9 +412,8 @@ extern HFONT holdsfont;
 extern HFONT hMainFont;
 extern HFONT hNumberFont;
 extern HFONT hFixedFont;
-extern HINSTANCE hInst;
 
-extern int progMode;
+extern uint8_t progMode;
 #define PROG_NORMAL     0       // For normal floating-point handling
 #define PROG_DEC        10      // Comp-Sci DEC mode
 #define PROG_HEX        16      // Comp-Sci HEX mode
@@ -434,24 +431,27 @@ extern double SUM[SUM_MAX];
 
 #define MAX_CF          100
 extern double cashFlow[MAX_CF];
-extern int CFn;
-extern int hyperbolic;
-extern int binMode;
+extern uint8_t CFn;
+extern uint8_t hyperbolic;
+extern uint8_t binMode;
 
 #define FIN_REG_MAX     9
 extern double fin_reg[FIN_REG_MAX];
-extern int payMode;
-extern int dateMode;
+extern uint8_t payMode;
+extern uint8_t dateMode;
 
 /* Programming mode defines */
-extern int padZeros;
-extern int wordSize;
-extern int wordMode;
-extern PROG_LONG wordSizeMask;
+extern uint8_t padZeros;
+extern uint32_t wordSize;
+extern uint8_t wordMode;
+extern uint32_t wordSizeMask;
+
 #define PROG_UNSIGNED   1
 #define PROG_SIGNED     0
 #define PROG_PADZEROS   1
 #define PROG_NOPADZEROS 0
+
+extern uint8_t numberDisplayMode;
 
 extern int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCmdShow);
 extern void SelectNewFunc(struct funcStruct *funcs);
@@ -497,7 +497,6 @@ extern void RPN_dp(void);
 extern void RPN_Ex(void);
 extern void RPN_digit(WPARAM key);
 extern void RPN_mode(void);
-extern BOOL CALLBACK fnDIALOG_5DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
 extern void RPN_backspace(void);
 extern void RPN_plus(void);
 extern void RPN_multiply(void);
@@ -509,15 +508,12 @@ extern void RPN_rotateStackUp(void);
 extern void RPN_rotateStackDn(void);
 extern void RPN_lastX(void);
 extern void RPN_store(void);
-extern BOOL CALLBACK fnDIALOG_3DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
 extern void RPN_recall(void);
-extern BOOL CALLBACK fnDIALOG_3aDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
 extern int GetMenuType(struct funcStruct *cFunc);
 extern void SetMenuType(int type);
 extern void SaveToDisk(void);
 extern void ReadFromDisk(void);
 extern void GetUserSettings(void);
-extern BOOL CALLBACK fnDIALOG_12DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
 extern void RPN_SelectSci(void);
 extern void RPN_SelectStat(void);
 extern void RPN_SelectBusi(void);
@@ -572,21 +568,19 @@ extern void RPN_inverse(void);
 
 struct customSaveStruct
 {
-    int custom_save_idx;        // CUSTOM_SAVE_xxx defines above
-    int func_idx;               // 0 - 39 inclusive
+    int16_t custom_save_idx;        // CUSTOM_SAVE_xxx defines above
+    int16_t func_idx;               // 0 - 39 inclusive
 };
 extern struct customSaveStruct customSave[MAX_FUNCS];
 
-extern unsigned long stackPushes;
-extern unsigned long stackPops;
-
-extern int numberDisplayMode;
+extern uint32_t stackPushes;
+extern uint32_t stackPops;
 
 #define INTERNATIONAL     0
 #define NONINTERNATIONAL  1
 
-#define M_PI 3.14159265359
-#define CNULL '\0'
+#define M_PI             3.14159265359
+#define CNULL           '\0'
 
 extern int allowDigitBasedOnMaxStringSize(char *Xstr, char digit);
 extern void makeInternational(char *str);
@@ -595,43 +589,40 @@ extern PROG_LONG smallestProgVal(void);
 extern void turnOnNumLock(void);
 
 #define MAX_FUNCTIONS    650
-#define MAX_REC_PLAYBACK 300
-#define MAX_MACROS       200
+#define MAX_REC_PLAYBACK 256
+#define MAX_MACROS       64
 struct playbackStruct
 {
-    int uniqueIndex;
-    char useFloatsLongs;
-    char allowRecord;
-    char saveLastX;             /* Do we save LASTX here? */
-    char newXedit;              /* The new Xedit */
+    int16_t uniqueIndex;
+    uint8_t useFloatsLongs;
+    uint8_t allowRecord;
+    uint8_t saveLastX;             /* Do we save LASTX here? */
+    uint8_t newXedit;              /* The new Xedit */
     void(*routine) (void);
-    char funcText[31];
+    char funcText[30];
 };
 extern struct playbackStruct playBackMap[MAX_FUNCTIONS + 1];
 
 extern char macroName[MAX_MACROS][51];
 extern char macro_short_names[MAX_MACROS][7];
 
-extern short int playBackSave[MAX_MACROS][MAX_REC_PLAYBACK + 1];
-extern short int playBackIdxSave[MAX_MACROS];   // tbd init to zeros...
+extern int16_t playBackSave[MAX_MACROS][MAX_REC_PLAYBACK + 1];
+extern int16_t playBackIdxSave[MAX_MACROS];
+extern int16_t playBack[MAX_REC_PLAYBACK + 1];
+extern int16_t playBackIdx;
+extern uint8_t progModecarry;
+extern uint8_t recModeON;
 
-extern int recModeON;
-
-extern short int playBack[MAX_REC_PLAYBACK + 1];
-extern short int playBackIdx;
-extern int progModecarry;
-
-#define MAX_CONST_BANKS 5
-#define MAX_CONSTS 200
+#define MAX_CONST_BANKS     5
+#define MAX_CONSTS          64
 struct constTableStruct
 {
-    char includeInList;
-    char name[26];
-    char units[11];
-    double value;
+    uint8_t includeInList;
+    char    name[26];
+    char    units[11];
+    double  value;
 };
 
-extern struct constTableStruct constantsUsed[MAX_CONSTS];
 extern struct constTableStruct constants[MAX_CONST_BANKS][MAX_CONSTS];
 
 #define MAX_CURRENCY_CONV 50
@@ -643,39 +634,35 @@ struct CurrencyStruct
 
 extern struct CurrencyStruct CurrencyConv[MAX_CURRENCY_CONV];
 
-extern int currency1index;
-extern int currency2index;
+extern int32_t currency1index;
+extern int32_t currency2index;
 
-extern int stackLevels;
-extern int popFillZero;
-extern int lastChosenConst;
-extern int lastConstBank;
+extern uint8_t extendedStack;
+extern uint8_t popFillZero;
+extern int32_t lastChosenConst;
+extern int32_t lastConstBank;
 extern char constantBankNames[MAX_CONST_BANKS][15];
 
-extern int finStore;
-extern int finRecall;
-extern int convInverse;
-extern int depreciationType;
-
-int PreInit(void);
+extern uint8_t finStore;
+extern uint8_t finRecall;
+extern uint8_t convInverse;
+extern uint8_t depreciationType;
 
 #define MAX_STO 26
 extern double STO[MAX_STO];
 extern char STOlabels[MAX_STO][9];
-extern char tmp[128];
 
-extern int macroPlayback;
-extern short int currentMacroPlaybackIdx;
-extern int totalMappedButtonFuncs;
+extern uint8_t macroPlayback;
+extern int16_t currentMacroPlaybackIdx;
 
 #define MAX_MACRO_STACK 1000
 extern short int MacroStack[MAX_MACRO_STACK];
 extern short int MacroStackIdx;
 extern unsigned int macroFlags;
-extern int traceMacroPlayback;
+extern uint8_t traceMacroPlayback;
+extern uint16_t progDelayValue;
 
 extern void blinkXDisplay(void);
-extern int progDelayValue;
 extern void endRunningMacro(void);
 extern void UpdateDebugRegs(void);
 extern void UpdateDebugProgram(int resetProgramList);
@@ -687,6 +674,7 @@ extern int CreateToolTipWindow(HWND hwnd, HINSTANCE hInstance);
 extern int CreateDebugWindow(HWND hwnd, HINSTANCE hInstance);
 extern void RPN_SingleStep(void);
 extern HWND debugTraceWindow;
+int PreInit(void);
 void RPN_storeReg(int reg);
 void RPN_storeAddReg(int reg);
 void RPN_storeSubReg(int reg);
@@ -1273,7 +1261,7 @@ enum UniqueButtonIndexTag
     UNI_TSTOP,
     UNI_TCLR,
     UNI_ASTRO,
-    UNI_MERLYN,
+    UNI_IEEE,
     UNI_STOXTH,
     UNI_RCLXTH,
     UNI_CPLUS,
@@ -1422,5 +1410,11 @@ enum UniqueButtonIndexTag
 
     UNI_ADD_NEW_HERE
 };
+
+extern struct keypadStruct RPNkeys[];
+extern struct keypadStruct STOkeys[];
+
+extern uint8_t  userTimer;
+extern uint32_t userTicks;
 
 #include "resource.h"

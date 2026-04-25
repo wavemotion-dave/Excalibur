@@ -28,72 +28,6 @@
 // OR OTHER DEALINGS IN THE SOFTWARE.
 // ========================================================================================
 
-/*--------------------------------------------------------------------------
-Module Name: EXCALIBUR.C
-
-Created By:  David Bernazzani
-
-Create Date: 07/01/94
-
-===========================================================================
-                          Revision History
-===========================================================================
-Version    Date     Person                 Description of Change
--------  --------   ------   ----------------------------------------------
-  0.00   07/01/94    DSB     Create Date.
-  0.77   07/18/94    DSB     Added misceleneous menu.
-  0.78   07/19/94    EWJ     Added resistor code conversion.
-  0.80   07/20/94    DSB     Code cleanup, statistics fixes, menu changes.
-  0.82   07/21/94    DSB     Fixed hex/binary mode bugs.  Added BIN hi/lo.
-  0.83   07/26/94    DSB     Added multi-font to the buttons to produce
-                             various symbols, especially for Statistics.
-  0.84   07/27/94    DSB     Added string resources for button titles/help.
-  0.85   07/28/94    DSB     Added global settings screen.
-  0.86   07/28/94    DSB     Added commas as an option.  Fixed QUAD formula.
-  0.87   07/29/94    DSB     Cleaned up financial functions.   Added NPV, IRR
-  0.88   08/02/94    DSB     Added additional calculator settings.
-  0.90
-  0.90b  12/03/94    DSB     Allow expand of window to larger sizes to
-                             handle bigger font sizes in windows.
-  0.90c  03/05/95    DSB     Fixed ascii chart to show system font.
-  0.91   03/12/95    DSB     Added .. for fraction use.  Added true gray
-                             background.  Added display modes to settings menu.
-  0.92   03/14/95    DSB     Added custom button pallette.
-  0.92b  03/21/95    DSB     Fixed 10^X
-  0.93   03/27/95    DSB     Added tooltips popup help for function bar.
-  0.94   04/07/95    DSB     Added tooltips popup help for all keys.
-  0.95   04/20/95    DSB     Enhanced custom bank.
-  0.95g  07/25/96    DSB     Fixed negative exponent processing.
-  0.95h  04/26/97    DSB     Port to 32-bit Visual C++ 5.0.  Fixed time routine.
-  0.95i  04/28/97    DSB     Fixes.
-  0.95j  07/24/97    DSB     Fixes for display in programming mode.  Size fix.
-  0.95k  07/26/97    DSB     Bug fixes.  Business section cleaned up.  Time display fix.
-                      Added new buttons to select key layout.
-  0.96a  07/27/97    DSB     Bug fixes.
-  0.96b  07/28/97    DSB     Bug fixes.
-  0.96c  07/29/97    DSB     Bug fixes.  Added back some complex functions.
-  0.96d  07/30/97    DSB     Bug fixes.  Added rest of complex functions.  Warn cleanups.
-  0.96e  08/01/97    DSB     Bug fixes.  Metric Prefix cleanup.  Configure tool-tips.
-  0.96f  08/03/97    DSB     Increased resolution on interest %.  Added RclA.  Play/Rec.
-  0.96g  08/04/97    DSB     Screen cleanups. New programming layout functions.
-  0.96h  08/05/97    DSB     Infinite "gray" size on main window.  Copy from clipboard.
-  0.96i  08/06/97    DSB     Shortened Edit menu.  Fixed past to Long stack.  Now uses
-                             the Windows default path to store Excal32.dat.
-  0.96k  08/07/97    DSB     EWJ found bugs fixed.  ToRadians and FromRadians cleaned up.
-  0.99a  08/08/97    DSB     Candidate release 1.
-  1.00   02/09/98            Added word size.  Added international/noninternational
-                             comma format.  Added clear all to registers.  Fixed paste to and from Long stack.
-                             Fixed store and recall to LONG stack.  Better help for financial register useage.
-                             Added macro STO/RCL.  User defined macros stored to the custom bank and user
-                             defined constants.  Currency bank added.  Misc business fixes.  Misc word size
-                             fixes.  Double click added back in for most list box windows.
-         03/06/98    DSB     Fixed if main window closed or started up small it would not show(main_x==-1).
-  1.01   04/12/98    DSb     Official 1.01 release.
-  1.05   07/31/98    DSB     Tons of new features and cleanup for 1.05(32-bit only)
-  1.06   01/10/01    DSB     Many minor fixes that were necessary from findings in 1.05.  Some small enhancements.
-  2.00   06/19/06    DSB     Many fixes and improvements. See the help file.
-  2.01   04/17/10    DSB     Homepage change.
---------------------------------------------------------------------------*/
 #include <stdio.h>
 #include <string.h>
 #include <windows.h>
@@ -111,7 +45,7 @@ Version    Date     Person                 Description of Change
 #define WINDOW_TITLE "Excalibur 32-bit"
 
 #define ABOUT_MSG "Excalibur for Windows 32-bit\n"                      \
-                  "Version 2.05  -  April 26, 2026\n\n"                 \
+                  "Version 3.XX-01  -  April 26, 2026\n\n"              \
                   "Copyright 1994-2026 David Bernazzani\n\n"            \
                   "Please read the disclaimer and understand the\n"     \
                   "accuracy and precision issues before using.\n\n"     \
@@ -119,55 +53,62 @@ Version    Date     Person                 Description of Change
                   "if you want to donate to support the effort.\n\n"    \
                   "https://github.com/wavemotion-dave/Excalibur"
 
-#define CONFIG_VERSION          0x0057
-#define DISPLAY_CONFIG_VERSION  0x0003  /* I use this so I can force resize of main window without destroying other settings! */
-
-short int playBackSave[MAX_MACROS][MAX_REC_PLAYBACK + 1];
-short int playBackIdxSave[MAX_MACROS];
+#define CONFIG_VERSION_MAIN     0xF001      // If this changes, we wipe EVERYTHING
+#define CONFIG_VERSION_SUB      0xF001      // If this changes, we reset x,y window position and reset constant tables (currency, physics constants, etc)
 
 #define END_OF_PROGRAM_STR "<End Of Program>"
 
-int     recModeON = 0;
-char    macroName[MAX_MACROS][51];
-char    macro_short_names[MAX_MACROS][7];
-int     macroPlayback = FALSE;      /* TRUE if macro playback in progress */
+int16_t  playBackSave[MAX_MACROS][MAX_REC_PLAYBACK + 1];
+int16_t  playBackIdxSave[MAX_MACROS];
+uint8_t  recModeON = 0;
+uint8_t  macroPlayback = FALSE;      /* TRUE if macro playback in progress */
 
-short int playBack[MAX_REC_PLAYBACK + 1];
-short int playBackIdx = 0;
-short int currentMacroPlaybackIdx = 0;
-int showTrace = FALSE;
-int toolTipCounter = 0;
-int bExactFont = TRUE;
-short int MacroStack[MAX_MACRO_STACK];
-short int MacroStackIdx = 0;
-unsigned int macroFlags = 0x00000000;
+int16_t  playBack[MAX_REC_PLAYBACK + 1];
+int16_t  playBackIdx = 0;
+int16_t  currentMacroPlaybackIdx = 0;
+uint8_t  showTrace = FALSE;
+uint8_t  toolTipCounter = 0;
+uint8_t  bExactFont = TRUE;
+int16_t  MacroStack[MAX_MACRO_STACK];
+int16_t  MacroStackIdx = 0;
+uint32_t macroFlags = 0x00000000;
 
-int wordSize = 32;
-PROG_LONG wordSizeMask = 0xFFFFFFFF;
-int padZeros = PROG_NOPADZEROS;
-int wordMode = PROG_SIGNED;
-int numberDisplayMode = INTERNATIONAL;
+uint32_t wordSize = 32;
+uint32_t wordSizeMask = 0xFFFFFFFF;
+uint8_t  padZeros = PROG_NOPADZEROS;
+uint8_t  wordMode = PROG_SIGNED;
+uint8_t  numberDisplayMode = INTERNATIONAL;
 
-int progDelayValue = 1000;
+uint16_t progDelayValue = 1000;
 
-extern struct keypadStruct RPNkeys[];
-extern struct keypadStruct STOkeys[];
+int16_t  totalMappedButtonFuncs = 0;
+uint32_t lastTickCount = 0;
+uint32_t ticksUsed = 0;
 
-int totalMappedButtonFuncs = 0;
-unsigned int lastTickCount = 0;
-unsigned int ticksUsed = 0;
+uint8_t  ClearStackOnExit = 0;
+uint8_t  RPL_entry = 0;
+uint8_t  progModecarry = 0;
+uint8_t  rightAlignStack = 0;
+uint8_t  showXMinimized = 0;
+uint8_t  traceMacroPlayback = FALSE;
+int32_t  lastChosenMacro = 0;
+uint8_t  showTime24HourFormat = FALSE;
+uint8_t  alwaysOnTop = 0;
 
-int ClearStackOnExit = 0;
-int RPL_entry = 0;
-int progModecarry = 0;
-int lastChosenMacro = 0;
-int rightAlignStack = 0;
-int showXMinimized = 0;
-int lastStoRcl = 0;
-int traceMacroPlayback = FALSE;
+char     macroName[MAX_MACROS][51];
+char     macro_short_names[MAX_MACROS][7];
+char     clipboardBuffer[MAX_IMPORT_CLIPBOARD_SIZE+1];
+char     helpTitle[64];
+char     helpMsg[256];
+char     statusBar[32];
+char     tmpStr[256];
+BYTE     keyState[256];
 
-int showTime24HourFormat = FALSE;
-char tmpBuffer[MAX_IMPORT_CLIPBOARD_SIZE+1];
+// -------------------------------------
+// Buffers for editing the X register
+// -------------------------------------
+uint8_t  Xedit = X_NEW;
+char     Xstr[50];
 
 /* ---------------- */
 /* Global registers */
@@ -194,37 +135,30 @@ PROG_LONG DL;                   /* The extended stack D when in Comp-Sci mode */
 PROG_LONG LASTXL;               /* LAST X when in Comp-Sci mode */
 PROG_LONG LASTYL;               /* LAST Y when in Comp-Sci mode */
 
-unsigned int  indirectRegister = 0;
-unsigned long stackPushes = 0L;
-unsigned long stackPops = 0L;
-unsigned long inFocusTime = 0L;
+// Some statistics registers
+uint32_t stackPushes = 0;           // Total number of Stack Pushes
+uint32_t stackPops = 0;             // Total number of Stack Pops
+uint32_t inFocusTime = 0;           // Number of minutes Excalibur window in 'focus'
 
-int AngleMode = 0;              /* 0=Degrees, 1=Radians, 2=Gradients */
-int numLock = 1;
-int commaMode = 1;
-int eexMode = 1;
-int numLockMode = 1;
-int toolTipsOn = 1;
-int footPrint = 0;
-int footPrintChanged = FALSE;
-int stackLevels = 4;
-int popFillZero = 0;
-int lastChosenConst = 0;
-int lastConstBank = 0;
+uint8_t  AngleMode = 0;             // 0=Degrees, 1=Radians, 2=Gradients
+uint8_t  commaMode = 1;             // 0=International, 1=American
+uint8_t  eexMode = 1;               // 0=EEX, 1=E
+uint8_t  numLockMode = 1;           // Turn on NumLock when program starts?
+uint8_t  toolTipsOn = 1;            // Enable tooltips?
+uint8_t  extendedStack = 0;         // Standard Stack is 4 deep. Extended is 8 deep.
+uint8_t  popFillZero = 0;           // T register fills with zero?
+int32_t  lastChosenConst = 0;       // Last chosen constant 
+int32_t  lastConstBank = 0;         // Last chosen constant bank
+int32_t  decimal_places = 12;       // Default decimal places
+uint8_t  sci_format = 'g';          // Default scientific display format
+uint32_t indirectRegister = 0;      // For programming - (i) register
+uint8_t  progMode = PROG_NORMAL;    // Normal floating-point mode
+uint8_t  helpMode = 0;              // Used to determine if next key or button hit is for help
 
-char helpTitle[55];
-char helpMsg[250];
-
-int decimal_places = 12;
-char sci_format = 'g';
-#define MAX_DIGITS 18
-
-double STO[MAX_STO];            // STOrage registers R0-R25
-char STOlabels[MAX_STO][9];     // Labels associated with the R0-R25 registers
-
-double SUM[SUM_MAX];            // Statistics registers for the Business bank
-
-char excaliburNotes[1024];      // A small scratchpad for the user
+double STO[MAX_STO];                // Storage registers R0-R25
+char STOlabels[MAX_STO][9];         // Labels associated with the R0-R25 registers
+double SUM[SUM_MAX];                // Statistics registers for the Financial bank
+char excaliburNotes[NOTES_SIZE];    // A small scratchpad for the user to jot down some info
 
 struct playbackStruct playBackMap[MAX_FUNCTIONS + 1];
 
@@ -245,19 +179,10 @@ extern void callButtonFunc(void(*routine) (void), char useFloatsLongs,
 extern void mapButtonFuncs(void);
 void DoMacroSaveRecall(void);
 
-char statusBar[60];
-int alwaysOnTop = 0;
-char tmp[128];
+struct funcStruct *currentFuncs = (struct funcStruct *) &Scientific_funcs;
+struct funcStruct *lastFuncs = (struct funcStruct *) &Scientific_funcs;
 
-struct funcStruct *currentFuncs = (struct funcStruct *) &Sci_I_funcs;
-struct funcStruct *lastFuncs = (struct funcStruct *) &Sci_I_funcs;
-
-int progMode = PROG_NORMAL;
-
-int helpMode = 0;               // Used to determine if next key or button
-                                // hit is for help
-extern int userTimer;
-extern DWORD userTicks;
+uint32_t halfSecTimer = 0;
 
 #define MIN_WINDOW_WIDTH    5
 #define MIN_WINDOW_HEIGHT   5
@@ -267,25 +192,24 @@ extern DWORD userTicks;
 #define MIN_WINDOW_Y        0
 
 // This will force a "default" size...
-int main_x = -1;
-int main_y = 50;
-int main_cx = 100;
-int main_cy = 100;
+int32_t main_x  = -1;
+int32_t main_y  = 50;
+int32_t main_cx = 100;
+int32_t main_cy = 100;
 
-int macroMode = 1;              // Macro Mode on
-HWND toolTipWnd;                // window handle from CreateWindow
+HWND        toolTipWnd;             // window handle from CreateWindow
+HFONT       holdsfont;              // handle of original font
+HFONT       hMainFont;              // handle of new font for most of the UI
+HFONT       hNumberFont;            // handle of new font for the Stack Display (bigger, bolder)
+HFONT       hFixedFont;             // handle of the new font for dialogs that need fixed pitch
+DLGPROC     lpfnMainWndProc;        // Main window procedure/handler
+HINSTANCE   hExcaliburInstance;     // The global instance of Excalibur (assigned by the OS)
+HWND        calcMainWindow;         // A handle to the Main Window
+HMENU       hMainMenu;              // A handle to the Main Menu 
 
-DWORD halfSecTimer = 0;
-
-HFONT holdsfont;                // handle of original font
-HFONT hMainFont;                // handle of new font for most of the UI
-HFONT hNumberFont;              // handle of new font for the Stack Display (bigger, bolder)
-HFONT hFixedFont;               // handle of the new font for dialogs that need fixed pitch
-DLGPROC lpfnMainWndProc;
-
-HINSTANCE hInst;
-HWND calcMainWindow;
-HMENU hMenu;
+//Brushes that we need for this application.
+static HBRUSH backgroundBrush;
+static HBRUSH helpWindowBackgroundBrush;
 
 extern void PROG_dec(void);
 extern void cust_define(void);
@@ -302,22 +226,15 @@ typedef void(*fptr) (int);
 typedef void(*fptr) ();
 #endif
 
-//Brushes that we need for this application.
-static HBRUSH hBrushG;
-static HBRUSH hBrushW;
-static HBRUSH backgroundBrush;
-static HBRUSH helpWindowBackgroundBrush;
-
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow)
 {
     static char szAppName[] = "EXCALIBUR";
-    HWND hwnd;
     MSG msg;
     WNDCLASSEX wndclass;
     int i;
     HMENU hMenu2;
 
-    hInst = hInstance;          //tbd what to do about this?!?
+    hExcaliburInstance = hInstance;  // Set the global handle - we use this in a number of places
 
     wndclass.cbSize = sizeof(wndclass);
     wndclass.hIconSm = LoadIcon(hInstance, szAppName);
@@ -337,87 +254,80 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
     PreInit();
 
-    ReadFromDisk();            // tbd - we repeat this later!
-    if (footPrint == 1)         // Small Footprint
-        hwnd = CreateDialog(hInstance, "EXCALIBUR_SMALL", 0, NULL);
-    else if (footPrint == 2)    // Tiny Footprint
-        hwnd = CreateDialog(hInstance, "EXCALIBUR_TINY", 0, NULL);
-    else if (footPrint == 3)    // X-Only Footprint
-        hwnd = CreateDialog(hInstance, "EXCALIBUR_XONLY", 0, NULL);
-    else if (footPrint == 4)    // No Funcs Footprint
-        hwnd = CreateDialog(hInstance, "EXCALIBUR_NOFUNCS", 0, NULL);
-    else                        // Classic style
-        hwnd = CreateDialog(hInstance, "EXCALIBUR", 0, NULL);
+    // This is the main Excalibur dialog window!
+    calcMainWindow = CreateDialog(hInstance, "EXCALIBUR", 0, NULL);
 
-    hMenu = GetMenu(hwnd);
-    calcMainWindow = hwnd;
+    hMainMenu = GetMenu(calcMainWindow);
 
-    ShowWindow(hwnd, SW_HIDE);
+    ShowWindow(calcMainWindow, SW_HIDE);
 
-    SetTimer(hwnd, 1, 60000, NULL);
-    SetTimer(hwnd, 2, 300, NULL);
-    SetTimer(hwnd, 3, 50, NULL);
-    SetTimer(hwnd, 4, 100, NULL);
+    SetTimer(calcMainWindow, 1, 60000, NULL);
+    SetTimer(calcMainWindow, 2, 300, NULL);
+    SetTimer(calcMainWindow, 3, 50, NULL);
+    SetTimer(calcMainWindow, 4, 100, NULL);
     srand((unsigned) time(NULL));
 
-    hMenu2 = GetSystemMenu(hwnd, FALSE);
+    hMenu2 = GetSystemMenu(calcMainWindow, FALSE);
     AppendMenu(hMenu2, MF_SEPARATOR, 0, NULL);
     AppendMenu(hMenu2, MF_STRING, IDM_SETTINGS, "Excalibur Settings...");
 
-    SendMessage(GetDlgItem(hwnd, 128), WM_SETFONT, (WPARAM) hNumberFont, FALSE);
-    SendMessage(GetDlgItem(hwnd, 129), WM_SETFONT, (WPARAM) hNumberFont, FALSE);
-    SendMessage(GetDlgItem(hwnd, 130), WM_SETFONT, (WPARAM) hNumberFont, FALSE);
-    SendMessage(GetDlgItem(hwnd, 131), WM_SETFONT, (WPARAM) hNumberFont, FALSE);
+    SendMessage(GetDlgItem(calcMainWindow, 128), WM_SETFONT, (WPARAM) hNumberFont, FALSE);
+    SendMessage(GetDlgItem(calcMainWindow, 129), WM_SETFONT, (WPARAM) hNumberFont, FALSE);
+    SendMessage(GetDlgItem(calcMainWindow, 130), WM_SETFONT, (WPARAM) hNumberFont, FALSE);
+    SendMessage(GetDlgItem(calcMainWindow, 131), WM_SETFONT, (WPARAM) hNumberFont, FALSE);
 
-    SendMessage(GetDlgItem(hwnd, 177), WM_SETFONT, (WPARAM) hMainFont, FALSE);
-    SendMessage(GetDlgItem(hwnd, 178), WM_SETFONT, (WPARAM) hMainFont, FALSE);
-    SendMessage(GetDlgItem(hwnd, 179), WM_SETFONT, (WPARAM) hMainFont, FALSE);
-    SendMessage(GetDlgItem(hwnd, 180), WM_SETFONT, (WPARAM) hMainFont, FALSE);
-    SendMessage(GetDlgItem(hwnd, 181), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, fix
-    SendMessage(GetDlgItem(hwnd, 182), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of buttons
-    SendMessage(GetDlgItem(hwnd, 190), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
+    SendMessage(GetDlgItem(calcMainWindow, 177), WM_SETFONT, (WPARAM) hMainFont, FALSE);
+    SendMessage(GetDlgItem(calcMainWindow, 178), WM_SETFONT, (WPARAM) hMainFont, FALSE);
+    SendMessage(GetDlgItem(calcMainWindow, 179), WM_SETFONT, (WPARAM) hMainFont, FALSE);
+    SendMessage(GetDlgItem(calcMainWindow, 180), WM_SETFONT, (WPARAM) hMainFont, FALSE);
+    SendMessage(GetDlgItem(calcMainWindow, 181), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, fix
+    SendMessage(GetDlgItem(calcMainWindow, 182), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of buttons
+    SendMessage(GetDlgItem(calcMainWindow, 190), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
 
-    SendMessage(GetDlgItem(hwnd, 191), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
-    SendMessage(GetDlgItem(hwnd, 185), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
-    SendMessage(GetDlgItem(hwnd, 186), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
-    SendMessage(GetDlgItem(hwnd, 187), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
-    SendMessage(GetDlgItem(hwnd, 188), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
-    SendMessage(GetDlgItem(hwnd, 189), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
-    SendMessage(GetDlgItem(hwnd, 193), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
-    SendMessage(GetDlgItem(hwnd, 194), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
-    SendMessage(GetDlgItem(hwnd, 195), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
+    SendMessage(GetDlgItem(calcMainWindow, 191), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
+    SendMessage(GetDlgItem(calcMainWindow, 185), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
+    SendMessage(GetDlgItem(calcMainWindow, 186), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
+    SendMessage(GetDlgItem(calcMainWindow, 187), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
+    SendMessage(GetDlgItem(calcMainWindow, 188), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
+    SendMessage(GetDlgItem(calcMainWindow, 189), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
+    SendMessage(GetDlgItem(calcMainWindow, 193), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
+    SendMessage(GetDlgItem(calcMainWindow, 194), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
+    SendMessage(GetDlgItem(calcMainWindow, 195), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
 
-    SendMessage(GetDlgItem(hwnd, 400), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
-    SendMessage(GetDlgItem(hwnd, 192), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
-    SendMessage(GetDlgItem(hwnd, 350), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
-    SendMessage(GetDlgItem(hwnd, 351), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
-    SendMessage(GetDlgItem(hwnd, 352), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
-    SendMessage(GetDlgItem(hwnd, 353), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
-    SendMessage(GetDlgItem(hwnd, 354), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
-    SendMessage(GetDlgItem(hwnd, 355), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
-    SendMessage(GetDlgItem(hwnd, 356), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
-    SendMessage(GetDlgItem(hwnd, 357), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
-    SendMessage(GetDlgItem(hwnd, 358), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
-    SendMessage(GetDlgItem(hwnd, 359), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
-    SendMessage(GetDlgItem(hwnd, 360), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of buttons
+    SendMessage(GetDlgItem(calcMainWindow, 400), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
+    SendMessage(GetDlgItem(calcMainWindow, 192), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
+    SendMessage(GetDlgItem(calcMainWindow, 350), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
+    SendMessage(GetDlgItem(calcMainWindow, 351), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
+    SendMessage(GetDlgItem(calcMainWindow, 352), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
+    SendMessage(GetDlgItem(calcMainWindow, 353), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
+    SendMessage(GetDlgItem(calcMainWindow, 354), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
+    SendMessage(GetDlgItem(calcMainWindow, 355), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
+    SendMessage(GetDlgItem(calcMainWindow, 356), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
+    SendMessage(GetDlgItem(calcMainWindow, 357), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
+    SendMessage(GetDlgItem(calcMainWindow, 358), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
+    SendMessage(GetDlgItem(calcMainWindow, 359), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
+    SendMessage(GetDlgItem(calcMainWindow, 360), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of buttons
 
-    SendMessage(GetDlgItem(hwnd, STATUS_BAR),   WM_SETFONT, (WPARAM) hMainFont, FALSE);
-    SendMessage(GetDlgItem(hwnd, REC_BAR),      WM_SETFONT, (WPARAM) hMainFont, FALSE);
-    SendMessage(GetDlgItem(hwnd, SPARE_BAR),    WM_SETFONT, (WPARAM) hMainFont, FALSE);
-    SendMessage(GetDlgItem(hwnd, FUNC_BAR),     WM_SETFONT, (WPARAM) hMainFont, FALSE);
-    SendMessage(GetDlgItem(hwnd, TIME_BAR),     WM_SETFONT, (WPARAM) hMainFont, FALSE);
-    SendMessage(GetDlgItem(hwnd, ANGLE_BAR),    WM_SETFONT, (WPARAM) hMainFont, FALSE);
-    SendMessage(GetDlgItem(hwnd, PROG_BAR),     WM_SETFONT, (WPARAM) hMainFont, FALSE);
+    SendMessage(GetDlgItem(calcMainWindow, STATUS_BAR),   WM_SETFONT, (WPARAM) hMainFont, FALSE);
+    SendMessage(GetDlgItem(calcMainWindow, REC_BAR),      WM_SETFONT, (WPARAM) hMainFont, FALSE);
+    SendMessage(GetDlgItem(calcMainWindow, SPARE_BAR),    WM_SETFONT, (WPARAM) hMainFont, FALSE);
+    SendMessage(GetDlgItem(calcMainWindow, FUNC_BAR),     WM_SETFONT, (WPARAM) hMainFont, FALSE);
+    SendMessage(GetDlgItem(calcMainWindow, TIME_BAR),     WM_SETFONT, (WPARAM) hMainFont, FALSE);
+    SendMessage(GetDlgItem(calcMainWindow, ANGLE_BAR),    WM_SETFONT, (WPARAM) hMainFont, FALSE);
+    SendMessage(GetDlgItem(calcMainWindow, PROG_BAR),     WM_SETFONT, (WPARAM) hMainFont, FALSE);
     for (i = 132; i <= 171; i++)
-        SendMessage(GetDlgItem(hwnd, i), WM_SETFONT, (WPARAM) hMainFont, FALSE);
+        SendMessage(GetDlgItem(calcMainWindow, i), WM_SETFONT, (WPARAM) hMainFont, FALSE);
     for (i = 101; i <= 127; i++)
-        SendMessage(GetDlgItem(hwnd, i), WM_SETFONT, (WPARAM) hMainFont, FALSE);
-    calcMainWindow = hwnd;
+        SendMessage(GetDlgItem(calcMainWindow, i), WM_SETFONT, (WPARAM) hMainFont, FALSE);
+    
     Init();
-    ShowWindow(hwnd, iCmdShow);        // Now show the window the way it was asked to be displayed...
-    CreateToolTipWindow(hwnd, hInstance);
-    CreateDebugWindow(hwnd, hInstance);
+    ShowWindow(calcMainWindow, iCmdShow);        // Now show the window the way it was asked to be displayed...
+    CreateToolTipWindow(calcMainWindow, hInstance);
+    CreateDebugWindow(calcMainWindow, hInstance);
 
+    // -------------------------------------------------------------------------------
+    // This is our main loop that runs forever... processing and dispatching messages
+    // -------------------------------------------------------------------------------
     while (GetMessage(&msg, NULL, 0, 0))
     {
         TranslateMessage(&msg);
@@ -428,24 +338,24 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
 int CreateToolTipWindow(HWND hwnd, HINSTANCE hInstance)
 {
-    static TCHAR toolTipWndName[] = TEXT("ToolTipWindow") ;
-    WNDCLASS     wndclass ;
+    static TCHAR toolTipWndName[] = TEXT("ToolTipWindow");
+    WNDCLASS     wndclass;
 
-     wndclass.style         = CS_HREDRAW | CS_VREDRAW ;
-     wndclass.lpfnWndProc   = helpWndProc ;
-     wndclass.cbClsExtra    = 0 ;
-     wndclass.cbWndExtra    = 0 ;
-     wndclass.hInstance     = hInstance ;
-     wndclass.hIcon         = LoadIcon(NULL, IDI_APPLICATION) ;
-     wndclass.hCursor       = LoadCursor(NULL, IDC_ARROW) ;
+     wndclass.style         = CS_HREDRAW | CS_VREDRAW;
+     wndclass.lpfnWndProc   = helpWndProc;
+     wndclass.cbClsExtra    = 0;
+     wndclass.cbWndExtra    = 0;
+     wndclass.hInstance     = hInstance;
+     wndclass.hIcon         = LoadIcon(NULL, IDI_APPLICATION);
+     wndclass.hCursor       = LoadCursor(NULL, IDC_ARROW);
      wndclass.hbrBackground = (HBRUSH) helpWindowBackgroundBrush;
-     wndclass.lpszMenuName  = NULL ;
-     wndclass.lpszClassName = toolTipWndName ;
+     wndclass.lpszMenuName  = NULL;
+     wndclass.lpszClassName = toolTipWndName;
 
      if (!RegisterClass(&wndclass))
      {
-          MessageBox(NULL, TEXT("This program requires a version of Windows\nthat supports Win32 (Generally Win95 and beyond)"), toolTipWndName, MB_ICONERROR) ;
-          return 0 ;
+          MessageBox(NULL, TEXT("Unable to register the Excalibur Class with Windows.\nThis is a fatal error and the program will now exit."), toolTipWndName, MB_ICONERROR);
+          return 0;
      }
 
      toolTipWnd = CreateWindow(toolTipWndName,        // window class name
@@ -458,12 +368,12 @@ int CreateToolTipWindow(HWND hwnd, HINSTANCE hInstance)
                           hwnd,                       // parent window handle
                           NULL,                       // window menu handle
                           hInstance,                  // program instance handle
-                          NULL) ;                     // creation parameters
+                          NULL);                      // creation parameters
 
 
-     ShowWindow(toolTipWnd, SW_HIDE) ;
+     ShowWindow(toolTipWnd, SW_HIDE);
      toolTipCounter = 0;
-     UpdateWindow(toolTipWnd) ;
+     UpdateWindow(toolTipWnd);
 
     return 0;
 }
@@ -483,19 +393,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
     PAINTSTRUCT ps;
     int i;
     UINT flags;
-    char tmpBuff[12];
 
     switch(iMsg)
     {
     case WM_CREATE:
-        hBrushG = CreateSolidBrush(RGB(192, 192, 192));
-        hBrushW = CreateSolidBrush(RGB(255, 255, 255));
         backgroundBrush = CreateSolidBrush(GetSysColor(COLOR_WINDOW));
         helpWindowBackgroundBrush = CreateSolidBrush(GetSysColor(COLOR_INFOBK));
         SetUpFonts(hwnd);
         return 0;
 
-        // We place Settings on the system command box!
+    // We place Settings on the system command box!
     case WM_SYSCOMMAND:
         switch(LOWORD(wParam))
         {
@@ -573,17 +480,17 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
                     ClipboardCopySelection(hwnd, 3);
                 }
                 break;
-            case IDM_SCIENTIFICI:
-                SelectNewFunc((struct funcStruct *) &Sci_I_funcs);
+            case IDM_SCIENTIFIC:
+                SelectNewFunc((struct funcStruct *) &Scientific_funcs);
                 break;
-            case IDM_BUSINESS:
-                SelectNewFunc((struct funcStruct *) &Business_funcs);
+            case IDM_FINANCIAL:
+                SelectNewFunc((struct funcStruct *) &Financial_funcs);
                 break;
             case IDM_CONVERSION:
                 SelectNewFunc((struct funcStruct *) &Conversion_funcs);
                 break;
-            case IDM_PROGRAMMING:
-                SelectNewFunc((struct funcStruct *) &Programming_funcs);
+            case IDM_COMPSCI:
+                SelectNewFunc((struct funcStruct *) &CompSci_funcs);
                 break;
             case IDM_GEOMETRY:
                 SelectNewFunc((struct funcStruct *) &Geometry_funcs);
@@ -595,16 +502,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
                 SelectNewFunc((struct funcStruct *) &Complex_funcs);
                 break;
             case IDM_STATS:
-                SelectNewFunc((struct funcStruct *) &Stat_funcs);
+                SelectNewFunc((struct funcStruct *) &Statistics_funcs);
                 break;
             case IDM_PHYSICS:
                 SelectNewFunc((struct funcStruct *) &Physics_funcs);
                 break;
             case IDM_MACROBANK:
-                SelectNewFunc((struct funcStruct *) &Prog1_funcs);
+                SelectNewFunc((struct funcStruct *) &Program1_funcs);
                 break;
             case IDM_MISC:
-                SelectNewFunc((struct funcStruct *) &Prog2_funcs);
+                SelectNewFunc((struct funcStruct *) &Program2_funcs);
                 break;
             case IDM_DEFINECUSTOM:
                 cust_define();
@@ -618,12 +525,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
                         flags = SWP_SHOWWINDOW | SWP_NOSIZE;
                     if (alwaysOnTop)
                     {
-                        CheckMenuItem(hMenu, IDM_ALWAYSONTOP, MF_CHECKED);
+                        CheckMenuItem(hMainMenu, IDM_ALWAYSONTOP, MF_CHECKED);
                         SetWindowPos(calcMainWindow, HWND_TOPMOST, main_x, main_y, main_cx, main_cy, flags);
                     }
                     else
                     {
-                        CheckMenuItem(hMenu, IDM_ALWAYSONTOP, MF_UNCHECKED);
+                        CheckMenuItem(hMainMenu, IDM_ALWAYSONTOP, MF_UNCHECKED);
                         SetWindowPos(calcMainWindow, HWND_NOTOPMOST, main_x, main_y, main_cx, main_cy, flags);
                     }
                 }
@@ -706,6 +613,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
             lastTickCount += ticksUsed;
             if (userTimer == 1)
             {
+                char tmpBuff[16];
                 userTicks += ticksUsed;
                 sprintf(tmpBuff, "%03d:%02d.%1d", (userTicks / 60000),
                          (userTicks / 1000) % 60, (userTicks / 100) % 10);
@@ -780,7 +688,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
         switch((int) wParam)
         {
         case(VK_NUMLOCK):
-            numLock ^= 1;
             ShowStatus();
             break;
 
@@ -995,8 +902,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
         {
             if (wParam == SIZE_MINIMIZED)
             {
-                GetDlgItemText(calcMainWindow, 131, tmp, 24);
-                SetWindowText(calcMainWindow, tmp);
+                GetDlgItemText(calcMainWindow, 131, tmpStr, 24);
+                SetWindowText(calcMainWindow, tmpStr);
             }
             else
             {
@@ -1033,8 +940,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
         DeleteObject(hMainFont);
         DeleteObject(hNumberFont);
         DeleteObject(hFixedFont);
-        DeleteObject(hBrushG);
-        DeleteObject(hBrushW);
         DeleteObject(backgroundBrush);
         DestroyWindow(toolTipWnd);
         DestroyWindow(debugTraceWindow);
@@ -1050,9 +955,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 
 void SelectNewFunc(struct funcStruct *funcs)
 {
-    if (currentFuncs == (struct funcStruct *) &Programming_funcs || progMode != PROG_NORMAL)
+    if (currentFuncs == (struct funcStruct *) &CompSci_funcs || progMode != PROG_NORMAL)
     {
-        if ( (funcs != (struct funcStruct *) &Prog1_funcs) && (funcs != (struct funcStruct *) &Prog2_funcs) )
+        if ( (funcs != (struct funcStruct *) &Program1_funcs) && (funcs != (struct funcStruct *) &Program2_funcs) )
         {
             LongsToFloats();
             progMode = PROG_NORMAL;
@@ -1060,17 +965,17 @@ void SelectNewFunc(struct funcStruct *funcs)
             ShowStatus();
         }
     }
-    CheckMenuItem(hMenu, IDM_SCIENTIFICI, MF_UNCHECKED);
-    CheckMenuItem(hMenu, IDM_PROGRAMMING, MF_UNCHECKED);
-    CheckMenuItem(hMenu, IDM_BUSINESS, MF_UNCHECKED);
-    CheckMenuItem(hMenu, IDM_CONVERSION, MF_UNCHECKED);
-    CheckMenuItem(hMenu, IDM_MISC, MF_UNCHECKED);
-    CheckMenuItem(hMenu, IDM_COMPLEX, MF_UNCHECKED);
-    CheckMenuItem(hMenu, IDM_GEOMETRY, MF_UNCHECKED);
-    CheckMenuItem(hMenu, IDM_CUSTOM, MF_UNCHECKED);
-    CheckMenuItem(hMenu, IDM_STATS, MF_UNCHECKED);
-    CheckMenuItem(hMenu, IDM_PHYSICS, MF_UNCHECKED);
-    CheckMenuItem(hMenu, IDM_MACROBANK, MF_UNCHECKED);
+    CheckMenuItem(hMainMenu, IDM_SCIENTIFIC, MF_UNCHECKED);
+    CheckMenuItem(hMainMenu, IDM_COMPSCI, MF_UNCHECKED);
+    CheckMenuItem(hMainMenu, IDM_FINANCIAL, MF_UNCHECKED);
+    CheckMenuItem(hMainMenu, IDM_CONVERSION, MF_UNCHECKED);
+    CheckMenuItem(hMainMenu, IDM_MISC, MF_UNCHECKED);
+    CheckMenuItem(hMainMenu, IDM_COMPLEX, MF_UNCHECKED);
+    CheckMenuItem(hMainMenu, IDM_GEOMETRY, MF_UNCHECKED);
+    CheckMenuItem(hMainMenu, IDM_CUSTOM, MF_UNCHECKED);
+    CheckMenuItem(hMainMenu, IDM_STATS, MF_UNCHECKED);
+    CheckMenuItem(hMainMenu, IDM_PHYSICS, MF_UNCHECKED);
+    CheckMenuItem(hMainMenu, IDM_MACROBANK, MF_UNCHECKED);
 
     SendMessage(GetDlgItem(calcMainWindow, 350), BM_SETCHECK, (WORD) 0, (DWORD) 0L);
     SendMessage(GetDlgItem(calcMainWindow, 351), BM_SETCHECK, (WORD) 0, (DWORD) 0L);
@@ -1084,15 +989,15 @@ void SelectNewFunc(struct funcStruct *funcs)
     SendMessage(GetDlgItem(calcMainWindow, 359), BM_SETCHECK, (WORD) 0, (DWORD) 0L);
     SendMessage(GetDlgItem(calcMainWindow, 360), BM_SETCHECK, (WORD) 0, (DWORD) 0L);
 
-    if (funcs == (struct funcStruct *) &Sci_I_funcs)
+    if (funcs == (struct funcStruct *) &Scientific_funcs)
     {
-        CheckMenuItem(hMenu, IDM_SCIENTIFICI, MF_CHECKED);
+        CheckMenuItem(hMainMenu, IDM_SCIENTIFIC, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, 350), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_SCI_I);
     }
-    if (funcs == (struct funcStruct *) &Programming_funcs)
+    if (funcs == (struct funcStruct *) &CompSci_funcs)
     {
-        CheckMenuItem(hMenu, IDM_PROGRAMMING, MF_CHECKED);
+        CheckMenuItem(hMainMenu, IDM_COMPSCI, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, 355), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_COMPSCI);
         FloatsToLongs();
@@ -1100,57 +1005,57 @@ void SelectNewFunc(struct funcStruct *funcs)
         ShowStack();
         ShowStatus();
     }
-    if (funcs == (struct funcStruct *) &Business_funcs)
+    if (funcs == (struct funcStruct *) &Financial_funcs)
     {
-        CheckMenuItem(hMenu, IDM_BUSINESS, MF_CHECKED);
+        CheckMenuItem(hMainMenu, IDM_FINANCIAL, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, 352), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_BUIS);
     }
     if (funcs == (struct funcStruct *) &Conversion_funcs)
     {
-        CheckMenuItem(hMenu, IDM_CONVERSION, MF_CHECKED);
+        CheckMenuItem(hMainMenu, IDM_CONVERSION, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, 353), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_CONV);
     }
     if (funcs == (struct funcStruct *) &Geometry_funcs)
     {
-        CheckMenuItem(hMenu, IDM_GEOMETRY, MF_CHECKED);
+        CheckMenuItem(hMainMenu, IDM_GEOMETRY, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, 354), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_GEOM);
     }
     if (funcs == (struct funcStruct *) &Custom_funcs)
     {
-        CheckMenuItem(hMenu, IDM_CUSTOM, MF_CHECKED);
+        CheckMenuItem(hMainMenu, IDM_CUSTOM, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, 357), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_CUSTOM);
     }
     if (funcs == (struct funcStruct *) &Complex_funcs)
     {
-        CheckMenuItem(hMenu, IDM_COMPLEX, MF_CHECKED);
+        CheckMenuItem(hMainMenu, IDM_COMPLEX, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, 358), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_COMPLEX);
     }
-    if (funcs == (struct funcStruct *) &Stat_funcs)
+    if (funcs == (struct funcStruct *) &Statistics_funcs)
     {
-        CheckMenuItem(hMenu, IDM_STATS, MF_CHECKED);
+        CheckMenuItem(hMainMenu, IDM_STATS, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, 351), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_STATS);
     }
     if (funcs == (struct funcStruct *) &Physics_funcs)
     {
-        CheckMenuItem(hMenu, IDM_PHYSICS, MF_CHECKED);
+        CheckMenuItem(hMainMenu, IDM_PHYSICS, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, 359), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_PHYSICS);
     }
-    if (funcs == (struct funcStruct *) &Prog1_funcs)
+    if (funcs == (struct funcStruct *) &Program1_funcs)
     {
-        CheckMenuItem(hMenu, IDM_MACROBANK, MF_CHECKED);
+        CheckMenuItem(hMainMenu, IDM_MACROBANK, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, 360), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_PROG1);
     }
-    if (funcs == (struct funcStruct *) &Prog2_funcs)
+    if (funcs == (struct funcStruct *) &Program2_funcs)
     {
-        CheckMenuItem(hMenu, IDM_MISC, MF_CHECKED);
+        CheckMenuItem(hMainMenu, IDM_MISC, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, 356), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_PROG2);
     }
@@ -1162,29 +1067,29 @@ void SelectNewFunc(struct funcStruct *funcs)
 
 LRESULT CALLBACK helpWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-     HDC         hdc ;
-     PAINTSTRUCT ps ;
-     RECT        rect ;
+     HDC         hdc;
+     PAINTSTRUCT ps;
+     RECT        rect;
 
      switch(message)
      {
      case WM_CREATE:
-          return 0 ;
+          return 0;
 
      case WM_PAINT:
-        hdc = BeginPaint(hwnd, &ps) ;
-        GetClientRect(hwnd, &rect) ;
+        hdc = BeginPaint(hwnd, &ps);
+        GetClientRect(hwnd, &rect);
         SelectObject(hdc, GetStockObject(ANSI_VAR_FONT));
         SetBkColor((HDC) hdc, GetSysColor(COLOR_INFOBK));
         SetTextColor((HDC) hdc, GetSysColor(COLOR_INFOTEXT));
-        DrawText(hdc, TEXT(helpTitle), -1, &rect, DT_SINGLELINE | DT_CENTER | DT_VCENTER) ;
-        EndPaint(hwnd, &ps) ;
-        return 0 ;
+        DrawText(hdc, TEXT(helpTitle), -1, &rect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+        EndPaint(hwnd, &ps);
+        return 0;
 
      case WM_DESTROY:
-        return 0 ;
+        return 0;
      }
-     return DefWindowProc(hwnd, message, wParam, lParam) ;
+     return DefWindowProc(hwnd, message, wParam, lParam);
 }
 
 
@@ -1203,11 +1108,11 @@ int ClipboardCopySelection(HWND hwnd, int copytype)
     {
         tptr = GlobalAlloc(GHND, (DWORD) 64L);
         cptr = GlobalLock(tptr);
-        GetDlgItemText(calcMainWindow, 131, tmp, 29);  // X register
+        GetDlgItemText(calcMainWindow, 131, tmpStr, 29);  // X register
         k = 0;                  // Strip leading spaces!
-        while ((tmp[k] == ' ') && k < 20)
+        while ((tmpStr[k] == ' ') && k < 20)
             k++;
-        lstrcpy(cptr, (LPSTR) & tmp[k]);
+        lstrcpy(cptr, (LPSTR) & tmpStr[k]);
         OpenClipboard(hwnd);
         EmptyClipboard();
         GlobalUnlock(tptr);
@@ -1279,29 +1184,29 @@ int ClipboardCopySelection(HWND hwnd, int copytype)
         tptr = GlobalAlloc(GHND, (DWORD) 128L);
         cptr = GlobalLock(tptr);
         lstrcpy(cptr, "");
-        GetDlgItemText(calcMainWindow, 128, tmp, 29);  // T register
+        GetDlgItemText(calcMainWindow, 128, tmpStr, 29);  // T register
         k = 0;                  // Strip leading spaces!
-        while ((tmp[k] == ' ') && k < 20)
+        while ((tmpStr[k] == ' ') && k < 20)
             k++;
-        lstrcat(cptr, (LPSTR) & tmp[k]);
+        lstrcat(cptr, (LPSTR) & tmpStr[k]);
         lstrcat(cptr, (LPSTR) "\r\n");
-        GetDlgItemText(calcMainWindow, 129, tmp, 29);  // Z register
+        GetDlgItemText(calcMainWindow, 129, tmpStr, 29);  // Z register
         k = 0;                  // Strip leading spaces!
-        while ((tmp[k] == ' ') && k < 20)
+        while ((tmpStr[k] == ' ') && k < 20)
             k++;
-        lstrcat(cptr, (LPSTR) & tmp[k]);
+        lstrcat(cptr, (LPSTR) & tmpStr[k]);
         lstrcat(cptr, (LPSTR) "\r\n");
-        GetDlgItemText(calcMainWindow, 130, tmp, 29);  // Y register
+        GetDlgItemText(calcMainWindow, 130, tmpStr, 29);  // Y register
         k = 0;                  // Strip leading spaces!
-        while ((tmp[k] == ' ') && k < 20)
+        while ((tmpStr[k] == ' ') && k < 20)
             k++;
-        lstrcat(cptr, (LPSTR) & tmp[k]);
+        lstrcat(cptr, (LPSTR) & tmpStr[k]);
         lstrcat(cptr, (LPSTR) "\r\n");
-        GetDlgItemText(calcMainWindow, 131, tmp, 29);  // X register
+        GetDlgItemText(calcMainWindow, 131, tmpStr, 29);  // X register
         k = 0;                  // Strip leading spaces!
-        while ((tmp[k] == ' ') && k < 20)
+        while ((tmpStr[k] == ' ') && k < 20)
             k++;
-        lstrcat(cptr, (LPSTR) & tmp[k]);
+        lstrcat(cptr, (LPSTR) & tmpStr[k]);
         lstrcat(cptr, (LPSTR) "\r\n");
         OpenClipboard(hwnd);
         EmptyClipboard();
@@ -1320,19 +1225,19 @@ int ClipboardCopySelection(HWND hwnd, int copytype)
 
         for (i = 0; i < playBackIdx; i++)
         {
-            sprintf(tmp, "%03d - %s", i + 1, playBackMap[playBack[i]].funcText);
-            lstrcat(cptr, (LPSTR) tmp);
+            sprintf(tmpStr, "%03d - %s", i + 1, playBackMap[playBack[i]].funcText);
+            lstrcat(cptr, (LPSTR) tmpStr);
             lstrcat(cptr, (LPSTR) "\r\n");
         }
-        sprintf(tmp, "%03d - <End Of Program>", i + 1);
-        lstrcat(cptr, (LPSTR) tmp);
+        sprintf(tmpStr, "%03d - <End Of Program>", i + 1);
+        lstrcat(cptr, (LPSTR) tmpStr);
         lstrcat(cptr, (LPSTR) "\r\n");
         chksum = 0x0000;
         for (i = 0; i < playBackIdx; i++)
             chksum += playBack[i];
-        sprintf(tmp, "Checksum: %04X", chksum);
+        sprintf(tmpStr, "Checksum: %04X", chksum);
         lstrcat(cptr, (LPSTR) "\r\n");
-        lstrcat(cptr, (LPSTR) tmp);
+        lstrcat(cptr, (LPSTR) tmpStr);
         lstrcat(cptr, (LPSTR) "\r\n");
 
         OpenClipboard(hwnd);
@@ -1480,25 +1385,28 @@ void FloatsToLongs(void)
     else
         TL = 0xFFFFFFFF;
 
-    if (A <= (float) 0xFFFFFFFF)
-        AL = (PROG_LONG) A;
-    else
-        AL = 0xFFFFFFFF;
+    if (extendedStack)
+    {
+        if (A <= (float) 0xFFFFFFFF)
+            AL = (PROG_LONG) A;
+        else
+            AL = 0xFFFFFFFF;
 
-    if (B <= (float) 0xFFFFFFFF)
-        BL = (PROG_LONG) B;
-    else
-        BL = 0xFFFFFFFF;
+        if (B <= (float) 0xFFFFFFFF)
+            BL = (PROG_LONG) B;
+        else
+            BL = 0xFFFFFFFF;
 
-    if (C <= (float) 0xFFFFFFFF)
-        CL = (PROG_LONG) C;
-    else
-        CL = 0xFFFFFFFF;
+        if (C <= (float) 0xFFFFFFFF)
+            CL = (PROG_LONG) C;
+        else
+            CL = 0xFFFFFFFF;
 
-    if (D <= (float) 0xFFFFFFFF)
-        DL = (PROG_LONG) D;
-    else
-        DL = 0xFFFFFFFF;
+        if (D <= (float) 0xFFFFFFFF)
+            DL = (PROG_LONG) D;
+        else
+            DL = 0xFFFFFFFF;
+    }
 
     if (LASTX <= (float) 0xFFFFFFFF)
         LASTXL = (PROG_LONG) LASTX;
@@ -1556,6 +1464,7 @@ int PreInit(void)
     B = 0.0;
     C = 0.0;
     D = 0.0;
+    
     for (i = 0; i < MAX_STO; i++)
     {
         STO[i] = 0.0;
@@ -1570,7 +1479,7 @@ int PreInit(void)
     }
     playBackIdx = 0;
     currentMacroPlaybackIdx = 0;
-
+    
     // Since we don't want to pre-init the whole constants table we look for first FALSE entry and mark the rest FALSE!
     // We read them in from disk again below so this won't harm anything to do it here!
     for (k = 0; k < MAX_CONST_BANKS; k++)
@@ -1587,14 +1496,14 @@ int PreInit(void)
     }
 
     // Get regional time setting for 24-hour format!
-    GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_ITIME, tmp, 5);
-    tmp[4] = '\0';
-    if (atoi(tmp) == 1)
+    GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_ITIME, tmpStr, 5);
+    tmpStr[4] = '\0';
+    if (atoi(tmpStr) == 1)
         showTime24HourFormat = TRUE;
 
     // Get regional comma format...
-    GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SDECIMAL, tmp, 5);
-    if (tmp[0] == ',')
+    GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SDECIMAL, tmpStr, 5);
+    if (tmpStr[0] == ',')
         numberDisplayMode = NONINTERNATIONAL;
     return(0);
 }
@@ -1617,14 +1526,15 @@ int Init(void)
         flags = SWP_HIDEWINDOW | SWP_NOSIZE | SWP_NOMOVE;
     else
         flags = SWP_HIDEWINDOW | SWP_NOSIZE;
+    
     if (alwaysOnTop)
     {
-        CheckMenuItem(hMenu, IDM_ALWAYSONTOP, MF_CHECKED);
+        CheckMenuItem(hMainMenu, IDM_ALWAYSONTOP, MF_CHECKED);
         SetWindowPos(calcMainWindow, HWND_TOPMOST, main_x, main_y, main_cx, main_cy, flags);
     }
     else
     {
-        CheckMenuItem(hMenu, IDM_ALWAYSONTOP, MF_UNCHECKED);
+        CheckMenuItem(hMainMenu, IDM_ALWAYSONTOP, MF_UNCHECKED);
         SetWindowPos(calcMainWindow, HWND_NOTOPMOST, main_x, main_y, main_cx, main_cy, flags);
     }
 
@@ -1656,53 +1566,53 @@ int ShowStatus(void)
     if (progMode != PROG_NORMAL)
     {
         if (progModecarry == 1)
-            sprintf(tmp, "C");
+            sprintf(tmpStr, "C");
         else
-            sprintf(tmp, "  ");
-        SetDlgItemText(calcMainWindow, ID_CARRY_POS, tmp);
+            sprintf(tmpStr, "  ");
+        SetDlgItemText(calcMainWindow, ID_CARRY_POS, tmpStr);
     }
 
 
     if (recModeON == 0)
-        sprintf(tmp, "   ");
+        sprintf(tmpStr, "   ");
     else
-        sprintf(tmp, "REC ");
-    SetDlgItemText(calcMainWindow, REC_BAR, tmp);
+        sprintf(tmpStr, "REC ");
+    SetDlgItemText(calcMainWindow, REC_BAR, tmpStr);
 
 
 
     if (progMode != PROG_NORMAL)
     {
         if (wordMode == PROG_SIGNED)
-            sprintf(tmp, "S");
+            sprintf(tmpStr, "S");
         else
-            sprintf(tmp, "U");
+            sprintf(tmpStr, "U");
 
         if (wordSize == 8)
-            strcat(tmp, "8  ");
+            strcat(tmpStr, "8  ");
         else if (wordSize == 16)
-            strcat(tmp, "16 ");
+            strcat(tmpStr, "16 ");
         else
-            strcat(tmp, "32 ");
+            strcat(tmpStr, "32 ");
 
         if (progMode == PROG_BIN)
         {
             if (binMode == 0)
-                strcat(tmp, "bin LO");
+                strcat(tmpStr, "bin LO");
             else
-                strcat(tmp, "bin HI");
+                strcat(tmpStr, "bin HI");
         }
         else
         {
-            strcat(tmp, "       ");
+            strcat(tmpStr, "       ");
         }
 
-        SetDlgItemText(calcMainWindow, PROG_BAR, tmp);
+        SetDlgItemText(calcMainWindow, PROG_BAR, tmpStr);
     }
     else
     {
-        sprintf(tmp, "    ");
-        SetDlgItemText(calcMainWindow, PROG_BAR, tmp);
+        sprintf(tmpStr, "    ");
+        SetDlgItemText(calcMainWindow, PROG_BAR, tmpStr);
     }
 
     if (sci_format == 'g')
@@ -1716,12 +1626,12 @@ int ShowStatus(void)
     SetDlgItemText(calcMainWindow, STATUS_BAR, statusBar);
 
     if (AngleMode == 0)
-        sprintf(tmp, "DEG");
+        sprintf(tmpStr, "DEG");
     if (AngleMode == 1)
-        sprintf(tmp, "RAD");
+        sprintf(tmpStr, "RAD");
     if (AngleMode == 2)
-        sprintf(tmp, "GRA");
-    SetDlgItemText(calcMainWindow, ANGLE_BAR, tmp);
+        sprintf(tmpStr, "GRA");
+    SetDlgItemText(calcMainWindow, ANGLE_BAR, tmpStr);
 
     return(0);
 }
@@ -1736,18 +1646,17 @@ int UpdateSpareBar(char *msg)
 
 int UpdateTimeBar()
 {
-    char tmp[20];
     int temp_hour, temp_min;
 
-    _strtime(tmp);
-    tmp[5] = CNULL;
-    tmp[2] = CNULL;
-    temp_hour = atoi(tmp);
-    temp_min = atoi(&tmp[3]);
+    _strtime(tmpStr);
+    tmpStr[5] = CNULL;
+    tmpStr[2] = CNULL;
+    temp_hour = atoi(tmpStr);
+    temp_min = atoi(&tmpStr[3]);
 
     if (showTime24HourFormat == TRUE)
     {
-        sprintf(tmp, "%2d:%02d ", temp_hour, temp_min);
+        sprintf(tmpStr, "%2d:%02d ", temp_hour, temp_min);
     }
     else
     {
@@ -1755,16 +1664,16 @@ int UpdateTimeBar()
         {
             if (temp_hour == 0)
                 temp_hour = 12; //12AM!!
-            sprintf(tmp, "%2d:%02d AM", temp_hour, temp_min);
+            sprintf(tmpStr, "%2d:%02d AM", temp_hour, temp_min);
         }
         else if (temp_hour == 12)
-            sprintf(tmp, "%2d:%02d PM", temp_hour, temp_min);
+            sprintf(tmpStr, "%2d:%02d PM", temp_hour, temp_min);
         else
-            sprintf(tmp, "%2d:%02d PM", temp_hour - 12, temp_min);
+            sprintf(tmpStr, "%2d:%02d PM", temp_hour - 12, temp_min);
     }
 
     if (userTimer == 0)         // Only if we don't have stopwatch!
-        SetDlgItemText(calcMainWindow, TIME_BAR, tmp);
+        SetDlgItemText(calcMainWindow, TIME_BAR, tmpStr);
 
     return(0);
 }
@@ -1799,11 +1708,6 @@ double MakeAccurate(double val)
     return(val);
 }
 
-/* ----------------------------------------- */
-/* Xedit can be any of the following defines */
-/* ----------------------------------------- */
-int Xedit = X_NEW;
-char Xstr[50];
 // clang-format off
 struct keypadStruct RPNkeys[] = {
     {RPN_DIGIT_0,   UNI_DIG0,   USES_FL, ALLOWREC, '0', NO_L,   X_EDIT,     RPN_digit0,         "Digit 0",              "Used in keypad number entry."},
@@ -1833,7 +1737,7 @@ struct keypadStruct RPNkeys[] = {
     {RPN_LASTX,     UNI_LSTX,   USES_FL, ALLOWREC, 'L', NO_L,   X_NEW,      RPN_lastX,          "Last X",               "Retrieves the last value of X before the last operation occurred"},
     {RPN_MODE,      UNI_MODE,   USES_FL, ALLOWREC, 'M', NO_L,   X_NEW,      RPN_mode,           "Select Mode",          "Used to select number format mode"},
     {RPN_BKSP,      UNI_BKSP,   USES_FL, ALLOWREC,  8,  NO_L,   X_NULL,     RPN_backspace,      "Backspace",            "Used to correct mistakes in number entry"},
-    {RPN_HELP,      UNI_HELP,   USES_FL, ALLOWREC, 'h', NO_L,   X_NULL,     RPN_help,           "Help",                 "After clicking this Help key, select any key for individual key help.\nYou can also right-click the mouse on any key for help.\nUse the Help Menu to get full help on Excalibur."},
+    {RPN_HELP,      UNI_HELP,   USES_FL, ALLOWREC, 'h', NO_L,   X_NULL,     RPN_help,           "Help",                 "After clicking this key, select another key for individual key help.\nSame as right-click of the mouse on any key."},
     {RPN_PLAYBACK,  UNI_PLAY,   USES_FL, NORECORD, 'p', NO_L,   X_NEW,      RPN_Playback,       "Playback",             "Plays back the last recorded sequence of button presses."},
     {RPN_CLEAR_ALL, UNI_CLRA,   USES_FL, ALLOWREC, 'C', YES_L,  X_ENTER,    RPN_clear,          "Clear Stack",          "Used to clear the entire stack contents."},
     {RPN_RCLA,      UNI_RCLA,   USES_FL, NORECORD, 'a', YES_L,  X_NEW,      RPN_recallA,        "Recall R0",            "Recalls the R0 register stored using the STO key."},
@@ -1847,16 +1751,16 @@ struct keypadStruct RPNkeys[] = {
     {RPN_RECORD,    UNI_REC,    USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_Record,         "Record Mode On/Off",   "When ON - Records button presses for playback."},
     {RPN_NOTES,     UNI_NOTES,  USES_FL, ALLOWREC, ' ', NO_L,   X_NULL,     RPN_Notes,          "Excalibur Notepad",    "Allows some simple notes to be stored/saved."},
     {RPN_INV,       UNI_INVX,   USES_FL, ALLOWREC, ' ', YES_L,  X_NEW,      RPN_inverse,        "Inverse X",            "Computes the inverse of X"},
-    {RPN_SCI,       UNI_SCI,    USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectSci,      "Select Scientific",    "Selects the Scientific Button Layout"},
-    {RPN_STAT,      UNI_STAT,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectStat,     "Select Statistics",    "Selects the Statistical Button Layout"},
-    {RPN_BUSI,      UNI_BUSI,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectBusi,     "Select Business",      "Selects the Business Button Layout"},
-    {RPN_CONV,      UNI_CONV,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectConv,     "Select Conversion",    "Selects the Conversion Button Layout"},
-    {RPN_GEOM,      UNI_GEOM,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectGeom,     "Select Geometry",      "Selects the Geometry Button Layout"},
-    {RPN_PROG,      UNI_PROG1,  USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectProg,     "Select Comp Sci",      "Selects the Computer Science Button Layout"},
+    {RPN_SCI,       UNI_SCI,    USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectSci,      "Select Scientific",    "Selects the Scientific Layout"},
+    {RPN_STAT,      UNI_STAT,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectStat,     "Select Statistics",    "Selects the Statistical Layout"},
+    {RPN_BUSI,      UNI_BUSI,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectBusi,     "Select Financial",     "Selects the Financial Layout"},
+    {RPN_CONV,      UNI_CONV,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectConv,     "Select Conversion",    "Selects the Conversion Layout"},
+    {RPN_GEOM,      UNI_GEOM,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectGeom,     "Select Geometry",      "Selects the Geometry Layout"},
+    {RPN_PROG,      UNI_PROG1,  USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectProg,     "Select Comp Sci",      "Selects the Computer Science Layout"},
     {RPN_MISC,      UNI_PROG2,  USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectProg2,    "Select Program II",    "Selects Program Bank II"},
-    {RPN_CMPLX,     UNI_CMPLX,  USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectComplex,  "Select Complex",       "Selects the Complex Number Button Layout"},
-    {RPN_CUST,      UNI_CUST,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectCust,     "Select Custom",        "Selects the Custom Button Layout"},
-    {RPN_PHY,       UNI_PHY,    USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectPhysics,  "Select Physics",       "Selects the Physics Button Layout"},
+    {RPN_CMPLX,     UNI_CMPLX,  USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectComplex,  "Select Complex",       "Selects the Complex Number Layout"},
+    {RPN_CUST,      UNI_CUST,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectCust,     "Select Custom",        "Selects the Custom Layout"},
+    {RPN_PHY,       UNI_PHY,    USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectPhysics,  "Select Physics",       "Selects the Physics Layout"},
     {RPN_MACBANK,   UNI_MAC,    USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectMacro,    "Select Program I",     "Selects Program Bank I"},
 
     {RPN_LAST_KEY,  UNI_UNUSED, USES_FL, ALLOWREC, ' ', NO_L,   X_NEW,      NULL,               "Unused",               "Unused"}
@@ -2074,8 +1978,8 @@ int ProcessHelp(WPARAM key)
     {
         if (key == (WPARAM) currentFuncs[i].index)
         {
-            LoadString(hInst, currentFuncs[i].keyTitle, helpTitle, sizeof(helpTitle) - 1);
-            LoadString(hInst, currentFuncs[i].keyHelp, helpMsg, sizeof(helpMsg) - 1);
+            LoadString(hExcaliburInstance, currentFuncs[i].keyTitle, helpTitle, sizeof(helpTitle) - 1);
+            LoadString(hExcaliburInstance, currentFuncs[i].keyHelp, helpMsg, sizeof(helpMsg) - 1);
             MessageBox(calcMainWindow, helpMsg, helpTitle, MB_OK | MB_ICONQUESTION);
             break;
         }
@@ -2167,7 +2071,7 @@ void makeInternational(char *str)
 
 void PutCommas(char *str)
 {
-    char tempStr[50];
+    char commaStr[50];
     char *orgp;
     char *orgp2;
     int i, j, k, dpCount;
@@ -2195,34 +2099,34 @@ void PutCommas(char *str)
         k = 0;
         for (i = 0; i <= (int) strlen(str); i++)
         {
-            tempStr[j] = str[i];
+            commaStr[j] = str[i];
             j++;
             if (str[i] >= '0' && str[i] <= '9')
             {
                 k++;
                 if ((k < dpCount) && ((dpCount - k) % 3) == 0)
                 {
-                    tempStr[j] = ',';
+                    commaStr[j] = ',';
                     j++;
                 }
             }
         }
-        strcpy(str, tempStr);
+        strcpy(str, commaStr);
     }
     makeInternational(str);    // To swap commas and DPs if needed
 }
 
 void MakeEngineeringFormat(double val, char *Fstr)
 {
-    char str[50];
+    char engStr[50];
     char *sp;
     int exponent, shiftDP;
 
     if (decimal_places >= 2)
-        sprintf(str, "%%- 21.%dE", decimal_places);
+        sprintf(engStr, "%%- 21.%dE", decimal_places);
     else
-        sprintf(str, "%%- 21.%dE", 2);
-    sprintf(Fstr, str, val);
+        sprintf(engStr, "%%- 21.%dE", 2);
+    sprintf(Fstr, engStr, val);
     sp = strchr(Fstr, 'E');
     sp++;
     exponent = atoi(sp);
@@ -2245,8 +2149,8 @@ void MakeEngineeringFormat(double val, char *Fstr)
 
 void MakeSciFormat(double val, char *Fstr)
 {
-    char tempStr[500];
-    char str[500];
+    char sciStr[50];
+    char str[50];
     int i;
 
     val = MakeAccurate(val);
@@ -2258,8 +2162,8 @@ void MakeSciFormat(double val, char *Fstr)
         }
         else
         {
-            sprintf(tempStr, "%%- .%d%c", decimal_places, sci_format);
-            sprintf(str, tempStr, val);
+            sprintf(sciStr, "%%- .%d%c", decimal_places, sci_format);
+            sprintf(str, sciStr, val);
             if (strlen(str) > MAX_DIGITS)
                 sprintf(str, "%%- 21.%dg", decimal_places+1);
             else
@@ -2286,24 +2190,21 @@ void MakeSciFormat(double val, char *Fstr)
 
 void ShowStack(void)
 {
-    char tmp[150];
-    char tmp2[50];
-    char tmpL[50];
+    char formattedStr[50];
 
     if (recModeON == 1)    // Special record mode - show current program step in Z register!
     {
-        sprintf(tmp, "%03d-Unknown!", currentMacroPlaybackIdx);
+        sprintf(tmpStr, "%03d-Unknown!", currentMacroPlaybackIdx);
         if (currentMacroPlaybackIdx == 0)
         {
-            sprintf(tmp, "%03d-<Start Of Program>", currentMacroPlaybackIdx);
+            sprintf(tmpStr, "%03d-<Start Of Program>", currentMacroPlaybackIdx);
         }
         else
         {
-            sprintf(tmp, "%03d-%s", currentMacroPlaybackIdx,
-                     playBackMap[playBack[currentMacroPlaybackIdx - 1]].funcText);
+            sprintf(tmpStr, "%03d-%s", currentMacroPlaybackIdx, playBackMap[playBack[currentMacroPlaybackIdx - 1]].funcText);
         }
-        tmp[22] = CNULL;
-        SetDlgItemText(calcMainWindow, 128, tmp);
+        tmpStr[22] = CNULL;
+        SetDlgItemText(calcMainWindow, 128, tmpStr);
         SetDlgItemText(calcMainWindow, 129, " ");
     }
     else
@@ -2311,16 +2212,16 @@ void ShowStack(void)
     {
         if (currentMacroPlaybackIdx == playBackIdx)
         {
-            sprintf(tmp, "%03d-<End Of Program>", currentMacroPlaybackIdx);
+            sprintf(tmpStr, "%03d-<End Of Program>", currentMacroPlaybackIdx);
         }
         else
         {
-            sprintf(tmp, "%03d-%s", currentMacroPlaybackIdx,
+            sprintf(tmpStr, "%03d-%s", currentMacroPlaybackIdx,
                      playBackMap[playBack[currentMacroPlaybackIdx]].funcText);
         }
 
-        tmp[22] = CNULL;
-        SetDlgItemText(calcMainWindow, 128, tmp);
+        tmpStr[22] = CNULL;
+        SetDlgItemText(calcMainWindow, 128, tmpStr);
         SetDlgItemText(calcMainWindow, 129, " ");
     }
 
@@ -2328,49 +2229,49 @@ void ShowStack(void)
     {
         if (Xedit == X_EDIT)
         {
-            sprintf(tmp, " %s_", Xstr);
-            PutCommas(tmp);
+            sprintf(tmpStr, " %s_", Xstr);
+            PutCommas(tmpStr);
         }
         else
-            MakeSciFormat(X, tmp);
+            MakeSciFormat(X, tmpStr);
 
         if (rightAlignStack == 1)
         {
-            sprintf(tmp2, (bExactFont ? "%24s":"%22s"), tmp);
-            SetDlgItemText(calcMainWindow, 131, tmp2);
+            sprintf(formattedStr, (bExactFont ? "%24s":"%22s"), tmpStr);
+            SetDlgItemText(calcMainWindow, 131, formattedStr);
         }
         else
-            SetDlgItemText(calcMainWindow, 131, tmp);
+            SetDlgItemText(calcMainWindow, 131, tmpStr);
 
 
-        MakeSciFormat(Y, tmp);
+        MakeSciFormat(Y, tmpStr);
         if (rightAlignStack == 1)
         {
-            sprintf(tmp2, (bExactFont ? "%24s":"%22s"), tmp);
-            SetDlgItemText(calcMainWindow, 130, tmp2);
+            sprintf(formattedStr, (bExactFont ? "%24s":"%22s"), tmpStr);
+            SetDlgItemText(calcMainWindow, 130, formattedStr);
         }
         else
-            SetDlgItemText(calcMainWindow, 130, tmp);
+            SetDlgItemText(calcMainWindow, 130, tmpStr);
 
         if (recModeON == 0 && showTrace == FALSE)
         {
-            MakeSciFormat(Z, tmp);
+            MakeSciFormat(Z, tmpStr);
             if (rightAlignStack == 1)
             {
-                sprintf(tmp2, (bExactFont ? "%24s":"%22s"), tmp);
-                SetDlgItemText(calcMainWindow, 129, tmp2);
+                sprintf(formattedStr, (bExactFont ? "%24s":"%22s"), tmpStr);
+                SetDlgItemText(calcMainWindow, 129, formattedStr);
             }
             else
-                SetDlgItemText(calcMainWindow, 129, tmp);
+                SetDlgItemText(calcMainWindow, 129, tmpStr);
 
-            MakeSciFormat(T, tmp);
+            MakeSciFormat(T, tmpStr);
             if (rightAlignStack == 1)
             {
-                sprintf(tmp2, (bExactFont ? "%24s":"%22s"), tmp);
-                SetDlgItemText(calcMainWindow, 128, tmp2);
+                sprintf(formattedStr, (bExactFont ? "%24s":"%22s"), tmpStr);
+                SetDlgItemText(calcMainWindow, 128, formattedStr);
             }
             else
-                SetDlgItemText(calcMainWindow, 128, tmp);
+                SetDlgItemText(calcMainWindow, 128, tmpStr);
         }
     }
     else
@@ -2378,23 +2279,23 @@ void ShowStack(void)
         if (Xedit == X_EDIT)
             XL = MakeProgStr(Xstr);
 
-        MakeRadixStr(XL, tmpL);
-        sprintf(tmp, (bExactFont ? "%23s%c%c":"%20s%c%c"), tmpL, Radix(progMode), Radix2(progMode));
-        SetDlgItemText(calcMainWindow, 131, tmp);
+        MakeRadixStr(XL, formattedStr);
+        sprintf(tmpStr, (bExactFont ? "%23s%c%c":"%20s%c%c"), formattedStr, Radix(progMode), Radix2(progMode));
+        SetDlgItemText(calcMainWindow, 131, tmpStr);
 
-        MakeRadixStr(YL, tmpL);
-        sprintf(tmp, (bExactFont ? "%23s%c%c":"%20s%c%c"), tmpL, Radix(progMode), Radix2(progMode));
-        SetDlgItemText(calcMainWindow, 130, tmp);
+        MakeRadixStr(YL, formattedStr);
+        sprintf(tmpStr, (bExactFont ? "%23s%c%c":"%20s%c%c"), formattedStr, Radix(progMode), Radix2(progMode));
+        SetDlgItemText(calcMainWindow, 130, tmpStr);
 
         if (recModeON == 0 && traceMacroPlayback == FALSE)
         {
-            MakeRadixStr(ZL, tmpL);
-            sprintf(tmp, (bExactFont ? "%23s%c%c":"%20s%c%c"), tmpL, Radix(progMode), Radix2(progMode));
-            SetDlgItemText(calcMainWindow, 129, tmp);
+            MakeRadixStr(ZL, formattedStr);
+            sprintf(tmpStr, (bExactFont ? "%23s%c%c":"%20s%c%c"), formattedStr, Radix(progMode), Radix2(progMode));
+            SetDlgItemText(calcMainWindow, 129, tmpStr);
 
-            MakeRadixStr(TL, tmpL);
-            sprintf(tmp, (bExactFont ? "%23s%c%c":"%20s%c%c"), tmpL, Radix(progMode), Radix2(progMode));
-            SetDlgItemText(calcMainWindow, 128, tmp);
+            MakeRadixStr(TL, formattedStr);
+            sprintf(tmpStr, (bExactFont ? "%23s%c%c":"%20s%c%c"), formattedStr, Radix(progMode), Radix2(progMode));
+            SetDlgItemText(calcMainWindow, 128, tmpStr);
         }
     }
 
@@ -2416,19 +2317,18 @@ void StackPush(double temp)
     // This checks the number for NAN and INF, etc...
     if (_finite(temp) == 0)
     {
-        MessageBox(calcMainWindow,
-                    "Overflow:  Result is too large to be represented.", "Excalibur Floating Point", MB_OK);
+        MessageBox(calcMainWindow, "Overflow:  Result is too large or too small to be represented.", "Excalibur Floating Point", MB_OK);
         temp = 0.0;
         endRunningMacro();
     }
     if (_isnan(temp) != 0)
     {
-        MessageBox(calcMainWindow, "Result cannot be represented.", "Excalibur Floating Point", MB_OK);
+        MessageBox(calcMainWindow, "Result cannot be represented (NAN).", "Excalibur Floating Point", MB_OK);
         temp = 0.0;
         endRunningMacro();
     }
 
-    if (stackLevels == 8)
+    if (extendedStack)
     {
         D = C;
         C = B;
@@ -2439,6 +2339,7 @@ void StackPush(double temp)
     Z = Y;
     Y = X;
     X = temp;
+    
     FloatsToLongs();
 }
 
@@ -2446,12 +2347,14 @@ void StackPush(double temp)
 double StackPop(void)
 {
     double temp;
+    
     stackPops++;
+    
     temp = X;
     X = Y;
     Y = Z;
     Z = T;
-    if (stackLevels == 8)
+    if (extendedStack)
     {
         T = A;
         A = B;
@@ -2465,6 +2368,7 @@ double StackPop(void)
         if (popFillZero != 0)
             T = 0.0;
     }
+    
     FloatsToLongs();
     return(temp);
 }
@@ -2475,8 +2379,7 @@ double StackPop(void)
 /* ----------------------- */
 void RPN_clear(void)
 {
-    if (progMode > 0)
-        RPN_clearL();
+    if (progMode > 0) RPN_clearL();
     X = 0.0;
     Y = 0.0;
     Z = 0.0;
@@ -2565,7 +2468,7 @@ void RPN_dp(void)
                     Xstr[strlen(Xstr) - 1] = '/';
                 else
                 {
-                    for (i = 0; i < (int) strlen(Xstr); i++)   //zzzzz
+                    for (i = 0; i < (int) strlen(Xstr); i++)
                     {
                         if (Xstr[i] == '.')
                             Xstr[i] = '~';
@@ -2612,7 +2515,6 @@ void RPN_Ex(void)
 
 void RPN_digit(WPARAM key)
 {
-    char tmp[50];
     double tmp1, tmp2, tmp3;
 
     if (progMode == PROG_BIN && key > 102)
@@ -2635,8 +2537,8 @@ void RPN_digit(WPARAM key)
     {
         if (allowDigitBasedOnMaxStringSize(Xstr, (char) ('0' + (key - 101))))
         {
-            sprintf(tmp, "%d", (key - 101));
-            strcat(Xstr, tmp);
+            sprintf(tmpStr, "%d", (key - 101));
+            strcat(Xstr, tmpStr);
         }
     }
     if (strchr(Xstr, '/') == NULL)
@@ -2644,8 +2546,8 @@ void RPN_digit(WPARAM key)
         X = atof(Xstr);
     }
     else
-    {                           // This handles the .. to allow fractions to
-        // be entered!
+    {
+        // This handles the .. to allow fractions to be entered!
         if (strchr(Xstr, '~') == NULL)
         {
             tmp1 = atof(Xstr);
@@ -2732,39 +2634,38 @@ int allowDigitBasedOnMaxStringSize(char *Xstr, char digit)
     return status;
 }
 
-extern BOOL CALLBACK fnDIALOG_5DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
+extern BOOL CALLBACK fnDIALOG_DisplayModeProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
 void RPN_mode2(HWND hDlg)
 {
-    DLGPROC lpfnfnDIALOG_5DlgProc;
+    DLGPROC lpfnDIALOG_DisplayModeProc;
 
-    lpfnfnDIALOG_5DlgProc = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_5DlgProc, hInst);
+    lpfnDIALOG_DisplayModeProc = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_DisplayModeProc, hExcaliburInstance);
 
-    if ((DialogBox(hInst, (LPCSTR) "DIALOG_DISPLAY_MODE", hDlg, lpfnfnDIALOG_5DlgProc)) == -1)
+    if ((DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_DISPLAY_MODE", hDlg, lpfnDIALOG_DisplayModeProc)) == -1)
     {
         MessageBox(NULL, "Unable to display dialog", "System Error", MB_SYSTEMMODAL | MB_ICONHAND | MB_OK);
     }
-    FreeProcInstance((FARPROC) lpfnfnDIALOG_5DlgProc);
+    FreeProcInstance((FARPROC) lpfnDIALOG_DisplayModeProc);
     ShowStatus();
 }
 
 void RPN_mode(void)
 {
-    DLGPROC lpfnfnDIALOG_5DlgProc;
+    DLGPROC lpfnDIALOG_DisplayModeProc;
 
-    lpfnfnDIALOG_5DlgProc = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_5DlgProc, hInst);
+    lpfnDIALOG_DisplayModeProc = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_DisplayModeProc, hExcaliburInstance);
 
-    if ((DialogBox(hInst, (LPCSTR) "DIALOG_DISPLAY_MODE", calcMainWindow, lpfnfnDIALOG_5DlgProc)) == -1)
+    if ((DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_DISPLAY_MODE", calcMainWindow, lpfnDIALOG_DisplayModeProc)) == -1)
     {
         MessageBox(NULL, "Unable to display dialog", "System Error", MB_SYSTEMMODAL | MB_ICONHAND | MB_OK);
     }
-    FreeProcInstance((FARPROC) lpfnfnDIALOG_5DlgProc);
+    FreeProcInstance((FARPROC) lpfnDIALOG_DisplayModeProc);
     ShowStatus();
 }
 
 
-BOOL CALLBACK fnDIALOG_5DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK fnDIALOG_DisplayModeProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
 {
-
     switch(wMessage)
     {
     case WM_INITDIALOG:
@@ -2808,6 +2709,7 @@ BOOL CALLBACK fnDIALOG_5DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM 
             SendMessage(GetDlgItem(hDlg, IDC_CHECK1), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
 
         return TRUE;
+        
     case WM_COMMAND:
         switch(wParam)
         {
@@ -3016,7 +2918,6 @@ void RPN_exchange_x_y(void)
 void RPN_negate_x(void)
 {
     char *ptr;
-    char tmp[51];
 
     ptr = strchr(Xstr, 'e');
     if ((ptr != NULL) && !(Xedit == X_NEW || Xedit == X_ENTER))
@@ -3038,8 +2939,8 @@ void RPN_negate_x(void)
                 Xstr[0] = '-';
             else
             {
-                sprintf(tmp, "-%s", Xstr);
-                strcpy(Xstr, tmp);
+                sprintf(tmpStr, "-%s", Xstr);
+                strcpy(Xstr, tmpStr);
             }
             X = atof(Xstr);
         }
@@ -3182,26 +3083,25 @@ BOOL CALLBACK StoNameDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
     return FALSE;
 }
 
-BOOL CALLBACK fnDIALOG_3DlgProc(HWND, UINT, WPARAM, LPARAM);
+BOOL CALLBACK fnDIALOG_StoreProc(HWND, UINT, WPARAM, LPARAM);
 
 void RPN_store(void)
 {
 
-    DLGPROC lpfnfnDIALOG_3DlgProc;
+    DLGPROC lpfnDIALOG_StoreProc;
 
-    lpfnfnDIALOG_3DlgProc = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_3DlgProc, hInst);
+    lpfnDIALOG_StoreProc = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_StoreProc, hExcaliburInstance);
 
-    if ((DialogBox(hInst, (LPCSTR) "DIALOG_STORE", calcMainWindow, lpfnfnDIALOG_3DlgProc)) == -1)
+    if ((DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_STORE", calcMainWindow, lpfnDIALOG_StoreProc)) == -1)
     {
         MessageBox(NULL, "Unable to display dialog", "System Error", MB_SYSTEMMODAL | MB_ICONHAND | MB_OK);
     }
-    FreeProcInstance((FARPROC) lpfnfnDIALOG_3DlgProc);
+    FreeProcInstance((FARPROC) lpfnDIALOG_StoreProc);
 }
 
-BOOL CALLBACK fnDIALOG_3DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK fnDIALOG_StoreProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
 {
     int i;
-    char tmp[50];
     LRESULT item;
 
     switch(wMessage)
@@ -3210,9 +3110,9 @@ BOOL CALLBACK fnDIALOG_3DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM 
         SendMessage(GetDlgItem(hDlg, 101), WM_SETFONT, (WPARAM) hFixedFont, FALSE);
         for (i = 0; i < MAX_STO; i++)
         {
-            sprintf(tmp, "R%02d = %-18.11g {%-8s}", i, STO[i], STOlabels[i]);
-            makeInternational(tmp);
-            SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+            sprintf(tmpStr, "R%02d = %-18.11g {%-8s}", i, STO[i], STOlabels[i]);
+            makeInternational(tmpStr);
+            SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmpStr));
         }
         SendDlgItemMessage(hDlg, 101, LB_SETCURSEL, 0, 0);
         SetFocus(GetDlgItem(hDlg, 101));
@@ -3233,7 +3133,7 @@ BOOL CALLBACK fnDIALOG_3DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM 
             }
             else
             {
-                SendDlgItemMessage(hDlg, 101, LB_GETTEXT, item, (LPARAM) ((LPSTR) tmp));
+                SendDlgItemMessage(hDlg, 101, LB_GETTEXT, item, (LPARAM) ((LPSTR) tmpStr));
                 RPN_storeReg(item);
                 Xedit = X_NEW;
             }
@@ -3252,7 +3152,7 @@ BOOL CALLBACK fnDIALOG_3DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM 
             }
             else
             {
-                SendDlgItemMessage(hDlg, 101, LB_GETTEXT, item, (LPARAM) ((LPSTR) tmp));
+                SendDlgItemMessage(hDlg, 101, LB_GETTEXT, item, (LPARAM) ((LPSTR) tmpStr));
                 RPN_storeAddReg(item);
                 Xedit = X_NEW;
             }
@@ -3266,7 +3166,7 @@ BOOL CALLBACK fnDIALOG_3DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM 
             }
             else
             {
-                SendDlgItemMessage(hDlg, 101, LB_GETTEXT, item, (LPARAM) ((LPSTR) tmp));
+                SendDlgItemMessage(hDlg, 101, LB_GETTEXT, item, (LPARAM) ((LPSTR) tmpStr));
                 RPN_storeSubReg(item);
                 Xedit = X_NEW;
             }
@@ -3280,7 +3180,7 @@ BOOL CALLBACK fnDIALOG_3DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM 
             }
             else
             {
-                SendDlgItemMessage(hDlg, 101, LB_GETTEXT, item, (LPARAM) ((LPSTR) tmp));
+                SendDlgItemMessage(hDlg, 101, LB_GETTEXT, item, (LPARAM) ((LPSTR) tmpStr));
                 RPN_storeMulReg(item);
                 Xedit = X_NEW;
             }
@@ -3295,7 +3195,7 @@ BOOL CALLBACK fnDIALOG_3DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM 
             }
             else
             {
-                SendDlgItemMessage(hDlg, 101, LB_GETTEXT, item, (LPARAM) ((LPSTR) tmp));
+                SendDlgItemMessage(hDlg, 101, LB_GETTEXT, item, (LPARAM) ((LPSTR) tmpStr));
                 RPN_storeDivReg(item);
                 Xedit = X_NEW;
             }
@@ -3309,9 +3209,9 @@ BOOL CALLBACK fnDIALOG_3DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM 
             {
                 STO[i] = 0.0;
                 strcpy(STOlabels[i], "no label");
-                sprintf(tmp, "R%02d = %-18.11g {%-8s}", i, STO[i], STOlabels[i]);
-                makeInternational(tmp);
-                SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+                sprintf(tmpStr, "R%02d = %-18.11g {%-8s}", i, STO[i], STOlabels[i]);
+                makeInternational(tmpStr);
+                SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmpStr));
             }
             SendDlgItemMessage(hDlg, 101, LB_SETCURSEL, 0, 0);
             return TRUE;
@@ -3326,14 +3226,14 @@ BOOL CALLBACK fnDIALOG_3DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM 
             else
             {
                 strcpy(stoTmpStr, STOlabels[item]);
-                DialogBox(hInst, (LPCSTR) "DIALOG_STO_NAME", calcMainWindow, StoNameDlgProc);
+                DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_STO_NAME", calcMainWindow, StoNameDlgProc);
                 strcpy(STOlabels[item], stoTmpStr);
                 SendDlgItemMessage(hDlg, 101, LB_RESETCONTENT, 0, 0);
                 for (i = 0; i < MAX_STO; i++)
                 {
-                    sprintf(tmp, "R%02d = %-18.11g {%-8s}", i, STO[i], STOlabels[i]);
-                    makeInternational(tmp);
-                    SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+                    sprintf(tmpStr, "R%02d = %-18.11g {%-8s}", i, STO[i], STOlabels[i]);
+                    makeInternational(tmpStr);
+                    SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmpStr));
                 }
                 SendDlgItemMessage(hDlg, 101, LB_SETCURSEL, item, 0);
             }
@@ -3354,25 +3254,23 @@ BOOL CALLBACK fnDIALOG_3DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM 
     return FALSE;
 }
 
-BOOL CALLBACK fnDIALOG_3aDlgProc(HWND, UINT, WPARAM, LPARAM);
+BOOL CALLBACK fnDIALOG_RecallProc(HWND, UINT, WPARAM, LPARAM);
 void RPN_recall(void)
 {
+    DLGPROC lpfnDIALOG_RecallProc;
 
-    DLGPROC lpfnfnDIALOG_3aDlgProc;
+    lpfnDIALOG_RecallProc = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_RecallProc, hExcaliburInstance);
 
-    lpfnfnDIALOG_3aDlgProc = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_3aDlgProc, hInst);
-
-    if ((DialogBox(hInst, (LPCSTR) "DIALOG_RECALL", calcMainWindow, lpfnfnDIALOG_3aDlgProc)) == -1)
+    if ((DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_RECALL", calcMainWindow, lpfnDIALOG_RecallProc)) == -1)
     {
         MessageBox(NULL, "Unable to display dialog", "System Error", MB_SYSTEMMODAL | MB_ICONHAND | MB_OK);
     }
-    FreeProcInstance((FARPROC) lpfnfnDIALOG_3aDlgProc);
+    FreeProcInstance((FARPROC) lpfnDIALOG_RecallProc);
 }
 
-BOOL CALLBACK fnDIALOG_3aDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK fnDIALOG_RecallProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
 {
     int i;
-    char tmp[50];
     LRESULT item;
 
     switch(wMessage)
@@ -3381,9 +3279,9 @@ BOOL CALLBACK fnDIALOG_3aDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
         SendMessage(GetDlgItem(hDlg, 101), WM_SETFONT, (WPARAM) hFixedFont, FALSE);
         for (i = 0; i < MAX_STO; i++)
         {
-            sprintf(tmp, "R%02d = %-18.11g {%-8s}", i, STO[i], STOlabels[i]);
-            makeInternational(tmp);
-            SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+            sprintf(tmpStr, "R%02d = %-18.11g {%-8s}", i, STO[i], STOlabels[i]);
+            makeInternational(tmpStr);
+            SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmpStr));
         }
         SendDlgItemMessage(hDlg, 101, LB_SETCURSEL, 0, 0);
         SetFocus(GetDlgItem(hDlg, 101));
@@ -3431,30 +3329,30 @@ BOOL CALLBACK fnDIALOG_3aDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
 /* ------------------------------------------------------------------------ */
 int GetMenuType(struct funcStruct *cFunc)
 {
-    int retVal;
+    int retVal = 1;
 
-    if (cFunc == (struct funcStruct *) &Sci_I_funcs)
+    if (cFunc == (struct funcStruct *) &Scientific_funcs)
         retVal = 1;
-    if (cFunc == (struct funcStruct *) &Programming_funcs)
+    if (cFunc == (struct funcStruct *) &Financial_funcs)
+        retVal = 2;
+    if (cFunc == (struct funcStruct *) &CompSci_funcs)
         retVal = 3;
-    if (cFunc == (struct funcStruct *) &Business_funcs)
-        retVal = 4;
     if (cFunc == (struct funcStruct *) &Conversion_funcs)
-        retVal = 5;
+        retVal = 4;
     if (cFunc == (struct funcStruct *) &Geometry_funcs)
+        retVal = 5;
+    if (cFunc == (struct funcStruct *) &Program1_funcs)
         retVal = 6;
-    if (cFunc == (struct funcStruct *) &Prog2_funcs)
+    if (cFunc == (struct funcStruct *) &Program2_funcs)
         retVal = 7;
     if (cFunc == (struct funcStruct *) &Complex_funcs)
         retVal = 8;
-    if (cFunc == (struct funcStruct *) &Stat_funcs)
+    if (cFunc == (struct funcStruct *) &Statistics_funcs)
         retVal = 9;
-    if (cFunc == (struct funcStruct *) &Custom_funcs)
-        retVal = 10;
     if (cFunc == (struct funcStruct *) &Physics_funcs)
+        retVal = 10;
+    if (cFunc == (struct funcStruct *) &Custom_funcs)
         retVal = 11;
-    if (cFunc == (struct funcStruct *) &Prog1_funcs)
-        retVal = 12;
 
     return(retVal);
 }
@@ -3464,73 +3362,70 @@ void SetMenuType(int type)
     switch(type)
     {
     case(1):
-        currentFuncs = (struct funcStruct *) &Sci_I_funcs;
-        CheckMenuItem(hMenu, IDM_SCIENTIFICI, MF_CHECKED);
+        currentFuncs = (struct funcStruct *) &Scientific_funcs;
+        CheckMenuItem(hMainMenu, IDM_SCIENTIFIC, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, 350), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_SCI_I);
         break;
     case(2):
-
+        currentFuncs = (struct funcStruct *) &Financial_funcs;
+        CheckMenuItem(hMainMenu, IDM_FINANCIAL, MF_CHECKED);
+        SendMessage(GetDlgItem(calcMainWindow, 352), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
+        ShowFunctionBar(FUNC_BAR_TEXT_BUIS);
         break;
     case(3):
-        currentFuncs = (struct funcStruct *) &Programming_funcs;
-        CheckMenuItem(hMenu, IDM_PROGRAMMING, MF_CHECKED);
+        currentFuncs = (struct funcStruct *) &CompSci_funcs;
+        CheckMenuItem(hMainMenu, IDM_COMPSCI, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, 355), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_COMPSCI);
         break;
     case(4):
-        currentFuncs = (struct funcStruct *) &Business_funcs;
-        CheckMenuItem(hMenu, IDM_BUSINESS, MF_CHECKED);
-        SendMessage(GetDlgItem(calcMainWindow, 352), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
-        ShowFunctionBar(FUNC_BAR_TEXT_BUIS);
-        break;
-    case(5):
         currentFuncs = (struct funcStruct *) &Conversion_funcs;
-        CheckMenuItem(hMenu, IDM_CONVERSION, MF_CHECKED);
+        CheckMenuItem(hMainMenu, IDM_CONVERSION, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, 353), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_CONV);
         break;
-    case(6):
+    case(5):
         currentFuncs = (struct funcStruct *) &Geometry_funcs;
-        CheckMenuItem(hMenu, IDM_GEOMETRY, MF_CHECKED);
+        CheckMenuItem(hMainMenu, IDM_GEOMETRY, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, 354), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_GEOM);
         break;
+    case(6):
+        currentFuncs = (struct funcStruct *) &Program1_funcs;
+        CheckMenuItem(hMainMenu, IDM_MACROBANK, MF_CHECKED);
+        SendMessage(GetDlgItem(calcMainWindow, 360), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
+        ShowFunctionBar(FUNC_BAR_TEXT_PROG1);
+        break;
     case(7):
-        currentFuncs = (struct funcStruct *) &Prog2_funcs;
-        CheckMenuItem(hMenu, IDM_MISC, MF_CHECKED);
+        currentFuncs = (struct funcStruct *) &Program2_funcs;
+        CheckMenuItem(hMainMenu, IDM_MISC, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, 356), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_PROG2);
         break;
     case(8):
         currentFuncs = (struct funcStruct *) &Complex_funcs;
-        CheckMenuItem(hMenu, IDM_COMPLEX, MF_CHECKED);
+        CheckMenuItem(hMainMenu, IDM_COMPLEX, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, 358), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_COMPLEX);
         break;
     case(9):
-        currentFuncs = (struct funcStruct *) &Stat_funcs;
-        CheckMenuItem(hMenu, IDM_STATS, MF_CHECKED);
+        currentFuncs = (struct funcStruct *) &Statistics_funcs;
+        CheckMenuItem(hMainMenu, IDM_STATS, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, 351), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_STATS);
         break;
     case(10):
-        currentFuncs = (struct funcStruct *) &Custom_funcs;
-        CheckMenuItem(hMenu, IDM_CUSTOM, MF_CHECKED);
-        SendMessage(GetDlgItem(calcMainWindow, 357), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
-        ShowFunctionBar(FUNC_BAR_TEXT_CUSTOM);
-        break;
-    case(11):
         currentFuncs = (struct funcStruct *) &Physics_funcs;
-        CheckMenuItem(hMenu, IDM_PHYSICS, MF_CHECKED);
+        CheckMenuItem(hMainMenu, IDM_PHYSICS, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, 359), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_PHYSICS);
         break;
-    case(12):
-        currentFuncs = (struct funcStruct *) &Prog1_funcs;
-        CheckMenuItem(hMenu, IDM_MACROBANK, MF_CHECKED);
-        SendMessage(GetDlgItem(calcMainWindow, 360), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
-        ShowFunctionBar(FUNC_BAR_TEXT_PROG1);
+    case(11):
+        currentFuncs = (struct funcStruct *) &Custom_funcs;
+        CheckMenuItem(hMainMenu, IDM_CUSTOM, MF_CHECKED);
+        SendMessage(GetDlgItem(calcMainWindow, 357), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
+        ShowFunctionBar(FUNC_BAR_TEXT_CUSTOM);
         break;
     }
 }
@@ -3540,80 +3435,83 @@ void SetLastMenuType(int type)
     switch(type)
     {
     case(1):
-        lastFuncs = (struct funcStruct *) &Sci_I_funcs;
+        lastFuncs = (struct funcStruct *) &Scientific_funcs;
         break;
     case(2):
-
+        lastFuncs = (struct funcStruct *) &Financial_funcs;
         break;
     case(3):
-        lastFuncs = (struct funcStruct *) &Programming_funcs;
+        lastFuncs = (struct funcStruct *) &CompSci_funcs;
         break;
     case(4):
-        lastFuncs = (struct funcStruct *) &Business_funcs;
-        break;
-    case(5):
         lastFuncs = (struct funcStruct *) &Conversion_funcs;
         break;
-    case(6):
+    case(5):
         lastFuncs = (struct funcStruct *) &Geometry_funcs;
         break;
+    case(6):
+        lastFuncs = (struct funcStruct *) &Program1_funcs;
+        break;
     case(7):
-        lastFuncs = (struct funcStruct *) &Prog2_funcs;
+        lastFuncs = (struct funcStruct *) &Program2_funcs;
         break;
     case(8):
         lastFuncs = (struct funcStruct *) &Complex_funcs;
         break;
     case(9):
-        lastFuncs = (struct funcStruct *) &Stat_funcs;
+        lastFuncs = (struct funcStruct *) &Statistics_funcs;
         break;
     case(10):
-        lastFuncs = (struct funcStruct *) &Custom_funcs;
-        break;
-    case(11):
         lastFuncs = (struct funcStruct *) &Physics_funcs;
         break;
-    case(12):
-        lastFuncs = (struct funcStruct *) &Prog1_funcs;
+    case(11):
+        lastFuncs = (struct funcStruct *) &Custom_funcs;
         break;
     }
 }
 
-#define RESERVED_SIZE 1024
+#define RESERVED_SIZE           1024
+#define CSIDL_LOCAL_APPDATA     0x001c
 char reserved[RESERVED_SIZE];
-#define CSIDL_LOCAL_APPDATA 0x001c
 
-void SaveToDisk(void)
+char *GetConfigurationDirectory(void)
 {
-    FILE *outfile;
-    int i;
-    unsigned int ui;
-    TCHAR Buffer[MAX_PATH];     // buffer for concatenated string
-    TCHAR szPath[MAX_PATH];
+    static TCHAR Buffer[MAX_PATH];     // buffer for concatenated string
+    static TCHAR szPath[MAX_PATH];
     LPITEMIDLIST pidl = NULL;
     LPTSTR lpszSystemInfo;     // pointer to system information string
 
-    if ( SUCCEEDED(SHGetSpecialFolderLocation(NULL, CSIDL_LOCAL_APPDATA, &pidl)) )
+    if (SUCCEEDED(SHGetSpecialFolderLocation(NULL, CSIDL_LOCAL_APPDATA, &pidl)))
     {
-        if ( SHGetPathFromIDList(pidl, szPath) )  // Use the applications directory...
+        if (SHGetPathFromIDList(pidl, szPath))  // Use the applications directory...
         {
-            sprintf(Buffer, "%s\\Excal32.dat", szPath);
+            sprintf(Buffer, "%s\\Excal32.cfg", szPath);
             CoTaskMemFree(pidl);
         }
         else // ... but if that fails, use the standard system directory...
         {
            lpszSystemInfo = Buffer;
            GetWindowsDirectory(lpszSystemInfo, MAX_PATH);
-           strcat(Buffer, "\\Excal32.dat");
+           strcat(Buffer, "\\Excal32.cfg");
         }
     }
     else
     {
            lpszSystemInfo = Buffer;
            GetWindowsDirectory(lpszSystemInfo, MAX_PATH);
-           strcat(Buffer, "\\Excal32.dat");
+           strcat(Buffer, "\\Excal32.cfg");
     }
+    
+    return Buffer;
+}
 
-    outfile = fopen(Buffer, "wb+");
+void SaveToDisk(void)
+{
+    FILE *outfile;
+    uint8_t  menuCurrentFuncs, menuLastFuncs;
+    uint16_t configVersionMain, configVersionSub;
+
+    outfile = fopen(GetConfigurationDirectory(), "wb+");
 
     if (ClearStackOnExit)
     {
@@ -3621,312 +3519,256 @@ void SaveToDisk(void)
         RPN_clearL();
     }
 
-    ui = 0x00000000;
-    if (footPrintChanged == TRUE)
-        ui = (0x0000FFFF << 16) | CONFIG_VERSION;
-    else
-        ui = (DISPLAY_CONFIG_VERSION << 16) | CONFIG_VERSION;
-
-    fwrite(&ui, sizeof(unsigned int), 1, outfile);
-
-    i = GetMenuType(currentFuncs);
-    fwrite(&i, sizeof(int), 1, outfile);
-
-    fwrite(&progMode, sizeof(int), 1, outfile);
-    fwrite(&alwaysOnTop, sizeof(int), 1, outfile);
-    fwrite(&decimal_places, sizeof(int), 1, outfile);
-    fwrite(&sci_format, sizeof(char), 1, outfile);
-
-    fwrite(&X, sizeof(double), 1, outfile);
-    fwrite(&Y, sizeof(double), 1, outfile);
-    fwrite(&Z, sizeof(double), 1, outfile);
-    fwrite(&T, sizeof(double), 1, outfile);
-    fwrite(&LASTX, sizeof(double), 1, outfile);
-    fwrite(&LASTY, sizeof(double), 1, outfile);
-
-    fwrite(&XL, sizeof(long), 1, outfile);
-    fwrite(&YL, sizeof(long), 1, outfile);
-    fwrite(&ZL, sizeof(long), 1, outfile);
-    fwrite(&TL, sizeof(long), 1, outfile);
-    fwrite(&LASTXL, sizeof(long), 1, outfile);
-    fwrite(&LASTYL, sizeof(long), 1, outfile);
-
-    fwrite(&indirectRegister, sizeof(unsigned int), 1, outfile);
-
-    for (i = 0; i < MAX_STO; i++)
-        fwrite(&STO[i], sizeof(double), 1, outfile);
-
-    for (i = 0; i < SUM_MAX; i++)
-        fwrite(&SUM[i], sizeof(double), 1, outfile);
-
-    for (i = 0; i < FIN_REG_MAX; i++)
-        fwrite(&fin_reg[i], sizeof(double), 1, outfile);
-
-    for (i = 0; i < MAX_CF; i++)
-        fwrite(&cashFlow[i], sizeof(double), 1, outfile);
-    fwrite(&CFn, sizeof(int), 1, outfile);
-
-    fwrite(&main_x, sizeof(int), 1, outfile);
-    fwrite(&main_y, sizeof(int), 1, outfile);
-    fwrite(&main_cx, sizeof(int), 1, outfile);
-    fwrite(&main_cy, sizeof(int), 1, outfile);
-    fwrite(&AngleMode, sizeof(int), 1, outfile);
-    fwrite(&taxConstant, sizeof(double), 1, outfile);
-    fwrite(&commaMode, sizeof(int), 1, outfile);
-    fwrite(&eexMode, sizeof(int), 1, outfile);
-    fwrite(&numLockMode, sizeof(int), 1, outfile);
-    fwrite(&toolTipsOn, sizeof(int), 1, outfile);
-    fwrite(&payMode, sizeof(int), 1, outfile);
-    fwrite(&dateMode, sizeof(int), 1, outfile);
-    fwrite(&depreciationType, sizeof(int), 1, outfile);
-    fwrite(&stackPushes, sizeof(long), 1, outfile);
-    fwrite(&stackPops, sizeof(long), 1, outfile);
-    fwrite(&inFocusTime, sizeof(long), 1, outfile);
-    fwrite(customSave, sizeof(customSave), 1, outfile);
-
-    fwrite(playBack, sizeof(playBack), 1, outfile);
-    fwrite(playBackSave, sizeof(playBackSave), 1, outfile);
-    fwrite(&playBackIdx, sizeof(playBackIdx), 1, outfile);
-    fwrite(&playBackIdxSave, sizeof(playBackIdxSave), 1, outfile);
-    fwrite(&macroName, sizeof(macroName), 1, outfile);
-    fwrite(&macro_short_names, sizeof(macro_short_names), 1, outfile);
-
-    fwrite(&numberDisplayMode, sizeof(int), 1, outfile);
-
-    fwrite(&padZeros, sizeof(int), 1, outfile);
-    fwrite(&wordSize, sizeof(int), 1, outfile);
-    fwrite(&wordMode, sizeof(int), 1, outfile);
-    fwrite(&wordSizeMask, sizeof(PROG_LONG), 1, outfile);
-
-    fwrite(&currency1index, sizeof(int), 1, outfile);
-    fwrite(&currency2index, sizeof(int), 1, outfile);
-
-    fwrite(constants, sizeof(constants), 1, outfile);
-    fwrite(constantBankNames, sizeof(constantBankNames), 1, outfile);
-
-    fwrite(CurrencyConv, sizeof(CurrencyConv), 1, outfile);
-
-    i = GetMenuType(lastFuncs);
-    fwrite(&i, sizeof(int), 1, outfile);
-
-    fwrite(&footPrint, sizeof(int), 1, outfile);
-
-    fwrite(&A, sizeof(double), 1, outfile);
-    fwrite(&B, sizeof(double), 1, outfile);
-    fwrite(&C, sizeof(double), 1, outfile);
-    fwrite(&D, sizeof(double), 1, outfile);
-
-    fwrite(&stackLevels, sizeof(int), 1, outfile);
-    fwrite(&popFillZero, sizeof(int), 1, outfile);
-
-    fwrite(&AL, sizeof(long), 1, outfile);
-    fwrite(&BL, sizeof(long), 1, outfile);
-    fwrite(&CL, sizeof(long), 1, outfile);
-    fwrite(&DL, sizeof(long), 1, outfile);
-
-    fwrite(&lastChosenConst, sizeof(int), 1, outfile);
-    fwrite(&lastConstBank, sizeof(int), 1, outfile);
-
-    fwrite(excaliburNotes, 1024, 1, outfile);
-
-    fwrite(&lastChosenMacro, sizeof(int), 1, outfile);
-
-    fwrite(&rightAlignStack, sizeof(int), 1, outfile);
-    fwrite(&showXMinimized, sizeof(int), 1, outfile);
-    fwrite(&RPL_entry, sizeof(int), 1, outfile);
-    fwrite(&ClearStackOnExit, sizeof(int), 1, outfile);
-
-    fwrite(&lastStoRcl, sizeof(int), 1, outfile);
-
-    fwrite(STOlabels, sizeof(STOlabels), 1, outfile);
-
-    fwrite(&progDelayValue, sizeof(int), 1, outfile);
-
     memset(reserved, 0, RESERVED_SIZE);
-    fwrite(reserved, sizeof(char), RESERVED_SIZE, outfile);
+    
+    configVersionMain = CONFIG_VERSION_MAIN;
+    configVersionSub  = CONFIG_VERSION_SUB;
+    menuCurrentFuncs  = GetMenuType(currentFuncs);
+    menuLastFuncs     = GetMenuType(lastFuncs);
+    
+    if (outfile)
+    {
+        fwrite(&configVersionMain,  sizeof(configVersionMain),  1, outfile);
+        fwrite(&configVersionSub,   sizeof(configVersionSub),   1, outfile);
 
-    fclose(outfile);
+        fwrite(&main_x,             sizeof(main_x),             1, outfile);
+        fwrite(&main_y,             sizeof(main_y),             1, outfile);
+        fwrite(&main_cx,            sizeof(main_cx),            1, outfile);
+        fwrite(&main_cy,            sizeof(main_cy),            1, outfile);
+
+        fwrite(&menuCurrentFuncs,   sizeof(menuCurrentFuncs),   1, outfile);
+        fwrite(&menuLastFuncs,      sizeof(menuLastFuncs),      1, outfile);
+        fwrite(&progMode,           sizeof(progMode),           1, outfile);
+        fwrite(&alwaysOnTop,        sizeof(alwaysOnTop),        1, outfile);
+        fwrite(&decimal_places,     sizeof(decimal_places),     1, outfile);
+        fwrite(&sci_format,         sizeof(sci_format),         1, outfile);
+        fwrite(&numberDisplayMode,  sizeof(numberDisplayMode),  1, outfile);
+        fwrite(&padZeros,           sizeof(padZeros),           1, outfile);
+        fwrite(&wordSize,           sizeof(wordSize),           1, outfile);
+        fwrite(&wordMode,           sizeof(wordMode),           1, outfile);
+        fwrite(&wordSizeMask,       sizeof(wordSizeMask),       1, outfile);
+            
+        fwrite(&X,                  sizeof(X),                  1, outfile);
+        fwrite(&Y,                  sizeof(Y),                  1, outfile);
+        fwrite(&Z,                  sizeof(Z),                  1, outfile);
+        fwrite(&T,                  sizeof(T),                  1, outfile);
+        fwrite(&LASTX,              sizeof(LASTX),              1, outfile);
+        fwrite(&LASTY,              sizeof(LASTY),              1, outfile);
+            
+        fwrite(&XL,                 sizeof(XL),                 1, outfile);
+        fwrite(&YL,                 sizeof(YL),                 1, outfile);
+        fwrite(&ZL,                 sizeof(ZL),                 1, outfile);
+        fwrite(&TL,                 sizeof(TL),                 1, outfile);
+        fwrite(&LASTXL,             sizeof(LASTXL),             1, outfile);
+        fwrite(&LASTYL,             sizeof(LASTYL),             1, outfile);
+        
+        fwrite(&A,                  sizeof(A),                  1, outfile);
+        fwrite(&B,                  sizeof(B),                  1, outfile);
+        fwrite(&C,                  sizeof(C),                  1, outfile);
+        fwrite(&D,                  sizeof(D),                  1, outfile);
+        fwrite(&AL,                 sizeof(AL),                 1, outfile);
+        fwrite(&BL,                 sizeof(BL),                 1, outfile);
+        fwrite(&CL,                 sizeof(CL),                 1, outfile);
+        fwrite(&DL,                 sizeof(DL),                 1, outfile);    
+
+        fwrite(STO,                 sizeof(STO),                1, outfile);
+        fwrite(SUM,                 sizeof(SUM),                1, outfile);
+        fwrite(fin_reg,             sizeof(fin_reg),            1, outfile);
+        fwrite(cashFlow,            sizeof(cashFlow),           1, outfile);
+        fwrite(&CFn,                sizeof(CFn),                1, outfile);
+
+        fwrite(&AngleMode,          sizeof(AngleMode),          1, outfile);
+        fwrite(&taxConstant,        sizeof(taxConstant),        1, outfile);
+        fwrite(&commaMode,          sizeof(commaMode),          1, outfile);
+        fwrite(&eexMode,            sizeof(eexMode),            1, outfile);
+        fwrite(&numLockMode,        sizeof(numLockMode),        1, outfile);
+        fwrite(&toolTipsOn,         sizeof(toolTipsOn),         1, outfile);
+        fwrite(&payMode,            sizeof(payMode),            1, outfile);
+        fwrite(&dateMode,           sizeof(dateMode),           1, outfile);
+        fwrite(&depreciationType,   sizeof(depreciationType),   1, outfile);
+        fwrite(&stackPushes,        sizeof(stackPushes),        1, outfile);
+        fwrite(&stackPops,          sizeof(stackPops),          1, outfile);
+        fwrite(&inFocusTime,        sizeof(inFocusTime),        1, outfile);
+        fwrite(customSave,          sizeof(customSave),         1, outfile);
+        fwrite(&extendedStack,      sizeof(extendedStack),      1, outfile);
+        fwrite(&popFillZero,        sizeof(popFillZero),        1, outfile);
+        fwrite(&rightAlignStack,    sizeof(rightAlignStack),    1, outfile);
+        fwrite(&showXMinimized,     sizeof(showXMinimized),     1, outfile);
+        fwrite(&RPL_entry,          sizeof(RPL_entry),          1, outfile);
+        fwrite(&ClearStackOnExit,   sizeof(ClearStackOnExit),   1, outfile);
+
+        fwrite(playBack,            sizeof(playBack),           1, outfile);
+        fwrite(playBackSave,        sizeof(playBackSave),       1, outfile);
+        fwrite(&playBackIdx,        sizeof(playBackIdx),        1, outfile);
+        fwrite(&playBackIdxSave,    sizeof(playBackIdxSave),    1, outfile);
+        fwrite(&macroName,          sizeof(macroName),          1, outfile);
+        fwrite(&macro_short_names,  sizeof(macro_short_names),  1, outfile);
+
+        fwrite(&currency1index,     sizeof(currency1index),     1, outfile);
+        fwrite(&currency2index,     sizeof(currency2index),     1, outfile);
+
+        fwrite(constants,           sizeof(constants),          1, outfile);
+        fwrite(constantBankNames,   sizeof(constantBankNames),  1, outfile);
+        fwrite(CurrencyConv,        sizeof(CurrencyConv),       1, outfile);
+
+        fwrite(&lastChosenConst,    sizeof(lastChosenConst),    1, outfile);
+        fwrite(&lastConstBank,      sizeof(lastConstBank),      1, outfile);
+        fwrite(excaliburNotes,      sizeof(excaliburNotes),     1, outfile);
+        fwrite(&lastChosenMacro,    sizeof(lastChosenMacro),    1, outfile);
+        fwrite(STOlabels,           sizeof(STOlabels),          1, outfile);
+        fwrite(&progDelayValue,     sizeof(int),                1, outfile);
+        fwrite(&indirectRegister,   sizeof(indirectRegister),   1, outfile);
+
+        fwrite(reserved,            RESERVED_SIZE,              1, outfile);
+
+        fclose(outfile);
+    }
+    else
+    {
+        // For now we are silent on not being able to save a config file... it's no real harm and maybe something about the user's system prevents it.
+        // MessageBox(NULL, TEXT("Unable to save Excalibur Configuration."), "Excalibur 32-bit", MB_ICONERROR);
+    }
 }
 
 void ReadFromDisk(void)
 {
     FILE *infile;
-    int i;
-    unsigned int all_config_ver = -2;
-    unsigned int config_ver = -2;
-    unsigned int display_config_ver = -2;
-    TCHAR Buffer[MAX_PATH];     // buffer for concatenated string
-    TCHAR szPath[MAX_PATH];
-    LPITEMIDLIST pidl = NULL;
-    LPTSTR lpszSystemInfo;     // pointer to system information string
+    uint8_t  menuCurrentFuncs, menuLastFuncs;
+    uint16_t configVersionMain, configVersionSub;
 
-    if ( SUCCEEDED(SHGetSpecialFolderLocation(NULL, CSIDL_LOCAL_APPDATA, &pidl)) )
-    {
-        if ( SHGetPathFromIDList(pidl, szPath) )  // Use the personal apps directory...
-        {
-            sprintf(Buffer, "%s\\Excal32.dat", szPath);
-            CoTaskMemFree(pidl);
-        }
-        else // ... but if that fails, use the standard system directory...
-        {
-           lpszSystemInfo = Buffer;
-           GetWindowsDirectory(lpszSystemInfo, MAX_PATH);
-           strcat(Buffer, "\\Excal32.dat");
-        }
-    }
-    else
-    {
-           lpszSystemInfo = Buffer;
-           GetWindowsDirectory(lpszSystemInfo, MAX_PATH);
-           strcat(Buffer, "\\Excal32.dat");
-    }
-
-    infile = fopen(Buffer, "rb");
+    infile = fopen(GetConfigurationDirectory(), "rb");
     if (infile != NULL)
     {
-        fread(&all_config_ver, sizeof(int), 1, infile);
-        config_ver = all_config_ver & 0x0000FFFF;
-        display_config_ver = (all_config_ver >> 16) & 0x0000FFFF;
-        if (config_ver != CONFIG_VERSION)       /* If new version */
+        fread(&configVersionMain,   sizeof(configVersionMain),      1, infile);
+        fread(&configVersionSub,    sizeof(configVersionSub),       1, infile);
+        
+        // --------------------------------------------------------------
+        // If main version has changed, we wipe config with defaults...
+        // --------------------------------------------------------------
+        if (configVersionMain != CONFIG_VERSION_MAIN) 
         {
             main_x = -1;
-            SaveToDisk();
             SetMenuType(1);
+            SaveToDisk();
             ProcessCusomSave();
             return;
         }
-        fread(&i, sizeof(int), 1, infile);
-        SetMenuType(i);
+        
+        fread(&main_x,             sizeof(main_x),             1, infile);
+        fread(&main_y,             sizeof(main_y),             1, infile);
+        fread(&main_cx,            sizeof(main_cx),            1, infile);
+        fread(&main_cy,            sizeof(main_cy),            1, infile);
 
-        fread(&progMode, sizeof(int), 1, infile);
-        fread(&alwaysOnTop, sizeof(int), 1, infile);
-        fread(&decimal_places, sizeof(int), 1, infile);
-        fread(&sci_format, sizeof(char), 1, infile);
+        fread(&menuCurrentFuncs,   sizeof(menuCurrentFuncs),   1, infile);
+        fread(&menuLastFuncs,      sizeof(menuLastFuncs),      1, infile);
+        fread(&progMode,           sizeof(progMode),           1, infile);
+        fread(&alwaysOnTop,        sizeof(alwaysOnTop),        1, infile);
+        fread(&decimal_places,     sizeof(decimal_places),     1, infile);
+        fread(&sci_format,         sizeof(sci_format),         1, infile);
+        fread(&numberDisplayMode,  sizeof(numberDisplayMode),  1, infile);
+        fread(&padZeros,           sizeof(padZeros),           1, infile);
+        fread(&wordSize,           sizeof(wordSize),           1, infile);
+        fread(&wordMode,           sizeof(wordMode),           1, infile);
+        fread(&wordSizeMask,       sizeof(wordSizeMask),       1, infile);
+            
+        fread(&X,                  sizeof(X),                  1, infile);
+        fread(&Y,                  sizeof(Y),                  1, infile);
+        fread(&Z,                  sizeof(Z),                  1, infile);
+        fread(&T,                  sizeof(T),                  1, infile);
+        fread(&LASTX,              sizeof(LASTX),              1, infile);
+        fread(&LASTY,              sizeof(LASTY),              1, infile);
 
-        fread(&X, sizeof(double), 1, infile);
-        fread(&Y, sizeof(double), 1, infile);
-        fread(&Z, sizeof(double), 1, infile);
-        fread(&T, sizeof(double), 1, infile);
-        fread(&LASTX, sizeof(double), 1, infile);
-        fread(&LASTY, sizeof(double), 1, infile);
+        fread(&XL,                 sizeof(XL),                 1, infile);
+        fread(&YL,                 sizeof(YL),                 1, infile);
+        fread(&ZL,                 sizeof(ZL),                 1, infile);
+        fread(&TL,                 sizeof(TL),                 1, infile);
+        fread(&LASTXL,             sizeof(LASTXL),             1, infile);
+        fread(&LASTYL,             sizeof(LASTYL),             1, infile);
+        
+        fread(&A,                  sizeof(A),                  1, infile);
+        fread(&B,                  sizeof(B),                  1, infile);
+        fread(&C,                  sizeof(C),                  1, infile);
+        fread(&D,                  sizeof(D),                  1, infile);
+        fread(&AL,                 sizeof(AL),                 1, infile);
+        fread(&BL,                 sizeof(BL),                 1, infile);
+        fread(&CL,                 sizeof(CL),                 1, infile);
+        fread(&DL,                 sizeof(DL),                 1, infile);    
 
-        fread(&XL, sizeof(long), 1, infile);
-        fread(&YL, sizeof(long), 1, infile);
-        fread(&ZL, sizeof(long), 1, infile);
-        fread(&TL, sizeof(long), 1, infile);
-        fread(&LASTXL, sizeof(long), 1, infile);
-        fread(&LASTYL, sizeof(long), 1, infile);
+        fread(STO,                 sizeof(STO),                1, infile);
+        fread(SUM,                 sizeof(SUM),                1, infile);
+        fread(fin_reg,             sizeof(fin_reg),            1, infile);
+        fread(cashFlow,            sizeof(cashFlow),           1, infile);
+        fread(&CFn,                sizeof(CFn),                1, infile);
 
-        fread(&indirectRegister, sizeof(unsigned int), 1, infile);
+        fread(&AngleMode,          sizeof(AngleMode),          1, infile);
+        fread(&taxConstant,        sizeof(taxConstant),        1, infile);
+        fread(&commaMode,          sizeof(commaMode),          1, infile);
+        fread(&eexMode,            sizeof(eexMode),            1, infile);
+        fread(&numLockMode,        sizeof(numLockMode),        1, infile);
+        fread(&toolTipsOn,         sizeof(toolTipsOn),         1, infile);
+        fread(&payMode,            sizeof(payMode),            1, infile);
+        fread(&dateMode,           sizeof(dateMode),           1, infile);
+        fread(&depreciationType,   sizeof(depreciationType),   1, infile);
+        fread(&stackPushes,        sizeof(stackPushes),        1, infile);
+        fread(&stackPops,          sizeof(stackPops),          1, infile);
+        fread(&inFocusTime,        sizeof(inFocusTime),        1, infile);
+        fread(customSave,          sizeof(customSave),         1, infile);
+        fread(&extendedStack,      sizeof(extendedStack),      1, infile);
+        fread(&popFillZero,        sizeof(popFillZero),        1, infile);
+        fread(&rightAlignStack,    sizeof(rightAlignStack),    1, infile);
+        fread(&showXMinimized,     sizeof(showXMinimized),     1, infile);
+        fread(&RPL_entry,          sizeof(RPL_entry),          1, infile);
+        fread(&ClearStackOnExit,   sizeof(ClearStackOnExit),   1, infile);
 
-        for (i = 0; i < MAX_STO; i++)
-            fread(&STO[i], sizeof(double), 1, infile);
+        fread(playBack,            sizeof(playBack),           1, infile);
+        fread(playBackSave,        sizeof(playBackSave),       1, infile);
+        fread(&playBackIdx,        sizeof(playBackIdx),        1, infile);
+        fread(&playBackIdxSave,    sizeof(playBackIdxSave),    1, infile);
+        fread(&macroName,          sizeof(macroName),          1, infile);
+        fread(&macro_short_names,  sizeof(macro_short_names),  1, infile);
 
-        for (i = 0; i < SUM_MAX; i++)
-            fread(&SUM[i], sizeof(double), 1, infile);
+        fread(&currency1index,     sizeof(currency1index),     1, infile);
+        fread(&currency2index,     sizeof(currency2index),     1, infile);
 
-        for (i = 0; i < FIN_REG_MAX; i++)
-            fread(&fin_reg[i], sizeof(double), 1, infile);
+        if (configVersionSub != CONFIG_VERSION_SUB) // Skip these if sub-ver changed
+        {
+            fseek(infile, sizeof(constants),           SEEK_CUR);
+            fseek(infile, sizeof(constantBankNames),   SEEK_CUR);
+            fseek(infile, sizeof(CurrencyConv),        SEEK_CUR);
+        }
+        else
+        {
+            fread(constants,           sizeof(constants),          1, infile);
+            fread(constantBankNames,   sizeof(constantBankNames),  1, infile);
+            fread(CurrencyConv,        sizeof(CurrencyConv),       1, infile);
+        }
 
-        for (i = 0; i < MAX_CF; i++)
-            fread(&cashFlow[i], sizeof(double), 1, infile);
-        fread(&CFn, sizeof(int), 1, infile);
+        fread(&lastChosenConst,    sizeof(lastChosenConst),    1, infile);
+        fread(&lastConstBank,      sizeof(lastConstBank),      1, infile);
+        fread(excaliburNotes,      sizeof(excaliburNotes),     1, infile);
+        fread(&lastChosenMacro,    sizeof(lastChosenMacro),    1, infile);
+        fread(STOlabels,           sizeof(STOlabels),          1, infile);
+        fread(&progDelayValue,     sizeof(int),                1, infile);
+        fread(&indirectRegister,   sizeof(indirectRegister),   1, infile);
 
-        fread(&main_x, sizeof(int), 1, infile);
-        fread(&main_y, sizeof(int), 1, infile);
-        fread(&main_cx, sizeof(int), 1, infile);
-        fread(&main_cy, sizeof(int), 1, infile);
-
+        fread(reserved,            RESERVED_SIZE,              1, infile);
+        
+        SetMenuType(menuCurrentFuncs);
+        SetLastMenuType(menuLastFuncs);
+        
+        // -----------------------------------------------------------------------------------------------
+        // If the main window was somehow shifted off screen (maybe due to using on a dock station with 
+        // multiple monitors), simply force the main window back to the center again and auto-resize it.
+        // -----------------------------------------------------------------------------------------------
         if ((main_cx < MIN_WINDOW_WIDTH) || (main_cy < MIN_WINDOW_HEIGHT) ||
             (main_x >= MAX_WINDOW_X) || (main_y >= MAX_WINDOW_Y) || (main_x < MIN_WINDOW_X) || (main_y < MIN_WINDOW_Y))
         {
             main_x = -1;        // Force auto-resize!
         }
-        if (display_config_ver != DISPLAY_CONFIG_VERSION)       /* If new version but still supported version */
+        if (configVersionSub != CONFIG_VERSION_SUB)       /* If new version but still supported version */
         {
             main_x = -1;        // Force auto-resize!
         }
-
-        fread(&AngleMode, sizeof(int), 1, infile);
-        fread(&taxConstant, sizeof(double), 1, infile);
-        fread(&commaMode, sizeof(int), 1, infile);
-        fread(&eexMode, sizeof(int), 1, infile);
-        fread(&numLockMode, sizeof(int), 1, infile);
-        fread(&toolTipsOn, sizeof(int), 1, infile);
-        fread(&payMode, sizeof(int), 1, infile);
-        fread(&dateMode, sizeof(int), 1, infile);
-        fread(&depreciationType, sizeof(int), 1, infile);
-
-        fread(&stackPushes, sizeof(long), 1, infile);
-        fread(&stackPops, sizeof(long), 1, infile);
-        fread(&inFocusTime, sizeof(long), 1, infile);
-        fread(customSave, sizeof(customSave), 1, infile);
-
-        fread(playBack, sizeof(playBack), 1, infile);
-        fread(playBackSave, sizeof(playBackSave), 1, infile);
-        fread(&playBackIdx, sizeof(playBackIdx), 1, infile);
-        fread(&playBackIdxSave, sizeof(playBackIdxSave), 1, infile);
-        fread(&macroName, sizeof(macroName), 1, infile);
-        fread(&macro_short_names, sizeof(macro_short_names), 1, infile);
-
-        fread(&numberDisplayMode, sizeof(int), 1, infile);
-
-        fread(&padZeros, sizeof(int), 1, infile);
-        fread(&wordSize, sizeof(int), 1, infile);
-        fread(&wordMode, sizeof(int), 1, infile);
-        fread(&wordSizeMask, sizeof(PROG_LONG), 1, infile);
-
-        fread(&currency1index, sizeof(int), 1, infile);
-        fread(&currency2index, sizeof(int), 1, infile);
-
-        fread(constants, sizeof(constants), 1, infile);
-        fread(constantBankNames, sizeof(constantBankNames), 1, infile);
-
-        if (main_x == -1) // Did we do a soft reset of the config?
-        {
-            struct CurrencyStruct tmpCurrencyConv[MAX_CURRENCY_CONV];
-            fread(tmpCurrencyConv, sizeof(tmpCurrencyConv), 1, infile);
-        }
-        else
-        {
-            fread(CurrencyConv, sizeof(CurrencyConv), 1, infile);
-        }
-
-        fread(&i, sizeof(int), 1, infile);
-        SetLastMenuType(i);
-
-        fread(&footPrint, sizeof(int), 1, infile);
-
-        fread(&A, sizeof(double), 1, infile);
-        fread(&B, sizeof(double), 1, infile);
-        fread(&C, sizeof(double), 1, infile);
-        fread(&D, sizeof(double), 1, infile);
-
-        fread(&stackLevels, sizeof(int), 1, infile);
-        fread(&popFillZero, sizeof(int), 1, infile);
-
-        fread(&AL, sizeof(long), 1, infile);
-        fread(&BL, sizeof(long), 1, infile);
-        fread(&CL, sizeof(long), 1, infile);
-        fread(&DL, sizeof(long), 1, infile);
-
-        fread(&lastChosenConst, sizeof(int), 1, infile);
-        fread(&lastConstBank, sizeof(int), 1, infile);
-
-        fread(excaliburNotes, 1024, 1, infile);
-
-        fread(&lastChosenMacro, sizeof(int), 1, infile);
-
-        fread(&rightAlignStack, sizeof(int), 1, infile);
-        fread(&showXMinimized, sizeof(int), 1, infile);
-        fread(&RPL_entry, sizeof(int), 1, infile);
-        fread(&ClearStackOnExit, sizeof(int), 1, infile);
-
-        fread(&lastStoRcl, sizeof(int), 1, infile);
-
-        fread(STOlabels, sizeof(STOlabels), 1, infile);
-
-        fread(&progDelayValue, sizeof(int), 1, infile);
 
         fclose(infile);
         ProcessCusomSave();
@@ -3935,7 +3777,7 @@ void ReadFromDisk(void)
     {
         SetMenuType(1);
         ProcessCusomSave();
-        // Window will auto resize because main_cx == -1
+        main_cx = -1;       // Window will auto resize because main_cx == -1
     }
 }
 
@@ -3950,22 +3792,22 @@ void ProcessCusomSave(void)
         saveIdx = Custom_funcs[newIdx].index;
         switch(customSave[newIdx].custom_save_idx)
         {
-        case(CUSTOM_SAVE_SCI):
-            memcpy(&Custom_funcs[newIdx], &Sci_I_funcs[index], sizeof(struct funcStruct));
+        case(CUSTOM_SAVE_SCI):        // Scientific
+            memcpy(&Custom_funcs[newIdx], &Scientific_funcs[index], sizeof(struct funcStruct));
             break;
-        case(CUSTOM_SAVE_BUS):
-            memcpy(&Custom_funcs[newIdx], &Business_funcs[index], sizeof(struct funcStruct));
+        case(CUSTOM_SAVE_BUS):        // Financial
+            memcpy(&Custom_funcs[newIdx], &Financial_funcs[index], sizeof(struct funcStruct));
             break;
-        case(CUSTOM_SAVE_PRO):
-            memcpy(&Custom_funcs[newIdx], &Programming_funcs[index], sizeof(struct funcStruct));
+        case(CUSTOM_SAVE_PRO):        // Programming
+            memcpy(&Custom_funcs[newIdx], &CompSci_funcs[index], sizeof(struct funcStruct));
             break;
-        case(CUSTOM_SAVE_STA):
-            memcpy(&Custom_funcs[newIdx], &Stat_funcs[index], sizeof(struct funcStruct));
+        case(CUSTOM_SAVE_STA):        // Statistics
+            memcpy(&Custom_funcs[newIdx], &Statistics_funcs[index], sizeof(struct funcStruct));
             break;
-        case(CUSTOM_SAVE_GEO):
+        case(CUSTOM_SAVE_GEO):        // Geometry
             memcpy(&Custom_funcs[newIdx], &Geometry_funcs[index], sizeof(struct funcStruct));
             break;
-        case(CUSTOM_SAVE_CON):
+        case(CUSTOM_SAVE_CON):        // Conversion
             memcpy(&Custom_funcs[newIdx], &Conversion_funcs[index], sizeof(struct funcStruct));
             break;
         case(CUSTOM_SAVE_COM):        // Complex
@@ -3975,10 +3817,10 @@ void ProcessCusomSave(void)
             memcpy(&Custom_funcs[newIdx], &Physics_funcs[index], sizeof(struct funcStruct));
             break;
         case(CUSTOM_SAVE_MACBANK):    // Programming Bank I
-            memcpy(&Custom_funcs[newIdx], &Prog1_funcs[index], sizeof(struct funcStruct));
+            memcpy(&Custom_funcs[newIdx], &Program1_funcs[index], sizeof(struct funcStruct));
             break;
         case(CUSTOM_SAVE_MACBANK2):    // Programming Bank II
-            memcpy(&Custom_funcs[newIdx], &Prog2_funcs[index], sizeof(struct funcStruct));
+            memcpy(&Custom_funcs[newIdx], &Program2_funcs[index], sizeof(struct funcStruct));
             break;
         case(CUSTOM_SAVE_MAC):        // Macros - SPECIAL!
             memcpy(&Custom_funcs[newIdx], &MacroFuncs[index], sizeof(struct funcStruct));
@@ -3999,9 +3841,9 @@ void GetMacroName(void)
 {
     DLGPROC lpfnDIALOG_MACRO;
 
-    lpfnDIALOG_MACRO = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_MACRONAME, hInst);
+    lpfnDIALOG_MACRO = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_MACRONAME, hExcaliburInstance);
 
-    if ((DialogBox(hInst, (LPCSTR) "DIALOG_MACRO_NAME", calcMainWindow, lpfnDIALOG_MACRO)) == -1)
+    if ((DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_MACRO_NAME", calcMainWindow, lpfnDIALOG_MACRO)) == -1)
     {
         MessageBox(NULL, "Unable to display dialog", "System Error", MB_SYSTEMMODAL | MB_ICONHAND | MB_OK);
     }
@@ -4053,7 +3895,7 @@ BOOL CALLBACK fnDIALOG_MACRONAME(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
 }
 
 
-void CopyBufferToCurrentMacro(char *tmpBuffer)
+void CopyBufferToCurrentMacro(char *clipboardBuffer)
 {
     int idx;
     char tmpB[50];
@@ -4077,7 +3919,7 @@ void CopyBufferToCurrentMacro(char *tmpBuffer)
 
     while ((idx < MAX_IMPORT_CLIPBOARD_SIZE) && !done)
     {
-        if ((tmpBuffer[idx] == '\n') || (tmpBuffer[idx] == CNULL))
+        if ((clipboardBuffer[idx] == '\n') || (clipboardBuffer[idx] == CNULL))
         {
             tmpB[tmpBidx++] = CNULL;
 
@@ -4213,12 +4055,12 @@ void CopyBufferToCurrentMacro(char *tmpBuffer)
         }
         else
         {
-            if (tmpBuffer[idx] != '\r')
+            if (clipboardBuffer[idx] != '\r')
             {
-                tmpB[tmpBidx++] = tmpBuffer[idx];
+                tmpB[tmpBidx++] = clipboardBuffer[idx];
             }
         }
-        if (tmpBuffer[idx] == CNULL)
+        if (clipboardBuffer[idx] == CNULL)
         {
             break;
         }
@@ -4228,7 +4070,7 @@ void CopyBufferToCurrentMacro(char *tmpBuffer)
     {
         while ((idx < MAX_IMPORT_CLIPBOARD_SIZE))
         {
-            if ((tmpBuffer[idx] == '\n') || (tmpBuffer[idx] == CNULL))
+            if ((clipboardBuffer[idx] == '\n') || (clipboardBuffer[idx] == CNULL))
             {
                 tmpB[tmpBidx++] = CNULL;
                 tmpBidx=0;
@@ -4242,12 +4084,12 @@ void CopyBufferToCurrentMacro(char *tmpBuffer)
             }
             else
             {
-                if (tmpBuffer[idx] != '\r')
+                if (clipboardBuffer[idx] != '\r')
                 {
-                    tmpB[tmpBidx++] = tmpBuffer[idx];
+                    tmpB[tmpBidx++] = clipboardBuffer[idx];
                 }
             }
-            if (tmpBuffer[idx] == CNULL)
+            if (clipboardBuffer[idx] == CNULL)
             {
                 break;
             }
@@ -4284,9 +4126,9 @@ void DoMacroSaveRecall(void)
 {
     DLGPROC lpfnDIALOG_MACRO;
 
-    lpfnDIALOG_MACRO = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_MACRO, hInst);
+    lpfnDIALOG_MACRO = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_MACRO, hExcaliburInstance);
 
-    if ((DialogBox(hInst, (LPCSTR) "DIALOG_MACRO_SAVE", calcMainWindow, lpfnDIALOG_MACRO)) == -1)
+    if ((DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_MACRO_SAVE", calcMainWindow, lpfnDIALOG_MACRO)) == -1)
     {
         MessageBox(NULL, "Unable to display dialog", "System Error", MB_SYSTEMMODAL | MB_ICONHAND | MB_OK);
     }
@@ -4297,7 +4139,6 @@ BOOL CALLBACK fnDIALOG_MACRO(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
 {
     int i;
     unsigned short chksum;
-    char tmp[91];
     LRESULT item;
     HANDLE hMem;
     LPSTR lpMem;
@@ -4315,21 +4156,21 @@ BOOL CALLBACK fnDIALOG_MACRO(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
         chksum = 0x0000;
         for (i = 0; i < playBackIdx; i++)
             chksum += playBack[i];
-        sprintf(tmp, "Checksum: %04X", chksum);
-        SetDlgItemText(hDlg, IDC_CHECKSUM2, tmp);
+        sprintf(tmpStr, "Checksum: %04X", chksum);
+        SetDlgItemText(hDlg, IDC_CHECKSUM2, tmpStr);
 
         for (i = 0; i < playBackIdx; i++)
         {
-            sprintf(tmp, "%03d - %s", i + 1, playBackMap[playBack[i]].funcText);
-            SendDlgItemMessage(hDlg, IDC_LIST2, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+            sprintf(tmpStr, "%03d - %s", i + 1, playBackMap[playBack[i]].funcText);
+            SendDlgItemMessage(hDlg, IDC_LIST2, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmpStr));
         }
-        sprintf(tmp, "%03d - <End Of Program>", i + 1);
-        SendDlgItemMessage(hDlg, IDC_LIST2, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+        sprintf(tmpStr, "%03d - <End Of Program>", i + 1);
+        SendDlgItemMessage(hDlg, IDC_LIST2, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmpStr));
 
         for (i = 0; i < MAX_MACROS; i++)
         {
-            sprintf(tmp, "%-6s:\t%s", macro_short_names[i], macroName[i]);
-            SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+            sprintf(tmpStr, "%-6s:\t%s", macro_short_names[i], macroName[i]);
+            SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmpStr));
         }
         SendDlgItemMessage(hDlg, 101, LB_SETCURSEL, lastChosenMacro, 0);
         SetFocus(GetDlgItem(hDlg, 101));
@@ -4349,16 +4190,16 @@ BOOL CALLBACK fnDIALOG_MACRO(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
                 chksum = 0x0000;
                 for (i = 0; i < playBackIdxSave[item]; i++)
                     chksum += playBackSave[item][i];
-                sprintf(tmp, "Checksum: %04X", chksum);
-                SetDlgItemText(hDlg, IDC_CHECKSUM1, tmp);
+                sprintf(tmpStr, "Checksum: %04X", chksum);
+                SetDlgItemText(hDlg, IDC_CHECKSUM1, tmpStr);
 
                 for (i = 0; i < playBackIdxSave[item]; i++)
                 {
-                    sprintf(tmp, "%03d - %s", i + 1, playBackMap[playBackSave[item][i]].funcText);
-                    SendDlgItemMessage(hDlg, IDC_LIST1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+                    sprintf(tmpStr, "%03d - %s", i + 1, playBackMap[playBackSave[item][i]].funcText);
+                    SendDlgItemMessage(hDlg, IDC_LIST1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmpStr));
                 }
-                sprintf(tmp, "%03d - <End Of Program>", i + 1);
-                SendDlgItemMessage(hDlg, IDC_LIST1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+                sprintf(tmpStr, "%03d - <End Of Program>", i + 1);
+                SendDlgItemMessage(hDlg, IDC_LIST1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmpStr));
                 return FALSE;
             }
             return TRUE;
@@ -4386,13 +4227,13 @@ BOOL CALLBACK fnDIALOG_MACRO(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
                     chksum = 0x0000;
                     for (i = 0; i < playBackIdx; i++)
                         chksum += playBack[i];
-                    sprintf(tmp, "Checksum: %04X", chksum);
-                    SetDlgItemText(hDlg, IDC_CHECKSUM2, tmp);
+                    sprintf(tmpStr, "Checksum: %04X", chksum);
+                    SetDlgItemText(hDlg, IDC_CHECKSUM2, tmpStr);
 
                     for (i = 0; i < MAX_MACROS; i++)
                     {
-                        sprintf(tmp, "%-6s:\t%s", macro_short_names[i], macroName[i]);
-                        SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+                        sprintf(tmpStr, "%-6s:\t%s", macro_short_names[i], macroName[i]);
+                        SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmpStr));
                     }
                     SendDlgItemMessage(hDlg, 101, LB_SETCURSEL, lastChosenMacro, 0);
                     SetFocus(GetDlgItem(hDlg, 101));
@@ -4418,15 +4259,15 @@ BOOL CALLBACK fnDIALOG_MACRO(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
             chksum = 0x0000;
             for (i = 0; i < playBackIdx; i++)
                 chksum += playBack[i];
-            sprintf(tmp, "Checksum: %04X", chksum);
-            SetDlgItemText(hDlg, IDC_CHECKSUM2, tmp);
+            sprintf(tmpStr, "Checksum: %04X", chksum);
+            SetDlgItemText(hDlg, IDC_CHECKSUM2, tmpStr);
             for (i = 0; i < playBackIdx; i++)
             {
-                sprintf(tmp, "%03d - %s", i + 1, playBackMap[playBack[i]].funcText);
-                SendDlgItemMessage(hDlg, IDC_LIST2, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+                sprintf(tmpStr, "%03d - %s", i + 1, playBackMap[playBack[i]].funcText);
+                SendDlgItemMessage(hDlg, IDC_LIST2, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmpStr));
             }
-            sprintf(tmp, "%03d - <End Of Program>", i + 1);
-            SendDlgItemMessage(hDlg, IDC_LIST2, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+            sprintf(tmpStr, "%03d - <End Of Program>", i + 1);
+            SendDlgItemMessage(hDlg, IDC_LIST2, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmpStr));
 
             return TRUE;
             break;
@@ -4442,12 +4283,12 @@ BOOL CALLBACK fnDIALOG_MACRO(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
                     playBackIdxSave[i] = 0;
                     strcpy(macroName[i], "Not Currently Defined");
                     sprintf(macro_short_names[i], "P%02d", i + 1);
-                    sprintf(tmp, "%-6s:\t%s", macro_short_names[i], macroName[i]);
-                    SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+                    sprintf(tmpStr, "%-6s:\t%s", macro_short_names[i], macroName[i]);
+                    SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmpStr));
                 }
                 chksum = 0x0000;
-                sprintf(tmp, "Checksum: %04X", chksum);
-                SetDlgItemText(hDlg, IDC_CHECKSUM1, tmp);
+                sprintf(tmpStr, "Checksum: %04X", chksum);
+                SetDlgItemText(hDlg, IDC_CHECKSUM1, tmpStr);
                 lastChosenMacro = 0;
                 SendDlgItemMessage(hDlg, 101, LB_SETCURSEL, lastChosenMacro, 0);
                 SetFocus(GetDlgItem(hDlg, 101));
@@ -4469,14 +4310,14 @@ BOOL CALLBACK fnDIALOG_MACRO(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
                 SendMessage(GetDlgItem(hDlg, 101), LB_RESETCONTENT, 0, 0);
                 for (i = 0; i < MAX_MACROS; i++)
                 {
-                    sprintf(tmp, "%-6s:\t%s", macro_short_names[i], macroName[i]);
-                    SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+                    sprintf(tmpStr, "%-6s:\t%s", macro_short_names[i], macroName[i]);
+                    SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmpStr));
                 }
                 chksum = 0x0000;
                 for (i = 0; i < playBackIdxSave[item]; i++)
                     chksum += playBackSave[item][i];
-                sprintf(tmp, "Checksum: %04X", chksum);
-                SetDlgItemText(hDlg, IDC_CHECKSUM1, tmp);
+                sprintf(tmpStr, "Checksum: %04X", chksum);
+                SetDlgItemText(hDlg, IDC_CHECKSUM1, tmpStr);
 
                 SendDlgItemMessage(hDlg, 101, LB_SETCURSEL, lastChosenMacro, 0);
                 SetFocus(GetDlgItem(hDlg, 101));
@@ -4490,25 +4331,25 @@ BOOL CALLBACK fnDIALOG_MACRO(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
                 OpenClipboard(calcMainWindow);
                 hMem = GetClipboardData(CF_TEXT);
                 lpMem = GlobalLock(hMem);
-                lstrcpyn(tmpBuffer, lpMem, MAX_IMPORT_CLIPBOARD_SIZE);
+                lstrcpyn(clipboardBuffer, lpMem, MAX_IMPORT_CLIPBOARD_SIZE);
                 GlobalUnlock(hMem);
                 CloseClipboard();
-                tmpBuffer[MAX_IMPORT_CLIPBOARD_SIZE] = '\0';
-                CopyBufferToCurrentMacro(tmpBuffer);
+                clipboardBuffer[MAX_IMPORT_CLIPBOARD_SIZE] = '\0';
+                CopyBufferToCurrentMacro(clipboardBuffer);
                 lastChosenMacro = 0;
                 SendMessage(GetDlgItem(hDlg, IDC_LIST2), LB_RESETCONTENT, 0, 0);
                 chksum = 0x0000;
                 for (i = 0; i < playBackIdx; i++)
                     chksum += playBack[i];
-                sprintf(tmp, "Checksum: %04X", chksum);
-                SetDlgItemText(hDlg, IDC_CHECKSUM2, tmp);
+                sprintf(tmpStr, "Checksum: %04X", chksum);
+                SetDlgItemText(hDlg, IDC_CHECKSUM2, tmpStr);
                 for (i = 0; i < playBackIdx; i++)
                 {
-                    sprintf(tmp, "%03d - %s", i + 1, playBackMap[playBack[i]].funcText);
-                    SendDlgItemMessage(hDlg, IDC_LIST2, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+                    sprintf(tmpStr, "%03d - %s", i + 1, playBackMap[playBack[i]].funcText);
+                    SendDlgItemMessage(hDlg, IDC_LIST2, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmpStr));
                 }
-                sprintf(tmp, "%03d - <End Of Program>", i + 1);
-                SendDlgItemMessage(hDlg, IDC_LIST2, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+                sprintf(tmpStr, "%03d - <End Of Program>", i + 1);
+                SendDlgItemMessage(hDlg, IDC_LIST2, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmpStr));
             }
             return TRUE;
 
@@ -4520,36 +4361,36 @@ BOOL CALLBACK fnDIALOG_MACRO(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
             item = SendDlgItemMessage(hDlg, 101, LB_GETCURSEL, 0, 0L);
 
 #if 1 //tbd
-            sprintf(tmp, "Macro Name:  %s", macro_short_names[item]);
-            lstrcat(cptr, (LPSTR) tmp);
+            sprintf(tmpStr, "Macro Name:  %s", macro_short_names[item]);
+            lstrcat(cptr, (LPSTR) tmpStr);
             lstrcat(cptr, (LPSTR) "\r\n");
 
-            sprintf(tmp, "Description: %s", macroName[item]);
-            lstrcat(cptr, (LPSTR) tmp);
+            sprintf(tmpStr, "Description: %s", macroName[item]);
+            lstrcat(cptr, (LPSTR) tmpStr);
             lstrcat(cptr, (LPSTR) "\r\n");
             lstrcat(cptr, (LPSTR) "\r\n");
 
             for (i = 0; i < playBackIdxSave[item]; i++)
             {
-                sprintf(tmp, "%03d - %s", i + 1, playBackMap[playBackSave[item][i]].funcText);
-                lstrcat(cptr, (LPSTR) tmp);
+                sprintf(tmpStr, "%03d - %s", i + 1, playBackMap[playBackSave[item][i]].funcText);
+                lstrcat(cptr, (LPSTR) tmpStr);
                 lstrcat(cptr, (LPSTR) "\r\n");
             }
-            sprintf(tmp, "%03d - <End Of Program>", i + 1);
-            lstrcat(cptr, (LPSTR) tmp);
+            sprintf(tmpStr, "%03d - <End Of Program>", i + 1);
+            lstrcat(cptr, (LPSTR) tmpStr);
             lstrcat(cptr, (LPSTR) "\r\n");
             chksum = 0x0000;
             for (i = 0; i < playBackIdxSave[item]; i++)
                 chksum += playBackSave[item][i];
-            sprintf(tmp, "Checksum: %04X", chksum);
+            sprintf(tmpStr, "Checksum: %04X", chksum);
             lstrcat(cptr, (LPSTR) "\r\n");
-            lstrcat(cptr, (LPSTR) tmp);
+            lstrcat(cptr, (LPSTR) tmpStr);
             lstrcat(cptr, (LPSTR) "\r\n");
 #else
             for (i=0; i<totalMappedButtonFuncs; i++)
             {
-                sprintf(tmp, "%s", playBackMap[i].funcText);
-                lstrcat(cptr, (LPSTR) tmp);
+                sprintf(tmpStr, "%s", playBackMap[i].funcText);
+                lstrcat(cptr, (LPSTR) tmpStr);
                 lstrcat(cptr, (LPSTR) "\r\n");
             }
 #endif
@@ -4558,8 +4399,8 @@ BOOL CALLBACK fnDIALOG_MACRO(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
             GlobalUnlock(tptr);
             SetClipboardData(CF_TEXT, tptr);
             CloseClipboard();
-            sprintf(tmp, "The currently selected program [%s] has been saved to the clipboard.", macro_short_names[item]);
-            MessageBox(hDlg, tmp, "Excalibur For Windows", MB_ICONINFORMATION | MB_OK);
+            sprintf(tmpStr, "The currently selected program [%s] has been saved to the clipboard.", macro_short_names[item]);
+            MessageBox(hDlg, tmpStr, "Excalibur For Windows", MB_ICONINFORMATION | MB_OK);
             return TRUE;
 
         case(109):            // Copy Loaded to Clipboard
@@ -4593,46 +4434,34 @@ BOOL CALLBACK fnDIALOG_MACRO(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
 }
 
 
-BOOL CALLBACK fnDIALOG_12DlgProc(HWND, UINT, WPARAM, LPARAM);
+BOOL CALLBACK fnDIALOG_SettingsProc(HWND, UINT, WPARAM, LPARAM);
 void GetUserSettings(void)
 {
-    DLGPROC lpfnfnDIALOG_12DlgProc;
+    DLGPROC lpfnDIALOG_SettingsProc;
 
-    lpfnfnDIALOG_12DlgProc = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_12DlgProc, hInst);
+    lpfnDIALOG_SettingsProc = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_SettingsProc, hExcaliburInstance);
 
-    if ((DialogBox(hInst, (LPCSTR) "DIALOG_SETTINGS", calcMainWindow, lpfnfnDIALOG_12DlgProc)) == -1)
+    if ((DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_SETTINGS", calcMainWindow, lpfnDIALOG_SettingsProc)) == -1)
     {
         MessageBox(NULL, "Unable to display dialog", "System Error", MB_SYSTEMMODAL | MB_ICONHAND | MB_OK);
     }
-    FreeProcInstance((FARPROC) lpfnfnDIALOG_12DlgProc);
+    FreeProcInstance((FARPROC) lpfnDIALOG_SettingsProc);
 }
 
-BOOL CALLBACK fnDIALOG_12DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK fnDIALOG_SettingsProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
 {
-    char tmp[30];
     DWORD bs;                   // Button Status
 
     switch(wMessage)
     {
     case WM_INITDIALOG:
-        sprintf(tmp, "%3.4f", taxConstant);
-        SetDlgItemText(hDlg, 103, tmp);
+        sprintf(tmpStr, "%3.4f", taxConstant);
+        SetDlgItemText(hDlg, 103, tmpStr);
 
-        sprintf(tmp, "%d", progDelayValue);
-        SetDlgItemText(hDlg, 123, tmp);
+        sprintf(tmpStr, "%d", progDelayValue);
+        SetDlgItemText(hDlg, 123, tmpStr);
 
-        if (footPrint == 1)
-            SendMessage(GetDlgItem(hDlg, 119), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
-        else if (footPrint == 2)
-            SendMessage(GetDlgItem(hDlg, 120), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
-        else if (footPrint == 3)
-            SendMessage(GetDlgItem(hDlg, 122), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
-        else if (footPrint == 4)
-            SendMessage(GetDlgItem(hDlg, 126), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
-        else
-            SendMessage(GetDlgItem(hDlg, 118), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
-
-        if (stackLevels == 8)
+        if (extendedStack)
             SendMessage(GetDlgItem(hDlg, 125), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         else
             SendMessage(GetDlgItem(hDlg, 124), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
@@ -4680,86 +4509,25 @@ BOOL CALLBACK fnDIALOG_12DlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
         {
         case(101):            // OK
 
-            GetDlgItemText(hDlg, 103, tmp, 8);
-            taxConstant = atof(tmp);
+            GetDlgItemText(hDlg, 103, tmpStr, 8);
+            taxConstant = atof(tmpStr);
             if (taxConstant == 0.0)
                 taxConstant = 1.05;
 
-            GetDlgItemText(hDlg, 123, tmp, 9);
-            progDelayValue = atoi(tmp);
+            GetDlgItemText(hDlg, 123, tmpStr, 9);
+            progDelayValue = atoi(tmpStr);
 
             bs = SendMessage(GetDlgItem(hDlg, 125), BM_GETCHECK, (WORD) 0, (DWORD) 0L);
             if (bs != 0L)
-                stackLevels = 8;
+                extendedStack = 1;
             else
-                stackLevels = 4;
+                extendedStack = 0;
 
             bs = SendMessage(GetDlgItem(hDlg, IDC_CHECK1), BM_GETCHECK, (WORD) 0, (DWORD) 0L);
             if (bs != 0)
                 popFillZero = 1;
             else
                 popFillZero = 0;
-
-            bs = SendMessage(GetDlgItem(hDlg, 118), BM_GETCHECK, (WORD) 0, (DWORD) 0L);
-            if (bs != 0L)
-            {
-                if (footPrint != 0)
-                {
-                    MessageBox(hDlg,
-                                "Changing the footprint size requires you to close and restart Excalibur for the new setting to take place.",
-                                "Excalibur Footprint Change", MB_OK);
-                    footPrintChanged = TRUE;
-                }
-                footPrint = 0;
-            }
-            bs = SendMessage(GetDlgItem(hDlg, 119), BM_GETCHECK, (WORD) 0, (DWORD) 0L);
-            if (bs != 0L)
-            {
-                if (footPrint != 1)
-                {
-                    MessageBox(hDlg,
-                                "Changing the footprint size requires you to close and restart Excalibur for the new setting to take place.",
-                                "Excalibur Footprint Change", MB_OK);
-                    footPrintChanged = TRUE;
-                }
-                footPrint = 1;
-            }
-            bs = SendMessage(GetDlgItem(hDlg, 120), BM_GETCHECK, (WORD) 0, (DWORD) 0L);
-            if (bs != 0L)
-            {
-                if (footPrint != 2)
-                {
-                    MessageBox(hDlg,
-                                "Changing the footprint size requires you to close and restart Excalibur for the new setting to take place.",
-                                "Excalibur Footprint Change", MB_OK);
-                    footPrintChanged = TRUE;
-                }
-                footPrint = 2;
-            }
-            bs = SendMessage(GetDlgItem(hDlg, 122), BM_GETCHECK, (WORD) 0, (DWORD) 0L);
-            if (bs != 0L)
-            {
-                if (footPrint != 3)
-                {
-                    MessageBox(hDlg,
-                                "Changing the footprint size requires you to close and restart Excalibur for the new setting to take place.",
-                                "Excalibur Footprint Change", MB_OK);
-                    footPrintChanged = TRUE;
-                }
-                footPrint = 3;
-            }
-            bs = SendMessage(GetDlgItem(hDlg, 126), BM_GETCHECK, (WORD) 0, (DWORD) 0L);
-            if (bs != 0L)
-            {
-                if (footPrint != 4)
-                {
-                    MessageBox(hDlg,
-                                "Changing the footprint size requires you to close and restart Excalibur for the new setting to take place.",
-                                "Excalibur Footprint Change", MB_OK);
-                    footPrintChanged = TRUE;
-                }
-                footPrint = 4;
-            }
 
             bs = SendMessage(GetDlgItem(hDlg, 104), BM_GETCHECK, (WORD) 0, (DWORD) 0L);
             if (bs != 0L)
@@ -4875,12 +4643,10 @@ void HelpAbout(void)
 
 void ShowUsageStats(void)
 {
-    char tmp[100];
-
-    sprintf(tmp,
+    sprintf(tmpStr,
              "Stack Pushes:  %lu\nStack Pops:      %lu\nTime In Focus:  %lu mins",
              (unsigned long) stackPushes, (unsigned long) stackPops, inFocusTime);
-    MessageBox(calcMainWindow, tmp, "System Usage Statistics", MB_ICONINFORMATION | MB_OK);
+    MessageBox(calcMainWindow, tmpStr, "System Usage Statistics", MB_ICONINFORMATION | MB_OK);
 }
 
 int fnButtonX;
@@ -4893,33 +4659,31 @@ WORD GetMouseHelp(WORD xPos, WORD yPos)
     int i;
     WORD status = 0;
 
-    if ((footPrint != 2) && (footPrint != 4)) // No functions for tiny and no func layouts
+    i = 0;
+    while (FunctionBankKeyPos[i].index != RPN_LAST_KEY)
     {
-        i = 0;
-        while (FunctionBankKeyPos[i].index != RPN_LAST_KEY)
-        {
-            if (xPos >= FunctionBankKeyPos[i].x && xPos <= FunctionBankKeyPos[i].x + FunctionBankKeyPos[i].w)
-                if (yPos >= FunctionBankKeyPos[i].y && yPos <= FunctionBankKeyPos[i].y + FunctionBankKeyPos[i].h)
+        if (xPos >= FunctionBankKeyPos[i].x && xPos <= FunctionBankKeyPos[i].x + FunctionBankKeyPos[i].w)
+            if (yPos >= FunctionBankKeyPos[i].y && yPos <= FunctionBankKeyPos[i].y + FunctionBankKeyPos[i].h)
+            {
+                if (currentFuncs[i].keyTitle >= 9000)
                 {
-                    if (currentFuncs[i].keyTitle >= 9000)
-                    {
-                        strcpy(helpTitle, macroName[currentFuncs[i].keyTitle - 9000]);
-                        strcpy(helpMsg, "Program Assigned Key");
-                    }
-                    else
-                    {
-                        LoadString(hInst, currentFuncs[i].keyTitle, helpTitle, sizeof(helpTitle) - 1);
-                        LoadString(hInst, currentFuncs[i].keyHelp, helpMsg, sizeof(helpMsg) - 1);
-                    }
-                    status = 1;
-                    break;
+                    strcpy(helpTitle, macroName[currentFuncs[i].keyTitle - 9000]);
+                    strcpy(helpMsg, "Program Assigned Key");
                 }
-            i++;
-        }
+                else
+                {
+                    LoadString(hExcaliburInstance, currentFuncs[i].keyTitle, helpTitle, sizeof(helpTitle) - 1);
+                    LoadString(hExcaliburInstance, currentFuncs[i].keyHelp, helpMsg, sizeof(helpMsg) - 1);
+                }
+                status = 1;
+                break;
+            }
+        i++;
     }
 
     i = 0;
     if (status == 0)
+    {
         while (RPNkeyPos[i].index != RPN_LAST_KEY)
         {
             if (xPos >= RPNkeyPos[i].x && xPos <= RPNkeyPos[i].x + RPNkeyPos[i].w)
@@ -4933,7 +4697,8 @@ WORD GetMouseHelp(WORD xPos, WORD yPos)
                 }
             i++;
         }
-
+    }
+    
     return(status);
 }
 
@@ -5059,18 +4824,17 @@ void RPN_frac(void)
 
 void RPN_edit(void)
 {
-    char tmp[42];
     int i, j;
 
     if (Xedit != X_EDIT)
     {
-        GetDlgItemText(calcMainWindow, 131, tmp, 40);
+        GetDlgItemText(calcMainWindow, 131, tmpStr, 40);
         j = 0;
-        for (i = 0; i < (int) strlen(tmp); i++)
+        for (i = 0; i < (int) strlen(tmpStr); i++)
         {
-            if (tmp[i] != ' ' && tmp[i] != ',' && tmp[i] != 'h' && tmp[i] != 'b' && tmp[i] != 'o' && tmp[i] != 'd')
+            if (tmpStr[i] != ' ' && tmpStr[i] != ',' && tmpStr[i] != 'h' && tmpStr[i] != 'b' && tmpStr[i] != 'o' && tmpStr[i] != 'd')
             {
-                Xstr[j] = tmp[i];
+                Xstr[j] = tmpStr[i];
                 j++;
             }
         }
@@ -5087,17 +4851,17 @@ void RPN_edit(void)
 
 void RPN_SelectSci(void)
 {
-    SelectNewFunc((struct funcStruct *) &Sci_I_funcs);
+    SelectNewFunc((struct funcStruct *) &Scientific_funcs);
 }
 
 void RPN_SelectStat(void)
 {
-    SelectNewFunc((struct funcStruct *) &Stat_funcs);
+    SelectNewFunc((struct funcStruct *) &Statistics_funcs);
 }
 
 void RPN_SelectBusi(void)
 {
-    SelectNewFunc((struct funcStruct *) &Business_funcs);
+    SelectNewFunc((struct funcStruct *) &Financial_funcs);
 }
 
 void RPN_SelectConv(void)
@@ -5112,12 +4876,12 @@ void RPN_SelectGeom(void)
 
 void RPN_SelectProg(void)
 {
-    SelectNewFunc((struct funcStruct *) &Programming_funcs);
+    SelectNewFunc((struct funcStruct *) &CompSci_funcs);
 }
 
 void RPN_SelectProg2(void)
 {
-    SelectNewFunc((struct funcStruct *) &Prog2_funcs);
+    SelectNewFunc((struct funcStruct *) &Program2_funcs);
 }
 
 void RPN_SelectComplex(void)
@@ -5138,18 +4902,18 @@ void RPN_SelectPhysics(void)
 
 void RPN_SelectMacro(void)
 {
-    SelectNewFunc((struct funcStruct *) &Prog1_funcs);
+    SelectNewFunc((struct funcStruct *) &Program1_funcs);
 }
 
 void mapButtonFuncs(void)
 {
     int i, j;
-    int exchangeMade;
+    uint8_t exchangeMade;
     struct playbackStruct tmpPlayBack;
 
     j = 0;
-
     i = 0;
+    
     while (RPNkeys[i].index != RPN_LAST_KEY)
     {
         playBackMap[j].saveLastX = RPNkeys[i].saveLastX;
@@ -5165,37 +4929,37 @@ void mapButtonFuncs(void)
 
     for (i = 0; i < MAX_FUNCS; i++)
     {
-        playBackMap[j].saveLastX = Sci_I_funcs[i].saveLastX;
-        playBackMap[j].newXedit = Sci_I_funcs[i].newXedit;
-        playBackMap[j].routine = Sci_I_funcs[i].routine;
-        LoadString(hInst, Sci_I_funcs[i].keyTitle, playBackMap[j].funcText, 30);
-        playBackMap[j].uniqueIndex = Sci_I_funcs[i].uniqueIndex;
-        playBackMap[j].useFloatsLongs = Sci_I_funcs[i].useFloatsLongs;
-        playBackMap[j].allowRecord = Sci_I_funcs[i].allowRecord;
+        playBackMap[j].saveLastX = Scientific_funcs[i].saveLastX;
+        playBackMap[j].newXedit = Scientific_funcs[i].newXedit;
+        playBackMap[j].routine = Scientific_funcs[i].routine;
+        LoadString(hExcaliburInstance, Scientific_funcs[i].keyTitle, playBackMap[j].funcText, 29);
+        playBackMap[j].uniqueIndex = Scientific_funcs[i].uniqueIndex;
+        playBackMap[j].useFloatsLongs = Scientific_funcs[i].useFloatsLongs;
+        playBackMap[j].allowRecord = Scientific_funcs[i].allowRecord;
         j++;
     }
 
     for (i = 0; i < MAX_FUNCS; i++)
     {
-        playBackMap[j].saveLastX = Programming_funcs[i].saveLastX;
-        playBackMap[j].newXedit = Programming_funcs[i].newXedit;
-        playBackMap[j].routine = Programming_funcs[i].routine;
-        LoadString(hInst, Programming_funcs[i].keyTitle, playBackMap[j].funcText, 30);
-        playBackMap[j].uniqueIndex = Programming_funcs[i].uniqueIndex;
-        playBackMap[j].useFloatsLongs = Programming_funcs[i].useFloatsLongs;
-        playBackMap[j].allowRecord = Programming_funcs[i].allowRecord;
+        playBackMap[j].saveLastX = CompSci_funcs[i].saveLastX;
+        playBackMap[j].newXedit = CompSci_funcs[i].newXedit;
+        playBackMap[j].routine = CompSci_funcs[i].routine;
+        LoadString(hExcaliburInstance, CompSci_funcs[i].keyTitle, playBackMap[j].funcText, 29);
+        playBackMap[j].uniqueIndex = CompSci_funcs[i].uniqueIndex;
+        playBackMap[j].useFloatsLongs = CompSci_funcs[i].useFloatsLongs;
+        playBackMap[j].allowRecord = CompSci_funcs[i].allowRecord;
         j++;
     }
 
     for (i = 0; i < MAX_FUNCS; i++)
     {
-        playBackMap[j].saveLastX = Business_funcs[i].saveLastX;
-        playBackMap[j].newXedit = Business_funcs[i].newXedit;
-        playBackMap[j].routine = Business_funcs[i].routine;
-        LoadString(hInst, Business_funcs[i].keyTitle, playBackMap[j].funcText, 30);
-        playBackMap[j].uniqueIndex = Business_funcs[i].uniqueIndex;
-        playBackMap[j].useFloatsLongs = Business_funcs[i].useFloatsLongs;
-        playBackMap[j].allowRecord = Business_funcs[i].allowRecord;
+        playBackMap[j].saveLastX = Financial_funcs[i].saveLastX;
+        playBackMap[j].newXedit = Financial_funcs[i].newXedit;
+        playBackMap[j].routine = Financial_funcs[i].routine;
+        LoadString(hExcaliburInstance, Financial_funcs[i].keyTitle, playBackMap[j].funcText, 29);
+        playBackMap[j].uniqueIndex = Financial_funcs[i].uniqueIndex;
+        playBackMap[j].useFloatsLongs = Financial_funcs[i].useFloatsLongs;
+        playBackMap[j].allowRecord = Financial_funcs[i].allowRecord;
         j++;
     }
 
@@ -5204,7 +4968,7 @@ void mapButtonFuncs(void)
         playBackMap[j].saveLastX = Conversion_funcs[i].saveLastX;
         playBackMap[j].newXedit = Conversion_funcs[i].newXedit;
         playBackMap[j].routine = Conversion_funcs[i].routine;
-        LoadString(hInst, Conversion_funcs[i].keyTitle, playBackMap[j].funcText, 30);
+        LoadString(hExcaliburInstance, Conversion_funcs[i].keyTitle, playBackMap[j].funcText, 29);
         playBackMap[j].uniqueIndex = Conversion_funcs[i].uniqueIndex;
         playBackMap[j].useFloatsLongs = Conversion_funcs[i].useFloatsLongs;
         playBackMap[j].allowRecord = Conversion_funcs[i].allowRecord;
@@ -5216,7 +4980,7 @@ void mapButtonFuncs(void)
         playBackMap[j].saveLastX = Geometry_funcs[i].saveLastX;
         playBackMap[j].newXedit = Geometry_funcs[i].newXedit;
         playBackMap[j].routine = Geometry_funcs[i].routine;
-        LoadString(hInst, Geometry_funcs[i].keyTitle, playBackMap[j].funcText, 30);
+        LoadString(hExcaliburInstance, Geometry_funcs[i].keyTitle, playBackMap[j].funcText, 29);
         playBackMap[j].uniqueIndex = Geometry_funcs[i].uniqueIndex;
         playBackMap[j].useFloatsLongs = Geometry_funcs[i].useFloatsLongs;
         playBackMap[j].allowRecord = Geometry_funcs[i].allowRecord;
@@ -5228,7 +4992,7 @@ void mapButtonFuncs(void)
         playBackMap[j].saveLastX = Complex_funcs[i].saveLastX;
         playBackMap[j].newXedit = Complex_funcs[i].newXedit;
         playBackMap[j].routine = Complex_funcs[i].routine;
-        LoadString(hInst, Complex_funcs[i].keyTitle, playBackMap[j].funcText, 30);
+        LoadString(hExcaliburInstance, Complex_funcs[i].keyTitle, playBackMap[j].funcText, 29);
         playBackMap[j].uniqueIndex = Complex_funcs[i].uniqueIndex;
         playBackMap[j].useFloatsLongs = Complex_funcs[i].useFloatsLongs;
         playBackMap[j].allowRecord = Complex_funcs[i].allowRecord;
@@ -5237,13 +5001,13 @@ void mapButtonFuncs(void)
 
     for (i = 0; i < MAX_FUNCS; i++)
     {
-        playBackMap[j].saveLastX = Stat_funcs[i].saveLastX;
-        playBackMap[j].newXedit = Stat_funcs[i].newXedit;
-        playBackMap[j].routine = Stat_funcs[i].routine;
-        LoadString(hInst, Stat_funcs[i].keyTitle, playBackMap[j].funcText, 30);
-        playBackMap[j].uniqueIndex = Stat_funcs[i].uniqueIndex;
-        playBackMap[j].useFloatsLongs = Stat_funcs[i].useFloatsLongs;
-        playBackMap[j].allowRecord = Stat_funcs[i].allowRecord;
+        playBackMap[j].saveLastX = Statistics_funcs[i].saveLastX;
+        playBackMap[j].newXedit = Statistics_funcs[i].newXedit;
+        playBackMap[j].routine = Statistics_funcs[i].routine;
+        LoadString(hExcaliburInstance, Statistics_funcs[i].keyTitle, playBackMap[j].funcText, 29);
+        playBackMap[j].uniqueIndex = Statistics_funcs[i].uniqueIndex;
+        playBackMap[j].useFloatsLongs = Statistics_funcs[i].useFloatsLongs;
+        playBackMap[j].allowRecord = Statistics_funcs[i].allowRecord;
         j++;
     }
 
@@ -5252,7 +5016,7 @@ void mapButtonFuncs(void)
         playBackMap[j].saveLastX = Physics_funcs[i].saveLastX;
         playBackMap[j].newXedit = Physics_funcs[i].newXedit;
         playBackMap[j].routine = Physics_funcs[i].routine;
-        LoadString(hInst, Physics_funcs[i].keyTitle, playBackMap[j].funcText, 30);
+        LoadString(hExcaliburInstance, Physics_funcs[i].keyTitle, playBackMap[j].funcText, 29);
         playBackMap[j].uniqueIndex = Physics_funcs[i].uniqueIndex;
         playBackMap[j].useFloatsLongs = Physics_funcs[i].useFloatsLongs;
         playBackMap[j].allowRecord = Physics_funcs[i].allowRecord;
@@ -5261,25 +5025,25 @@ void mapButtonFuncs(void)
 
     for (i = 0; i < MAX_FUNCS; i++)
     {
-        playBackMap[j].saveLastX = Prog1_funcs[i].saveLastX;
-        playBackMap[j].newXedit = Prog1_funcs[i].newXedit;
-        playBackMap[j].routine = Prog1_funcs[i].routine;
-        LoadString(hInst, Prog1_funcs[i].keyTitle, playBackMap[j].funcText, 30);
-        playBackMap[j].uniqueIndex = Prog1_funcs[i].uniqueIndex;
-        playBackMap[j].useFloatsLongs = Prog1_funcs[i].useFloatsLongs;
-        playBackMap[j].allowRecord = Prog1_funcs[i].allowRecord;
+        playBackMap[j].saveLastX = Program1_funcs[i].saveLastX;
+        playBackMap[j].newXedit = Program1_funcs[i].newXedit;
+        playBackMap[j].routine = Program1_funcs[i].routine;
+        LoadString(hExcaliburInstance, Program1_funcs[i].keyTitle, playBackMap[j].funcText, 29);
+        playBackMap[j].uniqueIndex = Program1_funcs[i].uniqueIndex;
+        playBackMap[j].useFloatsLongs = Program1_funcs[i].useFloatsLongs;
+        playBackMap[j].allowRecord = Program1_funcs[i].allowRecord;
         j++;
     }
 
     for (i = 0; i < MAX_FUNCS; i++)
     {
-        playBackMap[j].saveLastX = Prog2_funcs[i].saveLastX;
-        playBackMap[j].newXedit = Prog2_funcs[i].newXedit;
-        playBackMap[j].routine = Prog2_funcs[i].routine;
-        LoadString(hInst, Prog2_funcs[i].keyTitle, playBackMap[j].funcText, 30);
-        playBackMap[j].uniqueIndex = Prog2_funcs[i].uniqueIndex;
-        playBackMap[j].useFloatsLongs = Prog2_funcs[i].useFloatsLongs;
-        playBackMap[j].allowRecord = Prog2_funcs[i].allowRecord;
+        playBackMap[j].saveLastX = Program2_funcs[i].saveLastX;
+        playBackMap[j].newXedit = Program2_funcs[i].newXedit;
+        playBackMap[j].routine = Program2_funcs[i].routine;
+        LoadString(hExcaliburInstance, Program2_funcs[i].keyTitle, playBackMap[j].funcText, 29);
+        playBackMap[j].uniqueIndex = Program2_funcs[i].uniqueIndex;
+        playBackMap[j].useFloatsLongs = Program2_funcs[i].useFloatsLongs;
+        playBackMap[j].allowRecord = Program2_funcs[i].allowRecord;
         j++;
     }
 
@@ -5303,7 +5067,7 @@ void mapButtonFuncs(void)
     {
         MessageBox(calcMainWindow, "Error - Maximum number of mapped functions exists!", "Excalibur Fatal Error", MB_OK);
     }
-    else  // Bubble sort on unique Index so that we can move buttons around and not have this all break!
+    else  // Bubble sort on unique Index so that we can move buttons around and not have this all break! Bubble sort fast enough - this list is almost sorted anyway...
     {
         for (i = 0; i < totalMappedButtonFuncs; i++)
         {
@@ -5361,9 +5125,8 @@ void SaveProgramStep(int uniqueIndex)
     }
 }
 
-void
-callButtonFunc(void(*routine) (void), char useFloatsLongs, char allowRecord,
-                int uniqueIndex, char saveLastX, char newXedit, int updateSpareBar)
+void callButtonFunc(void(*routine) (void), char useFloatsLongs, char allowRecord,
+                    int uniqueIndex, char saveLastX, char newXedit, int updateSpareBar)
 {
     if (IsWindowVisible(toolTipWnd))      // A button press reset's the window!
     {
@@ -5401,7 +5164,6 @@ callButtonFunc(void(*routine) (void), char useFloatsLongs, char allowRecord,
         ShowStack();
         ShowStatus();
     }
-
 
     routine();                 // This calls the actual button routine to perform things like SIN, COS, CLX, etc
 
@@ -5462,21 +5224,30 @@ void RPN_Playback(void)
 
     for (currentMacroPlaybackIdx = 0; currentMacroPlaybackIdx < playBackIdx; currentMacroPlaybackIdx++)
     {
-        while (PeekMessage(&msg, calcMainWindow, 0, 0, PM_REMOVE))
+        static int dampenSystemProcessing = 0;
+        
+        // Don't need to peek THAT often... allows macro to run faster
+        if (!(++dampenSystemProcessing & 7))
         {
-            if (msg.message == WM_QUIT) // Always check for quit!
+            while (PeekMessage(&msg, calcMainWindow, 0, 0, PM_REMOVE))
             {
-                endRunningMacro();
-                PostQuitMessage(0);
-                return;
+                if (msg.message == WM_QUIT) // Always check for quit!
+                {
+                    endRunningMacro();
+                    PostQuitMessage(0);
+                    return;
+                }
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
             }
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
+            
+            if (GetAsyncKeyState(VK_ESCAPE) & 0x0001)
+                break;
+                
+            if (currentMacroPlaybackIdx == playBackIdx)     // We may have ended the macro!!
+                break;
         }
         
-        if (currentMacroPlaybackIdx == playBackIdx)     // We may have ended the macro!!
-            break;
-
         if (traceMacroPlayback == FALSE)
         {
             if (halfSecTimer != initialTimer)
@@ -5488,11 +5259,7 @@ void RPN_Playback(void)
                     UpdateSpareBar("Run...");
             }
         }
-
-        if (GetAsyncKeyState(VK_ESCAPE) & 0x0001)
-            break;
-
-        if (traceMacroPlayback == TRUE)
+        else // traceMacroPlayback is TRUE
         {
             showTrace = TRUE;
             ShowStack();
@@ -5528,6 +5295,7 @@ void RPN_Playback(void)
     UpdateSpareBar("    ");
     macroPlayback = FALSE;
 }
+
 
 
 void RPN_SingleStep(void)
@@ -5588,7 +5356,8 @@ BOOL CALLBACK NotesDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPara
         switch(LOWORD(wParam))
         {
         case(IDOK):           /* OK - Close and save notes */
-            GetDlgItemText(hDlg, IDC_EDIT1, excaliburNotes, 1000);
+            GetDlgItemText(hDlg, IDC_EDIT1, excaliburNotes, NOTES_SIZE-1);
+            excaliburNotes[NOTES_SIZE] = CNULL;
             EndDialog(hDlg, FALSE);
             return TRUE;
         default:
@@ -5608,7 +5377,7 @@ BOOL CALLBACK NotesDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPara
 
 void RPN_Notes(void)
 {
-    DialogBox(hInst, (LPCSTR) "DIALOG_NOTES", calcMainWindow, NotesDlgProc);
+    DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_NOTES", calcMainWindow, NotesDlgProc);
 }
 
 void RPN_CopyX(void)
@@ -5630,10 +5399,10 @@ void RPN_inverse(void)
 
 void blinkXDisplay(void)
 {
-    GetDlgItemText(calcMainWindow, 131, tmp, 22);
+    GetDlgItemText(calcMainWindow, 131, tmpStr, 22);
     SetDlgItemText(calcMainWindow, 131, "                    ");
     Sleep(200);
-    GetDlgItemText(calcMainWindow, 131, tmp, 22);
+    GetDlgItemText(calcMainWindow, 131, tmpStr, 22);
 }
 
 
@@ -5703,7 +5472,7 @@ void RPN_endConst(void)
                         "Key /      Divide Y into X               Key M      Display Mode\n"\
                         "ENTER      Enter number to Stack         Key H      Help Key\n"\
                         "Key N      Change Sign (Negate)          Key F      Last Function Bank\n"\
-                        "\n" \
+                        "\n"\
                         "DP         Decimal Point. Press twice for fraction.\n"\
                         "BKSP       Erases last character, otherwise clears X.\n"\
                         "F1-F10     First column of the currently selected function bank.\n"\
@@ -5726,9 +5495,9 @@ void ExcaliburHelp(void)
 {
     DLGPROC lpHelpDialog;
 
-    lpHelpDialog = (DLGPROC) MakeProcInstance((FARPROC) HelpDialog, hInst);
+    lpHelpDialog = (DLGPROC) MakeProcInstance((FARPROC) HelpDialog, hExcaliburInstance);
 
-    if ((DialogBox(hInst, (LPCSTR) "DIALOG_HELP", calcMainWindow, lpHelpDialog)) == -1)
+    if ((DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_HELP", calcMainWindow, lpHelpDialog)) == -1)
     {
         MessageBox(NULL, "Unable to display dialog", "System Error", MB_SYSTEMMODAL | MB_ICONHAND | MB_OK);
     }
@@ -5820,19 +5589,17 @@ int _matherr(struct _exception *except)
     }
 }
 
-void SetNumLock( BOOL bState )
+void SetNumLock(BOOL bState)
 {
-    BYTE keyState[256];
-
     GetKeyboardState((LPBYTE)&keyState);
     if ( (bState && !(keyState[VK_NUMLOCK] & 1)) ||
       (!bState && (keyState[VK_NUMLOCK] & 1)) )
     {
      // Simulate a key press
-     keybd_event( VK_NUMLOCK, 0x45, KEYEVENTF_EXTENDEDKEY | 0, 0 );
+     keybd_event(VK_NUMLOCK, 0x45, KEYEVENTF_EXTENDEDKEY | 0, 0);
 
      // Simulate a key release
-     keybd_event( VK_NUMLOCK, 0x45, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+     keybd_event(VK_NUMLOCK, 0x45, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
     }
 }
 
@@ -5849,16 +5616,14 @@ void turnOnNumLock(void)
     }
     else // Windows 9x
     {
-        char cKeyBuf[256];
-        GetKeyboardState(cKeyBuf);
-        cKeyBuf[VK_NUMLOCK] = (char) 0x81;
-        SetKeyboardState(cKeyBuf);
+        GetKeyboardState(keyState);
+        keyState[VK_NUMLOCK] = (char) 0x81;
+        SetKeyboardState(keyState);
     }
 }
 
 void PushConstant(double value)
 {
-    char tmp[20];
     int i, startPos;
 
     if (Xedit == X_ENTER)
@@ -5868,16 +5633,16 @@ void PushConstant(double value)
 
     if (recModeON == 1) // If recording, generate key sequence to playback struct
     {
-        sprintf(tmp, "%.12g", value);
+        sprintf(tmpStr, "%.12g", value);
         startPos = 0;
-        if (tmp[0] == '-')
+        if (tmpStr[0] == '-')
         {
             startPos=1;
         }
         SaveProgramStep(UNI_STARTCONST);
-        for (i=startPos; i<(int)strlen(tmp); i++)
+        for (i=startPos; i<(int)strlen(tmpStr); i++)
         {
-            switch(tmp[i])
+            switch(tmpStr[i])
             {
                 case('.'): SaveProgramStep(UNI_DIGDP); break;
                 case('0'): SaveProgramStep(UNI_DIG0);  break;

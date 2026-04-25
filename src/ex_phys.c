@@ -518,7 +518,7 @@ BOOL CALLBACK AstroDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPara
 
 void Phys_Astro(void)
 {
-    DialogBox(hInst, (LPCSTR) "DIALOG_ASTRO", calcMainWindow, AstroDlgProc);
+    DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_ASTRO", calcMainWindow, AstroDlgProc);
 }
 
 

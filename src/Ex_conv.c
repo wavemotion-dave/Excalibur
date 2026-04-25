@@ -1,3 +1,32 @@
+// ========================================================================================
+// Excalibur RPN Calculator is Copyright(c) 1994-2026 by Dave Bernazzani(wavemotion-dave)
+//
+// This is legacy code that was created to run under Visual C++ 4.5 and 5.0 circa 1995 and
+// was largely developed with Windows 95 through Windows 98SE(some very early portions
+// of code were started during the Windows 3.1 era but were quickly ported for 32-bit).
+//
+// I don't think there is any proprietary code here... and as such I release all of this
+// source code into the wild using the permissive MIT license as follows:
+//
+// Copyright(c) 1994-2026 Dave Bernazzani
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this
+// software and associated documentation files(the "Software"), to deal in the Software
+// without restriction, including without limitation the rights to use, copy, modify,
+// merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+// permit persons to whom the Software is furnished to do so, subject to the following
+// conditions:
+//
+// The above copyright notice and this permission notice shall be included in all copies
+// or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+// INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+// PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+// TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
+// OR OTHER DEALINGS IN THE SOFTWARE.
+// ========================================================================================
 #include <stdio.h>
 #include <string.h>
 #include <windows.h>
@@ -44,6 +73,8 @@ extern void CONV_Mil_mm (void);
 extern void CONV_ShortTons_lbs (void);
 extern void CONV_LongTons_lbs (void);
 extern void CONV_MetricTons_lbs (void);
+
+uint8_t convInverse = 0;
 
 struct funcStruct Conversion_funcs[MAX_FUNCS] = {
     {FN1,   0,  UNI_CINV,    USES_F,    ALLOWREC,   ' ',    "INV",      NO_L,   X_NULL,     CONV_inverse,       T_CONV_INV,     H_CONV_INV},
@@ -96,8 +127,6 @@ struct funcStruct Conversion_funcs[MAX_FUNCS] = {
     {FN39,  0,  UNI_UNUSED,  USES_F,    ALLOWREC,   ' ',    "    ",     YES_L,  X_NEW,      NULL,               T_NULL,         H_NULL},
     {FN40,  0,  UNI_UNUSED,  USES_F,    ALLOWREC,   ' ',    "    ",     YES_L,  X_NEW,      NULL,               T_NULL,         H_NULL}
 };
-
-int convInverse = 0;
 
 
 double inverse (double x)

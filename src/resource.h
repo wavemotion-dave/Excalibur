@@ -433,8 +433,8 @@
 #define H_TIMERCLEAR                    416
 #define T_ASTRO                         417
 #define H_ASTRO                         418
-#define T_MERLYN                        419
-#define H_MERLYN                        420
+#define T_IEEE                          419
+#define H_IEEE                          420
 #define T_PYRA                          421
 #define H_PYRA                          422
 #define T_PYRV                          423

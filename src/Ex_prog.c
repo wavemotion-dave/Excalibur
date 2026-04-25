@@ -135,7 +135,7 @@ extern void Macro_Sto2i(void);
 extern void Macro_Rcl2i(void);
 
 
-struct funcStruct Prog1_funcs[MAX_FUNCS] = 
+struct funcStruct Program1_funcs[MAX_FUNCS] = 
 {
     {FN1,   0,  UNI_LBLA,       USES_FL,    ALLOWREC,   ' ',    "Lbl A",        YES_L,  X_NEW,   Macro_LblA,     T_LBLA,     H_LABELS},
     {FN2,   0,  UNI_GOTOA,      USES_FL,    ALLOWREC,   ' ',    "Goto A",       YES_L,  X_NEW,   Macro_GotoA,    T_GOTOA,    H_GOTOS},
@@ -188,7 +188,7 @@ struct funcStruct Prog1_funcs[MAX_FUNCS] =
     {FN40,  0,  UNI_DSZ,        USES_FL,    ALLOWREC,   ' ',    "DSZ",          YES_L,  X_NULL,  Macro_DSZ,      T_DSZ,      H_DSZ}
 };
 
-struct funcStruct Prog2_funcs[MAX_FUNCS] = 
+struct funcStruct Program2_funcs[MAX_FUNCS] = 
 {
     {FN1,   0,  UNI_LBLJ,       USES_FL,    ALLOWREC,   ' ',    "Lbl J",    YES_L,      X_NEW,   Macro_LblJ,     T_LBLJ,     H_LABELS},
     {FN2,   0,  UNI_GOTOJ,      USES_FL,    ALLOWREC,   ' ',    "Goto J",   YES_L,      X_NEW,   Macro_GotoJ,    T_GOTOJ,    H_GOTOS},
@@ -728,7 +728,7 @@ BOOL CALLBACK inputARegisterProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
 
 void Macro_InpA(void)
 {
-    DialogBox(hInst, (LPCSTR) "DIALOG_INPUTA", calcMainWindow, inputARegisterProc);
+    DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_INPUTA", calcMainWindow, inputARegisterProc);
 }
 
 
@@ -762,7 +762,7 @@ BOOL CALLBACK inputBRegisterProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
 
 void Macro_InpB(void)
 {
-    DialogBox(hInst, (LPCSTR) "DIALOG_INPUTB", calcMainWindow, inputBRegisterProc);
+    DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_INPUTB", calcMainWindow, inputBRegisterProc);
 }
 
 void Macro_DEL(void)
@@ -1071,7 +1071,7 @@ BOOL CALLBACK inputCRegisterProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
 
 void Macro_InpC(void)
 {
-    DialogBox(hInst, (LPCSTR) "DIALOG_INPUTC", calcMainWindow, inputCRegisterProc);
+    DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_INPUTC", calcMainWindow, inputCRegisterProc);
 }
 
 
@@ -1105,7 +1105,7 @@ BOOL CALLBACK inputDRegisterProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
 
 void Macro_InpD(void)
 {
-    DialogBox(hInst, (LPCSTR) "DIALOG_INPUTD", calcMainWindow, inputDRegisterProc);
+    DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_INPUTD", calcMainWindow, inputDRegisterProc);
 }
 
 
@@ -1336,7 +1336,7 @@ BOOL CALLBACK inputDebugValue(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lP
 double getNewDebugVal(void)
 {
     dinputDebugInProgress = 1;
-    DialogBox(hInst, (LPCSTR) "DIALOG_INPUT", calcMainWindow, inputDebugValue);
+    DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_INPUT", calcMainWindow, inputDebugValue);
     dinputDebugInProgress = 0;
     return debugValue;
 }
@@ -1349,7 +1349,7 @@ BOOL CALLBACK debugWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam
      switch(message)
      {
      case WM_INITDIALOG:
-          return TRUE ;
+          return TRUE;
 
      case WM_COMMAND:
             switch(LOWORD(wParam))
@@ -1431,8 +1431,8 @@ int CreateDebugWindow(HWND hwnd, HINSTANCE hInstance)
 {
     static char szAppName3[] = "DIALOG_PROGTRACE";
     debugTraceWindow = CreateDialog(hInstance, szAppName3, 0, ( DLGPROC )debugWndProc);
-    ShowWindow(debugTraceWindow, SW_HIDE) ;
-    UpdateWindow(debugTraceWindow) ;
+    ShowWindow(debugTraceWindow, SW_HIDE);
+    UpdateWindow(debugTraceWindow);
     SetFocus(calcMainWindow);
 
     return 0;
