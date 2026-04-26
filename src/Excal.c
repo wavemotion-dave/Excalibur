@@ -280,7 +280,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     SendMessage(GetDlgItem(calcMainWindow, 178), WM_SETFONT, (WPARAM) hMainFont, FALSE);
     SendMessage(GetDlgItem(calcMainWindow, 179), WM_SETFONT, (WPARAM) hMainFont, FALSE);
     SendMessage(GetDlgItem(calcMainWindow, 180), WM_SETFONT, (WPARAM) hMainFont, FALSE);
-    SendMessage(GetDlgItem(calcMainWindow, 181), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, fix
+    SendMessage(GetDlgItem(calcMainWindow, 181), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, fix - rework all of the IDCs in the Resource File...
     SendMessage(GetDlgItem(calcMainWindow, 182), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of buttons
     SendMessage(GetDlgItem(calcMainWindow, 190), WM_SETFONT, (WPARAM) hMainFont, FALSE);        // TBD, put with rest of
 
@@ -1901,19 +1901,13 @@ int selectFuncs(WPARAM key)
 int processFuncs()
 {
     int i;
-
-//TODO: cleanup only one font now
+    
     for (i = 0; i < MAX_FUNCS; i++)
     {
-        if (currentFuncs[i].fontType == 0)      // Sans Serif font
-            SendMessage(GetDlgItem(calcMainWindow, currentFuncs[i].index), WM_SETFONT, (WPARAM) hMainFont, FALSE);
-        else                    // Symbol font
-        if (currentFuncs[i].fontType == 1)      // Symbol
-            SendMessage(GetDlgItem(calcMainWindow, currentFuncs[i].index), WM_SETFONT, (WPARAM) hMainFont, FALSE);
-        else                    // Line Draw Font
-            SendMessage(GetDlgItem(calcMainWindow, currentFuncs[i].index), WM_SETFONT, (WPARAM) hMainFont, FALSE);
+        SendMessage(GetDlgItem(calcMainWindow, currentFuncs[i].index), WM_SETFONT, (WPARAM) hMainFont, FALSE);
         SetDlgItemText(calcMainWindow, currentFuncs[i].index, currentFuncs[i].desc);
     }
+    
     UpdateWindow(calcMainWindow);
     return(0);
 }
@@ -2040,7 +2034,7 @@ char Radix(int progM)
     return('*');
 }
 
-char Radix2(int progM)         // Shows bin HI arrow!
+char RadixBIN(int progM)         // Shows bin HI arrow!
 {
     if (progM == PROG_BIN)
     {
@@ -2280,21 +2274,21 @@ void ShowStack(void)
             XL = MakeProgStr(Xstr);
 
         MakeRadixStr(XL, formattedStr);
-        sprintf(tmpStr, (bExactFont ? "%23s%c%c":"%20s%c%c"), formattedStr, Radix(progMode), Radix2(progMode));
+        sprintf(tmpStr, (bExactFont ? "%23s%c%c":"%20s%c%c"), formattedStr, Radix(progMode), RadixBIN(progMode));
         SetDlgItemText(calcMainWindow, 131, tmpStr);
 
         MakeRadixStr(YL, formattedStr);
-        sprintf(tmpStr, (bExactFont ? "%23s%c%c":"%20s%c%c"), formattedStr, Radix(progMode), Radix2(progMode));
+        sprintf(tmpStr, (bExactFont ? "%23s%c%c":"%20s%c%c"), formattedStr, Radix(progMode), RadixBIN(progMode));
         SetDlgItemText(calcMainWindow, 130, tmpStr);
 
         if (recModeON == 0 && traceMacroPlayback == FALSE)
         {
             MakeRadixStr(ZL, formattedStr);
-            sprintf(tmpStr, (bExactFont ? "%23s%c%c":"%20s%c%c"), formattedStr, Radix(progMode), Radix2(progMode));
+            sprintf(tmpStr, (bExactFont ? "%23s%c%c":"%20s%c%c"), formattedStr, Radix(progMode), RadixBIN(progMode));
             SetDlgItemText(calcMainWindow, 129, tmpStr);
 
             MakeRadixStr(TL, formattedStr);
-            sprintf(tmpStr, (bExactFont ? "%23s%c%c":"%20s%c%c"), formattedStr, Radix(progMode), Radix2(progMode));
+            sprintf(tmpStr, (bExactFont ? "%23s%c%c":"%20s%c%c"), formattedStr, Radix(progMode), RadixBIN(progMode));
             SetDlgItemText(calcMainWindow, 128, tmpStr);
         }
     }
@@ -4360,7 +4354,6 @@ BOOL CALLBACK fnDIALOG_MACRO(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
 
             item = SendDlgItemMessage(hDlg, 101, LB_GETCURSEL, 0, 0L);
 
-#if 1 //tbd
             sprintf(tmpStr, "Macro Name:  %s", macro_short_names[item]);
             lstrcat(cptr, (LPSTR) tmpStr);
             lstrcat(cptr, (LPSTR) "\r\n");
@@ -4386,14 +4379,7 @@ BOOL CALLBACK fnDIALOG_MACRO(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
             lstrcat(cptr, (LPSTR) "\r\n");
             lstrcat(cptr, (LPSTR) tmpStr);
             lstrcat(cptr, (LPSTR) "\r\n");
-#else
-            for (i=0; i<totalMappedButtonFuncs; i++)
-            {
-                sprintf(tmpStr, "%s", playBackMap[i].funcText);
-                lstrcat(cptr, (LPSTR) tmpStr);
-                lstrcat(cptr, (LPSTR) "\r\n");
-            }
-#endif
+            
             OpenClipboard(calcMainWindow);
             EmptyClipboard();
             GlobalUnlock(tptr);
@@ -5141,9 +5127,9 @@ void callButtonFunc(void(*routine) (void), char useFloatsLongs, char allowRecord
 
     if (saveLastX == YES_L)
     {
-        LASTX = X;
+        LASTX  = X;
         LASTXL = XL;
-        LASTY = Y;
+        LASTY  = Y;
         LASTYL = YL;
     }
 
@@ -5184,6 +5170,53 @@ void callButtonFunc(void(*routine) (void), char useFloatsLongs, char allowRecord
     }
 }
 
+// -------------------------------------------------------------------------------------------------
+// This version is streamlined for use when a macro is playing back for relatively blazing speed...
+// -------------------------------------------------------------------------------------------------
+void callButtonFunc_fast(void(*routine) (void), char useFloatsLongs, int uniqueIndex, char saveLastX, char newXedit)
+{
+    if (progMode != PROG_NORMAL)        // Always ensure floats are "in-sync" with longs before any press!
+    {
+        LongsToFloats();
+    }
+
+    if (saveLastX == YES_L)
+    {
+        LASTX  = X;
+        LASTXL = XL;
+        LASTY  = Y;
+        LASTYL = YL;
+    }
+
+    // Before we call the button function we need to ensure both stacks look right.
+    // This will help with Macro programming between stacks!
+    if (useFloatsLongs == USES_L && progMode == PROG_NORMAL)
+    {
+        progMode = PROG_DEC;
+        FloatsToLongs();
+        ShowStack();
+        ShowStatus();
+    }
+    else if (useFloatsLongs == USES_F && progMode != PROG_NORMAL)
+    {
+        progMode = PROG_NORMAL;
+        LongsToFloats();
+        ShowStack();
+        ShowStatus();
+    }
+
+    routine();                 // This calls the actual button routine to perform things like SIN, COS, CLX, etc
+
+    if (newXedit != X_NULL)
+    {
+        Xedit = newXedit;
+        hyperbolic = 0;
+        finStore = 0;
+        finRecall = 0;
+        convInverse = 0;
+    }
+}
+
 void RPN_Record(void)
 {
     if (recModeON == 0)
@@ -5194,7 +5227,9 @@ void RPN_Record(void)
         Xedit = X_NEW;
     }
     else
+    {
         recModeON = 0;
+    }
     ShowStatus();
 }
 
@@ -5219,9 +5254,20 @@ void RPN_Playback(void)
 
     macroPlayback = TRUE;
 
-    GetAsyncKeyState(VK_ESCAPE);       // Get one reading at least!
-    SetFocus(calcMainWindow);  // For long macros this will "release" the Play key depresion...
+    GetAsyncKeyState(VK_ESCAPE);        // Get one reading at least!
+    SetFocus(calcMainWindow);           // For long macros this will "release" the Play key depresion...
+    
+    if (IsWindowVisible(toolTipWnd))    // Macro running... hide tool tip window if it was visible.
+    {
+        ShowWindow(toolTipWnd, SW_HIDE);
+        toolTipCounter = 0;
+    }    
 
+    // ------------------------------------------------------------------------------------------------
+    // This is the main macro playback loop... it has been somewhat optimized so that we push through
+    // as many recorded keystrokes as possible. On a fairly pedestrian i5 computer (circa 2018), this
+    // will run about 1 million 'Excalibur Instructions' per second. Good enough.
+    // ------------------------------------------------------------------------------------------------
     for (currentMacroPlaybackIdx = 0; currentMacroPlaybackIdx < playBackIdx; currentMacroPlaybackIdx++)
     {
         static int dampenSystemProcessing = 0;
@@ -5270,10 +5316,8 @@ void RPN_Playback(void)
 
         if (playBackMap[idx].routine != NULL)
         {
-            // Always disallow record of playback keystrokes!
-            callButtonFunc(playBackMap[idx].routine,
-                            playBackMap[idx].useFloatsLongs, NORECORD,
-                            playBackMap[idx].uniqueIndex, playBackMap[idx].saveLastX, playBackMap[idx].newXedit, FALSE);
+            callButtonFunc_fast(playBackMap[idx].routine, playBackMap[idx].useFloatsLongs,
+                                playBackMap[idx].uniqueIndex, playBackMap[idx].saveLastX, playBackMap[idx].newXedit);
         }
 
         if (traceMacroPlayback == TRUE)

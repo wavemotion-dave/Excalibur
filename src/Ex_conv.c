@@ -77,55 +77,55 @@ extern void CONV_MetricTons_lbs (void);
 uint8_t convInverse = 0;
 
 struct funcStruct Conversion_funcs[MAX_FUNCS] = {
-    {FN1,   0,  UNI_CINV,    USES_F,    ALLOWREC,   ' ',    "INV",      NO_L,   X_NULL,     CONV_inverse,       T_CONV_INV,     H_CONV_INV},
-    {FN2,   0,  UNI_LBKG,    USES_F,    ALLOWREC,   ' ',    "lb»kg",    YES_L,  X_NEW,      CONV_lb_kg,         T_LB_KG,        H_LB_KG},
-    {FN3,   0,  UNI_OZGR,    USES_F,    ALLOWREC,   ' ',    "Oz»g",     YES_L,  X_NEW,      CONV_Oz_g,          T_OZ_GR,        H_OZ_GR},
-    {FN4,   0,  UNI_OZML,    USES_F,    ALLOWREC,   ' ',    "flOz»ml",  YES_L,  X_NEW,      CONV_flOz_ml,       T_FO_ML,        H_FO_ML},
-                                                
-    {FN5,   0,  UNI_GALL,    USES_F,    ALLOWREC,   ' ',    "gal»l",    YES_L,  X_NEW,      CONV_gal_l,         T_GA_LI,        H_GA_LI},
-    {FN6,   0,  UNI_GALCM3,  USES_F,    ALLOWREC,   ' ',    "gal»cm³",  YES_L,  X_NEW,      CONV_gal_cm3,       T_GA_CM3,       H_GA_CM3},
-    {FN7,   0,  UNI_PINL,    USES_F,    ALLOWREC,   ' ',    "pnt»l",    YES_L,  X_NEW,      CONV_pin_l,         T_PINT_LI,      H_PINT_LI},
-    {FN8,   0,  UNI_IGALL,   USES_F,    ALLOWREC,   ' ',    "Igal»l",   YES_L,  X_NEW,      CONV_Igal_l,        T_IGA_LI,       H_IGA_LI},
-                                                
-    {FN9,   0,  UNI_FACE,    USES_F,    ALLOWREC,   ' ',    "F»C",      YES_L,  X_NEW,      CONV_F_C,           T_FA_CE,        H_FA_CE},
-    {FN10,  0,  UNI_FAKE,    USES_F,    ALLOWREC,   ' ',    "F»K",      YES_L,  X_NEW,      CONV_F_K,           T_FA_KE,        H_FA_KE},
-    {FN11,  0,  UNI_INCM,    USES_F,    ALLOWREC,   ' ',    "in»cm",    YES_L,  X_NEW,      CONV_In_Cm,         T_IN_CM,        H_IN_CM},
-    {FN12,  0,  UNI_INMM,    USES_F,    ALLOWREC,   ' ',    "in»mm",    YES_L,  X_NEW,      CONV_In_mm,         T_IN_MM,        H_IN_MM},
-                                                        
-    {FN13,  0,  UNI_FTMI,    USES_F,    ALLOWREC,   ' ',    "ft»mi",    YES_L,  X_NEW,      CONV_Ft_Mi,         T_FT_MI,        H_FT_MI},
-    {FN14,  0,  UNI_FTKM,    USES_F,    ALLOWREC,   ' ',    "ft»km",    YES_L,  X_NEW,      CONV_Ft_Km,         T_FT_KM,        H_FT_KM},
-    {FN15,  0,  UNI_FTFA,    USES_F,    ALLOWREC,   ' ',    "ft»fa",    YES_L,  X_NEW,      CONV_Ft_Fa,         T_FT_FA,        H_FT_FA},
-    {FN16,  0,  UNI_FTM,     USES_F,    ALLOWREC,   ' ',    "ft»m",     YES_L,  X_NEW,      CONV_Ft_m,          T_FT_ME,        H_FT_ME},
-                                                
-    {FN17,  0,  UNI_MIKM,    USES_F,    ALLOWREC,   ' ',    "mi»km",    YES_L,  X_NEW,      CONV_Mi_Km,         T_MI_KM,        H_MI_KM},
-    {FN18,  0,  UNI_IN2CM2,  USES_F,    ALLOWREC,   ' ',    "in²»cm²",  YES_L,  X_NEW,      CONV_in2_cm2,       T_SI_SC,        H_SI_SC},
-    {FN19,  0,  UNI_FT2M2,   USES_F,    ALLOWREC,   ' ',    "Ft²»m²",   YES_L,  X_NEW,      CONV_ft2_m2,        T_SF_SM,        H_SF_SM},
-    {FN20,  0,  UNI_IN3CM3,  USES_F,    ALLOWREC,   ' ',    "in³»cm³",  YES_L,  X_NEW,      CONV_in3_cm3,       T_CI_CC,        H_CI_CC},
-                                                                                                        
-    {FN21,  0,  UNI_FT3M3,   USES_F,    ALLOWREC,   ' ',    "Ft³»m³",   YES_L,  X_NEW,      CONV_ft3_m3,        T_CF_CM,        H_CF_CM},
-    {FN22,  0,  UNI_ACRFT2,  USES_F,    ALLOWREC,   ' ',    "Acr»ft²",  YES_L,  X_NEW,      CONV_acre_ft2,      T_ACR_FT2,      H_ACR_FT2},
-    {FN23,  0,  UNI_ATPSI,   USES_F,    ALLOWREC,   ' ',    "At»PSI",   YES_L,  X_NEW,      CONV_at_psi,        T_AT_PSI,       H_AT_PSI},
-    {FN24,  0,  UNI_HHMS,    USES_F,    ALLOWREC,   ' ',    "h»h.ms",   YES_L,  X_NEW,      CONV_H_Ms,          T_HMS,          H_HMS},
-                                                                                                
-    {FN25,  0,  UNI_DRAD,    USES_F,    ALLOWREC,   ' ',    "D»Rad",    YES_L,  X_NEW,      CONV_Deg_Rad,       T_DE_RA,        H_DE_RA},
-    {FN26,  0,  UNI_RP,      USES_F,    ALLOWREC,   ' ',    "R»P",      YES_L,  X_NEW,      CONV_R_P,           T_RE_PO,        H_RE_PO},
-    {FN27,  0,  UNI_KMHMPS,  USES_F,    ALLOWREC,   ' ',    "kph»mps",  YES_L,  X_NEW,      CONV_kmh_mps,       T_KMH_MPS,      H_KMH_MPS},
-    {FN28,  0,  UNI_KNOTMPH, USES_F,    ALLOWREC,   ' ',    "kt»mph",   YES_L,  X_NEW,      CONV_knot_mph,      T_KNOT_MPH,     H_KNOT_MPH},
-                                                                                                
-    {FN29,  0,  UNI_AHCOL,   USES_F,    ALLOWREC,   ' ',    "AH»Col",   YES_L,  X_NEW,      CONV_ah_col,        T_AH_COL,       H_AH_COL},
-    {FN30,  0,  UNI_AHFAR,   USES_F,    ALLOWREC,   ' ',    "AH»Far",   YES_L,  X_NEW,      CONV_ah_far,        T_AH_FAR,       H_AH_FAR},
-    {FN31,  0,  UNI_HPKW,    USES_F,    ALLOWREC,   ' ',    "HP»kW",    YES_L,  X_NEW,      CONV_hp_kw,         T_HP_KW,        H_HP_KW},
-    {FN32,  0,  UNI_JCAL,    USES_F,    ALLOWREC,   ' ',    "Cal»J",    YES_L,  X_NEW,      CONV_J_Cal,         T_CA_JO,        H_CA_JO},
+    {FN1,   UNI_CINV,    USES_F,    ALLOWREC,   ' ',    "INV",      NO_L,   X_NULL,     CONV_inverse,       T_CONV_INV,     H_CONV_INV},
+    {FN2,   UNI_LBKG,    USES_F,    ALLOWREC,   ' ',    "lb»kg",    YES_L,  X_NEW,      CONV_lb_kg,         T_LB_KG,        H_LB_KG},
+    {FN3,   UNI_OZGR,    USES_F,    ALLOWREC,   ' ',    "Oz»g",     YES_L,  X_NEW,      CONV_Oz_g,          T_OZ_GR,        H_OZ_GR},
+    {FN4,   UNI_OZML,    USES_F,    ALLOWREC,   ' ',    "flOz»ml",  YES_L,  X_NEW,      CONV_flOz_ml,       T_FO_ML,        H_FO_ML},
+                                            
+    {FN5,   UNI_GALL,    USES_F,    ALLOWREC,   ' ',    "gal»l",    YES_L,  X_NEW,      CONV_gal_l,         T_GA_LI,        H_GA_LI},
+    {FN6,   UNI_GALCM3,  USES_F,    ALLOWREC,   ' ',    "gal»cm³",  YES_L,  X_NEW,      CONV_gal_cm3,       T_GA_CM3,       H_GA_CM3},
+    {FN7,   UNI_PINL,    USES_F,    ALLOWREC,   ' ',    "pnt»l",    YES_L,  X_NEW,      CONV_pin_l,         T_PINT_LI,      H_PINT_LI},
+    {FN8,   UNI_IGALL,   USES_F,    ALLOWREC,   ' ',    "Igal»l",   YES_L,  X_NEW,      CONV_Igal_l,        T_IGA_LI,       H_IGA_LI},
+                                            
+    {FN9,   UNI_FACE,    USES_F,    ALLOWREC,   ' ',    "F»C",      YES_L,  X_NEW,      CONV_F_C,           T_FA_CE,        H_FA_CE},
+    {FN10,  UNI_FAKE,    USES_F,    ALLOWREC,   ' ',    "F»K",      YES_L,  X_NEW,      CONV_F_K,           T_FA_KE,        H_FA_KE},
+    {FN11,  UNI_INCM,    USES_F,    ALLOWREC,   ' ',    "in»cm",    YES_L,  X_NEW,      CONV_In_Cm,         T_IN_CM,        H_IN_CM},
+    {FN12,  UNI_INMM,    USES_F,    ALLOWREC,   ' ',    "in»mm",    YES_L,  X_NEW,      CONV_In_mm,         T_IN_MM,        H_IN_MM},
+                                                    
+    {FN13,  UNI_FTMI,    USES_F,    ALLOWREC,   ' ',    "ft»mi",    YES_L,  X_NEW,      CONV_Ft_Mi,         T_FT_MI,        H_FT_MI},
+    {FN14,  UNI_FTKM,    USES_F,    ALLOWREC,   ' ',    "ft»km",    YES_L,  X_NEW,      CONV_Ft_Km,         T_FT_KM,        H_FT_KM},
+    {FN15,  UNI_FTFA,    USES_F,    ALLOWREC,   ' ',    "ft»fa",    YES_L,  X_NEW,      CONV_Ft_Fa,         T_FT_FA,        H_FT_FA},
+    {FN16,  UNI_FTM,     USES_F,    ALLOWREC,   ' ',    "ft»m",     YES_L,  X_NEW,      CONV_Ft_m,          T_FT_ME,        H_FT_ME},
+                                            
+    {FN17,  UNI_MIKM,    USES_F,    ALLOWREC,   ' ',    "mi»km",    YES_L,  X_NEW,      CONV_Mi_Km,         T_MI_KM,        H_MI_KM},
+    {FN18,  UNI_IN2CM2,  USES_F,    ALLOWREC,   ' ',    "in²»cm²",  YES_L,  X_NEW,      CONV_in2_cm2,       T_SI_SC,        H_SI_SC},
+    {FN19,  UNI_FT2M2,   USES_F,    ALLOWREC,   ' ',    "Ft²»m²",   YES_L,  X_NEW,      CONV_ft2_m2,        T_SF_SM,        H_SF_SM},
+    {FN20,  UNI_IN3CM3,  USES_F,    ALLOWREC,   ' ',    "in³»cm³",  YES_L,  X_NEW,      CONV_in3_cm3,       T_CI_CC,        H_CI_CC},
+                                                                                                    
+    {FN21,  UNI_FT3M3,   USES_F,    ALLOWREC,   ' ',    "Ft³»m³",   YES_L,  X_NEW,      CONV_ft3_m3,        T_CF_CM,        H_CF_CM},
+    {FN22,  UNI_ACRFT2,  USES_F,    ALLOWREC,   ' ',    "Acr»ft²",  YES_L,  X_NEW,      CONV_acre_ft2,      T_ACR_FT2,      H_ACR_FT2},
+    {FN23,  UNI_ATPSI,   USES_F,    ALLOWREC,   ' ',    "At»PSI",   YES_L,  X_NEW,      CONV_at_psi,        T_AT_PSI,       H_AT_PSI},
+    {FN24,  UNI_HHMS,    USES_F,    ALLOWREC,   ' ',    "h»h.ms",   YES_L,  X_NEW,      CONV_H_Ms,          T_HMS,          H_HMS},
                                                                                             
-    {FN33,  0,  UNI_MILMM,   USES_F,    ALLOWREC,   ' ',    "Mil»mm",   YES_L,  X_NEW,      CONV_Mil_mm,        T_MIL_MM,       H_MIL_MM},
-    {FN34,  0,  UNI_STONLB,  USES_F,    ALLOWREC,   ' ',    "sTon»lb",  YES_L,  X_NEW,      CONV_ShortTons_lbs, T_STON_LB,      H_STON_LB},
-    {FN35,  0,  UNI_LTONLB,  USES_F,    ALLOWREC,   ' ',    "lTon»lb",  YES_L,  X_NEW,      CONV_LongTons_lbs,  T_LTON_LB,      H_LTON_LB},
-    {FN36,  0,  UNI_MTONLB,  USES_F,    ALLOWREC,   ' ',    "mTon»lb",  YES_L,  X_NEW,      CONV_MetricTons_lbs,T_MTON_LB,      H_MTON_LB},
-                                        
-    {FN37,  0,  UNI_UNUSED,  USES_F,    ALLOWREC,   ' ',    "    ",     YES_L,  X_NEW,      NULL,               T_NULL,         H_NULL},
-    {FN38,  0,  UNI_UNUSED,  USES_F,    ALLOWREC,   ' ',    "    ",     YES_L,  X_NEW,      NULL,               T_NULL,         H_NULL},
-    {FN39,  0,  UNI_UNUSED,  USES_F,    ALLOWREC,   ' ',    "    ",     YES_L,  X_NEW,      NULL,               T_NULL,         H_NULL},
-    {FN40,  0,  UNI_UNUSED,  USES_F,    ALLOWREC,   ' ',    "    ",     YES_L,  X_NEW,      NULL,               T_NULL,         H_NULL}
+    {FN25,  UNI_DRAD,    USES_F,    ALLOWREC,   ' ',    "D»Rad",    YES_L,  X_NEW,      CONV_Deg_Rad,       T_DE_RA,        H_DE_RA},
+    {FN26,  UNI_RP,      USES_F,    ALLOWREC,   ' ',    "R»P",      YES_L,  X_NEW,      CONV_R_P,           T_RE_PO,        H_RE_PO},
+    {FN27,  UNI_KMHMPS,  USES_F,    ALLOWREC,   ' ',    "kph»mps",  YES_L,  X_NEW,      CONV_kmh_mps,       T_KMH_MPS,      H_KMH_MPS},
+    {FN28,  UNI_KNOTMPH, USES_F,    ALLOWREC,   ' ',    "kt»mph",   YES_L,  X_NEW,      CONV_knot_mph,      T_KNOT_MPH,     H_KNOT_MPH},
+                                                                                            
+    {FN29,  UNI_AHCOL,   USES_F,    ALLOWREC,   ' ',    "AH»Col",   YES_L,  X_NEW,      CONV_ah_col,        T_AH_COL,       H_AH_COL},
+    {FN30,  UNI_AHFAR,   USES_F,    ALLOWREC,   ' ',    "AH»Far",   YES_L,  X_NEW,      CONV_ah_far,        T_AH_FAR,       H_AH_FAR},
+    {FN31,  UNI_HPKW,    USES_F,    ALLOWREC,   ' ',    "HP»kW",    YES_L,  X_NEW,      CONV_hp_kw,         T_HP_KW,        H_HP_KW},
+    {FN32,  UNI_JCAL,    USES_F,    ALLOWREC,   ' ',    "Cal»J",    YES_L,  X_NEW,      CONV_J_Cal,         T_CA_JO,        H_CA_JO},
+                                                                                        
+    {FN33,  UNI_MILMM,   USES_F,    ALLOWREC,   ' ',    "Mil»mm",   YES_L,  X_NEW,      CONV_Mil_mm,        T_MIL_MM,       H_MIL_MM},
+    {FN34,  UNI_STONLB,  USES_F,    ALLOWREC,   ' ',    "sTon»lb",  YES_L,  X_NEW,      CONV_ShortTons_lbs, T_STON_LB,      H_STON_LB},
+    {FN35,  UNI_LTONLB,  USES_F,    ALLOWREC,   ' ',    "lTon»lb",  YES_L,  X_NEW,      CONV_LongTons_lbs,  T_LTON_LB,      H_LTON_LB},
+    {FN36,  UNI_MTONLB,  USES_F,    ALLOWREC,   ' ',    "mTon»lb",  YES_L,  X_NEW,      CONV_MetricTons_lbs,T_MTON_LB,      H_MTON_LB},
+                                    
+    {FN37,  UNI_UNUSED,  USES_F,    ALLOWREC,   ' ',    "    ",     YES_L,  X_NEW,      NULL,               T_NULL,         H_NULL},
+    {FN38,  UNI_UNUSED,  USES_F,    ALLOWREC,   ' ',    "    ",     YES_L,  X_NEW,      NULL,               T_NULL,         H_NULL},
+    {FN39,  UNI_UNUSED,  USES_F,    ALLOWREC,   ' ',    "    ",     YES_L,  X_NEW,      NULL,               T_NULL,         H_NULL},
+    {FN40,  UNI_UNUSED,  USES_F,    ALLOWREC,   ' ',    "    ",     YES_L,  X_NEW,      NULL,               T_NULL,         H_NULL}
 };
 
 

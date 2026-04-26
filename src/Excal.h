@@ -274,29 +274,28 @@ typedef unsigned __int8     uint8_t;
 
 struct funcStruct
 {
-    int index;
-    char fontType;
-    int uniqueIndex;
-    char useFloatsLongs;
-    char allowRecord;
-    char op;
-    char desc[8];
-    char saveLastX;             /* Do we save LASTX here? */
-    char newXedit;              /* The new Xedit */
+    int32_t index;
+    int16_t uniqueIndex;
+    uint8_t useFloatsLongs;
+    uint8_t allowRecord;
+    uint8_t op;
+    char desc[9];
+    uint8_t saveLastX;             /* Do we save LASTX here? */
+    uint8_t newXedit;              /* The new Xedit */
     void(*routine) (void);
-    int keyTitle;
-    int keyHelp;
+    int32_t keyTitle;
+    int32_t keyHelp;
 };
 
 struct keypadStruct
 {
-    int index;
-    int uniqueIndex;
-    char useFloatsLongs;
-    char allowRecord;
-    char op;
-    char saveLastX;             /* Do we save LASTX here? */
-    char newXedit;              /* The new Xedit */
+    int32_t index;
+    int16_t uniqueIndex;
+    uint8_t useFloatsLongs;
+    uint8_t allowRecord;
+    uint8_t op;
+    uint8_t saveLastX;             /* Do we save LASTX here? */
+    uint8_t newXedit;              /* The new Xedit */
     void(*routine) (void);
     char keyTitle[26];
     char keyHelp[128];
@@ -308,9 +307,9 @@ struct keypadStruct
 #define NORECORD     0
 
 // Float or Long...
-#define USES_F  1
-#define USES_L  2
-#define USES_FL 3
+#define USES_F  1   // Uses floating point numbers
+#define USES_L  2   // Uses long integer numbers
+#define USES_FL 3   // Can use either floats or longs
 
 #define NOTES_SIZE 2048
 

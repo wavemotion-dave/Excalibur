@@ -5,7 +5,6 @@
 #define T_NULL                          0
 #define H_NULL                          1
 #define T_SIN                           2
-#define IDSTARTGAME                     2
 #define H_SIN                           3
 #define T_COS                           4
 #define H_COS                           5
