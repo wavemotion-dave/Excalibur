@@ -53,7 +53,7 @@
                   "if you want to donate to support the effort.\n\n"    \
                   "https://github.com/wavemotion-dave/Excalibur"
 
-#define CONFIG_VERSION_MAIN     0xF001      // If this changes, we wipe EVERYTHING
+#define CONFIG_VERSION_MAIN     0xF002      // If this changes, we wipe EVERYTHING
 #define CONFIG_VERSION_SUB      0xF001      // If this changes, we reset x,y window position and reset constant tables (currency, physics constants, etc)
 
 #define END_OF_PROGRAM_STR "<End Of Program>"
@@ -136,8 +136,8 @@ PROG_LONG LASTXL;               /* LAST X when in Comp-Sci mode */
 PROG_LONG LASTYL;               /* LAST Y when in Comp-Sci mode */
 
 // Some statistics registers
-uint32_t stackPushes = 0;           // Total number of Stack Pushes
-uint32_t stackPops = 0;             // Total number of Stack Pops
+uint64_t stackPushes = 0;           // Total number of Stack Pushes
+uint64_t stackPops = 0;             // Total number of Stack Pops
 uint32_t inFocusTime = 0;           // Number of minutes Excalibur window in 'focus'
 
 uint8_t  AngleMode = 0;             // 0=Degrees, 1=Radians, 2=Gradients
@@ -211,14 +211,12 @@ HMENU       hMainMenu;              // A handle to the Main Menu
 static HBRUSH backgroundBrush;
 static HBRUSH helpWindowBackgroundBrush;
 
-extern void PROG_dec(void);
-extern void cust_define(void);
 void HelpAbout(void);
 void ShowUsageStats(void);
 void ProcessCusomSave(void);
 void SetLastMenuType(int type);
-extern WORD GetMouseHelp(WORD xPos, WORD yPos);
-extern void init_key_pos(void);        // for tool tips
+WORD GetMouseHelp(WORD xPos, WORD yPos);
+void init_key_pos(void);        // for tool tips
 
 #ifdef __cplusplus
 typedef void(*fptr) (int);
@@ -267,10 +265,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     ShowWindow(calcMainWindow, SW_HIDE);
 
     SetTimer(calcMainWindow, 1, 60000, NULL);   // 1 Minute Timer
-    SetTimer(calcMainWindow, 2, 300, NULL);     // 300ms Timer
-    SetTimer(calcMainWindow, 3, 100, NULL);     // 100ms Timer
-    srand((unsigned) time(NULL));
+    SetTimer(calcMainWindow, 2, 300,   NULL);   // 300ms Timer
+    SetTimer(calcMainWindow, 3, 100,   NULL);   // 100ms Timer
+    
+    srand((unsigned) time(NULL));   // Ensure random numbers are somewhat random!
 
+    // Add the Excalibur Settings into the main menu
     tmpMenuHandle = GetSystemMenu(calcMainWindow, FALSE);
     AppendMenu(tmpMenuHandle, MF_SEPARATOR, 0, NULL);
     AppendMenu(tmpMenuHandle, MF_STRING, IDM_SETTINGS, "Excalibur Settings...");
@@ -356,6 +356,10 @@ int CreateToolTipWindow(HWND hwnd, HINSTANCE hInstance)
     return 0;
 }
 
+// ---------------------------------------------------------------------------------------
+// This is our top-level Excalibur window handler... Essentially this handles any 
+// top-level functionality such as keyboard presses, global timers, window movement, etc.
+// ---------------------------------------------------------------------------------------
 LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
     RECT rcWindow;
@@ -1075,8 +1079,8 @@ int ClipboardCopySelection(HWND hwnd, int copytype)
     HANDLE hMem;
     LPSTR lpMem;
     char far *cptr;
-    char tmp2[30];
-    char tmp3[30];
+    char tmp2[32];
+    char tmp3[32];
     int i, j, k;
     unsigned short chksum = 0x0000;
 
@@ -1084,7 +1088,7 @@ int ClipboardCopySelection(HWND hwnd, int copytype)
     {
         tptr = GlobalAlloc(GHND, (DWORD) 64L);
         cptr = GlobalLock(tptr);
-        GetDlgItemText(calcMainWindow, RPN_STACK_X, tmpStr, 29);  // X register
+        GetDlgItemText(calcMainWindow, RPN_STACK_X, tmpStr, MAX_STACK_STRLEN);  // X register
         k = 0;                  // Strip leading spaces!
         while ((tmpStr[k] == ' ') && k < 20)
             k++;
@@ -1103,7 +1107,7 @@ int ClipboardCopySelection(HWND hwnd, int copytype)
         OpenClipboard(hwnd);
         hMem = GetClipboardData(CF_TEXT);
         lpMem = GlobalLock(hMem);
-        lstrcpyn(tmp2, lpMem, 22);
+        lstrcpyn(tmp2, lpMem, MAX_STACK_STRLEN);
         GlobalUnlock(hMem);
         CloseClipboard();
         tmp2[20] = '\0';
@@ -1160,25 +1164,25 @@ int ClipboardCopySelection(HWND hwnd, int copytype)
         tptr = GlobalAlloc(GHND, (DWORD) 128L);
         cptr = GlobalLock(tptr);
         lstrcpy(cptr, "");
-        GetDlgItemText(calcMainWindow, RPN_STACK_T, tmpStr, 29);  // T register
+        GetDlgItemText(calcMainWindow, RPN_STACK_T, tmpStr, MAX_STACK_STRLEN);  // T register
         k = 0;                  // Strip leading spaces!
         while ((tmpStr[k] == ' ') && k < 20)
             k++;
         lstrcat(cptr, (LPSTR) & tmpStr[k]);
         lstrcat(cptr, (LPSTR) "\r\n");
-        GetDlgItemText(calcMainWindow, RPN_STACK_Z, tmpStr, 29);  // Z register
+        GetDlgItemText(calcMainWindow, RPN_STACK_Z, tmpStr, MAX_STACK_STRLEN);  // Z register
         k = 0;                  // Strip leading spaces!
         while ((tmpStr[k] == ' ') && k < 20)
             k++;
         lstrcat(cptr, (LPSTR) & tmpStr[k]);
         lstrcat(cptr, (LPSTR) "\r\n");
-        GetDlgItemText(calcMainWindow, RPN_STACK_Y, tmpStr, 29);  // Y register
+        GetDlgItemText(calcMainWindow, RPN_STACK_Y, tmpStr, MAX_STACK_STRLEN);  // Y register
         k = 0;                  // Strip leading spaces!
         while ((tmpStr[k] == ' ') && k < 20)
             k++;
         lstrcat(cptr, (LPSTR) & tmpStr[k]);
         lstrcat(cptr, (LPSTR) "\r\n");
-        GetDlgItemText(calcMainWindow, RPN_STACK_X, tmpStr, 29);  // X register
+        GetDlgItemText(calcMainWindow, RPN_STACK_X, tmpStr, MAX_STACK_STRLEN);  // X register
         k = 0;                  // Strip leading spaces!
         while ((tmpStr[k] == ' ') && k < 20)
             k++;
@@ -2041,7 +2045,7 @@ void makeInternational(char *str)
 
 void PutCommas(char *str)
 {
-    char commaStr[50];
+    char commaStr[64];
     char *orgp;
     char *orgp2;
     int i, j, k, dpCount;
@@ -2173,7 +2177,7 @@ void ShowStack(void)
         {
             sprintf(tmpStr, "%03d-%s", currentMacroPlaybackIdx, playBackMap[playBack[currentMacroPlaybackIdx - 1]].funcText);
         }
-        tmpStr[22] = CNULL;
+        tmpStr[MAX_STACK_STRLEN] = CNULL;
         SetDlgItemText(calcMainWindow, RPN_STACK_T, tmpStr);
         SetDlgItemText(calcMainWindow, RPN_STACK_Z, " ");
     }
@@ -2190,7 +2194,7 @@ void ShowStack(void)
                      playBackMap[playBack[currentMacroPlaybackIdx]].funcText);
         }
 
-        tmpStr[22] = CNULL;
+        tmpStr[MAX_STACK_STRLEN] = CNULL;
         SetDlgItemText(calcMainWindow, RPN_STACK_T, tmpStr);
         SetDlgItemText(calcMainWindow, RPN_STACK_Z, " ");
     }
@@ -2512,8 +2516,8 @@ void RPN_digit(WPARAM key)
         if (allowDigitBasedOnMaxStringSize(Xstr, (char) ('0' + (key - 101))))
         {
             int len = strlen(Xstr);
-            Xstr[len-1] = '0' + (key - 101);
-            Xstr[len] = CNULL;
+            Xstr[len] = '0' + (key - 101);
+            Xstr[len+1] = CNULL;
         }
     }
 
@@ -4603,16 +4607,16 @@ void HelpAbout(void)
 
 void ShowUsageStats(void)
 {
-    sprintf(tmpStr,
-             "Stack Pushes:  %lu\nStack Pops:      %lu\nTime In Focus:  %lu mins",
-             (unsigned long) stackPushes, (unsigned long) stackPops, inFocusTime);
+    char stackPushesStr[64];
+    char stackPopsStr[64];
+    
+    sprintf(stackPushesStr, "%I64u", stackPushes);
+    PutCommas(stackPushesStr);
+    sprintf(stackPopsStr, "%I64u", stackPops);
+    PutCommas(stackPopsStr);
+    sprintf(tmpStr, "Stack Pushes:  %s\nStack Pops:      %s\nTime In Focus:  %lu mins", stackPushesStr, stackPopsStr, inFocusTime);
     MessageBox(calcMainWindow, tmpStr, "System Usage Statistics", MB_ICONINFORMATION | MB_OK);
 }
-
-int fnButtonX;
-int fnButtonY;
-int fnButtonH;
-int fnButtonW;
 
 WORD GetMouseHelp(WORD xPos, WORD yPos)
 {
@@ -4668,6 +4672,10 @@ void init_key_pos(void)        // for tool tips
     int i;
     RECT rc;
     POINT pt;
+    int fnButtonX;
+    int fnButtonY;
+    int fnButtonH;
+    int fnButtonW;
 
     GetWindowRect(GetDlgItem(calcMainWindow, FN1), &rc);
     pt.x = rc.left;
@@ -4806,7 +4814,6 @@ void RPN_edit(void)
         Xedit = X_NEW;
         StackPush(StackPop());
     }
-
 }
 
 void RPN_SelectSci(void)
@@ -4892,7 +4899,7 @@ void mapButtonFuncs(void)
         playBackMap[j].saveLastX = Scientific_funcs[i].saveLastX;
         playBackMap[j].newXedit = Scientific_funcs[i].newXedit;
         playBackMap[j].routine = Scientific_funcs[i].routine;
-        LoadString(hExcaliburInstance, Scientific_funcs[i].keyTitle, playBackMap[j].funcText, 29);
+        LoadString(hExcaliburInstance, Scientific_funcs[i].keyTitle, playBackMap[j].funcText, MAX_MACRO_FUNC_TEXT-1);
         playBackMap[j].uniqueIndex = Scientific_funcs[i].uniqueIndex;
         playBackMap[j].useFloatsLongs = Scientific_funcs[i].useFloatsLongs;
         playBackMap[j].allowRecord = Scientific_funcs[i].allowRecord;
@@ -4904,7 +4911,7 @@ void mapButtonFuncs(void)
         playBackMap[j].saveLastX = CompSci_funcs[i].saveLastX;
         playBackMap[j].newXedit = CompSci_funcs[i].newXedit;
         playBackMap[j].routine = CompSci_funcs[i].routine;
-        LoadString(hExcaliburInstance, CompSci_funcs[i].keyTitle, playBackMap[j].funcText, 29);
+        LoadString(hExcaliburInstance, CompSci_funcs[i].keyTitle, playBackMap[j].funcText, MAX_MACRO_FUNC_TEXT-1);
         playBackMap[j].uniqueIndex = CompSci_funcs[i].uniqueIndex;
         playBackMap[j].useFloatsLongs = CompSci_funcs[i].useFloatsLongs;
         playBackMap[j].allowRecord = CompSci_funcs[i].allowRecord;
@@ -4916,7 +4923,7 @@ void mapButtonFuncs(void)
         playBackMap[j].saveLastX = Financial_funcs[i].saveLastX;
         playBackMap[j].newXedit = Financial_funcs[i].newXedit;
         playBackMap[j].routine = Financial_funcs[i].routine;
-        LoadString(hExcaliburInstance, Financial_funcs[i].keyTitle, playBackMap[j].funcText, 29);
+        LoadString(hExcaliburInstance, Financial_funcs[i].keyTitle, playBackMap[j].funcText, MAX_MACRO_FUNC_TEXT-1);
         playBackMap[j].uniqueIndex = Financial_funcs[i].uniqueIndex;
         playBackMap[j].useFloatsLongs = Financial_funcs[i].useFloatsLongs;
         playBackMap[j].allowRecord = Financial_funcs[i].allowRecord;
@@ -4928,7 +4935,7 @@ void mapButtonFuncs(void)
         playBackMap[j].saveLastX = Conversion_funcs[i].saveLastX;
         playBackMap[j].newXedit = Conversion_funcs[i].newXedit;
         playBackMap[j].routine = Conversion_funcs[i].routine;
-        LoadString(hExcaliburInstance, Conversion_funcs[i].keyTitle, playBackMap[j].funcText, 29);
+        LoadString(hExcaliburInstance, Conversion_funcs[i].keyTitle, playBackMap[j].funcText, MAX_MACRO_FUNC_TEXT-1);
         playBackMap[j].uniqueIndex = Conversion_funcs[i].uniqueIndex;
         playBackMap[j].useFloatsLongs = Conversion_funcs[i].useFloatsLongs;
         playBackMap[j].allowRecord = Conversion_funcs[i].allowRecord;
@@ -4940,7 +4947,7 @@ void mapButtonFuncs(void)
         playBackMap[j].saveLastX = Geometry_funcs[i].saveLastX;
         playBackMap[j].newXedit = Geometry_funcs[i].newXedit;
         playBackMap[j].routine = Geometry_funcs[i].routine;
-        LoadString(hExcaliburInstance, Geometry_funcs[i].keyTitle, playBackMap[j].funcText, 29);
+        LoadString(hExcaliburInstance, Geometry_funcs[i].keyTitle, playBackMap[j].funcText, MAX_MACRO_FUNC_TEXT-1);
         playBackMap[j].uniqueIndex = Geometry_funcs[i].uniqueIndex;
         playBackMap[j].useFloatsLongs = Geometry_funcs[i].useFloatsLongs;
         playBackMap[j].allowRecord = Geometry_funcs[i].allowRecord;
@@ -4952,7 +4959,7 @@ void mapButtonFuncs(void)
         playBackMap[j].saveLastX = Complex_funcs[i].saveLastX;
         playBackMap[j].newXedit = Complex_funcs[i].newXedit;
         playBackMap[j].routine = Complex_funcs[i].routine;
-        LoadString(hExcaliburInstance, Complex_funcs[i].keyTitle, playBackMap[j].funcText, 29);
+        LoadString(hExcaliburInstance, Complex_funcs[i].keyTitle, playBackMap[j].funcText, MAX_MACRO_FUNC_TEXT-1);
         playBackMap[j].uniqueIndex = Complex_funcs[i].uniqueIndex;
         playBackMap[j].useFloatsLongs = Complex_funcs[i].useFloatsLongs;
         playBackMap[j].allowRecord = Complex_funcs[i].allowRecord;
@@ -4964,7 +4971,7 @@ void mapButtonFuncs(void)
         playBackMap[j].saveLastX = Statistics_funcs[i].saveLastX;
         playBackMap[j].newXedit = Statistics_funcs[i].newXedit;
         playBackMap[j].routine = Statistics_funcs[i].routine;
-        LoadString(hExcaliburInstance, Statistics_funcs[i].keyTitle, playBackMap[j].funcText, 29);
+        LoadString(hExcaliburInstance, Statistics_funcs[i].keyTitle, playBackMap[j].funcText, MAX_MACRO_FUNC_TEXT-1);
         playBackMap[j].uniqueIndex = Statistics_funcs[i].uniqueIndex;
         playBackMap[j].useFloatsLongs = Statistics_funcs[i].useFloatsLongs;
         playBackMap[j].allowRecord = Statistics_funcs[i].allowRecord;
@@ -4976,7 +4983,7 @@ void mapButtonFuncs(void)
         playBackMap[j].saveLastX = Physics_funcs[i].saveLastX;
         playBackMap[j].newXedit = Physics_funcs[i].newXedit;
         playBackMap[j].routine = Physics_funcs[i].routine;
-        LoadString(hExcaliburInstance, Physics_funcs[i].keyTitle, playBackMap[j].funcText, 29);
+        LoadString(hExcaliburInstance, Physics_funcs[i].keyTitle, playBackMap[j].funcText, MAX_MACRO_FUNC_TEXT-1);
         playBackMap[j].uniqueIndex = Physics_funcs[i].uniqueIndex;
         playBackMap[j].useFloatsLongs = Physics_funcs[i].useFloatsLongs;
         playBackMap[j].allowRecord = Physics_funcs[i].allowRecord;
@@ -4988,7 +4995,7 @@ void mapButtonFuncs(void)
         playBackMap[j].saveLastX = Program1_funcs[i].saveLastX;
         playBackMap[j].newXedit = Program1_funcs[i].newXedit;
         playBackMap[j].routine = Program1_funcs[i].routine;
-        LoadString(hExcaliburInstance, Program1_funcs[i].keyTitle, playBackMap[j].funcText, 29);
+        LoadString(hExcaliburInstance, Program1_funcs[i].keyTitle, playBackMap[j].funcText, MAX_MACRO_FUNC_TEXT-1);
         playBackMap[j].uniqueIndex = Program1_funcs[i].uniqueIndex;
         playBackMap[j].useFloatsLongs = Program1_funcs[i].useFloatsLongs;
         playBackMap[j].allowRecord = Program1_funcs[i].allowRecord;
@@ -5000,7 +5007,7 @@ void mapButtonFuncs(void)
         playBackMap[j].saveLastX = Program2_funcs[i].saveLastX;
         playBackMap[j].newXedit = Program2_funcs[i].newXedit;
         playBackMap[j].routine = Program2_funcs[i].routine;
-        LoadString(hExcaliburInstance, Program2_funcs[i].keyTitle, playBackMap[j].funcText, 29);
+        LoadString(hExcaliburInstance, Program2_funcs[i].keyTitle, playBackMap[j].funcText, MAX_MACRO_FUNC_TEXT-1);
         playBackMap[j].uniqueIndex = Program2_funcs[i].uniqueIndex;
         playBackMap[j].useFloatsLongs = Program2_funcs[i].useFloatsLongs;
         playBackMap[j].allowRecord = Program2_funcs[i].allowRecord;
@@ -5417,10 +5424,10 @@ void RPN_inverse(void)
 
 void blinkXDisplay(void)
 {
-    GetDlgItemText(calcMainWindow, RPN_STACK_X, tmpStr, 22);
-    SetDlgItemText(calcMainWindow, RPN_STACK_X, "                    ");
+    GetDlgItemText(calcMainWindow, RPN_STACK_X, tmpStr, MAX_STACK_STRLEN);
+    SetDlgItemText(calcMainWindow, RPN_STACK_X, "                      ");
     Sleep(200);
-    GetDlgItemText(calcMainWindow, RPN_STACK_X, tmpStr, 22);
+    GetDlgItemText(calcMainWindow, RPN_STACK_X, tmpStr, MAX_STACK_STRLEN);
 }
 
 

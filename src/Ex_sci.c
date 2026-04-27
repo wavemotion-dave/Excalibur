@@ -1125,7 +1125,7 @@ void Sci_prime(void)
 BOOL CALLBACK fnDIALOG_PrimesProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
 {
     int i, j, prime, iprime;
-    char tmp[30];
+    char tmp[32];
     LRESULT item;
 
     switch(wMessage)

@@ -241,7 +241,7 @@ BOOL CALLBACK CustomDefDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM l
     char tmp[60];
     int saveIdx;
     int newIdx;
-    int i;
+    int i, id;
     static LRESULT macroItem;
     static int index;
     static int lbTabStops[1] = { 40 };
@@ -249,11 +249,11 @@ BOOL CALLBACK CustomDefDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM l
     switch(wMessage)
     {
     case WM_INITDIALOG:
-        SendMessage(GetDlgItem(hDlg, 101), LB_SETTABSTOPS, 1, (DWORD) lbTabStops);
+        //SendMessage(GetDlgItem(hDlg, 101), LB_SETTABSTOPS, 1, (DWORD) lbTabStops);
         customPullFuncs = (struct funcStruct *) &Scientific_funcs;
         processCustomFuncs(hDlg);
         savedIndexFunc = CUSTOM_SAVE_SCI;
-        SendMessage(GetDlgItem(hDlg, 190), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
+        SendMessage(GetDlgItem(hDlg, IDC_CUSTOM_SCI), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         memcpy(Custom_funcsTmp, Custom_funcs, sizeof(Custom_funcs));
         for (i = 0; i < MAX_MACROS; i++)
         {
@@ -261,6 +261,12 @@ BOOL CALLBACK CustomDefDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM l
             SendDlgItemMessage(hDlg, MACRO_LIST, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
         }
 
+        // Set the standard main font for all of the buttons
+        for (id = IDC_CUSTOM_PB1; id <= IDC_CUSTOM_PB80; id++)
+        {
+            SendMessage(GetDlgItem(hDlg, id), WM_SETFONT, (WPARAM) hMainFont, FALSE);
+        }
+        
         SetFocus(hDlg);
 
         return TRUE;
@@ -271,21 +277,21 @@ BOOL CALLBACK CustomDefDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM l
         case(MACRO_LIST):     // click on program list?!?
             macroItem = SendDlgItemMessage(hDlg, MACRO_LIST, LB_GETCURSEL, 0, 0L);
             strcpy(tmp, macroName[macroItem]);
-            SetDlgItemText(hDlg, 200, tmp);
+            SetDlgItemText(hDlg, IDC_CUSTOM_FUNCNAME, tmp);
             break;
         }
 
-        if (wParam >= 101 && wParam <= 140)
+        if (wParam >= IDC_CUSTOM_PB1 && wParam <= IDC_CUSTOM_PB40)
         {
             macroItem = (LRESULT) - 1;
-            index = wParam - 101;
+            index = wParam - IDC_CUSTOM_PB1;
             LoadString(hExcaliburInstance, customPullFuncs[index].keyTitle, tmp, sizeof(tmp) - 1);
-            SetDlgItemText(hDlg, 200, tmp);
+            SetDlgItemText(hDlg, IDC_CUSTOM_FUNCNAME, tmp);
             SetFocus(hDlg);
         }
-        else if (wParam >= 141 && wParam <= 180)
+        else if (wParam >= IDC_CUSTOM_PB41 && wParam <= IDC_CUSTOM_PB80)
         {
-            newIdx = wParam - 141;
+            newIdx = wParam - IDC_CUSTOM_PB41;
             saveIdx = Custom_funcs[newIdx].index;
             if (macroItem != (LRESULT) - 1)     // should we copy the macro instead...
             {
@@ -321,52 +327,52 @@ BOOL CALLBACK CustomDefDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM l
                 SaveToDisk();
                 break;
 
-            case(190):        // Sci funcs
+            case(IDC_CUSTOM_SCI):        // Scientific funcs
                 savedIndexFunc = CUSTOM_SAVE_SCI;
                 customPullFuncs = (struct funcStruct *) &Scientific_funcs;
                 processCustomFuncs(hDlg);
                 break;
-            case(191):        // Buisness funcs
+            case(IDC_CUSTOM_FIN):        // Financial funcs
                 savedIndexFunc = CUSTOM_SAVE_BUS;
                 customPullFuncs = (struct funcStruct *) &Financial_funcs;
                 processCustomFuncs(hDlg);
                 break;
-            case(192):        // Programming funcs
+            case(IDC_CUSTOM_COMPSCI):     // Comp-Sci funcs
                 savedIndexFunc = CUSTOM_SAVE_PRO;
                 customPullFuncs = (struct funcStruct *) &CompSci_funcs;
                 processCustomFuncs(hDlg);
                 break;
-            case(193):        // Stats funcs
+            case(IDC_CUSTOM_STAT):        // Stats funcs
                 savedIndexFunc = CUSTOM_SAVE_STA;
                 customPullFuncs = (struct funcStruct *) &Statistics_funcs;
                 processCustomFuncs(hDlg);
                 break;
-            case(194):        // Geom funcs
+            case(IDC_CUSTOM_GEOM):        // Geometry funcs
                 savedIndexFunc = CUSTOM_SAVE_GEO;
                 customPullFuncs = (struct funcStruct *) &Geometry_funcs;
                 processCustomFuncs(hDlg);
                 break;
-            case(196):        // Conversion funcs
+            case(IDC_CUSTOM_CONV):        // Conversion funcs
                 savedIndexFunc = CUSTOM_SAVE_CON;
                 customPullFuncs = (struct funcStruct *) &Conversion_funcs;
                 processCustomFuncs(hDlg);
                 break;
-            case(197):        // Conversion funcs
+            case(IDC_CUSTOM_COMPLX):        // Complex/Vector funcs
                 savedIndexFunc = CUSTOM_SAVE_COM;
                 customPullFuncs = (struct funcStruct *) &Complex_funcs;
                 processCustomFuncs(hDlg);
                 break;
-            case(198):        // Physics funcs
+            case(IDC_CUSTOM_PHY):        // Physics funcs
                 savedIndexFunc = CUSTOM_SAVE_PHY;
                 customPullFuncs = (struct funcStruct *) &Physics_funcs;
                 processCustomFuncs(hDlg);
                 break;
-            case(199):        // Program Bank 1 funcs
+            case(IDC_CUSTOM_PROG1):        // Program Bank 1 funcs
                 savedIndexFunc = CUSTOM_SAVE_MACBANK;
                 customPullFuncs = (struct funcStruct *) &Program1_funcs;
                 processCustomFuncs(hDlg);
                 break;
-            case(201):        // Program Bank II funcs
+            case(IDC_CUSTOM_PROG2):        // Program Bank II funcs
                 savedIndexFunc = CUSTOM_SAVE_MACBANK2;
                 customPullFuncs = (struct funcStruct *) &Program2_funcs;
                 processCustomFuncs(hDlg);
@@ -389,14 +395,14 @@ int processCustomFuncs(HWND hDlg)
 
     for (i = 0; i < MAX_FUNCS; i++)
     {
-        SendMessage(GetDlgItem(hDlg, 101 + i), WM_SETFONT, (WPARAM) hMainFont, FALSE);
-        SetDlgItemText(hDlg, 101 + i, customPullFuncs[i].desc);
+        SendMessage(GetDlgItem(hDlg, IDC_CUSTOM_PB1 + i), WM_SETFONT, (WPARAM) hMainFont, FALSE);
+        SetDlgItemText(hDlg, IDC_CUSTOM_PB1 + i, customPullFuncs[i].desc);
     }
 
     for (i = 0; i < MAX_FUNCS; i++)
     {
-        SendMessage(GetDlgItem(hDlg, 141 + i), WM_SETFONT, (WPARAM) hMainFont, FALSE);
-        SetDlgItemText(hDlg, 141 + i, Custom_funcs[i].desc);
+        SendMessage(GetDlgItem(hDlg, IDC_CUSTOM_PB41 + i), WM_SETFONT, (WPARAM) hMainFont, FALSE);
+        SetDlgItemText(hDlg, IDC_CUSTOM_PB41 + i, Custom_funcs[i].desc);
     }
 
     UpdateWindow(hDlg);
@@ -405,8 +411,8 @@ int processCustomFuncs(HWND hDlg)
 
 int processCustomFuncsSolo(HWND hDlg, int i)
 {
-    SendMessage(GetDlgItem(hDlg, 141 + i), WM_SETFONT, (WPARAM) hMainFont, FALSE);
-    SetDlgItemText(hDlg, 141 + i, Custom_funcs[i].desc);
+    SendMessage(GetDlgItem(hDlg, IDC_CUSTOM_PB41 + i), WM_SETFONT, (WPARAM) hMainFont, FALSE);
+    SetDlgItemText(hDlg, IDC_CUSTOM_PB41 + i, Custom_funcs[i].desc);
 
     UpdateWindow(hDlg);
     return(0);

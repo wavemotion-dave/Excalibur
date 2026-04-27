@@ -121,7 +121,7 @@ struct funcStruct CompSci_funcs[MAX_FUNCS] = {
     {FN37,  UNI_ASCII,   USES_L,     ALLOWREC,   ' ',    "ASCII",    NO_L,   X_NEW,      PROG_ascii,     T_ASCII,    H_ASCII},
     {FN38,  UNI_WSIZE,   USES_L,     ALLOWREC,   ' ',    "WSIZE",    YES_L,  X_NEW,      PROG_WordSize,  T_WORDSIZE, H_WORDSIZE},
     {FN39,  UNI_MIRROR,  USES_L,     ALLOWREC,   ' ',    "Mirror",   YES_L,  X_NEW,      PROG_Mirror,    T_MIRROR,   H_MIRROR},
-    {FN40,  UNI_IEEE,    USES_F,     ALLOWREC,   ' ',    "IEEE",     YES_L,  X_NEW,      Prog_IEEE,      T_IEEE,     H_IEEE}
+    {FN40,  UNI_IEEE,    USES_L,     ALLOWREC,   ' ',    "IEEE",     YES_L,  X_NEW,      Prog_IEEE,      T_IEEE,     H_IEEE}
 };
 
 
@@ -644,13 +644,13 @@ BOOL CALLBACK fnDIALOG_ASCIIProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
         SendMessage(GetDlgItem(hDlg, 104), WM_SETFONT, (WPARAM) hFixedFont, FALSE);  // Title
         for (i = 0; i <= 255; i++)
         {
-            ltoa(i, tmp2, 2);  // Conver to binary
+            ltoa(i, tmp2, 2);  // Convert to binary
             sprintf(tmp3, "%8s", tmp2);
             for (j = 0; j < (int) strlen(tmp3); j++)
                 if (tmp3[j] == ' ')
                     tmp3[j] = '0';
 
-            ltoa(i, tmp2, 8);  // Conver to binary
+            ltoa(i, tmp2, 8);  // Convert to binary
             sprintf(tmp4, "%3s", tmp2);
             for (j = 0; j < (int) strlen(tmp4); j++)
                 if (tmp4[j] == ' ')
@@ -1089,12 +1089,28 @@ PROG_LONG biggestProgVal(void)
 void int64_to_binary(uint64_t n, char *out_str, uint8_t bits)
 {
     int i;
-    for (i = (bits-1); i >= 0; i--) {
+    int idx=0;
+    for (i = (bits-1); i >= 0; i--) 
+    {
+        if (bits == 32)
+        {
+            if (i==(bits-1)) {out_str[idx++] = '[';}
+            if (i==(bits-2)) {out_str[idx++] = ']'; out_str[idx++] = ' '; out_str[idx++] = '[';}
+            if (i==(bits-10)) {out_str[idx++] = ']'; out_str[idx++] = ' '; out_str[idx++] = '[';}
+        }
+        else // 64 bits
+        {
+            if (i==(bits-1)) {out_str[idx++] = '[';}
+            if (i==(bits-2)) {out_str[idx++] = ']'; out_str[idx++] = ' '; out_str[idx++] = '[';}
+            if (i==(bits-13)) {out_str[idx++] = ']'; out_str[idx++] = ' '; out_str[idx++] = '[';}
+        }
+        
         // Shift n right by 'i' positions and mask the last bit
         // Then add '0' to convert the bit (0 or 1) to its ASCII character ('0' or '1')
-        out_str[(bits-1) - i] = ((uint8_t)(n >> i) & 1) + '0';
+        out_str[idx++] = ((uint8_t)(n >> i) & 1) + '0';
     }
-    out_str[bits] = '\0'; // null-terminate
+    out_str[idx++] = ']';
+    out_str[idx] = '\0'; // null-terminate
 }
 
 BOOL CALLBACK DlgProcIEEE(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
@@ -1106,12 +1122,25 @@ BOOL CALLBACK DlgProcIEEE(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam
     double val_double = 0.0;
     uint32_t val32 = 0;
     uint64_t val64 = 0;
-
+    HDC hdc;
+    SIZE lpSize;
+    RECT rect;
+    
     switch(wMessage)
     {
     case WM_INITDIALOG:
         SendMessage(GetDlgItem(hDlg, 101), WM_SETFONT, (WPARAM) hFixedFont, FALSE);
         SendMessage(GetDlgItem(hDlg, 102), WM_SETFONT, (WPARAM) hFixedFont, FALSE);
+        
+        hdc = GetDC(hDlg);
+        SelectObject(hdc, hFixedFont);
+        (void)GetTextExtentPoint32(hdc, "[0] [00000000000] [00000000000000000000000000000000000000000000000000000]", 73, &lpSize);
+        ReleaseDC(hDlg, hdc);
+        if (GetWindowRect(hDlg, &rect))
+        {
+            int height = rect.bottom - rect.top;
+            MoveWindow(hDlg, main_x+100, main_y+50, lpSize.cx + 40, height, TRUE);
+        }        
         SetDlgItemText(hDlg, 101, "32-bit:  Enter Number Above - Click Enter");
         SetDlgItemText(hDlg, 102, "64-bit:  Enter Number Above - Click Enter");
         return TRUE;
@@ -1127,13 +1156,13 @@ BOOL CALLBACK DlgProcIEEE(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam
             
             memcpy(&val32, &val_float, 4);
             int64_to_binary(val32, tmp2, 32);
-            sprintf(tmp, "32-bit:  0x%08X\n[%s]", (uint32_t)val32, tmp2);
+            sprintf(tmp, "32-bit:  0x%08X\n%s", (uint32_t)val32, tmp2);
             SetDlgItemText(hDlg, 101, tmp);
             
             memcpy(&val64, &val_double, 8);
             int64_to_binary(val64, tmp2, 64);
             sprintf(tmp3, "0x%016I64X", (uint64_t)val64);
-            sprintf(tmp, "64-bit:  %s\n[%s]", tmp3, tmp2);
+            sprintf(tmp, "64-bit:  %s\n%s", tmp3, tmp2);
             SetDlgItemText(hDlg, 102, tmp);            
             return TRUE;
 

@@ -38,85 +38,6 @@ typedef unsigned __int32    uint32_t;
 typedef unsigned __int16    uint16_t;
 typedef unsigned __int8     uint8_t;
 
-#define IDC_PUSHBUTTON1     105
-#define IDC_PUSHBUTTON2     106
-#define IDC_PUSHBUTTON3     107
-#define IDC_PUSHBUTTON4     108
-#define IDC_PUSHBUTTON12    116
-#define IDC_PUSHBUTTON28    132
-#define IDC_PUSHBUTTON36    140
-#define IDC_PUSHBUTTON76    180
-#define IDC_CUSTOM_OK       100
-#define IDC_CUSTOM_CANCEL   182
-#define IDC_PUSHBUTTON75    179
-#define IDC_PUSHBUTTON74    178
-#define IDC_PUSHBUTTON73    177
-#define IDC_PUSHBUTTON72    176
-#define IDC_PUSHBUTTON71    175
-#define IDC_PUSHBUTTON70    174
-#define IDC_PUSHBUTTON69    173
-#define IDC_PUSHBUTTON68    172
-#define IDC_PUSHBUTTON67    171
-#define IDC_PUSHBUTTON66    170
-#define IDC_PUSHBUTTON65    169
-#define IDC_PUSHBUTTON64    168
-#define IDC_PUSHBUTTON63    167
-#define IDC_PUSHBUTTON62    166
-#define IDC_PUSHBUTTON61    165
-#define IDC_PUSHBUTTON60    164
-#define IDC_PUSHBUTTON59    163
-#define IDC_PUSHBUTTON58    162
-#define IDC_PUSHBUTTON57    161
-#define IDC_PUSHBUTTON56    160
-#define IDC_PUSHBUTTON55    159
-#define IDC_PUSHBUTTON54    158
-#define IDC_PUSHBUTTON53    157
-#define IDC_PUSHBUTTON52    156
-#define IDC_PUSHBUTTON51    155
-#define IDC_PUSHBUTTON50    154
-#define IDC_PUSHBUTTON49    153
-#define IDC_PUSHBUTTON48    152
-#define IDC_PUSHBUTTON47    151
-#define IDC_PUSHBUTTON46    150
-#define IDC_PUSHBUTTON45    149
-#define IDC_PUSHBUTTON44    148
-#define IDC_PUSHBUTTON43    147
-#define IDC_PUSHBUTTON42    146
-#define IDC_PUSHBUTTON41    145
-#define IDC_PUSHBUTTON40    144
-#define IDC_PUSHBUTTON39    143
-#define IDC_PUSHBUTTON38    142
-#define IDC_PUSHBUTTON37    141
-#define IDC_PUSHBUTTON35    139
-#define IDC_PUSHBUTTON34    138
-#define IDC_PUSHBUTTON33    137
-#define IDC_PUSHBUTTON32    136
-#define IDC_PUSHBUTTON31    135
-#define IDC_PUSHBUTTON30    134
-#define IDC_PUSHBUTTON29    133
-#define IDC_PUSHBUTTON27    131
-#define IDC_PUSHBUTTON26    130
-#define IDC_PUSHBUTTON25    129
-#define IDC_PUSHBUTTON24    128
-#define IDC_PUSHBUTTON23    127
-#define IDC_PUSHBUTTON22    126
-#define IDC_PUSHBUTTON21    125
-#define IDC_PUSHBUTTON20    124
-#define IDC_PUSHBUTTON19    123
-#define IDC_PUSHBUTTON18    122
-#define IDC_PUSHBUTTON17    121
-#define IDC_PUSHBUTTON16    120
-#define IDC_PUSHBUTTON15    119
-#define IDC_PUSHBUTTON14    118
-#define IDC_PUSHBUTTON13    117
-#define IDC_PUSHBUTTON11    115
-#define IDC_PUSHBUTTON10    114
-#define IDC_PUSHBUTTON9     113
-#define IDC_PUSHBUTTON8     112
-#define IDC_PUSHBUTTON7     111
-#define IDC_PUSHBUTTON6     110
-#define IDC_PUSHBUTTON5     109
-
 #define MAX_FUNCS           40           // The 40th one is for help only
 
 #define RPN_LAST_KEY        -1
@@ -279,6 +200,9 @@ extern PROG_LONG LASTXL;
 
 extern uint32_t indirectRegister;
 
+extern int32_t main_x;
+extern int32_t main_y;
+
 extern double taxConstant;
 extern uint8_t commaMode;
 extern uint8_t eexMode;
@@ -369,6 +293,8 @@ extern void StackPushL(PROG_LONG temp);
 extern PROG_LONG StackPopL(void);
 extern PROG_LONG MakeProgStr(char *str);
 extern PROG_LONG maskStackStuff(PROG_LONG lng);
+extern void PROG_dec(void);
+extern void cust_define(void);
 
 extern void RPN_clear(void);
 extern void RPN_clearL(void);
@@ -453,8 +379,8 @@ struct customSaveStruct
 };
 extern struct customSaveStruct customSave[MAX_FUNCS];
 
-extern uint32_t stackPushes;
-extern uint32_t stackPops;
+extern uint64_t stackPushes;
+extern uint64_t stackPops;
 
 #define INTERNATIONAL     0
 #define NONINTERNATIONAL  1
@@ -468,9 +394,12 @@ extern PROG_LONG biggestProgVal(void);
 extern PROG_LONG smallestProgVal(void);
 extern void turnOnNumLock(void);
 
-#define MAX_FUNCTIONS    650
-#define MAX_REC_PLAYBACK 256
-#define MAX_MACROS       64
+#define MAX_STACK_STRLEN  29
+
+#define MAX_FUNCTIONS       650
+#define MAX_REC_PLAYBACK    256
+#define MAX_MACROS          64
+#define MAX_MACRO_FUNC_TEXT 30
 struct playbackStruct
 {
     int16_t uniqueIndex;
@@ -479,8 +408,9 @@ struct playbackStruct
     uint8_t saveLastX;             /* Do we save LASTX here? */
     uint8_t newXedit;              /* The new Xedit */
     void(*routine) (void);
-    char funcText[30];
+    char funcText[MAX_MACRO_FUNC_TEXT];
 };
+
 extern struct playbackStruct playBackMap[MAX_FUNCTIONS + 1];
 
 extern char macroName[MAX_MACROS][51];
@@ -1298,15 +1228,15 @@ extern uint8_t  userTimer;
 extern uint32_t userTicks;
 
 #define ID_CURRENCY_BOX1                101
-#define TRACE_PROGRAM                   101
 #define ID_CURRENCY_A_TO_B              102
 #define ID_CURRENCY_CANCEL              103
 #define ID_CURRENCY_REDEFINE            104
-#define TRACE_REGS                      104
-#define TRACE_REGS2                     104
 #define ID_CURRENCY_BOX2                105
-#define TRACE_REGS1                     105
 #define ID_CURRENCY_B_TO_A              106
+
+#define TRACE_PROGRAM                   101
+#define TRACE_REGS1                     102
+#define TRACE_REGS2                     103
 
 // RPN_DIGIT_0 to RPN_DIGIT_9 must be 101 for logic to work
 #define RPN_START_OF_LIST               100
@@ -1437,6 +1367,103 @@ extern uint32_t userTicks;
 #define RPN_STACK_Z                     2002
 #define RPN_STACK_Y                     2001
 #define RPN_STACK_X                     2000
+
+// For the Custom Button dialog...
+#define IDC_CUSTOM_OK                   100
+#define IDC_CUSTOM_SCI                  190
+#define IDC_CUSTOM_STAT                 191
+#define IDC_CUSTOM_FIN                  192
+#define IDC_CUSTOM_CONV                 193
+#define IDC_CUSTOM_GEOM                 194
+#define IDC_CUSTOM_COMPSCI              195
+#define IDC_CUSTOM_COMPLX               196
+#define IDC_CUSTOM_PHY                  197
+#define IDC_CUSTOM_PROG1                198
+#define IDC_CUSTOM_PROG2                199
+#define IDC_CUSTOM_FUNCNAME             200
+#define IDC_CUSTOM_CANCEL               299
+                
+#define IDC_CUSTOM_PB1                  101
+#define IDC_CUSTOM_PB2                  102
+#define IDC_CUSTOM_PB3                  103
+#define IDC_CUSTOM_PB4                  104
+#define IDC_CUSTOM_PB5                  105
+#define IDC_CUSTOM_PB6                  106
+#define IDC_CUSTOM_PB7                  107
+#define IDC_CUSTOM_PB8                  108
+#define IDC_CUSTOM_PB9                  109
+#define IDC_CUSTOM_PB10                 110
+#define IDC_CUSTOM_PB11                 111
+#define IDC_CUSTOM_PB12                 112
+#define IDC_CUSTOM_PB13                 113
+#define IDC_CUSTOM_PB14                 114
+#define IDC_CUSTOM_PB15                 115
+#define IDC_CUSTOM_PB16                 116
+#define IDC_CUSTOM_PB17                 117
+#define IDC_CUSTOM_PB18                 118
+#define IDC_CUSTOM_PB19                 119
+#define IDC_CUSTOM_PB20                 120
+#define IDC_CUSTOM_PB21                 121
+#define IDC_CUSTOM_PB22                 122
+#define IDC_CUSTOM_PB23                 123
+#define IDC_CUSTOM_PB24                 124
+#define IDC_CUSTOM_PB25                 125
+#define IDC_CUSTOM_PB26                 126
+#define IDC_CUSTOM_PB27                 127
+#define IDC_CUSTOM_PB28                 128
+#define IDC_CUSTOM_PB29                 129
+#define IDC_CUSTOM_PB30                 130
+#define IDC_CUSTOM_PB31                 131
+#define IDC_CUSTOM_PB32                 132
+#define IDC_CUSTOM_PB33                 133
+#define IDC_CUSTOM_PB34                 134
+#define IDC_CUSTOM_PB35                 135
+#define IDC_CUSTOM_PB36                 136
+#define IDC_CUSTOM_PB37                 137
+#define IDC_CUSTOM_PB38                 138
+#define IDC_CUSTOM_PB39                 139
+#define IDC_CUSTOM_PB40                 140
+
+#define IDC_CUSTOM_PB41                 141
+#define IDC_CUSTOM_PB42                 142
+#define IDC_CUSTOM_PB43                 143
+#define IDC_CUSTOM_PB44                 144
+#define IDC_CUSTOM_PB45                 145
+#define IDC_CUSTOM_PB46                 146
+#define IDC_CUSTOM_PB47                 147
+#define IDC_CUSTOM_PB48                 148
+#define IDC_CUSTOM_PB49                 149
+#define IDC_CUSTOM_PB50                 150
+#define IDC_CUSTOM_PB51                 151
+#define IDC_CUSTOM_PB52                 152
+#define IDC_CUSTOM_PB53                 153
+#define IDC_CUSTOM_PB54                 154
+#define IDC_CUSTOM_PB55                 155
+#define IDC_CUSTOM_PB56                 156
+#define IDC_CUSTOM_PB57                 157
+#define IDC_CUSTOM_PB58                 158
+#define IDC_CUSTOM_PB59                 159
+#define IDC_CUSTOM_PB60                 160
+#define IDC_CUSTOM_PB61                 161
+#define IDC_CUSTOM_PB62                 162
+#define IDC_CUSTOM_PB63                 163
+#define IDC_CUSTOM_PB64                 164
+#define IDC_CUSTOM_PB65                 165
+#define IDC_CUSTOM_PB66                 166
+#define IDC_CUSTOM_PB67                 167
+#define IDC_CUSTOM_PB68                 168
+#define IDC_CUSTOM_PB69                 169
+#define IDC_CUSTOM_PB70                 170
+#define IDC_CUSTOM_PB71                 171
+#define IDC_CUSTOM_PB72                 172
+#define IDC_CUSTOM_PB73                 173
+#define IDC_CUSTOM_PB74                 174
+#define IDC_CUSTOM_PB75                 175
+#define IDC_CUSTOM_PB76                 176
+#define IDC_CUSTOM_PB77                 177
+#define IDC_CUSTOM_PB78                 178
+#define IDC_CUSTOM_PB79                 179
+#define IDC_CUSTOM_PB80                 180
 
 
 #include "resource.h"
