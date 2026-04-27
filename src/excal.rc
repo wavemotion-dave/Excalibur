@@ -41,123 +41,123 @@ EXCALIBUR               ICON    DISCARDABLE     "excal.ico"
 EXCALIBUR DIALOGEX 50, 50, 392, 201
 STYLE DS_CENTER | WS_MINIMIZEBOX | WS_CAPTION | WS_SYSMENU
 CAPTION "Excalibur 32-bit"
-MENU EXCALIBURMNU
+MENU EXCALIBUR_MENU
 CLASS "EXCALIBUR"
-FONT 10, "MS Sans Serif", 0, 0, 0x1
+FONT 10, "MS Sans Serif"
 BEGIN
-    PUSHBUTTON      "0",101,3,152,18,20
-    PUSHBUTTON      "1",102,3,126,18,20
-    PUSHBUTTON      "2",103,23,126,18,20
-    PUSHBUTTON      "3",104,43,126,18,20
-    PUSHBUTTON      "4",105,3,101,18,20
-    PUSHBUTTON      "5",106,23,101,18,20
-    PUSHBUTTON      "6",107,43,101,18,20
-    PUSHBUTTON      "7",108,3,76,18,20
-    PUSHBUTTON      "8",109,23,76,18,20
-    PUSHBUTTON      "9",110,43,76,18,20
-    PUSHBUTTON      "·",111,23,152,18,20
-    PUSHBUTTON      "C",112,43,152,18,20
-    PUSHBUTTON      "÷",113,64,76,18,20
-    PUSHBUTTON      "×",114,64,101,18,20
-    PUSHBUTTON      "--",115,64,126,18,20
-    PUSHBUTTON      "+",116,64,152,18,20
-    PUSHBUTTON      "ENTER",117,7,55,72,18
-    PUSHBUTTON      "X«»Y",118,86,74,27,15
-    PUSHBUTTON      "+/-",119,86,91,27,15
-    PUSHBUTTON      "E",120,86,108,27,15
-    PUSHBUTTON      "STO",121,86,125,27,15
-    PUSHBUTTON      "RCL",122,86,142,27,15
-    PUSHBUTTON      "R Up",123,119,74,27,15
-    PUSHBUTTON      "R Dn",124,119,91,27,15
-    PUSHBUTTON      "Lst X",125,119,108,27,15
-    PUSHBUTTON      "Mode",126,152,40,27,15
-    PUSHBUTTON      "BSP",127,119,142,27,15
-    PUSHBUTTON      "SIN",132,244,6,33,15
-    PUSHBUTTON      "SIN",133,244,23,33,15
-    PUSHBUTTON      "SIN",134,244,40,33,15
-    PUSHBUTTON      "LOG",135,244,57,33,15
-    PUSHBUTTON      "SIN",136,244,74,33,15
-    PUSHBUTTON      "SIN",137,244,91,33,15
-    PUSHBUTTON      "SIN",138,244,108,33,15
-    PUSHBUTTON      "COS",139,281,6,33,15
-    PUSHBUTTON      "ACOS",140,281,23,33,15
-    PUSHBUTTON      "1/x",141,281,40,33,15
-    PUSHBUTTON      "SIN",142,281,57,33,15
-    PUSHBUTTON      "SIN",143,281,74,33,15
-    PUSHBUTTON      "SIN",144,281,91,33,15
-    PUSHBUTTON      "SIN",145,281,108,33,15
-    PUSHBUTTON      "TAN",146,318,6,33,15
-    PUSHBUTTON      "ATAN",147,318,23,33,15
-    PUSHBUTTON      "e^x",148,318,40,33,15
-    PUSHBUTTON      "SIN",149,318,57,33,15
-    PUSHBUTTON      "SIN",150,318,74,33,15
-    PUSHBUTTON      "SIN",151,318,91,33,15
-    PUSHBUTTON      "SIN",152,318,108,33,15
-    PUSHBUTTON      "SQRT",153,355,6,33,15
-    PUSHBUTTON      "x^2",154,355,23,33,15
-    PUSHBUTTON      "LN",155,355,40,33,15
-    PUSHBUTTON      "SIN",156,355,57,33,15
-    PUSHBUTTON      "SIN",157,355,74,33,15
-    PUSHBUTTON      "SIN",158,355,91,33,15
-    PUSHBUTTON      "SIN",159,355,108,33,15
-    PUSHBUTTON      "SIN",160,244,125,33,15
-    PUSHBUTTON      "SIN",161,244,142,33,15
-    PUSHBUTTON      "SIN",162,244,159,33,15
-    PUSHBUTTON      "SIN",163,281,125,33,15
-    PUSHBUTTON      "SIN",164,281,142,33,15
-    PUSHBUTTON      "SIN",165,281,159,33,15
-    PUSHBUTTON      "SIN",166,318,125,33,15
-    PUSHBUTTON      "SIN",167,318,142,33,15
-    PUSHBUTTON      "SIN",168,318,159,33,15
-    PUSHBUTTON      "SIN",169,355,125,33,15
-    PUSHBUTTON      "SIN",170,355,142,33,15
-    PUSHBUTTON      "HELP",171,355,159,33,15
-    PUSHBUTTON      "Help",181,152,6,27,15
-    PUSHBUTTON      "Play",182,152,57,27,15
-    PUSHBUTTON      "CLS",190,86,159,27,15
-    LTEXT           "X",177,5,39,8,8
-    LTEXT           "Y",178,5,29,8,8
-    LTEXT           "Z",179,5,18,8,8
-    LTEXT           "T",180,5,7,8,8,NOT WS_GROUP
-    CONTROL         "",750,"Static",SS_LEFTNOWORDWRAP | SS_SUNKEN | 
-                    WS_BORDER | WS_GROUP,15,3,129,50
-    LTEXT           "1234567890123",128,23,6,113,9
-    LTEXT           "1234567890123",129,23,17,113,9
-    LTEXT           "1234567890123",130,23,28,113,9
-    LTEXT           "1234567890123",131,23,40,113,9
-    LTEXT           "FIX12",172,15,185,25,8
-    LTEXT           "Help",176,63,185,19,8
-    LTEXT           "DEG",183,104,185,19,8
-    LTEXT           "SCIENTIFIC",173,196,185,59,8
-    LTEXT           "HH:MM",174,346,185,36,8
-    PUSHBUTTON      "Rcl R0",192,152,125,27,15
-    PUSHBUTTON      "Rec",400,119,57,27,15
-    LTEXT           "Rec",175,144,185,28,8
-    LTEXT           "S16",184,262,185,37,8
-    PUSHBUTTON      "LArg",185,119,125,27,15
-    PUSHBUTTON      "Frac",186,152,91,27,15
-    PUSHBUTTON      "Edit",187,119,159,27,15
-    PUSHBUTTON      "Rcl R1",188,152,159,27,15
-    PUSHBUTTON      "Sto R0",189,152,108,27,15
-    PUSHBUTTON      "Drop",191,152,74,27,15
-    PUSHBUTTON      "Sto R1",193,152,142,27,15
-    LTEXT           "C",ID_CARRY_POS,313,185,8,8,NOT WS_VISIBLE
-    RADIOBUTTON     "Scientific",350,187,17,45,10
-    RADIOBUTTON     "Statistics",351,187,31,44,10
-    RADIOBUTTON     "Financial",352,187,45,44,10
-    RADIOBUTTON     "Conversion",353,187,59,47,10
-    RADIOBUTTON     "Geometry",354,187,73,46,10
-    RADIOBUTTON     "Comp Sci",355,187,87,46,10
-    RADIOBUTTON     "Program II",356,187,143,48,10
-    RADIOBUTTON     "Cplx/Vect",358,187,115,47,10
-    RADIOBUTTON     "Custom",357,187,157,39,10
-    GROUPBOX        "Function Bank",IDC_STATIC,183,4,57,169
-    CONTROL         "",IDC_STATIC,"Static",SS_SIMPLE | SS_SUNKEN | WS_GROUP,
-                    2,181,383,16,WS_EX_CLIENTEDGE
-    PUSHBUTTON      "Notes",RPN_NOTES,152,23,27,15
-    RADIOBUTTON     "Physics",359,187,101,40,10
-    PUSHBUTTON      "1/X",RPN_INV,86,57,27,15
-    RADIOBUTTON     "Program I",360,187,129,46,10
+    PUSHBUTTON      "0",                RPN_DIGIT_0,3,152,18,20
+    PUSHBUTTON      "1",                RPN_DIGIT_1,3,126,18,20
+    PUSHBUTTON      "2",                RPN_DIGIT_2,23,126,18,20
+    PUSHBUTTON      "3",                RPN_DIGIT_3,43,126,18,20
+    PUSHBUTTON      "4",                RPN_DIGIT_4,3,101,18,20
+    PUSHBUTTON      "5",                RPN_DIGIT_5,23,101,18,20
+    PUSHBUTTON      "6",                RPN_DIGIT_6,43,101,18,20
+    PUSHBUTTON      "7",                RPN_DIGIT_7,3,76,18,20
+    PUSHBUTTON      "8",                RPN_DIGIT_8,23,76,18,20
+    PUSHBUTTON      "9",                RPN_DIGIT_9,43,76,18,20
+    PUSHBUTTON      "·",                RPN_DIGIT_DP,23,152,18,20
+    PUSHBUTTON      "C",                RPN_CLEAR_X,43,152,18,20
+    PUSHBUTTON      "÷",                RPN_DIVIDE,64,76,18,20
+    PUSHBUTTON      "×",                RPN_MULTIPLY,64,101,18,20
+    PUSHBUTTON      "--",               RPN_SUBTRACT,64,126,18,20
+    PUSHBUTTON      "+",                RPN_PLUS,64,152,18,20
+    PUSHBUTTON      "ENTER",            RPN_ENTER,7,55,72,18
+    PUSHBUTTON      "X«»Y",             RPN_EXCH_X_Y,86,74,27,15
+    PUSHBUTTON      "+/-",              RPN_NEGATE,86,91,27,15
+    PUSHBUTTON      "E",                RPN_E,86,108,27,15
+    PUSHBUTTON      "STO",              RPN_STO,86,125,27,15
+    PUSHBUTTON      "RCL",              RPN_RCL,86,142,27,15
+    PUSHBUTTON      "R Up",             RPN_R_UP,119,74,27,15
+    PUSHBUTTON      "R Dn",             RPN_R_DN,119,91,27,15
+    PUSHBUTTON      "Lst X",            RPN_LASTX,119,108,27,15
+    PUSHBUTTON      "Mode",             RPN_MODE,152,40,27,15
+    PUSHBUTTON      "BSP",              RPN_BKSP,119,142,27,15
+    
+    PUSHBUTTON      "FN1",              FN1,244,6,33,15
+    PUSHBUTTON      "FN2",              FN2,281,6,33,15
+    PUSHBUTTON      "FN3",              FN3,318,6,33,15
+    PUSHBUTTON      "FN4",              FN4,355,6,33,15
+    PUSHBUTTON      "FN5",              FN5,244,23,33,15
+    PUSHBUTTON      "FN6",              FN6,281,23,33,15
+    PUSHBUTTON      "FN7",              FN7,318,23,33,15
+    PUSHBUTTON      "FN8",              FN8,355,23,33,15
+    PUSHBUTTON      "FN9",              FN9,244,40,33,15
+    PUSHBUTTON      "FN10",             FN10,281,40,33,15
+    PUSHBUTTON      "FN11",             FN11,318,40,33,15
+    PUSHBUTTON      "FN12",             FN12,355,40,33,15
+    PUSHBUTTON      "FN13",             FN13,244,57,33,15
+    PUSHBUTTON      "FN14",             FN14,281,57,33,15
+    PUSHBUTTON      "FN15",             FN15,318,57,33,15
+    PUSHBUTTON      "FN16",             FN16,355,57,33,15
+    PUSHBUTTON      "FN17",             FN17,244,74,33,15
+    PUSHBUTTON      "FN18",             FN18,281,74,33,15
+    PUSHBUTTON      "FN19",             FN19,318,74,33,15
+    PUSHBUTTON      "FN20",             FN20,355,74,33,15
+    PUSHBUTTON      "FN21",             FN21,244,91,33,15
+    PUSHBUTTON      "FN22",             FN22,281,91,33,15
+    PUSHBUTTON      "FN23",             FN23,318,91,33,15
+    PUSHBUTTON      "FN24",             FN24,355,91,33,15
+    PUSHBUTTON      "FN25",             FN25,244,108,33,15
+    PUSHBUTTON      "FN26",             FN26,281,108,33,15
+    PUSHBUTTON      "FN27",             FN27,318,108,33,15
+    PUSHBUTTON      "FN28",             FN28,355,108,33,15
+    PUSHBUTTON      "FN29",             FN29,244,125,33,15
+    PUSHBUTTON      "FN30",             FN30,281,125,33,15
+    PUSHBUTTON      "FN31",             FN31,318,125,33,15
+    PUSHBUTTON      "FN32",             FN32,355,125,33,15
+    PUSHBUTTON      "FN33",             FN33,244,142,33,15
+    PUSHBUTTON      "FN34",             FN34,281,142,33,15
+    PUSHBUTTON      "FN35",             FN35,318,142,33,15
+    PUSHBUTTON      "FN36",             FN36,355,142,33,15
+    PUSHBUTTON      "FN37",             FN37,244,159,33,15
+    PUSHBUTTON      "FN38",             FN38,281,159,33,15
+    PUSHBUTTON      "FN39",             FN39,318,159,33,15
+    PUSHBUTTON      "FN40",             FN40,355,159,33,15
+
+    PUSHBUTTON      "Help",             RPN_HELP,152,6,27,15
+    PUSHBUTTON      "Play",             RPN_PLAYBACK,152,57,27,15
+    PUSHBUTTON      "CLS",              RPN_CLEAR_ALL,86,159,27,15
+    LTEXT           "X",                RPN_X_LABEL,5,39,8,8
+    LTEXT           "Y",                RPN_Y_LABEL,5,29,8,8
+    LTEXT           "Z",                RPN_Z_LABEL,5,18,8,8
+    LTEXT           "T",                RPN_T_LABEL,5,7,8,8,NOT WS_GROUP
+    CONTROL         "",                 RPN_STACK,"Static",SS_LEFTNOWORDWRAP | SS_SUNKEN | WS_BORDER | WS_GROUP,15,3,129,50
+    LTEXT           "1234567890123",    RPN_STACK_T,23,6,113,9
+    LTEXT           "1234567890123",    RPN_STACK_Z,23,17,113,9
+    LTEXT           "1234567890123",    RPN_STACK_Y,23,28,113,9
+    LTEXT           "1234567890123",    RPN_STACK_X,23,40,113,9
+    LTEXT           "FIX12",            STATUS_BAR,15,185,25,8
+    LTEXT           "Help",             SPARE_BAR,63,185,19,8
+    LTEXT           "DEG",              ANGLE_BAR,104,185,19,8
+    LTEXT           "SCIENTIFIC",       FUNC_BAR,196,185,59,8
+    LTEXT           "HH:MM",            TIME_BAR,346,185,36,8
+    PUSHBUTTON      "Rcl R0",           RPN_RCL0,152,125,27,15
+    PUSHBUTTON      "Rec",              RPN_REC,119,57,27,15
+    LTEXT           "Rec",              REC_BAR,144,185,28,8
+    LTEXT           "S16",              PROG_BAR,262,185,37,8
+    PUSHBUTTON      "LArg",             RPN_LARG,119,125,27,15
+    PUSHBUTTON      "Frac",             RPN_FRAC,152,91,27,15
+    PUSHBUTTON      "Edit",             RPN_EDIT,119,159,27,15
+    PUSHBUTTON      "Rcl R1",           RPN_RCL1,152,159,27,15
+    PUSHBUTTON      "Sto R0",           RPN_STO0,152,108,27,15
+    PUSHBUTTON      "Drop",             RPN_DROP,152,74,27,15
+    PUSHBUTTON      "Sto R1",           RPN_STO1,152,142,27,15
+    LTEXT           "C",                RPN_CARRY,313,185,8,8,NOT WS_VISIBLE
+    RADIOBUTTON     "Scientific",       RPN_SCI,187,17,45,10
+    RADIOBUTTON     "Statistics",       RPN_STAT,187,31,44,10
+    RADIOBUTTON     "Financial",        RPN_FIN,187,45,44,10
+    RADIOBUTTON     "Conversion",       RPN_CONV,187,59,47,10
+    RADIOBUTTON     "Geometry",         RPN_GEOM,187,73,46,10
+    RADIOBUTTON     "Comp Sci",         RPN_COMPSCI,187,87,46,10
+    RADIOBUTTON     "Physics",          RPN_PHY,187,101,40,10
+    RADIOBUTTON     "Cplx/Vect",        RPN_CMPLX,187,115,47,10
+    RADIOBUTTON     "Program I",        RPN_PROGI,187,129,46,10
+    RADIOBUTTON     "Program II",       RPN_PROGII,187,143,48,10
+    RADIOBUTTON     "Custom",           RPN_CUST,187,157,39,10
+    GROUPBOX        "Function Bank",    IDC_STATIC,183,4,57,169
+    CONTROL         "",                 IDC_STATIC,"Static",SS_SIMPLE | SS_SUNKEN | WS_GROUP,2,181,383,16,WS_EX_CLIENTEDGE
+    PUSHBUTTON      "Notes",            RPN_NOTES,152,23,27,15
+    PUSHBUTTON      "1/X",              RPN_INV,86,57,27,15
 END
 
 DIALOG_ASCII DIALOG DISCARDABLE  150, 65531, 203, 178
@@ -839,7 +839,7 @@ END
 // Menu
 //
 
-EXCALIBURMNU MENU DISCARDABLE 
+EXCALIBUR_MENU MENU DISCARDABLE 
 BEGIN
     POPUP "&File"
     BEGIN
@@ -865,8 +865,8 @@ BEGIN
         MENUITEM "&Comp Sci",                   IDM_COMPSCI
         MENUITEM "&Physics",                    IDM_PHYSICS
         MENUITEM "&Complex/Vector",             IDM_COMPLEX
-        MENUITEM "&Program I",                  IDM_MACROBANK
-        MENUITEM "&Program II",                 IDM_MISC
+        MENUITEM "&Program I",                  IDM_PROGI
+        MENUITEM "&Program II",                 IDM_PROGII
         MENUITEM "&Custom",                     IDM_CUSTOM
         MENUITEM SEPARATOR
         MENUITEM "&Always On Top",              IDM_ALWAYSONTOP

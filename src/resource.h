@@ -2,6 +2,7 @@
 // Microsoft Developer Studio generated include file.
 // Used by excal.rc
 //
+
 #define T_NULL                          0
 #define H_NULL                          1
 #define T_SIN                           2
@@ -104,21 +105,11 @@
 #define H_RCLFN                         99
 #define T_FINN                          100
 #define H_FINN                          101
-#define ID_CURRENCY_BOX1                101
-#define TRACE_PROGRAM                   101
 #define T_INTR                          102
-#define ID_CURRENCY_A_TO_B              102
 #define H_INTR                          103
-#define ID_CURRENCY_CANCEL              103
 #define T_FINPV                         104
-#define ID_CURRENCY_REDEFINE            104
-#define TRACE_REGS                      104
-#define TRACE_REGS2                     104
 #define H_FINPV                         105
-#define ID_CURRENCY_BOX2                105
-#define TRACE_REGS1                     105
 #define T_FINPMT                        106
-#define ID_CURRENCY_B_TO_A              106
 #define H_FINPMT                        107
 #define T_FINFV                         108
 #define H_FINFV                         109
@@ -407,7 +398,6 @@
 #define H_LCM                           392
 #define T_MINR                          393
 #define H_MINR                          394
-#define ID_CARRY_POS                    395
 #define T_MAXR                          395
 #define H_MAXR                          396
 #define T_ROUNDYX                       397

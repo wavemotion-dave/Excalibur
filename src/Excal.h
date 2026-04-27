@@ -119,118 +119,7 @@ typedef unsigned __int8     uint8_t;
 
 #define MAX_FUNCS           40           // The 40th one is for help only
 
-#define FN1                 132
-#define FN2                 139
-#define FN3                 146
-#define FN4                 153
-            
-#define FN5                 133
-#define FN6                 140
-#define FN7                 147
-#define FN8                 154
-            
-#define FN9                 134
-#define FN10                141
-#define FN11                148
-#define FN12                155
-            
-#define FN13                135
-#define FN14                142
-#define FN15                149
-#define FN16                156
-            
-#define FN17                136
-#define FN18                143
-#define FN19                150
-#define FN20                157
-            
-#define FN21                137
-#define FN22                144
-#define FN23                151
-#define FN24                158
-            
-#define FN25                138
-#define FN26                145
-#define FN27                152
-#define FN28                159
-            
-#define FN29                160
-#define FN30                163
-#define FN31                166
-#define FN32                169
-            
-#define FN33                161
-#define FN34                164
-#define FN35                167
-#define FN36                170
-            
-#define FN37                162
-#define FN38                165
-#define FN39                168
-#define FN40                171
-
-
-#define RPN_DIGIT_0         101
-#define RPN_DIGIT_1         RPN_DIGIT_0 + 1
-#define RPN_DIGIT_2         RPN_DIGIT_1 + 1
-#define RPN_DIGIT_3         RPN_DIGIT_2 + 1
-#define RPN_DIGIT_4         RPN_DIGIT_3 + 1
-#define RPN_DIGIT_5         RPN_DIGIT_4 + 1
-#define RPN_DIGIT_6         RPN_DIGIT_5 + 1
-#define RPN_DIGIT_7         RPN_DIGIT_6 + 1
-#define RPN_DIGIT_8         RPN_DIGIT_7 + 1
-#define RPN_DIGIT_9         RPN_DIGIT_8 + 1
-#define RPN_DIGIT_DP        RPN_DIGIT_9 + 1
-#define RPN_CLEAR_X         RPN_DIGIT_DP + 1
-    
-#define RPN_DIVIDE          RPN_CLEAR_X   + 1
-#define RPN_MULTIPLY        RPN_DIVIDE    + 1
-#define RPN_SUBTRACT        RPN_MULTIPLY  + 1
-#define RPN_PLUS            RPN_SUBTRACT  + 1
-    
-#define RPN_ENTER           RPN_PLUS      + 1
-#define RPN_EXCH_X_Y        RPN_ENTER     + 1
-#define RPN_NEGATE          RPN_EXCH_X_Y  + 1
-#define RPN_E               RPN_NEGATE    + 1
-#define RPN_STO             RPN_E         + 1
-#define RPN_RCL             RPN_STO       + 1
-#define RPN_R_UP            RPN_RCL       + 1
-#define RPN_R_DN            RPN_R_UP      + 1
-#define RPN_LASTX           RPN_R_DN      + 1
-#define RPN_MODE            RPN_LASTX     + 1
-#define RPN_BKSP            RPN_MODE      + 1
-    
-#define RPN_SCI             350
-#define RPN_STAT            RPN_SCI       + 1
-#define RPN_BUSI            RPN_STAT      + 1
-#define RPN_CONV            RPN_BUSI      + 1
-#define RPN_GEOM            RPN_CONV      + 1
-#define RPN_PROG            RPN_GEOM      + 1
-#define RPN_MISC            RPN_PROG      + 1
-#define RPN_CUST            RPN_MISC      + 1
-#define RPN_CMPLX           RPN_CUST      + 1
-#define RPN_PHY             RPN_CMPLX     + 1
-#define RPN_MACBANK         RPN_PHY       + 1
-    
-#define RPN_CLEAR_ALL       190
-#define RPN_RCLA            192
-#define RPN_HELP            181
-#define RPN_PLAYBACK        182
-    
-#define RPN_DROP            191
-#define RPN_LARG            185
-#define RPN_FRAC            186
-    
-#define RPN_EDIT            187
-#define RPN_RCLB            188
-#define RPN_STOA            189
-#define RPN_STOB            193
-#define RPN_NOTES           194
-#define RPN_INV             195
-    
 #define RPN_LAST_KEY        -1
-    
-#define RPN_RECORD          400  // Macro record on/off button
     
 #define MAX_DIGITS          18
 
@@ -257,7 +146,7 @@ typedef unsigned __int8     uint8_t;
 #define   IDM_EXCALIBURHELP                   113
 #define   IDM_ABOUTPROGRAM                    114
 #define   IDM_GEOMETRY                        115
-#define   IDM_MISC                            116
+#define   IDM_PROGII                          116
 #define   IDM_COMPLEX                         117
 #define   IDM_STATS                           118
 #define   IDM_USAGESTATS                      119
@@ -265,7 +154,7 @@ typedef unsigned __int8     uint8_t;
 #define   IDM_DEFINECUSTOM                    121
 #define   IDM_COPYCLIPBOARDTOX                122
 #define   IDM_PHYSICS                         123
-#define   IDM_MACROBANK                       124
+#define   IDM_PROGI                           124
 
 // Function prototypes for dialog and subdialog modules
 
@@ -274,7 +163,7 @@ typedef unsigned __int8     uint8_t;
 
 struct funcStruct
 {
-    int32_t index;
+    int16_t index;
     int16_t uniqueIndex;
     uint8_t useFloatsLongs;
     uint8_t allowRecord;
@@ -289,7 +178,7 @@ struct funcStruct
 
 struct keypadStruct
 {
-    int32_t index;
+    int16_t index;
     int16_t uniqueIndex;
     uint8_t useFloatsLongs;
     uint8_t allowRecord;
@@ -316,14 +205,6 @@ struct keypadStruct
 /* --------------------------- */
 /* Defines for the main dialog */
 /* --------------------------- */
-#define STATUS_BAR              172
-#define FUNC_BAR                173
-#define TIME_BAR                174
-#define REC_BAR                 175
-#define SPARE_BAR               176
-#define ANGLE_BAR               183
-#define PROG_BAR                184
-
 #define FUNC_BAR_TEXT_SCI_I    "SCIENTIFIC"
 #define FUNC_BAR_TEXT_CONV     "CONVERSION"
 #define FUNC_BAR_TEXT_BUIS     "FINANCIAL"
@@ -1415,5 +1296,147 @@ extern struct keypadStruct STOkeys[];
 
 extern uint8_t  userTimer;
 extern uint32_t userTicks;
+
+#define ID_CURRENCY_BOX1                101
+#define TRACE_PROGRAM                   101
+#define ID_CURRENCY_A_TO_B              102
+#define ID_CURRENCY_CANCEL              103
+#define ID_CURRENCY_REDEFINE            104
+#define TRACE_REGS                      104
+#define TRACE_REGS2                     104
+#define ID_CURRENCY_BOX2                105
+#define TRACE_REGS1                     105
+#define ID_CURRENCY_B_TO_A              106
+
+// RPN_DIGIT_0 to RPN_DIGIT_9 must be 101 for logic to work
+#define RPN_START_OF_LIST               100
+#define RPN_DIGIT_0                     101
+#define RPN_DIGIT_1                     102
+#define RPN_DIGIT_2                     103
+#define RPN_DIGIT_3                     104
+#define RPN_DIGIT_4                     105
+#define RPN_DIGIT_5                     106
+#define RPN_DIGIT_6                     107
+#define RPN_DIGIT_7                     108
+#define RPN_DIGIT_8                     109
+#define RPN_DIGIT_9                     110
+#define RPN_DIGIT_DP                    111
+#define RPN_CLEAR_X                     112
+#define RPN_DIVIDE                      113
+#define RPN_MULTIPLY                    114
+#define RPN_SUBTRACT                    115
+#define RPN_PLUS                        116
+#define RPN_ENTER                       117
+#define RPN_EXCH_X_Y                    118
+#define RPN_NEGATE                      119
+#define RPN_E                           120
+#define RPN_STO                         121
+#define RPN_RCL                         122
+#define RPN_R_UP                        123
+#define RPN_R_DN                        124
+#define RPN_LASTX                       125
+#define RPN_MODE                        126
+#define RPN_BKSP                        127
+#define RPN_CLEAR_ALL                   128
+#define RPN_HELP                        129
+#define RPN_PLAYBACK                    130                
+#define RPN_DROP                        131
+#define RPN_LARG                        132
+#define RPN_FRAC                        133
+#define RPN_EDIT                        134
+#define RPN_RCL1                        135
+#define RPN_STO0                        136
+#define RPN_RCL0                        137
+#define RPN_STO1                        138
+#define RPN_NOTES                       139
+#define RPN_INV                         140
+#define RPN_CARRY                       141
+#define RPN_REC                         142
+
+#define RPN_SCI                         200
+#define RPN_STAT                        201
+#define RPN_FIN                         202
+#define RPN_CONV                        203
+#define RPN_GEOM                        204
+#define RPN_COMPSCI                     205
+#define RPN_PHY                         206
+#define RPN_CMPLX                       207
+#define RPN_PROGI                       208
+#define RPN_PROGII                      209
+#define RPN_CUST                        210
+
+#define STATUS_BAR                      300
+#define FUNC_BAR                        301
+#define TIME_BAR                        302
+#define REC_BAR                         303
+#define SPARE_BAR                       304
+#define ANGLE_BAR                       305
+#define PROG_BAR                        306
+
+#define RPN_STACK                       400
+#define RPN_X_LABEL                     401
+#define RPN_Y_LABEL                     402
+#define RPN_Z_LABEL                     403
+#define RPN_T_LABEL                     404
+
+#define RPN_END_OF_LIST                 999
+
+// Offset these function IDs to keep them grouped easily
+#define FN1                             1001
+#define FN2                             1002
+#define FN3                             1003
+#define FN4                             1004
+                        
+#define FN5                             1005
+#define FN6                             1006
+#define FN7                             1007
+#define FN8                             1008
+                        
+#define FN9                             1009
+#define FN10                            1010
+#define FN11                            1011
+#define FN12                            1012
+                        
+#define FN13                            1013
+#define FN14                            1014
+#define FN15                            1015
+#define FN16                            1016
+                        
+#define FN17                            1017
+#define FN18                            1018
+#define FN19                            1019
+#define FN20                            1020
+                        
+#define FN21                            1021
+#define FN22                            1022
+#define FN23                            1023
+#define FN24                            1024
+                        
+#define FN25                            1025
+#define FN26                            1026
+#define FN27                            1027
+#define FN28                            1028
+                        
+#define FN29                            1029
+#define FN30                            1030
+#define FN31                            1031
+#define FN32                            1032
+                        
+#define FN33                            1033
+#define FN34                            1034
+#define FN35                            1035
+#define FN36                            1036
+                        
+#define FN37                            1037
+#define FN38                            1038
+#define FN39                            1039
+#define FN40                            1040
+
+// These are pushed way up in index values as they are special
+#define RPN_STACK_T                     2003
+#define RPN_STACK_Z                     2002
+#define RPN_STACK_Y                     2001
+#define RPN_STACK_X                     2000
+
 
 #include "resource.h"

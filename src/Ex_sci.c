@@ -1542,7 +1542,7 @@ BOOL CALLBACK fnDIALOG_ResistorProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
 
         SendDlgItemMessage(hDlg, 170, WM_SETTEXT, 0, (LONG) ((LPSTR) color_list[res_val_1st_band]));
         SendDlgItemMessage(hDlg, 171, WM_SETTEXT, 0, (LONG) ((LPSTR) color_list[res_val_2nd_band]));
-        SendDlgItemMessage(hDlg, 172, WM_SETTEXT, 0, (LONG) ((LPSTR) color_list[res_val_3rd_band]));
+        SendDlgItemMessage(hDlg, STATUS_BAR, WM_SETTEXT, 0, (LONG) ((LPSTR) color_list[res_val_3rd_band]));
         SendDlgItemMessage(hDlg, 173, WM_SETTEXT, 0, (LONG) ((LPSTR) color_list[res_val_mult_band]));
 
         return TRUE;
