@@ -148,7 +148,7 @@ BEGIN
     RADIOBUTTON     "Conversion",RPN_CONV,187,80,47,10
     RADIOBUTTON     "Geometry",RPN_GEOM,187,95,46,10
     RADIOBUTTON     "Comp Sci",RPN_COMPSCI,187,50,46,10
-    RADIOBUTTON     "Scientific II",RPN_PHY,187,35,47,10
+    RADIOBUTTON     "Scientific II",RPN_SCI2,187,35,47,10
     RADIOBUTTON     "Program I",RPN_PROGI,187,125,46,10
     RADIOBUTTON     "Program II",RPN_PROGII,187,140,48,10
     RADIOBUTTON     "Custom",RPN_CUST,187,155,39,10
@@ -274,7 +274,7 @@ STYLE WS_POPUP | WS_CAPTION | WS_THICKFRAME
 CAPTION "Custom Defined Buttons"
 FONT 10, "MS Sans Serif"
 BEGIN
-    CONTROL         "Scientific",IDC_CUSTOM_SCI,"Button",BS_AUTORADIOBUTTON | 
+    CONTROL         "Scientific I",IDC_CUSTOM_SCI,"Button",BS_AUTORADIOBUTTON | 
                     WS_TABSTOP,10,20,50,10
     CONTROL         "Statistics",IDC_CUSTOM_STAT,"Button",BS_AUTORADIOBUTTON,
                     10,33,50,10
@@ -288,7 +288,7 @@ BEGIN
                     BS_AUTORADIOBUTTON,10,85,50,10
     CONTROL         "Complex",IDC_CUSTOM_COMPLX,"Button",BS_AUTORADIOBUTTON,
                     10,98,50,10
-    CONTROL         "Physics",IDC_CUSTOM_PHY,"Button",BS_AUTORADIOBUTTON,10,
+    CONTROL         "Scientific II",IDC_CUSTOM_SCI2,"Button",BS_AUTORADIOBUTTON,10,
                     111,50,10
     CONTROL         "Program I",IDC_CUSTOM_PROG1,"Button",BS_AUTORADIOBUTTON,
                     10,124,50,10
@@ -864,14 +864,13 @@ BEGIN
     END
     POPUP "&Bank"
     BEGIN
-        MENUITEM "&Scientific",                 IDM_SCIENTIFIC
+        MENUITEM "&Scientific I",               IDM_SCIENTIFIC
+        MENUITEM "&Scientific II",              IDM_SCI2
         MENUITEM "&Statistics",                 IDM_STATS
         MENUITEM "&Financial",                  IDM_FINANCIAL
         MENUITEM "&Conversion",                 IDM_CONVERSION
         MENUITEM "&Geometry",                   IDM_GEOMETRY
         MENUITEM "&Comp Sci",                   IDM_COMPSCI
-        MENUITEM "&Physics",                    IDM_PHYSICS
-        MENUITEM "&Complex/Vector",             IDM_COMPLEX
         MENUITEM "&Program I",                  IDM_PROGI
         MENUITEM "&Program II",                 IDM_PROGII
         MENUITEM "&Custom",                     IDM_CUSTOM

@@ -483,8 +483,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
             case IDM_STATS:
                 SelectNewFunc((struct funcStruct *) &Statistics_funcs);
                 break;
-            case IDM_PHYSICS:
-                SelectNewFunc((struct funcStruct *) &Physics_funcs);
+            case IDM_SCI2:
+                SelectNewFunc((struct funcStruct *) &Scientific2_funcs);
                 break;
             case IDM_PROGI:
                 SelectNewFunc((struct funcStruct *) &Program1_funcs);
@@ -594,8 +594,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
             {
                 char tmpBuff[16];
                 userTicks += ticksUsed;
-                sprintf(tmpBuff, "%03d:%02d.%1d", (userTicks / 60000),
-                         (userTicks / 1000) % 60, (userTicks / 100) % 10);
+                sprintf(tmpBuff, "%03d:%02d.%1d", (userTicks / 60000), (userTicks / 1000) % 60, (userTicks / 100) % 10);
                 SetDlgItemText(calcMainWindow, TIME_BAR, tmpBuff);
             }
             
@@ -950,7 +949,7 @@ void SelectNewFunc(struct funcStruct *funcs)
     CheckMenuItem(hMainMenu, IDM_GEOMETRY,      MF_UNCHECKED);
     CheckMenuItem(hMainMenu, IDM_CUSTOM,        MF_UNCHECKED);
     CheckMenuItem(hMainMenu, IDM_STATS,         MF_UNCHECKED);
-    CheckMenuItem(hMainMenu, IDM_PHYSICS,       MF_UNCHECKED);
+    CheckMenuItem(hMainMenu, IDM_SCI2,       MF_UNCHECKED);
     CheckMenuItem(hMainMenu, IDM_PROGI,         MF_UNCHECKED);
 
     SendMessage(GetDlgItem(calcMainWindow, RPN_SCI),     BM_SETCHECK, (WORD) 0, (DWORD) 0L);
@@ -959,7 +958,7 @@ void SelectNewFunc(struct funcStruct *funcs)
     SendMessage(GetDlgItem(calcMainWindow, RPN_CONV),    BM_SETCHECK, (WORD) 0, (DWORD) 0L);
     SendMessage(GetDlgItem(calcMainWindow, RPN_GEOM),    BM_SETCHECK, (WORD) 0, (DWORD) 0L);
     SendMessage(GetDlgItem(calcMainWindow, RPN_COMPSCI), BM_SETCHECK, (WORD) 0, (DWORD) 0L);
-    SendMessage(GetDlgItem(calcMainWindow, RPN_PHY),     BM_SETCHECK, (WORD) 0, (DWORD) 0L);
+    SendMessage(GetDlgItem(calcMainWindow, RPN_SCI2),     BM_SETCHECK, (WORD) 0, (DWORD) 0L);
     SendMessage(GetDlgItem(calcMainWindow, RPN_PROGI),   BM_SETCHECK, (WORD) 0, (DWORD) 0L);
     SendMessage(GetDlgItem(calcMainWindow, RPN_PROGII),  BM_SETCHECK, (WORD) 0, (DWORD) 0L);
     SendMessage(GetDlgItem(calcMainWindow, RPN_CUST),    BM_SETCHECK, (WORD) 0, (DWORD) 0L);
@@ -1010,11 +1009,11 @@ void SelectNewFunc(struct funcStruct *funcs)
         SendMessage(GetDlgItem(calcMainWindow, RPN_STAT), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_STATS);
     }
-    if (funcs == (struct funcStruct *) &Physics_funcs)
+    if (funcs == (struct funcStruct *) &Scientific2_funcs)
     {
-        CheckMenuItem(hMainMenu, IDM_PHYSICS, MF_CHECKED);
-        SendMessage(GetDlgItem(calcMainWindow, RPN_PHY), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
-        ShowFunctionBar(FUNC_BAR_TEXT_PHYSICS);
+        CheckMenuItem(hMainMenu, IDM_SCI2, MF_CHECKED);
+        SendMessage(GetDlgItem(calcMainWindow, RPN_SCI2), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
+        ShowFunctionBar(FUNC_BAR_TEXT_SCI2);
     }
     if (funcs == (struct funcStruct *) &Program1_funcs)
     {
@@ -1721,15 +1720,15 @@ struct keypadStruct RPNkeys[] = {
     {RPN_NOTES,     UNI_NOTES,  USES_FL, ALLOWREC, ' ', NO_L,   X_NULL,     RPN_Notes,          "Excalibur Notepad",    "Allows some simple notes to be stored/saved."},
     {RPN_INV,       UNI_INVX,   USES_FL, ALLOWREC, ' ', YES_L,  X_NEW,      RPN_inverse,        "Inverse X",            "Computes the inverse of X"},
     {RPN_SCI,       UNI_SCI,    USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectSci,      "Select Scientific I",  "Selects the Scientific I Layout"},
-    {RPN_PHY,       UNI_PHY,    USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectPhysics,  "Select Scientific II", "Selects the Scientific II Layout"},
-    {RPN_FIN,       UNI_BUSI,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectBusi,     "Select Financial",     "Selects the Financial Layout"},
-    {RPN_STAT,      UNI_STAT,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectStat,     "Select Statistics",    "Selects the Statistical Layout"},
+    {RPN_SCI2,      UNI_SCI2,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectSci2,     "Select Scientific II", "Selects the Scientific II Layout"},
+    {RPN_COMPSCI,   UNI_COMPSCI,USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectCompSci,  "Select Comp Sci",      "Selects the Computer Science Layout"},
+    {RPN_FIN,       UNI_BUSI,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectFin,      "Select Financial",     "Selects the Financial Layout"},
     {RPN_CONV,      UNI_CONV,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectConv,     "Select Conversion",    "Selects the Conversion Layout"},
     {RPN_GEOM,      UNI_GEOM,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectGeom,     "Select Geometry",      "Selects the Geometry Layout"},
-    {RPN_COMPSCI,   UNI_PROG1,  USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectProg,     "Select Comp Sci",      "Selects the Computer Science Layout"},
-    {RPN_PROGI,     UNI_MAC,    USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectMacro,    "Select Program I",     "Selects Program Bank I"},
-    {RPN_PROGII,    UNI_PROG2,  USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectProg2,    "Select Program II",    "Selects Program Bank II"},
-    {RPN_CUST,      UNI_CUST,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectCust,     "Select Custom",        "Selects the Custom Layout"},
+    {RPN_STAT,      UNI_STAT,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectStat,     "Select Statistics",    "Selects the Statistical Layout"},
+    {RPN_PROGI,     UNI_PROG1,  USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectProgI,    "Select Program I",     "Selects Program Bank I"},
+    {RPN_PROGII,    UNI_PROG2,  USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectProgII,   "Select Program II",    "Selects Program Bank II"},
+    {RPN_CUST,      UNI_CUST,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectCustom,   "Select Custom",        "Selects the Custom Layout"},
 
     {RPN_LAST_KEY,  UNI_UNUSED, USES_FL, ALLOWREC, ' ', NO_L,   X_NEW,      NULL,               "Unused",               "Unused"}
 };
@@ -1788,15 +1787,15 @@ struct keyPosStruct RPNkeyPos[] = {
     {RPN_NOTES,     0,          0},
     {RPN_INV,       0,          0},
     {RPN_SCI,       0,          0},
-    {RPN_STAT,      0,          0},
+    {RPN_SCI2,      0,          0},
+    {RPN_COMPSCI,   0,          0},
     {RPN_FIN,       0,          0},
     {RPN_CONV,      0,          0},
     {RPN_GEOM,      0,          0},
-    {RPN_COMPSCI,   0,          0},
+    {RPN_STAT,      0,          0},
+    {RPN_PROGI,     0,          0},
     {RPN_PROGII,    0,          0},
     {RPN_CUST,      0,          0},
-    {RPN_PHY,       0,          0},
-    {RPN_PROGI,     0,          0},
     {RPN_LAST_KEY,  0,          0}
 };
 
@@ -3309,7 +3308,7 @@ int GetMenuType(struct funcStruct *cFunc)
     if (cFunc == (struct funcStruct *) &Program1_funcs)    retVal = 6;
     if (cFunc == (struct funcStruct *) &Program2_funcs)    retVal = 7;
     if (cFunc == (struct funcStruct *) &Statistics_funcs)  retVal = 8;
-    if (cFunc == (struct funcStruct *) &Physics_funcs)     retVal = 9;
+    if (cFunc == (struct funcStruct *) &Scientific2_funcs)     retVal = 9;
     if (cFunc == (struct funcStruct *) &Custom_funcs)      retVal = 10;
 
     return(retVal);
@@ -3368,10 +3367,10 @@ void SetMenuType(int type)
         ShowFunctionBar(FUNC_BAR_TEXT_STATS);
         break;
     case(9):
-        currentFuncs = (struct funcStruct *) &Physics_funcs;
-        CheckMenuItem(hMainMenu, IDM_PHYSICS, MF_CHECKED);
-        SendMessage(GetDlgItem(calcMainWindow, RPN_PHY), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
-        ShowFunctionBar(FUNC_BAR_TEXT_PHYSICS);
+        currentFuncs = (struct funcStruct *) &Scientific2_funcs;
+        CheckMenuItem(hMainMenu, IDM_SCI2, MF_CHECKED);
+        SendMessage(GetDlgItem(calcMainWindow, RPN_SCI2), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
+        ShowFunctionBar(FUNC_BAR_TEXT_SCI2);
         break;
     case(10):
         currentFuncs = (struct funcStruct *) &Custom_funcs;
@@ -3411,7 +3410,7 @@ void SetLastMenuType(int type)
         lastFuncs = (struct funcStruct *) &Statistics_funcs;
         break;
     case(9):
-        lastFuncs = (struct funcStruct *) &Physics_funcs;
+        lastFuncs = (struct funcStruct *) &Scientific2_funcs;
         break;
     case(10):
         lastFuncs = (struct funcStruct *) &Custom_funcs;
@@ -3744,6 +3743,9 @@ void ProcessCusomSave(void)
         case(CUSTOM_SAVE_SCI):        // Scientific
             memcpy(&Custom_funcs[newIdx], &Scientific_funcs[index], sizeof(struct funcStruct));
             break;
+        case(CUSTOM_SAVE_SCI2):       // Scientific II
+            memcpy(&Custom_funcs[newIdx], &Scientific2_funcs[index], sizeof(struct funcStruct));
+            break;
         case(CUSTOM_SAVE_BUS):        // Financial
             memcpy(&Custom_funcs[newIdx], &Financial_funcs[index], sizeof(struct funcStruct));
             break;
@@ -3758,9 +3760,6 @@ void ProcessCusomSave(void)
             break;
         case(CUSTOM_SAVE_CON):        // Conversion
             memcpy(&Custom_funcs[newIdx], &Conversion_funcs[index], sizeof(struct funcStruct));
-            break;
-        case(CUSTOM_SAVE_PHY):        // Physics
-            memcpy(&Custom_funcs[newIdx], &Physics_funcs[index], sizeof(struct funcStruct));
             break;
         case(CUSTOM_SAVE_MACBANK):    // Programming Bank I
             memcpy(&Custom_funcs[newIdx], &Program1_funcs[index], sizeof(struct funcStruct));
@@ -4795,12 +4794,17 @@ void RPN_SelectSci(void)
     SelectNewFunc((struct funcStruct *) &Scientific_funcs);
 }
 
+void RPN_SelectSci2(void)
+{
+    SelectNewFunc((struct funcStruct *) &Scientific2_funcs);
+}
+
 void RPN_SelectStat(void)
 {
     SelectNewFunc((struct funcStruct *) &Statistics_funcs);
 }
 
-void RPN_SelectBusi(void)
+void RPN_SelectFin(void)
 {
     SelectNewFunc((struct funcStruct *) &Financial_funcs);
 }
@@ -4815,29 +4819,24 @@ void RPN_SelectGeom(void)
     SelectNewFunc((struct funcStruct *) &Geometry_funcs);
 }
 
-void RPN_SelectProg(void)
+void RPN_SelectCompSci(void)
 {
     SelectNewFunc((struct funcStruct *) &CompSci_funcs);
 }
 
-void RPN_SelectProg2(void)
-{
-    SelectNewFunc((struct funcStruct *) &Program2_funcs);
-}
-
-void RPN_SelectCust(void)
+void RPN_SelectCustom(void)
 {
     SelectNewFunc((struct funcStruct *) &Custom_funcs);
 }
 
-void RPN_SelectPhysics(void)
-{
-    SelectNewFunc((struct funcStruct *) &Physics_funcs);
-}
-
-void RPN_SelectMacro(void)
+void RPN_SelectProgI(void)
 {
     SelectNewFunc((struct funcStruct *) &Program1_funcs);
+}
+
+void RPN_SelectProgII(void)
+{
+    SelectNewFunc((struct funcStruct *) &Program2_funcs);
 }
 
 void mapButtonFuncs(void)
@@ -4936,13 +4935,13 @@ void mapButtonFuncs(void)
 
     for (i = 0; i < MAX_FUNCS; i++)
     {
-        playBackMap[j].saveLastX = Physics_funcs[i].saveLastX;
-        playBackMap[j].newXedit = Physics_funcs[i].newXedit;
-        playBackMap[j].routine = Physics_funcs[i].routine;
-        LoadString(hExcaliburInstance, Physics_funcs[i].keyTitle, playBackMap[j].funcText, MAX_MACRO_FUNC_TEXT-1);
-        playBackMap[j].uniqueIndex = Physics_funcs[i].uniqueIndex;
-        playBackMap[j].useFloatsLongs = Physics_funcs[i].useFloatsLongs;
-        playBackMap[j].allowRecord = Physics_funcs[i].allowRecord;
+        playBackMap[j].saveLastX = Scientific2_funcs[i].saveLastX;
+        playBackMap[j].newXedit = Scientific2_funcs[i].newXedit;
+        playBackMap[j].routine = Scientific2_funcs[i].routine;
+        LoadString(hExcaliburInstance, Scientific2_funcs[i].keyTitle, playBackMap[j].funcText, MAX_MACRO_FUNC_TEXT-1);
+        playBackMap[j].uniqueIndex = Scientific2_funcs[i].uniqueIndex;
+        playBackMap[j].useFloatsLongs = Scientific2_funcs[i].useFloatsLongs;
+        playBackMap[j].allowRecord = Scientific2_funcs[i].allowRecord;
         j++;
     }
 

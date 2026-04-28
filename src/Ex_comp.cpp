@@ -40,7 +40,7 @@
 #include <complex>
 #include "EXCAL.h"
 
-extern "C" struct funcStruct Physics_funcs[MAX_FUNCS];
+extern "C" struct funcStruct Scientific2_funcs[MAX_FUNCS];
 extern "C" void COMP_plus(void);
 extern "C" void COMP_minus(void);
 extern "C" void COMP_div(void);
@@ -56,6 +56,7 @@ extern "C" void COMP_pow(void);
 extern "C" void COMP_sqrt(void);
 extern "C" void COMP_abs(void);
 extern "C" void COMP_CHS(void);
+extern "C" void COMP_norm(void);
 
 extern "C" void COMP_VectAddion(void);
 extern "C" void COMP_VectSubtract(void);
@@ -292,6 +293,20 @@ extern "C" void COMP_CHS(void)
   std::complex<double> c3;
 
   c3 = -c1;
+  StackPush(c3.imag());
+  StackPush(c3.real());
+}
+
+extern "C" void COMP_norm(void)
+{
+  double a, b;
+
+  a = StackPop();
+  b = StackPop();
+
+  std::complex<double> c1(a,b);
+  std::complex<double> c3;
+  c3 = std::norm(c1);
   StackPush(c3.imag());
   StackPush(c3.real());
 }

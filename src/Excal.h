@@ -59,23 +59,22 @@ typedef unsigned __int8     uint8_t;
 #define   IDM_COPYALLTOCLIPBOARD              105
 #define   IDM_SETTINGS                        106
 #define   IDM_DIRECTORIES                     107
-#define   IDM_SCIENTIFIC                      108
-#define   IDM_FINANCIAL                       109
-#define   IDM_CONVERSION                      110
-#define   IDM_COMPSCI                         111
-#define   IDM_ALWAYSONTOP                     112
-#define   IDM_EXCALIBURHELP                   113
-#define   IDM_ABOUTPROGRAM                    114
-#define   IDM_GEOMETRY                        115
-#define   IDM_PROGII                          116
-#define   IDM_COMPLEX                         117
-#define   IDM_STATS                           118
-#define   IDM_USAGESTATS                      119
-#define   IDM_CUSTOM                          120
-#define   IDM_DEFINECUSTOM                    121
-#define   IDM_COPYCLIPBOARDTOX                122
-#define   IDM_PHYSICS                         123
-#define   IDM_PROGI                           124
+#define   IDM_ALWAYSONTOP                     108
+#define   IDM_EXCALIBURHELP                   109
+#define   IDM_ABOUTPROGRAM                    110
+#define   IDM_SCIENTIFIC                      111
+#define   IDM_SCI2                         112
+#define   IDM_FINANCIAL                       113
+#define   IDM_CONVERSION                      114
+#define   IDM_COMPSCI                         115
+#define   IDM_GEOMETRY                        116
+#define   IDM_PROGI                           117
+#define   IDM_PROGII                          118
+#define   IDM_CUSTOM                          119
+#define   IDM_DEFINECUSTOM                    120
+#define   IDM_STATS                           121
+#define   IDM_USAGESTATS                      122
+#define   IDM_COPYCLIPBOARDTOX                123
 
 // Function prototypes for dialog and subdialog modules
 
@@ -134,7 +133,7 @@ struct keypadStruct
 #define FUNC_BAR_TEXT_CUSTOM   "CUSTOM BANK"
 #define FUNC_BAR_TEXT_PROG2    "PROGRAM II"
 #define FUNC_BAR_TEXT_STATS    "STATISTICS"
-#define FUNC_BAR_TEXT_PHYSICS  "SCIENTIFIC II"
+#define FUNC_BAR_TEXT_SCI2  "SCIENTIFIC II"
 #define FUNC_BAR_TEXT_PROG1    "PROGRAM I"
 
 
@@ -169,7 +168,7 @@ extern struct funcStruct Custom_funcs[];
 extern struct funcStruct Program1_funcs[];
 extern struct funcStruct Program2_funcs[];
 extern struct funcStruct Statistics_funcs[];
-extern struct funcStruct Physics_funcs[];
+extern struct funcStruct Scientific2_funcs[];
 extern struct funcStruct MacroFuncs[];
 
 extern uint8_t Xedit;
@@ -319,14 +318,14 @@ extern void ReadFromDisk(void);
 extern void GetUserSettings(void);
 extern void RPN_SelectSci(void);
 extern void RPN_SelectStat(void);
-extern void RPN_SelectBusi(void);
+extern void RPN_SelectFin(void);
 extern void RPN_SelectConv(void);
 extern void RPN_SelectGeom(void);
-extern void RPN_SelectProg(void);
-extern void RPN_SelectProg2(void);
-extern void RPN_SelectCust(void);
-extern void RPN_SelectPhysics(void);
-extern void RPN_SelectMacro(void);
+extern void RPN_SelectCompSci(void);
+extern void RPN_SelectProgII(void);
+extern void RPN_SelectCustom(void);
+extern void RPN_SelectSci2(void);
+extern void RPN_SelectProgI(void);
 extern void RPN_Playback(void);
 extern void RPN_Record(void);
 extern void RPN_dp(void);
@@ -356,17 +355,16 @@ extern void RPN_Notes(void);
 extern void RPN_CopyX(void);
 extern void RPN_inverse(void);
 
-#define CUSTOM_SAVE_MAC       99        // macros
 #define CUSTOM_SAVE_SCI       1
 #define CUSTOM_SAVE_BUS       2
 #define CUSTOM_SAVE_PRO       3
 #define CUSTOM_SAVE_STA       4
 #define CUSTOM_SAVE_GEO       5
 #define CUSTOM_SAVE_CON       6
-#define CUSTOM_SAVE_COM       7
-#define CUSTOM_SAVE_PHY       8
-#define CUSTOM_SAVE_MACBANK   9
-#define CUSTOM_SAVE_MACBANK2  10
+#define CUSTOM_SAVE_SCI2       7
+#define CUSTOM_SAVE_MACBANK   8
+#define CUSTOM_SAVE_MACBANK2  9
+#define CUSTOM_SAVE_MAC       99        // macros
 
 struct customSaveStruct
 {
@@ -883,16 +881,15 @@ enum UniqueButtonIndexTag
     UNI_CPYX,
     UNI_INVX,
     UNI_SCI,
-    UNI_STAT,
+    UNI_SCI2,
     UNI_BUSI,
+    UNI_STAT,
     UNI_CONV,
     UNI_GEOM,
+    UNI_COMPSCI,
     UNI_PROG1,
     UNI_PROG2,
-    UNI_CMPLX,
     UNI_CUST,
-    UNI_PHY,
-    UNI_MAC,
     UNI_UNUSED,
     UNI_SIN,
     UNI_COS,
@@ -1280,12 +1277,12 @@ extern uint32_t userTicks;
 #define RPN_REC                         142
 
 #define RPN_SCI                         200
-#define RPN_STAT                        201
-#define RPN_FIN                         202
-#define RPN_CONV                        203
-#define RPN_GEOM                        204
-#define RPN_COMPSCI                     205
-#define RPN_PHY                         206
+#define RPN_SCI2                        201
+#define RPN_STAT                        202
+#define RPN_FIN                         203
+#define RPN_CONV                        204
+#define RPN_GEOM                        205
+#define RPN_COMPSCI                     206
 #define RPN_PROGI                       207
 #define RPN_PROGII                      208
 #define RPN_CUST                        209
@@ -1372,7 +1369,7 @@ extern uint32_t userTicks;
 #define IDC_CUSTOM_GEOM                 194
 #define IDC_CUSTOM_COMPSCI              195
 #define IDC_CUSTOM_COMPLX               196
-#define IDC_CUSTOM_PHY                  197
+#define IDC_CUSTOM_SCI2                  197
 #define IDC_CUSTOM_PROG1                198
 #define IDC_CUSTOM_PROG2                199
 #define IDC_CUSTOM_FUNCNAME             200

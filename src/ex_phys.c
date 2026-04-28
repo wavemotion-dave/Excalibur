@@ -53,23 +53,24 @@ extern void Phys_ProjectileRange(void);     // In meters
 extern void Phys_ProjectileHeight(void);    // In meters
 extern void Phys_Astro(void);
 
-extern void COMP_plus (void);
-extern void COMP_minus (void);
-extern void COMP_div (void);
-extern void COMP_mult (void);
-extern void COMP_sin (void);
-extern void COMP_cos (void);
-extern void COMP_tan (void);
-extern void COMP_conj (void);
-extern void COMP_exp (void);
-extern void COMP_ln (void);
-extern void COMP_log (void);
-extern void COMP_pow (void);
-extern void COMP_sqrt (void);
-extern void COMP_abs (void);
-extern void COMP_CHS (void);
+extern void COMP_plus(void);
+extern void COMP_minus(void);
+extern void COMP_div(void);
+extern void COMP_mult(void);
+extern void COMP_sin(void);
+extern void COMP_cos(void);
+extern void COMP_tan(void);
+extern void COMP_conj(void);
+extern void COMP_exp(void);
+extern void COMP_ln(void);
+extern void COMP_log(void);
+extern void COMP_pow(void);
+extern void COMP_sqrt(void);
+extern void COMP_abs(void);
+extern void COMP_CHS(void);
+extern void COMP_norm(void);
 
-struct funcStruct Physics_funcs[MAX_FUNCS] = {
+struct funcStruct Scientific2_funcs[MAX_FUNCS] = {
     {FN1,   UNI_CONST2,     USES_F,     NORECORD,   ' ',    "Const",    YES_L,      X_NEW,      Phys_Constants,         T_CONST,        H_CONST},
     {FN2,   UNI_MOLES,      USES_F,     ALLOWREC,   ' ',    "Moles",    YES_L,      X_NEW,      Phys_Moles,             T_MOLES,        H_MOLES},
     {FN3,   UNI_MOLEC,      USES_F,     ALLOWREC,   ' ',    "Molec",    YES_L,      X_NEW,      Phys_Molecules,         T_MOLECULES,    H_MOLECULES},
@@ -86,30 +87,30 @@ struct funcStruct Physics_funcs[MAX_FUNCS] = {
     {FN14,  UNI_PROJHEIGHT, USES_F,     ALLOWREC,   ' ',    "Proj H",   YES_L,      X_NEW,      Phys_ProjectileHeight,  T_PROJHEIGHT,   H_PROJHEIGHT},
     {FN15,  UNI_ASTRO,      USES_F,     NORECORD,   ' ',    "Astro",    YES_L,      X_NEW,      Phys_Astro,             T_ASTRO,        H_ASTRO},
     {FN16,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_NULL},
-    {FN17,  UNI_CPLUS,      USES_F,     ALLOWREC,   ' ',    "Cpx +",    YES_L,      X_NEW,      COMP_plus,              T_CPLXADD,      H_CPLXADD},
-    {FN18,  UNI_CMINUS,     USES_F,     ALLOWREC,   ' ',    "Cpx --",   YES_L,      X_NEW,      COMP_minus,             T_CPLXSUB,      H_CPLXSUB},
-    {FN19,  UNI_CDIV,       USES_F,     ALLOWREC,   ' ',    "Cpx ÷",    YES_L,      X_NEW,      COMP_div,               T_CPLXDIV,      H_CPLXDIV},
-    {FN20,  UNI_CMUL,       USES_F,     ALLOWREC,   ' ',    "Cpx ×",    YES_L,      X_NEW,      COMP_mult,              T_CPLXMUL,      H_CPLXMUL},
-    {FN21,  UNI_CSIN,       USES_F,     ALLOWREC,   ' ',    "cSIN",     YES_L,      X_NEW,      COMP_sin,               T_CPLXSIN,      H_CPLXSIN},
-    {FN22,  UNI_CCOS,       USES_F,     ALLOWREC,   ' ',    "cCOS",     YES_L,      X_NEW,      COMP_cos,               T_CPLXCOS,      H_CPLXCOS},
-    {FN23,  UNI_CTAN,       USES_F,     ALLOWREC,   ' ',    "cTAN",     YES_L,      X_NEW,      COMP_tan,               T_CPLXTAN,      H_CPLXTAN},
-    {FN24,  UNI_CCHS,       USES_F,     ALLOWREC,   ' ',    "cCHS",     YES_L,      X_NEW,      COMP_CHS,               T_CPLXCHS,      H_CPLXCHS},
-    {FN25,  UNI_CCONJ,      USES_F,     ALLOWREC,   ' ',    "Conj",     YES_L,      X_NEW,      COMP_conj,              T_CONJ,         H_CONJ},
-    {FN26,  UNI_CEXP,       USES_F,     ALLOWREC,   ' ',    "cEXP",     YES_L,      X_NEW,      COMP_exp,               T_CPLXEXP,      H_CPLXEXP},
-    {FN27,  UNI_CLN,        USES_F,     ALLOWREC,   ' ',    "cLN",      YES_L,      X_NEW,      COMP_ln,                T_CPLXLN,       H_CPLXLN},
-    {FN28,  UNI_CLOG,       USES_F,     ALLOWREC,   ' ',    "cLOG",     YES_L,      X_NEW,      COMP_log,               T_CPLXLOG,      H_CPLXLOG},
-    {FN29,  UNI_CPOW,       USES_F,     ALLOWREC,   ' ',    "cPOW",     YES_L,      X_NEW,      COMP_pow,               T_CPLXPOW,      H_CPLXPOW},
-    {FN30,  UNI_CSQRT,      USES_F,     ALLOWREC,   ' ',    "cSQRT",    YES_L,      X_NEW,      COMP_sqrt,              T_CPLXSQRT,     H_CPLXSQRT},
-    {FN31,  UNI_CABS,       USES_F,     ALLOWREC,   ' ',    "cABS",     YES_L,      X_NEW,      COMP_abs,               T_CPLXABS,      H_CPLXABS},
-    {FN32,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_NULL},
-    {FN33,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_NULL},
-    {FN34,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_NULL},
-    {FN35,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_NULL},
-    {FN36,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_NULL},
-    {FN37,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_NULL},
-    {FN38,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_NULL},
-    {FN39,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_ATLAS}, //hidden!
-    {FN40,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_NULL}
+    {FN17,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_NULL},
+    {FN18,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_NULL},
+    {FN19,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_NULL},
+    {FN20,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_NULL},
+    {FN21,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_NULL},
+    {FN22,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_NULL},
+    {FN23,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_ATLAS}, //hidden!
+    {FN24,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_NULL},
+    {FN25,  UNI_CPLUS,      USES_F,     ALLOWREC,   ' ',    "Cpx +",    YES_L,      X_NEW,      COMP_plus,              T_CPLXADD,      H_CPLXADD},
+    {FN26,  UNI_CMINUS,     USES_F,     ALLOWREC,   ' ',    "Cpx --",   YES_L,      X_NEW,      COMP_minus,             T_CPLXSUB,      H_CPLXSUB},
+    {FN27,  UNI_CDIV,       USES_F,     ALLOWREC,   ' ',    "Cpx /",    YES_L,      X_NEW,      COMP_div,               T_CPLXDIV,      H_CPLXDIV},
+    {FN28,  UNI_CMUL,       USES_F,     ALLOWREC,   ' ',    "Cpx *",    YES_L,      X_NEW,      COMP_mult,              T_CPLXMUL,      H_CPLXMUL},
+    {FN29,  UNI_CSIN,       USES_F,     ALLOWREC,   ' ',    "cSIN",     YES_L,      X_NEW,      COMP_sin,               T_CPLXSIN,      H_CPLXSIN},
+    {FN30,  UNI_CCOS,       USES_F,     ALLOWREC,   ' ',    "cCOS",     YES_L,      X_NEW,      COMP_cos,               T_CPLXCOS,      H_CPLXCOS},
+    {FN31,  UNI_CTAN,       USES_F,     ALLOWREC,   ' ',    "cTAN",     YES_L,      X_NEW,      COMP_tan,               T_CPLXTAN,      H_CPLXTAN},
+    {FN32,  UNI_CCHS,       USES_F,     ALLOWREC,   ' ',    "cCHS",     YES_L,      X_NEW,      COMP_CHS,               T_CPLXCHS,      H_CPLXCHS},
+    {FN33,  UNI_CCONJ,      USES_F,     ALLOWREC,   ' ',    "Conj",     YES_L,      X_NEW,      COMP_conj,              T_CONJ,         H_CONJ},
+    {FN34,  UNI_CEXP,       USES_F,     ALLOWREC,   ' ',    "cEXP",     YES_L,      X_NEW,      COMP_exp,               T_CPLXEXP,      H_CPLXEXP},
+    {FN35,  UNI_CLN,        USES_F,     ALLOWREC,   ' ',    "cLN",      YES_L,      X_NEW,      COMP_ln,                T_CPLXLN,       H_CPLXLN},
+    {FN36,  UNI_CLOG,       USES_F,     ALLOWREC,   ' ',    "cLOG",     YES_L,      X_NEW,      COMP_log,               T_CPLXLOG,      H_CPLXLOG},
+    {FN37,  UNI_CPOW,       USES_F,     ALLOWREC,   ' ',    "cPOW",     YES_L,      X_NEW,      COMP_pow,               T_CPLXPOW,      H_CPLXPOW},
+    {FN38,  UNI_CSQRT,      USES_F,     ALLOWREC,   ' ',    "cSQRT",    YES_L,      X_NEW,      COMP_sqrt,              T_CPLXSQRT,     H_CPLXSQRT},
+    {FN39,  UNI_CABS,       USES_F,     ALLOWREC,   ' ',    "cABS",     YES_L,      X_NEW,      COMP_abs,               T_CPLXABS,      H_CPLXABS},
+    {FN40,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "cNORM",    YES_L,      X_NEW,      COMP_norm,              T_NULL,         H_NULL} //TODO help
 };
 
 void Phys_Constants(void)

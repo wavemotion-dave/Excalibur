@@ -332,6 +332,11 @@ BOOL CALLBACK CustomDefDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM l
                 customPullFuncs = (struct funcStruct *) &Scientific_funcs;
                 processCustomFuncs(hDlg);
                 break;
+            case(IDC_CUSTOM_SCI2):        // Scientific II funcs
+                savedIndexFunc = CUSTOM_SAVE_SCI2;
+                customPullFuncs = (struct funcStruct *) &Scientific2_funcs;
+                processCustomFuncs(hDlg);
+                break;
             case(IDC_CUSTOM_FIN):        // Financial funcs
                 savedIndexFunc = CUSTOM_SAVE_BUS;
                 customPullFuncs = (struct funcStruct *) &Financial_funcs;
@@ -355,11 +360,6 @@ BOOL CALLBACK CustomDefDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM l
             case(IDC_CUSTOM_CONV):        // Conversion funcs
                 savedIndexFunc = CUSTOM_SAVE_CON;
                 customPullFuncs = (struct funcStruct *) &Conversion_funcs;
-                processCustomFuncs(hDlg);
-                break;
-            case(IDC_CUSTOM_PHY):        // Physics funcs
-                savedIndexFunc = CUSTOM_SAVE_PHY;
-                customPullFuncs = (struct funcStruct *) &Physics_funcs;
                 processCustomFuncs(hDlg);
                 break;
             case(IDC_CUSTOM_PROG1):        // Program Bank 1 funcs
