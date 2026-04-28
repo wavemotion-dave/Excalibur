@@ -53,7 +53,7 @@
                   "if you want to donate to support the effort.\n\n"    \
                   "https://github.com/wavemotion-dave/Excalibur"
 
-#define CONFIG_VERSION_MAIN     0xF002      // If this changes, we wipe EVERYTHING
+#define CONFIG_VERSION_MAIN     0xF003      // If this changes, we wipe EVERYTHING
 #define CONFIG_VERSION_SUB      0xF001      // If this changes, we reset x,y window position and reset constant tables (currency, physics constants, etc)
 
 #define END_OF_PROGRAM_STR "<End Of Program>"
@@ -182,7 +182,7 @@ void DoMacroSaveRecall(void);
 struct funcStruct *currentFuncs = (struct funcStruct *) &Scientific_funcs;
 struct funcStruct *lastFuncs = (struct funcStruct *) &Scientific_funcs;
 
-uint32_t halfSecTimer = 0;
+uint32_t fastTimer = 0; // Ticks at roughly 300ms intervals
 
 #define MIN_WINDOW_WIDTH    5
 #define MIN_WINDOW_HEIGHT   5
@@ -264,9 +264,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
     ShowWindow(calcMainWindow, SW_HIDE);
 
-    SetTimer(calcMainWindow, 1, 60000, NULL);   // 1 Minute Timer
-    SetTimer(calcMainWindow, 2, 300,   NULL);   // 300ms Timer
-    SetTimer(calcMainWindow, 3, 100,   NULL);   // 100ms Timer
+    SetTimer(calcMainWindow, TIMER_ONE_MINUTE,  60000, NULL);   // 1 Minute Timer
+    SetTimer(calcMainWindow, TIMER_SLOW,        300,   NULL);   // 300ms Timer
+    SetTimer(calcMainWindow, TIMER_FAST,        100,   NULL);   // 100ms Timer
     
     srand((unsigned) time(NULL));   // Ensure random numbers are somewhat random!
 
@@ -580,13 +580,67 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 
 
     case WM_TIMER:
-        if (wParam == 1)        // 60 second timer
+        if (wParam == TIMER_ONE_MINUTE)        // 60 second timer
         {
             if (GetFocus() == hwnd)
                 inFocusTime++;
             UpdateTimeBar();
         }
-        if (wParam == 3)        // 100 ms timer
+        
+        if (wParam == TIMER_SLOW)        // 300 ms timer
+        {
+            fastTimer++;
+
+            if (macroPlayback == FALSE)  // Don't bother if we are in the middle of macro playback
+            {
+                GetCursorPos(&pCursor);
+                xPos = (WORD) pCursor.x;
+                yPos = (WORD) pCursor.y;
+                ScreenToClient(hwnd, &pCursor);
+
+                GetWindowRect(hwnd, &rc);
+                ptUpperLeft.x = rc.left;
+                ptUpperLeft.y = rc.top;
+                ptLowerRight.x = rc.right;
+                ptLowerRight.y = rc.bottom;
+                ScreenToClient(hwnd, &ptUpperLeft);
+                ScreenToClient(hwnd, &ptLowerRight);
+            
+                if ((pCursor.x >= 0 && pCursor.x <= ptLowerRight.x) && (pCursor.y >= 0 && pCursor.y <= ptLowerRight.y))
+                {
+                    if (!IsWindowVisible(toolTipWnd))
+                    {
+                        if (xPos == lastXpos && yPos == lastYpos)
+                        {
+                            if ((toolTipCounter++) >= 2)
+                            {
+                                if (GetFocus() == calcMainWindow)
+                                    if (GetMouseHelp((WORD) pCursor.x, (WORD) pCursor.y) == 1)
+                                    {
+                                        hdc = GetDC(toolTipWnd);
+                                        SelectObject(hdc, GetStockObject(ANSI_VAR_FONT));
+                                        dw = GetTextExtentPoint32(hdc, helpTitle, strlen(helpTitle), &lpSize);
+                                        ReleaseDC(toolTipWnd, hdc);
+                                        MoveWindow(toolTipWnd, xPos - 1, yPos + 19, lpSize.cx + 10, lpSize.cy + 4, TRUE);
+                                        if ((toolTipsOn == 1) && (traceMacroPlayback == FALSE) && (macroPlayback == FALSE))
+                                        {
+                                            ShowWindow(toolTipWnd, SW_SHOWNOACTIVATE);
+                                        }
+                                    }
+                            }
+                        }
+                        else
+                        {
+                            toolTipCounter = 0;
+                        }
+                    }
+                }
+                lastXpos = xPos;
+                lastYpos = yPos;
+            }
+        }
+        
+        if (wParam == TIMER_FAST)        // 100 ms timer
         {
             ticksUsed = GetTickCount() - lastTickCount;
             lastTickCount += ticksUsed;
@@ -599,6 +653,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
             }
             
             if (GetFocus() == calcMainWindow)
+            {
                 if (IsWindowVisible(toolTipWnd))
                 {
                     GetCursorPos(&pCursor);
@@ -610,51 +665,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
                         toolTipCounter = 0;
                     }
                 }
+            }
         }
-        if (wParam == 2)        // 500 ms timer
-        {
-            halfSecTimer++;
-            GetCursorPos(&pCursor);
-            xPos = (WORD) pCursor.x;
-            yPos = (WORD) pCursor.y;
-            ScreenToClient(hwnd, &pCursor);
-
-            GetWindowRect(hwnd, &rc);
-            ptUpperLeft.x = rc.left;
-            ptUpperLeft.y = rc.top;
-            ptLowerRight.x = rc.right;
-            ptLowerRight.y = rc.bottom;
-            ScreenToClient(hwnd, &ptUpperLeft);
-            ScreenToClient(hwnd, &ptLowerRight);
-
-            if ((pCursor.x >= 0 && pCursor.x <= ptLowerRight.x) && (pCursor.y >= 0 && pCursor.y <= ptLowerRight.y))
-                if (!IsWindowVisible(toolTipWnd))
-                    if (xPos == lastXpos && yPos == lastYpos)
-                    {
-                        if ((toolTipCounter++) >= 2)
-                        {
-                            if (GetFocus() == calcMainWindow)
-                                if (GetMouseHelp((WORD) pCursor.x, (WORD) pCursor.y) == 1)
-                                {
-                                    hdc = GetDC(toolTipWnd);
-                                    SelectObject(hdc, GetStockObject(ANSI_VAR_FONT));
-                                    dw = GetTextExtentPoint32(hdc, helpTitle, strlen(helpTitle), &lpSize);
-                                    ReleaseDC(toolTipWnd, hdc);
-                                    MoveWindow(toolTipWnd, xPos - 1, yPos + 19, lpSize.cx + 10, lpSize.cy + 4, TRUE);
-                                    if ((toolTipsOn == 1) && (traceMacroPlayback == FALSE) && (macroPlayback == FALSE))
-                                    {
-                                        ShowWindow(toolTipWnd, SW_SHOWNOACTIVATE);
-                                    }
-                                }
-                        }
-                    }
-                    else
-                    {
-                        toolTipCounter = 0;
-                    }
-            lastXpos = xPos;
-            lastYpos = yPos;
-        }
+        
         return 0;
         break;
 
@@ -949,7 +962,7 @@ void SelectNewFunc(struct funcStruct *funcs)
     CheckMenuItem(hMainMenu, IDM_GEOMETRY,      MF_UNCHECKED);
     CheckMenuItem(hMainMenu, IDM_CUSTOM,        MF_UNCHECKED);
     CheckMenuItem(hMainMenu, IDM_STATS,         MF_UNCHECKED);
-    CheckMenuItem(hMainMenu, IDM_SCI2,       MF_UNCHECKED);
+    CheckMenuItem(hMainMenu, IDM_SCI2,          MF_UNCHECKED);
     CheckMenuItem(hMainMenu, IDM_PROGI,         MF_UNCHECKED);
 
     SendMessage(GetDlgItem(calcMainWindow, RPN_SCI),     BM_SETCHECK, (WORD) 0, (DWORD) 0L);
@@ -958,7 +971,7 @@ void SelectNewFunc(struct funcStruct *funcs)
     SendMessage(GetDlgItem(calcMainWindow, RPN_CONV),    BM_SETCHECK, (WORD) 0, (DWORD) 0L);
     SendMessage(GetDlgItem(calcMainWindow, RPN_GEOM),    BM_SETCHECK, (WORD) 0, (DWORD) 0L);
     SendMessage(GetDlgItem(calcMainWindow, RPN_COMPSCI), BM_SETCHECK, (WORD) 0, (DWORD) 0L);
-    SendMessage(GetDlgItem(calcMainWindow, RPN_SCI2),     BM_SETCHECK, (WORD) 0, (DWORD) 0L);
+    SendMessage(GetDlgItem(calcMainWindow, RPN_SCI2),    BM_SETCHECK, (WORD) 0, (DWORD) 0L);
     SendMessage(GetDlgItem(calcMainWindow, RPN_PROGI),   BM_SETCHECK, (WORD) 0, (DWORD) 0L);
     SendMessage(GetDlgItem(calcMainWindow, RPN_PROGII),  BM_SETCHECK, (WORD) 0, (DWORD) 0L);
     SendMessage(GetDlgItem(calcMainWindow, RPN_CUST),    BM_SETCHECK, (WORD) 0, (DWORD) 0L);
@@ -3746,25 +3759,25 @@ void ProcessCusomSave(void)
         case(CUSTOM_SAVE_SCI2):       // Scientific II
             memcpy(&Custom_funcs[newIdx], &Scientific2_funcs[index], sizeof(struct funcStruct));
             break;
-        case(CUSTOM_SAVE_BUS):        // Financial
+        case(CUSTOM_SAVE_FIN):        // Financial
             memcpy(&Custom_funcs[newIdx], &Financial_funcs[index], sizeof(struct funcStruct));
             break;
-        case(CUSTOM_SAVE_PRO):        // Programming
+        case(CUSTOM_SAVE_COMPSCI):    // Programming
             memcpy(&Custom_funcs[newIdx], &CompSci_funcs[index], sizeof(struct funcStruct));
             break;
-        case(CUSTOM_SAVE_STA):        // Statistics
+        case(CUSTOM_SAVE_STATS):      // Statistics
             memcpy(&Custom_funcs[newIdx], &Statistics_funcs[index], sizeof(struct funcStruct));
             break;
         case(CUSTOM_SAVE_GEO):        // Geometry
             memcpy(&Custom_funcs[newIdx], &Geometry_funcs[index], sizeof(struct funcStruct));
             break;
-        case(CUSTOM_SAVE_CON):        // Conversion
+        case(CUSTOM_SAVE_CONV):       // Conversion
             memcpy(&Custom_funcs[newIdx], &Conversion_funcs[index], sizeof(struct funcStruct));
             break;
-        case(CUSTOM_SAVE_MACBANK):    // Programming Bank I
+        case(CUSTOM_SAVE_PROG1):      // Programming Bank I
             memcpy(&Custom_funcs[newIdx], &Program1_funcs[index], sizeof(struct funcStruct));
             break;
-        case(CUSTOM_SAVE_MACBANK2):    // Programming Bank II
+        case(CUSTOM_SAVE_PROG2):      // Programming Bank II
             memcpy(&Custom_funcs[newIdx], &Program2_funcs[index], sizeof(struct funcStruct));
             break;
         case(CUSTOM_SAVE_MAC):        // Macros - SPECIAL!
@@ -3772,7 +3785,6 @@ void ProcessCusomSave(void)
             strcpy(Custom_funcs[newIdx].desc, macro_short_names[index]);
             Custom_funcs[newIdx].keyTitle = 9000 + index;
             break;
-
         }
         Custom_funcs[newIdx].index = saveIdx;
     }
@@ -5209,7 +5221,7 @@ void RPN_Playback(void)
         static int dampenSystemProcessing = 0;
 
         // Don't need to peek THAT often... allows macro to run faster
-        if (!(++dampenSystemProcessing & 7))
+        if (!(++dampenSystemProcessing & 0x3F))
         {
             while (PeekMessage(&msg, calcMainWindow, 0, 0, PM_REMOVE))
             {
@@ -5232,11 +5244,11 @@ void RPN_Playback(void)
 
         if (traceMacroPlayback == FALSE)
         {
-            if (halfSecTimer != initialTimer)
+            if (fastTimer != initialTimer)
             {
-                initialTimer = halfSecTimer;
+                initialTimer = fastTimer;
                 if ((++flashRunningDsp % 2) == 0)
-                    UpdateSpareBar("    ");
+                    UpdateSpareBar("      ");
                 else
                     UpdateSpareBar("Run...");
             }
@@ -5272,7 +5284,7 @@ void RPN_Playback(void)
         }
     }
 
-    UpdateSpareBar("    ");
+    UpdateSpareBar("      ");
     macroPlayback = FALSE;
 }
 
@@ -5305,8 +5317,7 @@ void RPN_SingleStep(void)
         if (playBackMap[idx].routine != NULL)
         {
             // Always disallow record of playback keystrokes!
-            callButtonFunc(playBackMap[idx].routine,
-                            playBackMap[idx].useFloatsLongs, NORECORD,
+            callButtonFunc(playBackMap[idx].routine, playBackMap[idx].useFloatsLongs, NORECORD,
                             playBackMap[idx].uniqueIndex, playBackMap[idx].saveLastX, playBackMap[idx].newXedit, FALSE);
             if (playBackMap[idx].newXedit != X_NULL)
             {

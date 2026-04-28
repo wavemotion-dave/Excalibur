@@ -338,17 +338,17 @@ BOOL CALLBACK CustomDefDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM l
                 processCustomFuncs(hDlg);
                 break;
             case(IDC_CUSTOM_FIN):        // Financial funcs
-                savedIndexFunc = CUSTOM_SAVE_BUS;
+                savedIndexFunc = CUSTOM_SAVE_FIN;
                 customPullFuncs = (struct funcStruct *) &Financial_funcs;
                 processCustomFuncs(hDlg);
                 break;
             case(IDC_CUSTOM_COMPSCI):     // Comp-Sci funcs
-                savedIndexFunc = CUSTOM_SAVE_PRO;
+                savedIndexFunc = CUSTOM_SAVE_COMPSCI;
                 customPullFuncs = (struct funcStruct *) &CompSci_funcs;
                 processCustomFuncs(hDlg);
                 break;
             case(IDC_CUSTOM_STAT):        // Stats funcs
-                savedIndexFunc = CUSTOM_SAVE_STA;
+                savedIndexFunc = CUSTOM_SAVE_STATS;
                 customPullFuncs = (struct funcStruct *) &Statistics_funcs;
                 processCustomFuncs(hDlg);
                 break;
@@ -358,17 +358,17 @@ BOOL CALLBACK CustomDefDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM l
                 processCustomFuncs(hDlg);
                 break;
             case(IDC_CUSTOM_CONV):        // Conversion funcs
-                savedIndexFunc = CUSTOM_SAVE_CON;
+                savedIndexFunc = CUSTOM_SAVE_CONV;
                 customPullFuncs = (struct funcStruct *) &Conversion_funcs;
                 processCustomFuncs(hDlg);
                 break;
             case(IDC_CUSTOM_PROG1):        // Program Bank 1 funcs
-                savedIndexFunc = CUSTOM_SAVE_MACBANK;
+                savedIndexFunc = CUSTOM_SAVE_PROG1;
                 customPullFuncs = (struct funcStruct *) &Program1_funcs;
                 processCustomFuncs(hDlg);
                 break;
             case(IDC_CUSTOM_PROG2):        // Program Bank II funcs
-                savedIndexFunc = CUSTOM_SAVE_MACBANK2;
+                savedIndexFunc = CUSTOM_SAVE_PROG2;
                 customPullFuncs = (struct funcStruct *) &Program2_funcs;
                 processCustomFuncs(hDlg);
                 break;

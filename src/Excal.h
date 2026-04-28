@@ -126,16 +126,15 @@ struct keypadStruct
 /* Defines for the main dialog */
 /* --------------------------- */
 #define FUNC_BAR_TEXT_SCI_I    "SCIENTIFIC I"
-#define FUNC_BAR_TEXT_CONV     "CONVERSION"
+#define FUNC_BAR_TEXT_SCI2     "SCIENTIFIC II"
 #define FUNC_BAR_TEXT_BUIS     "FINANCIAL"
-#define FUNC_BAR_TEXT_COMPSCI  "COMP SCI"
-#define FUNC_BAR_TEXT_GEOM     "GEOMETRY"
-#define FUNC_BAR_TEXT_CUSTOM   "CUSTOM BANK"
-#define FUNC_BAR_TEXT_PROG2    "PROGRAM II"
 #define FUNC_BAR_TEXT_STATS    "STATISTICS"
-#define FUNC_BAR_TEXT_SCI2  "SCIENTIFIC II"
+#define FUNC_BAR_TEXT_CONV     "CONVERSION"
+#define FUNC_BAR_TEXT_GEOM     "GEOMETRY"
+#define FUNC_BAR_TEXT_COMPSCI  "COMP SCI"
 #define FUNC_BAR_TEXT_PROG1    "PROGRAM I"
-
+#define FUNC_BAR_TEXT_PROG2    "PROGRAM II"
+#define FUNC_BAR_TEXT_CUSTOM   "CUSTOM BANK"
 
 /* ---------- */
 /* PROTOTYPES */
@@ -158,6 +157,11 @@ extern double ToRadians(double t);
 
 #define PROG_LONG        uint32_t    /* We handle signed and other word sizes in ex_prog.c */
 #define PROG_SIGNEDLONG  int32_t     /* Needed when we convert Signed to float... */
+
+
+#define TIMER_ONE_MINUTE    1
+#define TIMER_SLOW          2
+#define TIMER_FAST          3
 
 extern struct funcStruct Scientific_funcs[];
 extern struct funcStruct Financial_funcs[];
@@ -356,14 +360,14 @@ extern void RPN_CopyX(void);
 extern void RPN_inverse(void);
 
 #define CUSTOM_SAVE_SCI       1
-#define CUSTOM_SAVE_BUS       2
-#define CUSTOM_SAVE_PRO       3
-#define CUSTOM_SAVE_STA       4
-#define CUSTOM_SAVE_GEO       5
-#define CUSTOM_SAVE_CON       6
-#define CUSTOM_SAVE_SCI2       7
-#define CUSTOM_SAVE_MACBANK   8
-#define CUSTOM_SAVE_MACBANK2  9
+#define CUSTOM_SAVE_SCI2      2
+#define CUSTOM_SAVE_FIN       3
+#define CUSTOM_SAVE_STATS     4
+#define CUSTOM_SAVE_CONV      5
+#define CUSTOM_SAVE_GEO       6
+#define CUSTOM_SAVE_COMPSCI   7
+#define CUSTOM_SAVE_PROG1     8
+#define CUSTOM_SAVE_PROG2     9
 #define CUSTOM_SAVE_MAC       99        // macros
 
 struct customSaveStruct
@@ -379,8 +383,8 @@ extern uint64_t stackPops;
 #define INTERNATIONAL     0
 #define NONINTERNATIONAL  1
 
-#define M_PI             3.14159265359
-#define CNULL           '\0'
+#define M_PI              3.14159265359
+#define CNULL            '\0'
 
 extern int allowDigitBasedOnMaxStringSize(char *Xstr, char digit);
 extern void makeInternational(char *str);
@@ -388,7 +392,7 @@ extern PROG_LONG biggestProgVal(void);
 extern PROG_LONG smallestProgVal(void);
 extern void turnOnNumLock(void);
 
-#define MAX_STACK_STRLEN  29
+#define MAX_STACK_STRLEN    29
 
 #define MAX_FUNCTIONS       650
 #define MAX_REC_PLAYBACK    256
@@ -1231,7 +1235,7 @@ extern uint32_t userTicks;
 #define TRACE_REGS1                     102
 #define TRACE_REGS2                     103
 
-// RPN_DIGIT_0 to RPN_DIGIT_9 must be 101 for logic to work
+// RPN_DIGIT_0 to RPN_DIGIT_9 must be 101 to 110 for logic to work
 #define RPN_START_OF_LIST               100
 #define RPN_DIGIT_0                     101
 #define RPN_DIGIT_1                     102
@@ -1243,6 +1247,7 @@ extern uint32_t userTicks;
 #define RPN_DIGIT_7                     108
 #define RPN_DIGIT_8                     109
 #define RPN_DIGIT_9                     110
+
 #define RPN_DIGIT_DP                    111
 #define RPN_CLEAR_X                     112
 #define RPN_DIVIDE                      113
@@ -1278,8 +1283,8 @@ extern uint32_t userTicks;
 
 #define RPN_SCI                         200
 #define RPN_SCI2                        201
-#define RPN_STAT                        202
-#define RPN_FIN                         203
+#define RPN_FIN                         202
+#define RPN_STAT                        203
 #define RPN_CONV                        204
 #define RPN_GEOM                        205
 #define RPN_COMPSCI                     206
@@ -1363,16 +1368,16 @@ extern uint32_t userTicks;
 // For the Custom Button dialog...
 #define IDC_CUSTOM_OK                   100
 #define IDC_CUSTOM_SCI                  190
-#define IDC_CUSTOM_STAT                 191
+#define IDC_CUSTOM_SCI2                 191
 #define IDC_CUSTOM_FIN                  192
-#define IDC_CUSTOM_CONV                 193
-#define IDC_CUSTOM_GEOM                 194
-#define IDC_CUSTOM_COMPSCI              195
-#define IDC_CUSTOM_COMPLX               196
-#define IDC_CUSTOM_SCI2                  197
-#define IDC_CUSTOM_PROG1                198
-#define IDC_CUSTOM_PROG2                199
-#define IDC_CUSTOM_FUNCNAME             200
+#define IDC_CUSTOM_STAT                 193
+#define IDC_CUSTOM_CONV                 194
+#define IDC_CUSTOM_GEOM                 195
+#define IDC_CUSTOM_COMPSCI              196
+#define IDC_CUSTOM_PROG1                197
+#define IDC_CUSTOM_PROG2                198
+#define IDC_CUSTOM_FUNCNAME             199
+
 #define IDC_CUSTOM_CANCEL               299
                 
 #define IDC_CUSTOM_PB1                  101
