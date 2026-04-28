@@ -40,7 +40,7 @@
 #include <complex>
 #include "EXCAL.h"
 
-extern "C" struct funcStruct Complex_funcs[MAX_FUNCS];
+extern "C" struct funcStruct Physics_funcs[MAX_FUNCS];
 extern "C" void COMP_plus(void);
 extern "C" void COMP_minus(void);
 extern "C" void COMP_div(void);
@@ -281,8 +281,6 @@ extern "C" void COMP_abs(void)
   StackPush(c3.real());
 }
 
-
-
 extern "C" void COMP_CHS(void)
 {
   double a, b;
@@ -297,152 +295,3 @@ extern "C" void COMP_CHS(void)
   StackPush(c3.imag());
   StackPush(c3.real());
 }
-
-
-// TBD - All these are currently done in X,Y,Z not Polar!!!  Should we have an option?!?
-extern "C" void COMP_VectAddion(void)
-{
-  double x1, y1, z1, x2, y2, z2;
-
-  x1 = StackPop();
-  y1 = StackPop();
-  z1 = StackPop();
-  x2 = StackPop();
-  y2 = StackPop();
-  z2 = StackPop();
-  StackPush(z1+z2);    
-  StackPush(y1+y2);    
-  StackPush(x1+x2);    
-}
-
-extern "C" void COMP_VectSubtract(void)
-{
-  double x1, y1, z1, x2, y2, z2;
-    
-  x1 = StackPop();
-  y1 = StackPop();
-  z1 = StackPop();
-  x2 = StackPop();
-  y2 = StackPop();
-  z2 = StackPop();
-  StackPush(z2-z1);    
-  StackPush(y2-y1);    
-  StackPush(x2-x1);    
-}
-
-extern "C" void COMP_VectCross(void)
-{
-  double x, y, z, u, v, w;
-    
-  x = StackPop();
-  y = StackPop();
-  z = StackPop();
-  u = StackPop();
-  v = StackPop();
-  w = StackPop();
-  StackPush(x*v - y*u);    
-  StackPush(z*u - x*w);    
-  StackPush(y*w - z*v);    
-}
-
-extern "C" void COMP_VectDot(void)
-{
-  double x, y, z, u, v, w;
-    
-  x = StackPop();
-  y = StackPop();
-  z = StackPop();
-  u = StackPop();
-  v = StackPop();
-  w = StackPop();
-  StackPush(x*u + y*v + z*w);    
-}
-
-extern "C" void COMP_VectAngleBetween(void)
-{
-  double x, y, z, u, v, w, D, R1, R2, G;
-    
-  x = StackPop();
-  y = StackPop();
-  z = StackPop();
-  u = StackPop();
-  v = StackPop();
-  w = StackPop();
-  D = x*u + y*v + z*w;    
-  R1 = sqrt( (x*x) + (y*y) + (z*z) );
-  R2 = sqrt( (u*u) + (v*v) + (w*w) );
-  G = D / (R1 * R2);
-  StackPush(FromRadians(acos(G)));
-}
-
-extern "C" void COMP_VectConvertR(void)  // Convert to rect coordinates
-{
-  double x1, y1, z1, x2, y2, z2;
-  double r1, t1, p1, r2, t2, p2;
-  
-  r1 = StackPop();
-  t1 = StackPop();
-  p1 = StackPop();
-  r2 = StackPop();
-  t2 = StackPop();
-  p2 = StackPop();
-  
-  x1 = r1 * sin(ToRadians(p1)) * cos(ToRadians(t1));
-  y1 = r1 * sin(ToRadians(p1)) * sin(ToRadians(t1));
-  z1 = r1 * cos(ToRadians(p1));
-
-  x2 = r2 * sin(ToRadians(p2)) * cos(ToRadians(t2));
-  y2 = r2 * sin(ToRadians(p2)) * sin(ToRadians(t2));
-  z2 = r2 * cos(ToRadians(p2));
-  
-  StackPush(z2);
-  StackPush(y2);
-  StackPush(x2);
-  StackPush(z1);
-  StackPush(y1);
-  StackPush(x1);
-}
-
-extern "C" void COMP_VectConvertP(void)  // Convert to polar coordinates
-{
-  double x1, y1, z1, x2, y2, z2;
-  double r1, t1, p1, r2, t2, p2;
-  
-  x1 = StackPop();
-  y1 = StackPop();
-  z1 = StackPop();
-  x2 = StackPop();
-  y2 = StackPop();
-  z2 = StackPop();
-
-  r1 = sqrt( (x1*x1) + (y1*y1) + (z1*z1) );
-  if (x1 == 0.0)
-     t1 = 0.0;
-  else   
-     t1 = FromRadians(atan(y1/x1));
-  if (sqrt((x1*x1)+(y1*y1)) == 0.0)
-     p1 = 0.0;
-  else   
-     p1 = FromRadians(atan(z1/sqrt((x1*x1)+(y1*y1))));
-  p1 = p1 + 90.0;
-
-  r2 = sqrt( (x2*x2) + (y2*y2) + (z2*z2) );
-  if (x2 == 0.0)
-     t2 = 0.0;
-  else   
-     t2 = FromRadians(atan(y2/x2));
-  if (sqrt((x2*x2)+(y2*y2)) == 0.0)
-     p2 = 0.0;
-  else   
-     p2 = FromRadians(atan(z2/sqrt((x2*x2)+(y2*y2))));
-   
-  p2 = p2 + 90.0;
-  
-  StackPush(p2);
-  StackPush(t2);
-  StackPush(r2);
-  StackPush(p1);
-  StackPush(t1);
-  StackPush(r1);
-}
-

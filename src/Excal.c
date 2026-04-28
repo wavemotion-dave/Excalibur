@@ -480,9 +480,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
             case IDM_CUSTOM:
                 SelectNewFunc((struct funcStruct *) &Custom_funcs);
                 break;
-            case IDM_COMPLEX:
-                SelectNewFunc((struct funcStruct *) &Complex_funcs);
-                break;
             case IDM_STATS:
                 SelectNewFunc((struct funcStruct *) &Statistics_funcs);
                 break;
@@ -950,7 +947,6 @@ void SelectNewFunc(struct funcStruct *funcs)
     CheckMenuItem(hMainMenu, IDM_FINANCIAL,     MF_UNCHECKED);
     CheckMenuItem(hMainMenu, IDM_CONVERSION,    MF_UNCHECKED);
     CheckMenuItem(hMainMenu, IDM_PROGII,        MF_UNCHECKED);
-    CheckMenuItem(hMainMenu, IDM_COMPLEX,       MF_UNCHECKED);
     CheckMenuItem(hMainMenu, IDM_GEOMETRY,      MF_UNCHECKED);
     CheckMenuItem(hMainMenu, IDM_CUSTOM,        MF_UNCHECKED);
     CheckMenuItem(hMainMenu, IDM_STATS,         MF_UNCHECKED);
@@ -964,7 +960,6 @@ void SelectNewFunc(struct funcStruct *funcs)
     SendMessage(GetDlgItem(calcMainWindow, RPN_GEOM),    BM_SETCHECK, (WORD) 0, (DWORD) 0L);
     SendMessage(GetDlgItem(calcMainWindow, RPN_COMPSCI), BM_SETCHECK, (WORD) 0, (DWORD) 0L);
     SendMessage(GetDlgItem(calcMainWindow, RPN_PHY),     BM_SETCHECK, (WORD) 0, (DWORD) 0L);
-    SendMessage(GetDlgItem(calcMainWindow, RPN_CMPLX),   BM_SETCHECK, (WORD) 0, (DWORD) 0L);
     SendMessage(GetDlgItem(calcMainWindow, RPN_PROGI),   BM_SETCHECK, (WORD) 0, (DWORD) 0L);
     SendMessage(GetDlgItem(calcMainWindow, RPN_PROGII),  BM_SETCHECK, (WORD) 0, (DWORD) 0L);
     SendMessage(GetDlgItem(calcMainWindow, RPN_CUST),    BM_SETCHECK, (WORD) 0, (DWORD) 0L);
@@ -1008,12 +1003,6 @@ void SelectNewFunc(struct funcStruct *funcs)
         CheckMenuItem(hMainMenu, IDM_CUSTOM, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, RPN_CUST), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_CUSTOM);
-    }
-    if (funcs == (struct funcStruct *) &Complex_funcs)
-    {
-        CheckMenuItem(hMainMenu, IDM_COMPLEX, MF_CHECKED);
-        SendMessage(GetDlgItem(calcMainWindow, RPN_CMPLX), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
-        ShowFunctionBar(FUNC_BAR_TEXT_COMPLEX);
     }
     if (funcs == (struct funcStruct *) &Statistics_funcs)
     {
@@ -1731,17 +1720,16 @@ struct keypadStruct RPNkeys[] = {
     {RPN_REC,       UNI_REC,    USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_Record,         "Record Mode On/Off",   "When ON - Records button presses for playback."},
     {RPN_NOTES,     UNI_NOTES,  USES_FL, ALLOWREC, ' ', NO_L,   X_NULL,     RPN_Notes,          "Excalibur Notepad",    "Allows some simple notes to be stored/saved."},
     {RPN_INV,       UNI_INVX,   USES_FL, ALLOWREC, ' ', YES_L,  X_NEW,      RPN_inverse,        "Inverse X",            "Computes the inverse of X"},
-    {RPN_SCI,       UNI_SCI,    USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectSci,      "Select Scientific",    "Selects the Scientific Layout"},
-    {RPN_STAT,      UNI_STAT,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectStat,     "Select Statistics",    "Selects the Statistical Layout"},
+    {RPN_SCI,       UNI_SCI,    USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectSci,      "Select Scientific I",  "Selects the Scientific I Layout"},
+    {RPN_PHY,       UNI_PHY,    USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectPhysics,  "Select Scientific II", "Selects the Scientific II Layout"},
     {RPN_FIN,       UNI_BUSI,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectBusi,     "Select Financial",     "Selects the Financial Layout"},
+    {RPN_STAT,      UNI_STAT,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectStat,     "Select Statistics",    "Selects the Statistical Layout"},
     {RPN_CONV,      UNI_CONV,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectConv,     "Select Conversion",    "Selects the Conversion Layout"},
     {RPN_GEOM,      UNI_GEOM,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectGeom,     "Select Geometry",      "Selects the Geometry Layout"},
     {RPN_COMPSCI,   UNI_PROG1,  USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectProg,     "Select Comp Sci",      "Selects the Computer Science Layout"},
-    {RPN_PROGII,    UNI_PROG2,  USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectProg2,    "Select Program II",    "Selects Program Bank II"},
-    {RPN_CMPLX,     UNI_CMPLX,  USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectComplex,  "Select Complex",       "Selects the Complex Number Layout"},
-    {RPN_CUST,      UNI_CUST,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectCust,     "Select Custom",        "Selects the Custom Layout"},
-    {RPN_PHY,       UNI_PHY,    USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectPhysics,  "Select Physics",       "Selects the Physics Layout"},
     {RPN_PROGI,     UNI_MAC,    USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectMacro,    "Select Program I",     "Selects Program Bank I"},
+    {RPN_PROGII,    UNI_PROG2,  USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectProg2,    "Select Program II",    "Selects Program Bank II"},
+    {RPN_CUST,      UNI_CUST,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectCust,     "Select Custom",        "Selects the Custom Layout"},
 
     {RPN_LAST_KEY,  UNI_UNUSED, USES_FL, ALLOWREC, ' ', NO_L,   X_NEW,      NULL,               "Unused",               "Unused"}
 };
@@ -1806,7 +1794,6 @@ struct keyPosStruct RPNkeyPos[] = {
     {RPN_GEOM,      0,          0},
     {RPN_COMPSCI,   0,          0},
     {RPN_PROGII,    0,          0},
-    {RPN_CMPLX,     0,          0},
     {RPN_CUST,      0,          0},
     {RPN_PHY,       0,          0},
     {RPN_PROGI,     0,          0},
@@ -3321,10 +3308,9 @@ int GetMenuType(struct funcStruct *cFunc)
     if (cFunc == (struct funcStruct *) &Geometry_funcs)    retVal = 5;
     if (cFunc == (struct funcStruct *) &Program1_funcs)    retVal = 6;
     if (cFunc == (struct funcStruct *) &Program2_funcs)    retVal = 7;
-    if (cFunc == (struct funcStruct *) &Complex_funcs)     retVal = 8;
-    if (cFunc == (struct funcStruct *) &Statistics_funcs)  retVal = 9;
-    if (cFunc == (struct funcStruct *) &Physics_funcs)     retVal = 10;
-    if (cFunc == (struct funcStruct *) &Custom_funcs)      retVal = 11;
+    if (cFunc == (struct funcStruct *) &Statistics_funcs)  retVal = 8;
+    if (cFunc == (struct funcStruct *) &Physics_funcs)     retVal = 9;
+    if (cFunc == (struct funcStruct *) &Custom_funcs)      retVal = 10;
 
     return(retVal);
 }
@@ -3376,24 +3362,18 @@ void SetMenuType(int type)
         ShowFunctionBar(FUNC_BAR_TEXT_PROG2);
         break;
     case(8):
-        currentFuncs = (struct funcStruct *) &Complex_funcs;
-        CheckMenuItem(hMainMenu, IDM_COMPLEX, MF_CHECKED);
-        SendMessage(GetDlgItem(calcMainWindow, RPN_CMPLX), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
-        ShowFunctionBar(FUNC_BAR_TEXT_COMPLEX);
-        break;
-    case(9):
         currentFuncs = (struct funcStruct *) &Statistics_funcs;
         CheckMenuItem(hMainMenu, IDM_STATS, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, RPN_STAT), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_STATS);
         break;
-    case(10):
+    case(9):
         currentFuncs = (struct funcStruct *) &Physics_funcs;
         CheckMenuItem(hMainMenu, IDM_PHYSICS, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, RPN_PHY), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_PHYSICS);
         break;
-    case(11):
+    case(10):
         currentFuncs = (struct funcStruct *) &Custom_funcs;
         CheckMenuItem(hMainMenu, IDM_CUSTOM, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, RPN_CUST), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
@@ -3428,15 +3408,12 @@ void SetLastMenuType(int type)
         lastFuncs = (struct funcStruct *) &Program2_funcs;
         break;
     case(8):
-        lastFuncs = (struct funcStruct *) &Complex_funcs;
-        break;
-    case(9):
         lastFuncs = (struct funcStruct *) &Statistics_funcs;
         break;
-    case(10):
+    case(9):
         lastFuncs = (struct funcStruct *) &Physics_funcs;
         break;
-    case(11):
+    case(10):
         lastFuncs = (struct funcStruct *) &Custom_funcs;
         break;
     }
@@ -3781,9 +3758,6 @@ void ProcessCusomSave(void)
             break;
         case(CUSTOM_SAVE_CON):        // Conversion
             memcpy(&Custom_funcs[newIdx], &Conversion_funcs[index], sizeof(struct funcStruct));
-            break;
-        case(CUSTOM_SAVE_COM):        // Complex
-            memcpy(&Custom_funcs[newIdx], &Complex_funcs[index], sizeof(struct funcStruct));
             break;
         case(CUSTOM_SAVE_PHY):        // Physics
             memcpy(&Custom_funcs[newIdx], &Physics_funcs[index], sizeof(struct funcStruct));
@@ -4851,16 +4825,10 @@ void RPN_SelectProg2(void)
     SelectNewFunc((struct funcStruct *) &Program2_funcs);
 }
 
-void RPN_SelectComplex(void)
-{
-    SelectNewFunc((struct funcStruct *) &Complex_funcs);
-}
-
 void RPN_SelectCust(void)
 {
     SelectNewFunc((struct funcStruct *) &Custom_funcs);
 }
-
 
 void RPN_SelectPhysics(void)
 {
@@ -4951,18 +4919,6 @@ void mapButtonFuncs(void)
         playBackMap[j].uniqueIndex = Geometry_funcs[i].uniqueIndex;
         playBackMap[j].useFloatsLongs = Geometry_funcs[i].useFloatsLongs;
         playBackMap[j].allowRecord = Geometry_funcs[i].allowRecord;
-        j++;
-    }
-
-    for (i = 0; i < MAX_FUNCS; i++)
-    {
-        playBackMap[j].saveLastX = Complex_funcs[i].saveLastX;
-        playBackMap[j].newXedit = Complex_funcs[i].newXedit;
-        playBackMap[j].routine = Complex_funcs[i].routine;
-        LoadString(hExcaliburInstance, Complex_funcs[i].keyTitle, playBackMap[j].funcText, MAX_MACRO_FUNC_TEXT-1);
-        playBackMap[j].uniqueIndex = Complex_funcs[i].uniqueIndex;
-        playBackMap[j].useFloatsLongs = Complex_funcs[i].useFloatsLongs;
-        playBackMap[j].allowRecord = Complex_funcs[i].allowRecord;
         j++;
     }
 

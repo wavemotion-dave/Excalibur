@@ -126,16 +126,15 @@ struct keypadStruct
 /* --------------------------- */
 /* Defines for the main dialog */
 /* --------------------------- */
-#define FUNC_BAR_TEXT_SCI_I    "SCIENTIFIC"
+#define FUNC_BAR_TEXT_SCI_I    "SCIENTIFIC I"
 #define FUNC_BAR_TEXT_CONV     "CONVERSION"
 #define FUNC_BAR_TEXT_BUIS     "FINANCIAL"
 #define FUNC_BAR_TEXT_COMPSCI  "COMP SCI"
 #define FUNC_BAR_TEXT_GEOM     "GEOMETRY"
 #define FUNC_BAR_TEXT_CUSTOM   "CUSTOM BANK"
 #define FUNC_BAR_TEXT_PROG2    "PROGRAM II"
-#define FUNC_BAR_TEXT_COMPLEX  "COMPLEX/VECT"
 #define FUNC_BAR_TEXT_STATS    "STATISTICS"
-#define FUNC_BAR_TEXT_PHYSICS  "PHYSICS"
+#define FUNC_BAR_TEXT_PHYSICS  "SCIENTIFIC II"
 #define FUNC_BAR_TEXT_PROG1    "PROGRAM I"
 
 
@@ -169,10 +168,8 @@ extern struct funcStruct Geometry_funcs[];
 extern struct funcStruct Custom_funcs[];
 extern struct funcStruct Program1_funcs[];
 extern struct funcStruct Program2_funcs[];
-extern struct funcStruct Complex_funcs[];
 extern struct funcStruct Statistics_funcs[];
 extern struct funcStruct Physics_funcs[];
-extern struct funcStruct Complex_funcs[];
 extern struct funcStruct MacroFuncs[];
 
 extern uint8_t Xedit;
@@ -328,7 +325,6 @@ extern void RPN_SelectGeom(void);
 extern void RPN_SelectProg(void);
 extern void RPN_SelectProg2(void);
 extern void RPN_SelectCust(void);
-extern void RPN_SelectComplex(void);
 extern void RPN_SelectPhysics(void);
 extern void RPN_SelectMacro(void);
 extern void RPN_Playback(void);
@@ -1290,10 +1286,9 @@ extern uint32_t userTicks;
 #define RPN_GEOM                        204
 #define RPN_COMPSCI                     205
 #define RPN_PHY                         206
-#define RPN_CMPLX                       207
-#define RPN_PROGI                       208
-#define RPN_PROGII                      209
-#define RPN_CUST                        210
+#define RPN_PROGI                       207
+#define RPN_PROGII                      208
+#define RPN_CUST                        209
 
 #define STATUS_BAR                      300
 #define FUNC_BAR                        301

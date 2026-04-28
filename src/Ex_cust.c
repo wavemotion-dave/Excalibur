@@ -357,11 +357,6 @@ BOOL CALLBACK CustomDefDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM l
                 customPullFuncs = (struct funcStruct *) &Conversion_funcs;
                 processCustomFuncs(hDlg);
                 break;
-            case(IDC_CUSTOM_COMPLX):        // Complex/Vector funcs
-                savedIndexFunc = CUSTOM_SAVE_COM;
-                customPullFuncs = (struct funcStruct *) &Complex_funcs;
-                processCustomFuncs(hDlg);
-                break;
             case(IDC_CUSTOM_PHY):        // Physics funcs
                 savedIndexFunc = CUSTOM_SAVE_PHY;
                 customPullFuncs = (struct funcStruct *) &Physics_funcs;
