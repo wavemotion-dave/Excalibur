@@ -406,4 +406,12 @@ ULONG\_MAX 4294967295<br>
 
 This floating point inaccuracy is evident when you use functions such as Floor, Ceil and Round. Entering a number such as 3.9999999999999 and hitting Floor should yield 3 but will actually give 4 because of the precision inaccuracies inherent in floating point representation. The precision should not be a concern for most users but it should be understood.
 
-As stated in the disclaimer, this program has no guarantees associated with it. If the precision (or lack thereof) is a problem for you, please discontinue use of Excalibur.
+As stated in the disclaimer, this program has no guarantees associated with it. If the precision (or lack thereof) is a problem for you, please discontinue use of Excalibur.<b>
+
+# Donations Welcome (but never required!)
+
+Excalibur has been a labor of love. More than 1000 hours of development have gone into it - including answering many hundreds of emails over the decades. It's free to use and always will be, however if you feel inclined to buy me a virtual coffee for the effort, that would be amazing!
+
+<img width="320" height="121" alt="image" src="https://github.com/user-attachments/assets/ab67686c-2168-46a3-b39f-77b5f5fef5d0" />
+<b>https://ko-fi.com/wavemotiondave</b>
+
