@@ -351,6 +351,23 @@ Excalibur (modest i5) ran 57,335,221 iterations of the program in 30 seconds.<br
 
 Based on this simple experiment, I think it’s safe to say that Excalibur runs more than 1 million times faster than the early HP handhelds.
 
+# Excalibur Functions
+
+Excalibur breaks down functionality into 'banks'. Each bank contains up to 40 keys - and each key performs one function.
+
+| Bank | General Functionality |
+| :--- | :--- |
+| Scientific I | The main bank of scientific functions, trig calculations, constants, etc. |
+| Scientific II | The more advanced scientific functions, physics and complex number handling. |
+| Financial | Financial data for TVM of Money, Cash Flow Analysis and basics of Real Estate. |
+| Statistics | Statistics and numerical analysis computations. |
+| Conversion | A number of conversions (to and from) including most of the Metric to Imperial formulas.|
+| Geometry | Basics of Geometry, area and volume computations.|
+| Comp-Sci | Computer Science data handling and computations in Decimal, Hex, Binary and Octal. |
+| Program I | Macro programming - loops, subroutines and sundry logic. |
+| Program II | Even more macro programming - loops, subroutines and sundry logic. |
+| Custom | A custom-defined bank - you can put any 40 functions on this bank from any of the other banks above.|
+
 # Excalibur Settings
 
 The File/Settings menu item brings up a dialog box to display common Excalibur settings. They are:
