@@ -3532,10 +3532,10 @@ void SaveToDisk(void)
         fwrite(&CL,                 sizeof(CL),                 1, outfile);
         fwrite(&DL,                 sizeof(DL),                 1, outfile);
 
-        fwrite(STO,                 sizeof(STO),                1, outfile);
-        fwrite(SUM,                 sizeof(SUM),                1, outfile);
-        fwrite(fin_reg,             sizeof(fin_reg),            1, outfile);
-        fwrite(cashFlow,            sizeof(cashFlow),           1, outfile);
+        fwrite(&STO,                sizeof(STO),                1, outfile);
+        fwrite(&SUM,                sizeof(SUM),                1, outfile);
+        fwrite(&fin_reg,            sizeof(fin_reg),            1, outfile);
+        fwrite(&cashFlow,           sizeof(cashFlow),           1, outfile);
         fwrite(&CFn,                sizeof(CFn),                1, outfile);
 
         fwrite(&AngleMode,          sizeof(AngleMode),          1, outfile);
@@ -3558,8 +3558,8 @@ void SaveToDisk(void)
         fwrite(&RPL_entry,          sizeof(RPL_entry),          1, outfile);
         fwrite(&ClearStackOnExit,   sizeof(ClearStackOnExit),   1, outfile);
 
-        fwrite(playBack,            sizeof(playBack),           1, outfile);
-        fwrite(playBackSave,        sizeof(playBackSave),       1, outfile);
+        fwrite(&playBack,           sizeof(playBack),           1, outfile);
+        fwrite(&playBackSave,       sizeof(playBackSave),       1, outfile);
         fwrite(&playBackIdx,        sizeof(playBackIdx),        1, outfile);
         fwrite(&playBackIdxSave,    sizeof(playBackIdxSave),    1, outfile);
         fwrite(&macroName,          sizeof(macroName),          1, outfile);
@@ -3568,19 +3568,19 @@ void SaveToDisk(void)
         fwrite(&currency1index,     sizeof(currency1index),     1, outfile);
         fwrite(&currency2index,     sizeof(currency2index),     1, outfile);
 
-        fwrite(constants,           sizeof(constants),          1, outfile);
-        fwrite(constantBankNames,   sizeof(constantBankNames),  1, outfile);
-        fwrite(CurrencyConv,        sizeof(CurrencyConv),       1, outfile);
+        fwrite(&constants,          sizeof(constants),          1, outfile);
+        fwrite(&constantBankNames,  sizeof(constantBankNames),  1, outfile);
+        fwrite(&CurrencyConv,       sizeof(CurrencyConv),       1, outfile);
 
         fwrite(&lastChosenConst,    sizeof(lastChosenConst),    1, outfile);
         fwrite(&lastConstBank,      sizeof(lastConstBank),      1, outfile);
-        fwrite(excaliburNotes,      sizeof(excaliburNotes),     1, outfile);
+        fwrite(&excaliburNotes,     sizeof(excaliburNotes),     1, outfile);
         fwrite(&lastChosenMacro,    sizeof(lastChosenMacro),    1, outfile);
-        fwrite(STOlabels,           sizeof(STOlabels),          1, outfile);
+        fwrite(&STOlabels,          sizeof(STOlabels),          1, outfile);
         fwrite(&progDelayValue,     sizeof(int),                1, outfile);
         fwrite(&indirectRegister,   sizeof(indirectRegister),   1, outfile);
 
-        fwrite(reserved,            RESERVED_SIZE,              1, outfile);
+        fwrite(&reserved,           RESERVED_SIZE,              1, outfile);
 
         fclose(outfile);
     }
@@ -3655,10 +3655,10 @@ void ReadFromDisk(void)
         fread(&CL,                 sizeof(CL),                 1, infile);
         fread(&DL,                 sizeof(DL),                 1, infile);
 
-        fread(STO,                 sizeof(STO),                1, infile);
-        fread(SUM,                 sizeof(SUM),                1, infile);
-        fread(fin_reg,             sizeof(fin_reg),            1, infile);
-        fread(cashFlow,            sizeof(cashFlow),           1, infile);
+        fread(&STO,                sizeof(STO),                1, infile);
+        fread(&SUM,                sizeof(SUM),                1, infile);
+        fread(&fin_reg,            sizeof(fin_reg),            1, infile);
+        fread(&cashFlow,           sizeof(cashFlow),           1, infile);
         fread(&CFn,                sizeof(CFn),                1, infile);
 
         fread(&AngleMode,          sizeof(AngleMode),          1, infile);
@@ -3681,8 +3681,8 @@ void ReadFromDisk(void)
         fread(&RPL_entry,          sizeof(RPL_entry),          1, infile);
         fread(&ClearStackOnExit,   sizeof(ClearStackOnExit),   1, infile);
 
-        fread(playBack,            sizeof(playBack),           1, infile);
-        fread(playBackSave,        sizeof(playBackSave),       1, infile);
+        fread(&playBack,           sizeof(playBack),           1, infile);
+        fread(&playBackSave,       sizeof(playBackSave),       1, infile);
         fread(&playBackIdx,        sizeof(playBackIdx),        1, infile);
         fread(&playBackIdxSave,    sizeof(playBackIdxSave),    1, infile);
         fread(&macroName,          sizeof(macroName),          1, infile);
@@ -3699,20 +3699,20 @@ void ReadFromDisk(void)
         }
         else
         {
-            fread(constants,           sizeof(constants),          1, infile);
-            fread(constantBankNames,   sizeof(constantBankNames),  1, infile);
-            fread(CurrencyConv,        sizeof(CurrencyConv),       1, infile);
+            fread(&constants,           sizeof(constants),          1, infile);
+            fread(&constantBankNames,   sizeof(constantBankNames),  1, infile);
+            fread(&CurrencyConv,        sizeof(CurrencyConv),       1, infile);
         }
 
         fread(&lastChosenConst,    sizeof(lastChosenConst),    1, infile);
         fread(&lastConstBank,      sizeof(lastConstBank),      1, infile);
         fread(excaliburNotes,      sizeof(excaliburNotes),     1, infile);
         fread(&lastChosenMacro,    sizeof(lastChosenMacro),    1, infile);
-        fread(STOlabels,           sizeof(STOlabels),          1, infile);
+        fread(&STOlabels,          sizeof(STOlabels),          1, infile);
         fread(&progDelayValue,     sizeof(int),                1, infile);
         fread(&indirectRegister,   sizeof(indirectRegister),   1, infile);
 
-        fread(reserved,            RESERVED_SIZE,              1, infile);
+        fread(&reserved,           RESERVED_SIZE,              1, infile);
 
         SetMenuType(menuCurrentFuncs);
         SetLastMenuType(menuLastFuncs);
@@ -3762,9 +3762,6 @@ void ProcessCusomSave(void)
         case(CUSTOM_SAVE_FIN):        // Financial
             memcpy(&Custom_funcs[newIdx], &Financial_funcs[index], sizeof(struct funcStruct));
             break;
-        case(CUSTOM_SAVE_COMPSCI):    // Programming
-            memcpy(&Custom_funcs[newIdx], &CompSci_funcs[index], sizeof(struct funcStruct));
-            break;
         case(CUSTOM_SAVE_STATS):      // Statistics
             memcpy(&Custom_funcs[newIdx], &Statistics_funcs[index], sizeof(struct funcStruct));
             break;
@@ -3773,6 +3770,9 @@ void ProcessCusomSave(void)
             break;
         case(CUSTOM_SAVE_CONV):       // Conversion
             memcpy(&Custom_funcs[newIdx], &Conversion_funcs[index], sizeof(struct funcStruct));
+            break;
+        case(CUSTOM_SAVE_COMPSCI):    // Computer Science
+            memcpy(&Custom_funcs[newIdx], &CompSci_funcs[index], sizeof(struct funcStruct));
             break;
         case(CUSTOM_SAVE_PROG1):      // Programming Bank I
             memcpy(&Custom_funcs[newIdx], &Program1_funcs[index], sizeof(struct funcStruct));
@@ -3879,79 +3879,6 @@ void CopyBufferToCurrentMacro(char *clipboardBuffer)
         if ((clipboardBuffer[idx] == '\n') || (clipboardBuffer[idx] == CNULL))
         {
             tmpB[tmpBidx++] = CNULL;
-
-            // ---------------------------------------------------------------
-            // Map old Recall/StoreA-Z to new R0-R26 so that we are friendly
-            // to older users of Excalibur when importing programs...
-            // ---------------------------------------------------------------
-            ptr = strstr(tmpB, "Store Plus ");
-            if (ptr != 0) // Does the word 'Store Plus' appear here?
-            {
-                if ((ptr[11] >= 'A') && (ptr[11] <= 'Z') && (!isdigit(ptr[12])))
-                {
-                    char tmp2[5];
-                    sprintf(tmp2, "R%d", ptr[11]-'A');
-                    ptr[11] = CNULL;
-                    strcat(ptr, tmp2);
-                }
-            }
-            else
-            {
-                ptr = strstr(tmpB, "Store Mult ");
-                if (ptr != 0) // Does the word 'Store Plus' appear here?
-                {
-                    if ((ptr[11] >= 'A') && (ptr[11] <= 'Z') && (!isdigit(ptr[12])))
-                    {
-                        char tmp2[5];
-                        sprintf(tmp2, "R%d", ptr[11]-'A');
-                        ptr[11] = CNULL;
-                        strcat(ptr, tmp2);
-                    }
-                }
-                else
-                {
-                    ptr = strstr(tmpB, "Store Minus ");
-                    if (ptr != 0) // Does the word 'Store Minus' appear here?
-                    {
-                        if ((ptr[12] >= 'A') && (ptr[12] <= 'Z') && (!isdigit(ptr[13])))
-                        {
-                            char tmp2[5];
-                            sprintf(tmp2, "R%d", ptr[12]-'A');
-                            ptr[12] = CNULL;
-                            strcat(ptr, tmp2);
-                        }
-                    }
-                    else // Look for basic Store/Recall A-Z
-                    {
-                        ptr = strstr(tmpB, "Store ");
-                        if (ptr != 0) // Does the word Store appear here?
-                        {
-                            if ((ptr[6] >= 'A') && (ptr[6] <= 'Z') && (!isdigit(ptr[7])))
-                            {
-                                char tmp2[5];
-                                sprintf(tmp2, "R%d", ptr[6]-'A');
-                                ptr[6] = CNULL;
-                                strcat(ptr, tmp2);
-                            }
-                        }
-                        else
-                        {
-                            ptr = strstr(tmpB, "Recall ");
-                            if (ptr != 0) // Does the word Recall appear here?
-                            {
-                                if ((ptr[7] >= 'A') && (ptr[7] <= 'Z') && (!isdigit(ptr[8])))
-                                {
-                                    char tmp2[5];
-                                    sprintf(tmp2, "R%d", ptr[7]-'A');
-                                    ptr[7] = CNULL;
-                                    strcat(ptr, tmp2);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
             preambleIndex=0;
             done = 0;
             while (!done)

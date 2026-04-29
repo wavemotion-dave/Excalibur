@@ -52,29 +52,29 @@ typedef unsigned __int8     uint8_t;
 #define MAX_IMPORT_CLIPBOARD_SIZE (1024 * 10)
 
 // Defines for menu item IDs
-#define   IDM_OPEN                            101
-#define   IDM_SAVE                            102
-#define   IDM_EXIT                            103
-#define   IDM_COPYXTOCLIPBOARD                104
-#define   IDM_COPYALLTOCLIPBOARD              105
-#define   IDM_SETTINGS                        106
-#define   IDM_DIRECTORIES                     107
-#define   IDM_ALWAYSONTOP                     108
-#define   IDM_EXCALIBURHELP                   109
-#define   IDM_ABOUTPROGRAM                    110
-#define   IDM_SCIENTIFIC                      111
-#define   IDM_SCI2                         112
-#define   IDM_FINANCIAL                       113
-#define   IDM_CONVERSION                      114
-#define   IDM_COMPSCI                         115
-#define   IDM_GEOMETRY                        116
-#define   IDM_PROGI                           117
-#define   IDM_PROGII                          118
-#define   IDM_CUSTOM                          119
-#define   IDM_DEFINECUSTOM                    120
-#define   IDM_STATS                           121
-#define   IDM_USAGESTATS                      122
-#define   IDM_COPYCLIPBOARDTOX                123
+#define   IDM_OPEN                          101
+#define   IDM_SAVE                          102
+#define   IDM_EXIT                          103
+#define   IDM_COPYXTOCLIPBOARD              104
+#define   IDM_COPYALLTOCLIPBOARD            105
+#define   IDM_SETTINGS                      106
+#define   IDM_DIRECTORIES                   107
+#define   IDM_ALWAYSONTOP                   108
+#define   IDM_EXCALIBURHELP                 109
+#define   IDM_ABOUTPROGRAM                  110
+#define   IDM_SCIENTIFIC                    111
+#define   IDM_SCI2                          112
+#define   IDM_FINANCIAL                     113
+#define   IDM_CONVERSION                    114
+#define   IDM_COMPSCI                       115
+#define   IDM_GEOMETRY                      116
+#define   IDM_PROGI                         117
+#define   IDM_PROGII                        118
+#define   IDM_CUSTOM                        119
+#define   IDM_DEFINECUSTOM                  120
+#define   IDM_STATS                         121
+#define   IDM_USAGESTATS                    122
+#define   IDM_COPYCLIPBOARDTOX              123
 
 // Function prototypes for dialog and subdialog modules
 
@@ -245,13 +245,14 @@ extern uint8_t payMode;
 extern uint8_t dateMode;
 
 /* Programming mode defines */
-extern uint8_t padZeros;
+extern uint8_t  padZeros;
 extern uint32_t wordSize;
-extern uint8_t wordMode;
+extern uint8_t  wordMode;
 extern uint32_t wordSizeMask;
 
 #define PROG_UNSIGNED   1
 #define PROG_SIGNED     0
+
 #define PROG_PADZEROS   1
 #define PROG_NOPADZEROS 0
 
@@ -287,7 +288,6 @@ extern double StackPop(void);
 extern void PushConstant(double value);
 extern void SaveProgramStep(int uniqueIndex);
 extern void ExcaliburHelp(void);
-
 extern void MakeRadixStr(PROG_LONG val, char *tmpL);
 extern void StackPushL(PROG_LONG temp);
 extern PROG_LONG StackPopL(void);
@@ -295,7 +295,6 @@ extern PROG_LONG MakeProgStr(char *str);
 extern PROG_LONG maskStackStuff(PROG_LONG lng);
 extern void PROG_dec(void);
 extern void cust_define(void);
-
 extern void RPN_clear(void);
 extern void RPN_clearL(void);
 extern void RPN_enter(void);
