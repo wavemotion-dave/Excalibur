@@ -8,6 +8,8 @@ Version 2.00 and 2.01 (essentially the same with an updated email address) were 
 
 I'm in the process of reviving this for a new release with improved window size/font and some new features. Souce code will be made available shortly.
 
+The manual can be found here:  [Excalibur Manual](manual.md)
+
 <img width="786" height="449" alt="image" src="https://github.com/user-attachments/assets/209605b2-7485-4e14-b516-9412603fb7b2" />
 
 <br>
