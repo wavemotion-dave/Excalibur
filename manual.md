@@ -177,7 +177,7 @@ Keystroke programming is the most simple form of programming and the most common
 001 - X Squared<br>
 002 - PI<br>
 003 - Multiply<br>
-004 - <End Of Program><br>
+004 - \<End Of Program\><br>
 <br>
 Checksum: 0279 (you can see the program checksum from the File/Program Manager dialog box)<br>
 
