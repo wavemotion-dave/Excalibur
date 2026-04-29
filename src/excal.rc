@@ -1977,6 +1977,20 @@ BEGIN
     H_STO2I                 "Stores X to the register pointed to by the Indirect (0=A, 25=Z)"
     T_RCL2I                 "Recall Indirectly"
     H_RCL2I                 "Recalls value from the register pointed to by the Indirect (0=A, 25=Z)"
+    T_TOPOLAR               "Convert to Polar Coordinates from TBD"
+    H_TOPOLAR               "Convert to Polar"
+    T_CSINH                 "Complex sinh"
+    H_CSINH                 "Complex sinh"
+    T_CCOSH                 "Complex cosh"
+    H_CCOSH                 "Complex cosh"
+    T_CTANH                 "Complex tanh"
+    H_CTANH                 "Complex tanh"
+    T_FROMPOLAR             "Complex from Polar Coordinates using TBD"
+    H_FROMPOLAR             "Complex from Polar"    
+    T_CNORM                 "Complex Norm"
+    H_CNORM                 "Complex Norm"
+    T_CARG                  "Complex Arg"
+    H_CARG                  "Complex Arg"
 END
 
 #endif    // English (U.S.) resources

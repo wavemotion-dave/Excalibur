@@ -41,32 +41,6 @@
 #include "EXCAL.h"
 
 extern "C" struct funcStruct Scientific2_funcs[MAX_FUNCS];
-extern "C" void COMP_plus(void);
-extern "C" void COMP_minus(void);
-extern "C" void COMP_div(void);
-extern "C" void COMP_mult(void);
-extern "C" void COMP_sin(void);
-extern "C" void COMP_cos(void);
-extern "C" void COMP_tan(void);
-extern "C" void COMP_conj(void);
-extern "C" void COMP_exp(void);
-extern "C" void COMP_ln(void);
-extern "C" void COMP_log(void);
-extern "C" void COMP_pow(void);
-extern "C" void COMP_sqrt(void);
-extern "C" void COMP_abs(void);
-extern "C" void COMP_CHS(void);
-extern "C" void COMP_norm(void);
-extern "C" void COMP_arg(void);
-
-extern "C" void COMP_VectAddion(void);
-extern "C" void COMP_VectSubtract(void);
-extern "C" void COMP_VectCross(void);
-extern "C" void COMP_VectDot(void);
-extern "C" void COMP_VectAngleBetween(void);
-extern "C" void COMP_VectConvertR(void);
-extern "C" void COMP_VectConvertP(void);
-
 
 extern "C" void COMP_plus(void)
 {
@@ -181,6 +155,53 @@ extern "C" void COMP_tan(void)
   StackPush(c3.imag());
   StackPush(c3.real());
 }
+
+extern "C" void COMP_hsin(void)
+{
+  double a, b;
+
+  a = StackPop();
+  b = StackPop();
+
+  std::complex<double> c1(a,b);
+  std::complex<double> c3;
+  c3 = std::sinh(c1);
+  StackPush(c3.imag());
+  StackPush(c3.real());
+}
+
+extern "C" void COMP_hcos(void)
+{
+  double a, b;
+
+  a = StackPop();
+  b = StackPop();
+
+  std::complex<double> c1(a,b);
+  std::complex<double> c3;
+  c3 = std::cosh(c1);
+  StackPush(c3.imag());
+  StackPush(c3.real());
+}
+
+extern "C" void COMP_htan(void)
+{
+  double a, b;
+
+  a = StackPop();
+  b = StackPop();
+
+  std::complex<double> c1(a,b);
+  std::complex<double> c2;
+  std::complex<double> c3;
+  
+  c2 = std::sinh(c1);
+  c3 = std::cosh(c1);
+  c3 = c2/c3;
+  StackPush(c3.imag());
+  StackPush(c3.real());
+}
+
 
 extern "C" void COMP_conj(void)
 {
@@ -320,6 +341,35 @@ extern "C" void COMP_arg(void)
   b = StackPop();
 
   std::complex<double> c1(a,b);
+  std::complex<double> c3;
+  c3 = std::arg(c1);
+  StackPush(c3.imag());
+  StackPush(c3.real());
+}
+
+extern "C" void COMP_ToPolar(void)
+{
+  double a, b, r, theta;
+
+  a = StackPop();
+  b = StackPop();
+
+  std::complex<double> c1(a,b);
+
+  r = std::abs(c1);     // Magnitude
+  theta = std::arg(c1); // Phase angle in radians
+  StackPush(theta);
+  StackPush(r);
+}
+
+extern "C" void COMP_FromPolar(void)
+{
+  double a, b;
+
+  a = StackPop();
+  b = StackPop();
+
+  std::complex<double> c1 = std::polar(a,b);
   std::complex<double> c3;
   c3 = std::arg(c1);
   StackPush(c3.imag());
