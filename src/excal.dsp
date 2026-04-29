@@ -91,15 +91,11 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;hpj;bat;for;f90"
 # Begin Source File
 
-SOURCE=.\Ex_buis.c
+SOURCE=.\Ex_fin.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Ex_comp.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\ex_complex.c
+SOURCE=.\Ex_complex.cpp
 # End Source File
 # Begin Source File
 
@@ -119,7 +115,7 @@ SOURCE=.\Ex_geom.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\ex_phys.c
+SOURCE=.\ex_sci2.c
 # End Source File
 # Begin Source File
 

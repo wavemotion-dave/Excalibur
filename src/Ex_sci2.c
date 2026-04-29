@@ -95,7 +95,7 @@ struct funcStruct Scientific2_funcs[MAX_FUNCS] = {
     {FN21,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_NULL},
     {FN22,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_NULL},
     {FN23,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_ATLAS}, //hidden!
-    {FN24,  UNI_CARG,       USES_F,     ALLOWREC,   ' ',    "cARG",     YES_L,      X_NEW,      COMP_arg,               T_NULL,         H_NULL} //TODO help
+    {FN24,  UNI_CARG,       USES_F,     ALLOWREC,   ' ',    "cARG",     YES_L,      X_NEW,      COMP_arg,               T_NULL,         H_NULL}, //TODO help
     {FN25,  UNI_CPLUS,      USES_F,     ALLOWREC,   ' ',    "Cpx +",    YES_L,      X_NEW,      COMP_plus,              T_CPLXADD,      H_CPLXADD},
     {FN26,  UNI_CMINUS,     USES_F,     ALLOWREC,   ' ',    "Cpx --",   YES_L,      X_NEW,      COMP_minus,             T_CPLXSUB,      H_CPLXSUB},
     {FN27,  UNI_CDIV,       USES_F,     ALLOWREC,   ' ',    "Cpx /",    YES_L,      X_NEW,      COMP_div,               T_CPLXDIV,      H_CPLXDIV},
