@@ -57,6 +57,7 @@ extern "C" void COMP_sqrt(void);
 extern "C" void COMP_abs(void);
 extern "C" void COMP_CHS(void);
 extern "C" void COMP_norm(void);
+extern "C" void COMP_arg(void);
 
 extern "C" void COMP_VectAddion(void);
 extern "C" void COMP_VectSubtract(void);
@@ -307,6 +308,20 @@ extern "C" void COMP_norm(void)
   std::complex<double> c1(a,b);
   std::complex<double> c3;
   c3 = std::norm(c1);
+  StackPush(c3.imag());
+  StackPush(c3.real());
+}
+
+extern "C" void COMP_arg(void)
+{
+  double a, b;
+
+  a = StackPop();
+  b = StackPop();
+
+  std::complex<double> c1(a,b);
+  std::complex<double> c3;
+  c3 = std::arg(c1);
   StackPush(c3.imag());
   StackPush(c3.real());
 }

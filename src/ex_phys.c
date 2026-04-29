@@ -69,6 +69,7 @@ extern void COMP_sqrt(void);
 extern void COMP_abs(void);
 extern void COMP_CHS(void);
 extern void COMP_norm(void);
+extern void COMP_arg(void);
 
 struct funcStruct Scientific2_funcs[MAX_FUNCS] = {
     {FN1,   UNI_CONST2,     USES_F,     NORECORD,   ' ',    "Const",    YES_L,      X_NEW,      Phys_Constants,         T_CONST,        H_CONST},
@@ -94,7 +95,7 @@ struct funcStruct Scientific2_funcs[MAX_FUNCS] = {
     {FN21,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_NULL},
     {FN22,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_NULL},
     {FN23,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_ATLAS}, //hidden!
-    {FN24,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_NULL},
+    {FN24,  UNI_CARG,       USES_F,     ALLOWREC,   ' ',    "cARG",     YES_L,      X_NEW,      COMP_arg,               T_NULL,         H_NULL} //TODO help
     {FN25,  UNI_CPLUS,      USES_F,     ALLOWREC,   ' ',    "Cpx +",    YES_L,      X_NEW,      COMP_plus,              T_CPLXADD,      H_CPLXADD},
     {FN26,  UNI_CMINUS,     USES_F,     ALLOWREC,   ' ',    "Cpx --",   YES_L,      X_NEW,      COMP_minus,             T_CPLXSUB,      H_CPLXSUB},
     {FN27,  UNI_CDIV,       USES_F,     ALLOWREC,   ' ',    "Cpx /",    YES_L,      X_NEW,      COMP_div,               T_CPLXDIV,      H_CPLXDIV},
@@ -110,7 +111,7 @@ struct funcStruct Scientific2_funcs[MAX_FUNCS] = {
     {FN37,  UNI_CPOW,       USES_F,     ALLOWREC,   ' ',    "cPOW",     YES_L,      X_NEW,      COMP_pow,               T_CPLXPOW,      H_CPLXPOW},
     {FN38,  UNI_CSQRT,      USES_F,     ALLOWREC,   ' ',    "cSQRT",    YES_L,      X_NEW,      COMP_sqrt,              T_CPLXSQRT,     H_CPLXSQRT},
     {FN39,  UNI_CABS,       USES_F,     ALLOWREC,   ' ',    "cABS",     YES_L,      X_NEW,      COMP_abs,               T_CPLXABS,      H_CPLXABS},
-    {FN40,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "cNORM",    YES_L,      X_NEW,      COMP_norm,              T_NULL,         H_NULL} //TODO help
+    {FN40,  UNI_CNORM,      USES_F,     ALLOWREC,   ' ',    "cNORM",    YES_L,      X_NEW,      COMP_norm,              T_NULL,         H_NULL} //TODO help
 };
 
 void Phys_Constants(void)
