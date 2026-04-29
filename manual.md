@@ -82,4 +82,55 @@ X          50\_       New value is being entered here<br>
 
 (10) You have now filled the stack with chosen numbers. New numbers can be entered and the stack will continue to behave as you have seen here except that the contents of the T register will be pushed off the stack and are lost. Only the last four values can ever be shown and used.
 
+
+# Addition, Subtraction, etc.
+
+Basic math operations (Add, Subtract, Multiply and Divide) in an RPN calculator (like Excalibur) follows easy-to-understand rules and is unambiguous. First you need to get the two numbers you want on the stack. See the Basics section if you don't already know how to do this.
+
+Lets try Addition. To add 13.3 and 45.3 we must first get those numbers on the stack.
+
+T          0<br>
+Z          0<br>
+Y          45.3<br>
+X          13.3<br>
+
+We simply hit the + key on the keypad (or click the + key in the Excalibur window). This will add the contents of the X and Y register. The contents of the X and Y register will be popped off the stack (shifting T and Z down) for the addition. The result of the addition will be pushed back on the stack. After the addition operation, the stack will look as follows:
+
+T          0<br>
+Z          0<br>
+Y          0<br>
+X          58.6<br>
+
+To illustrate this point further, if the stack looked as follows:
+
+T          30<br>
+Z          20<br>
+Y          10<br>
+X          5<br>
+
+When addition is performed, the stack will look as follows:
+
+T          30<br>
+Z          30<br>
+Y          20<br>
+X          15<br>
+
+As you can see, the X and Y registers are popped off the stack, the T and Z registers are shifted down (with the T register repeating to fill in the back end) and after the addition, the result of 15 is pushed back on the stack. The pushing and popping to and from the stack is an important thing to remember about RPN calculators. It can let you work out complex equations in little or no time.
+
+Subtraction is exactly the same as addition. X is subtracted from Y and the result pushed back on the stack.
+
+Multiplication will multiply X and Y and push the result on the stack.
+
+Division will divide X into Y and push the result on the stack.
+
+Always remember, it's just like working out the equation on paper. If you wanted to divide 8 by 2 you would write down 8. Under that you would write down 2 and you would divide them. Do the same with any RPN calculator. Enter 8, enter 2 and hit the Divide key. This is the basis for any calculations you will ever work out.
+
+Some operations require two numbers (such as Addition, Multiplication, Subtraction and Division). For these, you enter the two numbers in the X and Y registers. Some operations are unary and only require a single number (such as Change Sign and Log) and for these only the X value is needed. There are even some built in formulas which require 3 or 4 numbers in which case Z and T come into play.
+
+The RPN calculator makes quick work of long chain calculations. The trick is to remember what's on the stack (Excalibur makes it easy since you can see all four stack locations on screen). The trick with long calculations is to work from the innermost set of parenthesis out and knowing the precedence of operations (multiply and divide before addition and subtraction).
+
+For example, the equation 45.2 + (6 / 2.98) \* 44.33
+
+You would enter 6, enter 2.98 and press the Divide key. Enter 44.33 (which pushes the result of the previous divide up to the Y register) and press the multiply key. Once again, the result is in the X register. Enter 45.2 and press the plus key. The result is the final result of the equation above.
+
 Now that you know how enter numbers on the stack, it’s time to learn how to perform basic operations on those numbers. See the summary of Numeric Entry to see all the forms of numeric entry then move onto the Addition/Subtraction section of this help file to see how work with these numbers on the stack.
