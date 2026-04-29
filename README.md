@@ -13,4 +13,10 @@ The manual can be found here:  [Excalibur Manual](manual.md)
 <img width="786" height="449" alt="image" src="https://github.com/user-attachments/assets/209605b2-7485-4e14-b516-9412603fb7b2" />
 
 <br>
-Excalibur is free to download and use... but if you have found anything I've done to be useful, buy me a virtual coffee here: https://ko-fi.com/wavemotiondave
+
+# Donations Welcome (but never required!)
+
+Excalibur has been a labor of love. More than 1000 hours of development have gone into it - including answering many hundreds of emails over the decades. It's free to use and always will be, however if you feel inclined to buy me a virtual coffee for the effort, that would be amazing!
+
+<img width="320" height="121" alt="image" src="https://github.com/user-attachments/assets/ab67686c-2168-46a3-b39f-77b5f5fef5d0" />
+<b>https://ko-fi.com/wavemotiondave</b>
