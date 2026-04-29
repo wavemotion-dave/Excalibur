@@ -202,7 +202,7 @@ Normally the program execution flows from the beginning of the program to the en
 013 - Digit 3<br>
 014 - Divide<br>
 015 - Halt Program<br>
-016 - <End Of Program><br>
+016 - \<End Of Program\><br>
 <br>
 Checksum: 0EFA<br>
 
@@ -230,7 +230,7 @@ Looping is simply a branch to an earlier instruction that is predicated on the o
 014 - Goto A<br>
 015 - Clear Stack<br>
 016 - Recall R0<br>
-017 - <End Of Program><br>
+017 - \<End Of Program\><br>
 <br>
 Checksum: 0A6F<br>
 
@@ -252,7 +252,7 @@ For example, to compute the area of 2 circles with the first circle's radius in 
 008 - PI<br>
 009 - Multiply<br>
 010 - Return<br>
-011 - <End Of Program><br>
+011 - \<End Of Program\><br>
 <br>
 Checksum: 0D2E<br>
 
