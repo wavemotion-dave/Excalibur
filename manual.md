@@ -268,6 +268,88 @@ This should allow you to make your own constants, conversions, formulas, etc. wi
 
 We all make mistakes during programming or need to add/remove features to existing programs. Excalibur allows the editing of the current program while recording by use of the REV, DEL, FWD keys. These keys will step around the current program from beginning to end if necessary. Use DEL to remove the current program step (as shown on the stack… the debug window will actually show the next statement to be executed as it always does). Any new buttons pressed are inserted after the currently displayed program step (as shown on the stack). If you are not recording a program and wish to edit the currently loaded program, simply hit EDIT and Excalibur will enter the program record mode but will not erase the current program (as REC would do) and you can use the REV, DEL, FWD keys to edit the program. When done you can press either REC or EDIT to end the program edit.
 
+**Program Manager**
+
+Only one program is loaded into memory at any given time. This is the program that is run when "Play" is hit.  If the "Rec" key is hit, the current program will be overwritten and a new program would be recorded. The Program Manager allows the user to save the current program to one of 200 program slots. The program can be given a short name (shown when the program is assigned to a key on the Custom bank) as well as a longer more descriptive name. Once saved, any program can be recalled back into service. Simply select the program on the left-hand pane and click "Load Program" - this will overwrite the currently loaded program with the selected program.  When you click on a program the program listing (with checksum) is shown so you can verify this is the program you want to load.
+
+**Importing/Exporting Programs**
+
+The currently loaded program can be exported to the clipboard by selecting the "Export Program to Clipboard". The program listing, line numbers and checksum are placed onto the clipboard in standard text format. They can be pasted into another program, email or text editor.  Importing programs is just as easy - simply highlight and copy a program listing (checksum is optional) and copy it to the clipboard. Within the Excalibur Program Manager click the "Import Program from Clipboard" to bring this program into Excalibur (the currently loaded program will be overwritten). If there are any problems with the program import, the user will be shown the offending program line. Once imported, this program can be run as a normal program or saved to one of the 200 program slots.
+
+**Program Debugger**
+
+The program debugger allows the user to see the entire program as it is running along with the contents of the stack, internal registers and other bits of debug information.  The debug window is activated or removed by selecting the "Program" button on Program Bank II. The debug window remains active while Excalibur is still functional so that everything within Excalibur I still up and running while the debugger acts as a "spy" to some key internals of the program as it runs. Using Trace or Step allows the user to work through the program a line at a time - this should make finding problems or errors in the program fairly painless.
+
+**Tracing Programs**
+
+If you want to see the program played out slowly so you can try and debug it, you use the STEP button on the program bank. This button has is used when not in record mode -- it moves forward one program step and executes that step. The step is briefly shown in the T register on the stack (and also in the debug window if opened). This key is used to slowly play back the program so you can see the steps and the stack. To play back the program slowly but automatically, use the Trace button. To control the delay time between steps, use File/Settings->Pause/Trace Delay.
+
+**Indirect Addressing**
+
+One of the most powerful programming techniques is the use of indirect addressing. Indirect addressing allows variable branch labels and register access. To indirectly address one of the 26 storage registers, use the StoXth and RclXth keys.  These use the X register as the index to determine which storage register should be used. For example, entering 1 in X and pressing StoXth will store the current Y value to the first register (the A register).  Using StoXth and RclXth all 26 registers can be addressed with 1=A, 2=B … 26=Z.  StoXth and RclXth both drop the stack so the index value is no longer on the stack at the end of the operation.  For example, if you wanted to store the value 123 to the Z register, key in the following sequence:
+
+123<br>
+ENTER<br>
+26<br>
+StoXth<br>
+
+This will drop the stack and use 26 as the index to the register that should be used to STO the 123 value from the stack. You can use the Program Debugger or the normal STO key on the main keypad to verify the value was saved properly. To save time and keystrokes the first half dozen registers can be stored and recalled with buttons located on Program Bank II.
+
+Perhaps of greater importance to programmers using Excalibur, labels can also be indirectly addressed. Excalibur uses a special Indirect Register called 'i' which is an integer based internal register. To store a number into the indirect register use the "Sto i" key. To recall the indirect register to the stack, use the "Rcl i" key. The number in the Indirect Register represents a program label with 0=label A, 1=label B, 9=label J.  Using the Goto(i) or Gsb(i) keys will jump to the label indicaetd by the value of the Indirect register.
+
+**Easier Looping**
+
+Let’s revisit the algorithm for summing numbers from 1 to X. Here we use the Loop key which automatically decrements the associated register and will branch to the associated label if the counter is above zero.
+
+001 - Store A<br>
+002 - Digit 0<br>
+003 - Store B<br>
+004 - Drop Stack<br>
+005 - Label A<br>
+006 - Recall A<br>
+007 - Store Plus B<br>
+008 - Loop A<br>
+009 - Clear Stack<br>
+010 - Recall B<br>
+011 - \<End Of Program\><br>
+<br>
+Checksum: 07AF<br>
+
+**Recursive Subroutines**
+
+Excalibur allows a subroutine to call itself. This can be extremely useful for recursive algorithms. Let's take the example of summing numbers from 1 to X.
+
+001 - Digit 0<br>
+002 - Store B<br>
+003 - Drop Stack<br>
+004 - Gosub A<br>
+005 - Recall B<br>
+006 - Halt Program<br>
+007 - Label A<br>
+008 - Store Plus B<br>
+009 - Digit 1<br>
+010 - Minus<br>
+011 - X > 0?<br>
+012 - Gosub A<br>
+013 - Return<br>
+014 - \<End Of Program\><br>
+<br>
+Checksum: 0ED4<br>
+
+Excalibur allows recursion up to 1000 levels deep. If recursion goes deeper, an error message will be given to the user and the program will terminate. The example above isn’t the shortest or best example of recursion (the looping example that precedes this is shorter and does the same thing), but it does demonstrate the functionality.
+
+**Excalibur Programming Speed**
+
+Excalibur program steps run based on the speed of your computer. But, in practice it hardly matters. It will execute many thousands of steps per second on even the lowliest computer capable of running a 32-bit Windows operating system.  On my fairly modest PC it performs about 60,000 steps per second. I ran an experiment taking a simple 6 step program that incremented a counter, inverted the value and then took the SIN of the value and then looped back to do it again. I let a variety of calculators run the program for 30 seconds. What I found was:
+
+HP15C ran 24 iterations of the program in 30 seconds.<br>
+HP11C ran 27 iterations of the program in 30 seconds.<br>
+HP25 ran 32 iterations of the program in 30 seconds.<br>
+HP41C ran 51 iterations of the program in 30 seconds.<br>
+HP32SII ran 237 iterations of the program in 30 seconds.<br>
+Excalibur (modest i5) ran 57,335,221 iterations of the program in 30 seconds.<br>
+
+Based on this simple experiment, I think it’s safe to say that Excalibur runs more than 1 million times faster than the early HP handhelds.
 
 # Excalibur Settings
 
