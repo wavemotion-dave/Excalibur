@@ -6,7 +6,7 @@ Win32-based and will run on any version of Windows from 98 up to Windows 11 and 
 
 Version 2.00 and 2.01 (essentially the same with an updated email address) were the last legacy versions available circa 2006.
 
-I've released a version 2.05 in April 2026 (see packages to the right of the screen) that is configuration-compatible with the
+I've released a version **2.05** in April 2026 (see **Releases** to the right of the screen) that is configuration-compatible with the
 legacy releases but it updates the application so that it renders about 50% larger, more consistent font handling, improved 
 dialog box sizing and generally allows the classic Excalibur to look a bit better for the modern operating system. This should 
 also help correct numerous small graphical glitches when running in wine under Linux (e.g. the Comp-Sci handling will now 
