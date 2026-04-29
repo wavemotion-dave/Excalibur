@@ -17,7 +17,7 @@ workhorse performance!
 
 The manual can be found here:  [Excalibur Manual](manual.md)
 
-<img width="786" height="449" alt="image" src="https://github.com/user-attachments/assets/209605b2-7485-4e14-b516-9412603fb7b2" />
+<img width="786" height="449" alt="image" src="https://github.com/user-attachments/assets/79992ac2-f035-42e9-8da2-1b441fbb3f3b" />
 
 <br>
 
