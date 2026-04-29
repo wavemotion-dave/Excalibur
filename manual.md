@@ -154,3 +154,26 @@ The RPN calculator makes quick work of long chain calculations. The trick is to 
 For example, the equation 45.2 + (6 / 2.98) \* 44.33
 
 You would enter 6, enter 2.98 and press the Divide key. Enter 44.33 (which pushes the result of the previous divide up to the Y register) and press the multiply key. Once again, the result is in the X register. Enter 45.2 and press the plus key. The result is the final result of the equation above.
+
+
+# Excalibur Settings
+
+The File/Settings menu item brings up a dialog box to display common Excalibur settings. They are:
+
+**Angle Mode:** Degrees, Radians, Gradients
+
+**Tax Constant:** Constant for calculating Tax (see Business Key Layout)
+
+**Numlock****:** You can have the numlock key active on entry or you can tell Excalibur not to change the numlock state.
+
+**Comma Display:** On or off. Determines if you want commas shown on numbers greater than 1000.
+
+**Key Settings:** For you die-hard HP fans you can have your choice of key labels for exponents and change sign.
+
+**Comma Format:** Allows the user to swap decimal points and commas in the display. This is done for some international users who require the XXX.XXX,yy format instead of the XXX,XXX.yy format.
+
+**Tool Tips:** Configures tool-tips on or off. By default (you can turn it on and off in the Settings dialog box) each function key outside of the typical numbers and ordinary arithmetic operations has a tool tip associated with it. If you rest the mouse cursor over a button, the tool tip will show in a small window below the mouse cursor. The tool tip will tell you a the full name of the key (the key names are often abbreviated to save space). If you want more help on how to use a particular key, you can click the Help button then click any button to get a better description for that key. As a shortcut, you can right-click on any key for additional information (saves having to hit the Help key first).
+
+**Stack Options:**  This allows you to select the classic 4-level stack or the deeper 8-level stack (those stack values are off screen and are internally labeled as A, B, C and D). When the 8-level stack is chosen, some stack operations such as rotate up / rotate down and a few functions such as LCM and GCD still use the visible 4-level stack (which seemed most appropriate since these are operations carried out on the visible stack). All other operations use the 8-level stack, if chosen. In addition, traditionally the T register (in the 4-level stack) or the D register (in the 8-level stack) repeats when the stack is popped. You can override this default behavior by selecting "Zero Fill Pop" which will fill a zero at the back end of the stack on a pop operation. You can select "Show X Min" to show the current X value when the main Excalibur window is minimized to the task bar. You can select an RPL method of entry where the X register is not duplicated. Lastly, you can select “Clear On Exit” to clear the stack when Excalibur closes (normally all stack values are preserved from the last run… registers are always preserved until explicitly cleared).
+
+**Pause/Trace Delay:** This controls the number of milliseconds (1000 milliseconds = 1 second) of delay between program trace steps (using FWD) and also how long the PAUSE command will wait. This is only useful if you are programming Excalibur.
