@@ -155,6 +155,119 @@ For example, the equation 45.2 + (6 / 2.98) \* 44.33
 
 You would enter 6, enter 2.98 and press the Divide key. Enter 44.33 (which pushes the result of the previous divide up to the Y register) and press the multiply key. Once again, the result is in the X register. Enter 45.2 and press the plus key. The result is the final result of the equation above.
 
+# Programming Basics
+
+Programming is one of the most powerful features of Excalibur. I was worried that some people would be turned off by the use of the word “programming” and considered calling the feature “Macros” instead since the programming of Excalibur can really be thought of as recording a series of keystrokes for automated rapid playback. That is, any task that you can do by hand with Excalibur can be recorded for instant playback. But the programming mode allows much more flexibility – counters and loops and subroutines (none of which are needed to enjoy quite a bit of power with the programming mode – you can stick to just recording keystrokes for rapid playback). In the end I left this as “Programming Mode” but don’t let that deter you from some real under-the-hood power of Excalibur.
+
+Recording programs is very easy. On the primary keypad you will see a button labeled REC and one labeled PLAY. The REC key puts the calculator into program record mode. A "REC" indicator will appear in the status bar near the bottom to indicate this and the stack will change and will show normal X, Y but the Z, T will now show the current program line and function. It is important to note that when you are in Programming REC mode, the keystrokes are being recorded but also the stack is still "live" and you are actually performing the calculations you are entering. I feel this is superior to the more traditional method of only showing the user the key values as they are pressed but not actually taking action on them until the program is run. In this way, you can feel your way though the programming effort and end up with less bugs in your program sequence. Every calculator key pressed (clicked) is stored in sequence until REC is hit again which will turn off the record feature. Pressing PLAY will then cause the key sequence recorded to playback in rapid succession. So, for example, you could enter the following key sequence:
+
+REC (starts recording)<br>
+9<br>
+\*<br>
+REC (ends recording)<br>
+
+which would effectively multiply the X value by 9 every time PLAY is hit. Give it a try… enter a number into the X register and hit PLAY.
+
+Several hundred Excalibur keys can be recorded in this way. Once recorded, the program will stay with the calculator (even between sessions – it’s saved to disk) until a new REC takes place. If you want to save your program more permanently, simply use the "Program Manager" menu selection from the File menu. The program manager allows you to store up to 200 programs – each of which can be up to 300 steps long. That’s a ton of programming power! Let’s look at the various programming techniques in a bit more detail.
+
+**Keystroke Programming**
+
+Keystroke programming is the most simple form of programming and the most common. Most of the users who ever venture into programming will only venture as far as Keystroke programming - and with good cause since it will allow you to do countless useful programs of your own choosing. Keystroke programming does not use branching, loops or subroutines. Only repetitive keystrokes are recorded for playback. Using only this method, user-defined constants, conversions and straight-line programs can be created and used with little effort. Let's take an example of keystroke programming. Suppose you wish to compute the circumference of a circle given the radius in X (I know this already exists as a built in Excalibur function but it makes a simple and nice example). First, start by pressing REC to turn the programming mode on. You will see at the top of the display the program counter set at 000 (start of program). Starting in the Scientific bank, enter in the following program simply by pressing the keys in the order shown:
+
+001 - X Squared<br>
+002 - PI<br>
+003 - Multiply<br>
+004 - <End Of Program><br>
+<br>
+Checksum: 0279 (you can see the program checksum from the File/Program Manager dialog box)<br>
+
+You have now entered the sequence of keystrokes to produce the area of a circle given the radius in X. Now enter a radius into X and press Play - you will see the answer displayed in X. A nearly infinite number of similar programs can be created in this manner. The Program Manager (on the File menu) allows you to see the entire program at a glance along with the checksum. This checksum is useful to determine if you’ve keyed in the program correctly (it is also used when programs are copied/pasted to and from the clipboard – they ensure that your program transferred correctly).
+
+**Labels, Branching and Conditionals**
+
+Normally the program execution flows from the beginning of the program to the end one step at a time. Labels and branching allows the programmer to skip lines either forwards or backwards. This is done with a label and a corresponding goto. A series of backwards gotos is called a loop (normally terminated using conditions on the Program bank layout). Here is a simple program which demonstrates labels, branching and conditionals. It takes a value in X and if the value is greater than 200 it will divide it by 3 otherwise it will multiply it by 6.
+
+001 - Digit 2<br>
+002 - Digit 0<br>
+003 - Digit 0<br>
+004 - Exchange X and Y<br>
+005 - X <= Y?<br>
+006 - Goto A<br>
+007 - Goto B<br>
+008 - Label A<br>
+009 - Digit 6<br>
+010 - Multiply<br>
+011 - Halt Program<br>
+012 - Label B<br>
+013 - Digit 3<br>
+014 - Divide<br>
+015 - Halt Program<br>
+016 - <End Of Program><br>
+<br>
+Checksum: 0EFA<br>
+
+The conditional you see above (X<=Y?) is typical of many of the programming keys (found on the Program I and Program II banks). This particular command will compare X and Y… if X is less than or equal to Y the next statement is executed (the condition is TRUE). If X is greater than Y the next statement is skipped (condition is FALSE). Therefore, the code will either execute Goto A (if X is less than or equal to Y) or it will execute Goto B (if X is greater than Y).
+
+There are 9 different labels that can be used with Excalibur labeled A-J (letter ‘I’ is notably absent… we use a similar symbol (i) for indirect jumps and so we avoid confusion by not allowing the letter ‘I’ to be used for a label).
+
+**Looping**
+
+Looping is simply a branch to an earlier instruction that is predicated on the outcome of a conditional test. We loop for several reasons - but mainly to count or sum a series of numbers or calculations. Here is a program to compute a simple summation sequence of 0+1+2+3+4...X. If you enter and X of 6 you should get 0+1+2+3+4+5+6 for a total of 21. The program looks as follows:
+
+001 - Digit 0<br>
+002 - Store R0<br>
+003 - Drop Stack<br>
+004 - Label A<br>
+005 - Enter<br>
+006 - Enter<br>
+007 - Recall R0<br>
+008 - Plus<br>
+009 - Store R0<br>
+010 - Drop Stack<br>
+011 - Digit 1<br>
+012 - Minus<br>
+013 - X > 0?<br>
+014 - Goto A<br>
+015 - Clear Stack<br>
+016 - Recall R0<br>
+017 - <End Of Program><br>
+<br>
+Checksum: 0A6F<br>
+
+WARNING - If you ever goto an earlier programming step and do not provide a way to break the looping cycle you will end up with an infinite loop. It is also possible that given the speed at which Excalibur executes instructions (which is many thousands of instructions per second) extremely long loops could take significant time. During this time, the program will show the word "Run..." in the status bar and will be otherwise oblivious to normal keystrokes or mouse clicks. To interrupt an infinite loop you should click the Play key or press the ESC key and the program will return to the non-running state.
+
+**Subroutines**
+
+Subroutines are useful for repetitive calculations. Each subroutine must start with a label and end with a "Return" statement. The label defines the start of the subroutine – the Return statement tells Excalibur to return to the line following the call to the subroutine. All of the tools for subroutines are found on the Program bank of functions.
+
+For example, to compute the area of 2 circles with the first circle's radius in X and the second circle's radius in Y you would key in the following program:
+
+001 - Gosub A<br>
+002 - Exchange X and Y<br>
+003 - Gosub A<br>
+004 - Exchange X and Y<br>
+005 - Halt Program<br>
+006 - Label A<br>
+007 - X Squared<br>
+008 - PI<br>
+009 - Multiply<br>
+010 - Return<br>
+011 - <End Of Program><br>
+<br>
+Checksum: 0D2E<br>
+
+Now entering a radius in X and a radius in Y and pressing "Play" will yield the area of both circles. The code is a little tricky but not overly complicated. The first line simply tells Excalibur to go to subroutine A (indicated by the Label A instruction). Excalibur will jump to label A and continue executing until a Return statement is reached at which time control is given back to the line after the Gosub A call and execution continues from there. There is no limit to the number of subroutines that can be called, however if a subroutine calls itself (recursively), the number of recursive calls can be nested only 1000 levels deep (Excalibur will give you an error dialog box if you attempt to call nested subroutines deeper than that).
+
+**Binding Programs to Custom Keys**
+
+To assign a program directly to a key, simply record any program you wish. Save it using "Program Manager" from the File menu. You can give it a short "key" name and a longer more descriptive name. Then you can go to the Define Custom Set menu item also in the File menu. There you will see a list of all keys and programs and you can click to assign any key or program to any desired custom key on the custom key bank. When you show the Custom bank you will see the short key name of your program and the tool-tip will be the longer more descriptive name. Pressing that key will load and invoke the program (but will not harm the contents of any current REC/PLAY macro program).
+
+This should allow you to make your own constants, conversions, formulas, etc. with relative ease. As of right now, menu items are not saved as part of the program record process - just buttons. This should pose very little problem since you can always type in the constant value as part of the program or use the StoA/RclA or StoB/RclB keys to get at more saved storage.
+
+**Editing Programs**
+
+We all make mistakes during programming or need to add/remove features to existing programs. Excalibur allows the editing of the current program while recording by use of the REV, DEL, FWD keys. These keys will step around the current program from beginning to end if necessary. Use DEL to remove the current program step (as shown on the stack… the debug window will actually show the next statement to be executed as it always does). Any new buttons pressed are inserted after the currently displayed program step (as shown on the stack). If you are not recording a program and wish to edit the currently loaded program, simply hit EDIT and Excalibur will enter the program record mode but will not erase the current program (as REC would do) and you can use the REV, DEL, FWD keys to edit the program. When done you can press either REC or EDIT to end the program edit.
+
 
 # Excalibur Settings
 
