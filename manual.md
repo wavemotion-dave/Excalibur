@@ -83,6 +83,28 @@ X          50\_       New value is being entered here<br>
 (10) You have now filled the stack with chosen numbers. New numbers can be entered and the stack will continue to behave as you have seen here except that the contents of the T register will be pushed off the stack and are lost. Only the last four values can ever be shown and used.
 
 
+# Number Entry
+
+Excalibur uses a traditional 4-level stack for mathematical operations. Numbers are entered directly into the X register of the calculator. Using ENTER, older numbers are pushed up the stack to make room for a new number in the X register. To enter a number, simply start pressing numeric keys. When you have finished entering the number, you can press an operator to perform some action (addition, multiplication, etc) or you can press ENTER to push this number up the stack (to the Y register) and start to enter a new number into the X register.  The use of the stack will become more apparent in the RPN Quick Start section (but please read the rest of this section so you are familiar with how to enter numbers into Excalibur)
+
+**Exponents**
+
+To enter a number with an exponent you must first enter the base (mantissa) part of the number. Then press the E/EEX key to insert the "e+" exponent. Then type the exponent. For example, to enter 6.02e+23 you would enter the 6.02 first, then press the EEX key, then enter 23.
+
+**Change Sign**
+
+To change of a number in the X register, simply press the CHS (change sign) key. To change the sign of an exponent you must do it as you enter the number. After you hit the EEX key and before you finish entering the exponent, hit the CHS key to change the sign of the exponent. For example, to enter 1.34e-12 you would first enter in 1.34 then press EEX. Then you could press CHS and 12 to get the 1.34e-12 value to show in the X register.
+
+**Fractions**
+
+Fractions can be entered in two ways. The most common way is to use the Frac key to separate the components of the fraction. For example, to enter 5 and 3/8 you would enter 5, hit the Frac key, then hit 3 and hit the Frac key again and finally enter 8. This will lead to the fractional display of 5~3/8
+
+You can also use the decimal point to enter fractions. To enter the same 5 and 3/8 using only the decimal point, you enter 5 then hit the decimal point to get "5." on the display. Then enter the 3 and press the decimal point again and finally enter the 8. The display will, once again, read 5~3/8.
+
+Once a fraction is entered, pressing ENTER or any numeric operation key will automatically convert the fraction to its decimal equivalent.
+
+Let's see how work with these numbers on the stack.
+
 # Addition, Subtraction, etc.
 
 Basic math operations (Add, Subtract, Multiply and Divide) in an RPN calculator (like Excalibur) follows easy-to-understand rules and is unambiguous. First you need to get the two numbers you want on the stack. See the Basics section if you don't already know how to do this.
@@ -132,5 +154,3 @@ The RPN calculator makes quick work of long chain calculations. The trick is to 
 For example, the equation 45.2 + (6 / 2.98) \* 44.33
 
 You would enter 6, enter 2.98 and press the Divide key. Enter 44.33 (which pushes the result of the previous divide up to the Y register) and press the multiply key. Once again, the result is in the X register. Enter 45.2 and press the plus key. The result is the final result of the equation above.
-
-Now that you know how enter numbers on the stack, it’s time to learn how to perform basic operations on those numbers. See the summary of Numeric Entry to see all the forms of numeric entry then move onto the Addition/Subtraction section of this help file to see how work with these numbers on the stack.
