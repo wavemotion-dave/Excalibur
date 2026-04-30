@@ -562,7 +562,7 @@ void BUSI_i(void)
     int newSign, oldSign;
     double closei;
     int found;
-    char tmpBuff[15];
+    char tmpBuff[16];
 
     if (finStore == 1)
     {
@@ -809,7 +809,7 @@ unsigned long dateSerial360(struct dateStruct dt)
 void ConvertFloatToDate(double flt, struct dateStruct *dt)
 {
     char *ptr;
-    char strval[4];
+    char strval[16];
     unsigned long diff;
 
     dt->month = (long) flt;
@@ -910,7 +910,7 @@ void BUSI_days(void)
 
 void BUSI_today(void)
 {
-    char datestr[12];
+    char datestr[16];
     int day, month, year;
 
     _strdate(datestr);

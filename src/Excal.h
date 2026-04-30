@@ -10,7 +10,7 @@
 //
 // Copyright(c) 1994-2026 Dave Bernazzani
 //
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this 
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this
 // software and associated documentation files(the "Software"), to deal in the Software
 // without restriction, including without limitation the rights to use, copy, modify,
 // merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
@@ -21,8 +21,8 @@
 // or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-// INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
-// PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE 
+// INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+// PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
 // LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 // TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 // OR OTHER DEALINGS IN THE SOFTWARE.
@@ -41,7 +41,7 @@ typedef unsigned __int8     uint8_t;
 #define MAX_FUNCS           40           // The 40th one is for help only
 
 #define RPN_LAST_KEY        -1
-    
+
 #define MAX_DIGITS          18
 
 #define X_NEW     01            /* Next keypress pushes stack and starts new edit */
@@ -1090,7 +1090,7 @@ enum UniqueButtonIndexTag
     UNI_CSINH,
     UNI_CCOSH,
     UNI_CTANH,
-    UNI_TOPOLAR,    
+    UNI_TOPOLAR,
     UNI_FROMPOLAR,
     UNI_SUMPLUS,
     UNI_SUMMINUS,
@@ -1266,7 +1266,7 @@ extern uint32_t userTicks;
 #define RPN_BKSP                        127
 #define RPN_CLEAR_ALL                   128
 #define RPN_HELP                        129
-#define RPN_PLAYBACK                    130                
+#define RPN_PLAYBACK                    130
 #define RPN_DROP                        131
 #define RPN_LARG                        132
 #define RPN_FRAC                        133
@@ -1312,47 +1312,47 @@ extern uint32_t userTicks;
 #define FN2                             1002
 #define FN3                             1003
 #define FN4                             1004
-                        
+
 #define FN5                             1005
 #define FN6                             1006
 #define FN7                             1007
 #define FN8                             1008
-                        
+
 #define FN9                             1009
 #define FN10                            1010
 #define FN11                            1011
 #define FN12                            1012
-                        
+
 #define FN13                            1013
 #define FN14                            1014
 #define FN15                            1015
 #define FN16                            1016
-                        
+
 #define FN17                            1017
 #define FN18                            1018
 #define FN19                            1019
 #define FN20                            1020
-                        
+
 #define FN21                            1021
 #define FN22                            1022
 #define FN23                            1023
 #define FN24                            1024
-                        
+
 #define FN25                            1025
 #define FN26                            1026
 #define FN27                            1027
 #define FN28                            1028
-                        
+
 #define FN29                            1029
 #define FN30                            1030
 #define FN31                            1031
 #define FN32                            1032
-                        
+
 #define FN33                            1033
 #define FN34                            1034
 #define FN35                            1035
 #define FN36                            1036
-                        
+
 #define FN37                            1037
 #define FN38                            1038
 #define FN39                            1039
@@ -1378,7 +1378,7 @@ extern uint32_t userTicks;
 #define IDC_CUSTOM_FUNCNAME             199
 
 #define IDC_CUSTOM_CANCEL               299
-                
+
 #define IDC_CUSTOM_PB1                  101
 #define IDC_CUSTOM_PB2                  102
 #define IDC_CUSTOM_PB3                  103

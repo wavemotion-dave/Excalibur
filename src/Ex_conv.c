@@ -129,7 +129,7 @@ struct funcStruct Conversion_funcs[MAX_FUNCS] = {
 };
 
 
-double inverse (double x)
+static double inverse(double x)
 {
     return (1.0 / x);
 }
@@ -137,7 +137,7 @@ double inverse (double x)
 /* --------------------- */
 /* Conversion Functioins */
 /* --------------------- */
-void CONV_lb_kg (void)
+void CONV_lb_kg(void)
 {
     if (convInverse == 0)
         StackPush (StackPop () * inverse (2.204622622));
@@ -146,7 +146,7 @@ void CONV_lb_kg (void)
 }
 
 
-void CONV_F_C (void)
+void CONV_F_C(void)
 {
     if (convInverse == 0)
         StackPush ((StackPop () - 32.0) * inverse (1.8));
@@ -155,7 +155,7 @@ void CONV_F_C (void)
 }
 
 
-void CONV_In_Cm (void)
+void CONV_In_Cm(void)
 {
     if (convInverse == 0)
         StackPush (StackPop () * 2.54);
@@ -164,7 +164,7 @@ void CONV_In_Cm (void)
 }
 
 
-void CONV_Oz_g (void)
+void CONV_Oz_g(void)
 {
     if (convInverse == 0)
         StackPush (StackPop () * 28.3495);
@@ -172,7 +172,7 @@ void CONV_Oz_g (void)
         StackPush (StackPop () * inverse (28.3495));
 }
 
-void CONV_gal_l (void)
+void CONV_gal_l(void)
 {
     if (convInverse == 0)
         StackPush (StackPop () * 3.785332);
@@ -180,7 +180,7 @@ void CONV_gal_l (void)
         StackPush (StackPop () * inverse (3.785332));
 }
 
-void CONV_Ft_Mi (void)
+void CONV_Ft_Mi(void)
 {
     if (convInverse == 0)
         StackPush (StackPop () * inverse (5280.0));
@@ -189,7 +189,7 @@ void CONV_Ft_Mi (void)
 }
 
 
-void CONV_J_Cal (void)
+void CONV_J_Cal(void)
 {
     if (convInverse == 0)
         StackPush (StackPop () * 4.18605);
@@ -198,7 +198,7 @@ void CONV_J_Cal (void)
 }
 
 
-void CONV_H_Ms (void)
+void CONV_H_Ms(void)
 {
     double temp;
     double temp2;
@@ -240,7 +240,7 @@ void CONV_H_Ms (void)
 }
 
 
-void CONV_Mi_Km (void)
+void CONV_Mi_Km(void)
 {
     if (convInverse == 0)
         StackPush (StackPop () * 1.6093472);
@@ -249,7 +249,7 @@ void CONV_Mi_Km (void)
 }
 
 
-void CONV_Ft_Fa (void)
+void CONV_Ft_Fa(void)
 {
     if (convInverse == 0)
         StackPush (StackPop () / 6.0);
@@ -258,7 +258,7 @@ void CONV_Ft_Fa (void)
 }
 
 
-void CONV_in2_cm2 (void)
+void CONV_in2_cm2(void)
 {
     if (convInverse == 0)
         StackPush (StackPop () * 6.452);
@@ -267,7 +267,7 @@ void CONV_in2_cm2 (void)
 }
 
 
-void CONV_in3_cm3 (void)
+void CONV_in3_cm3(void)
 {
     if (convInverse == 0)
         StackPush (StackPop () * 16.39);
@@ -276,7 +276,7 @@ void CONV_in3_cm3 (void)
 }
 
 
-void CONV_Deg_Rad (void)
+void CONV_Deg_Rad(void)
 {
     if (convInverse == 0)
         StackPush (StackPop () * (M_PI / 180.0));
@@ -285,7 +285,7 @@ void CONV_Deg_Rad (void)
 }
 
 
-void CONV_R_P (void)
+void CONV_R_P(void)
 {
     double a, b;
     double r, theta;
@@ -315,7 +315,7 @@ void CONV_R_P (void)
 }
 
 
-void CONV_flOz_ml (void)
+void CONV_flOz_ml(void)
 {
     if (convInverse == 0)
         StackPush (StackPop () * 29.6F);
@@ -324,7 +324,7 @@ void CONV_flOz_ml (void)
 }
 
 
-void CONV_Ft_m (void)
+void CONV_Ft_m(void)
 {
     if (convInverse == 0)
         StackPush (StackPop () * 0.3048);
@@ -333,7 +333,7 @@ void CONV_Ft_m (void)
 }
 
 
-void CONV_ft2_m2 (void)
+void CONV_ft2_m2(void)
 {
     if (convInverse == 0)
         StackPush (StackPop () * inverse (10.76391042));
@@ -342,7 +342,7 @@ void CONV_ft2_m2 (void)
 }
 
 
-void CONV_ft3_m3 (void)
+void CONV_ft3_m3(void)
 {
     if (convInverse == 0)
         StackPush (StackPop () * inverse (35.31466672));
@@ -351,7 +351,7 @@ void CONV_ft3_m3 (void)
 }
 
 
-void CONV_at_psi (void)
+void CONV_at_psi(void)
 {
     if (convInverse == 0)
         StackPush (StackPop () * (1.0 / 6.804e-2));
@@ -360,7 +360,7 @@ void CONV_at_psi (void)
 }
 
 
-void CONV_acre_ft2 (void)
+void CONV_acre_ft2(void)
 {
     if (convInverse == 0)
         StackPush (StackPop () * 43560);
@@ -369,7 +369,7 @@ void CONV_acre_ft2 (void)
 }
 
 
-void CONV_inverse (void)
+void CONV_inverse(void)
 {
     convInverse ^= 1;
     if (convInverse == 0)
@@ -379,7 +379,7 @@ void CONV_inverse (void)
 }
 
 
-void CONV_gal_cm3 (void)
+void CONV_gal_cm3(void)
 {
     if (convInverse == 0)
         StackPush (StackPop () * 3785.0);
@@ -387,7 +387,7 @@ void CONV_gal_cm3 (void)
         StackPush (StackPop () * inverse (3785.0));
 }
 
-void CONV_pin_l (void)
+void CONV_pin_l(void)
 {
     if (convInverse == 0)
         StackPush (StackPop () * inverse (2.113));
@@ -395,7 +395,7 @@ void CONV_pin_l (void)
         StackPush (StackPop () * 2.113);
 }
 
-void CONV_Igal_l (void)
+void CONV_Igal_l(void)
 {
     if (convInverse == 0)
         StackPush (StackPop () * 4.5458051988);
@@ -403,7 +403,7 @@ void CONV_Igal_l (void)
         StackPush (StackPop () * inverse (4.5458051988));
 }
 
-void CONV_F_K (void)
+void CONV_F_K(void)
 {
     double tmp;
 
@@ -419,7 +419,7 @@ void CONV_F_K (void)
     }
 }
 
-void CONV_In_mm (void)
+void CONV_In_mm(void)
 {
     if (convInverse == 0)
         StackPush (StackPop () * 25.4);
@@ -427,7 +427,7 @@ void CONV_In_mm (void)
         StackPush (StackPop () / 25.4);
 }
 
-void CONV_Ft_Km (void)
+void CONV_Ft_Km(void)
 {
     if (convInverse == 0)
         StackPush (StackPop () * 0.0003048);
@@ -435,7 +435,7 @@ void CONV_Ft_Km (void)
         StackPush (StackPop () * inverse (0.0003048));
 }
 
-void CONV_ah_col (void)
+void CONV_ah_col(void)
 {
     if (convInverse == 0)
         StackPush (StackPop () * 3600.0);
@@ -443,7 +443,7 @@ void CONV_ah_col (void)
         StackPush (StackPop () * inverse (3600.0));
 }
 
-void CONV_ah_far (void)
+void CONV_ah_far(void)
 {
     if (convInverse == 0)
         StackPush (StackPop () * 0.037307);
@@ -452,7 +452,7 @@ void CONV_ah_far (void)
 }
 
 
-void CONV_kmh_mps (void)
+void CONV_kmh_mps(void)
 {
     if (convInverse == 0)
         StackPush (StackPop () * inverse (3.6));
@@ -460,7 +460,7 @@ void CONV_kmh_mps (void)
         StackPush (StackPop () * 3.6);
 }
 
-void CONV_knot_mph (void)
+void CONV_knot_mph(void)
 {
     if (convInverse == 0)
         StackPush (StackPop () * inverse (0.8690));
@@ -468,7 +468,7 @@ void CONV_knot_mph (void)
         StackPush (StackPop () * 0.8690);
 }
 
-void CONV_hp_kw (void)
+void CONV_hp_kw(void)
 {
     if (convInverse == 0)
         StackPush (StackPop () * 0.7457);
@@ -477,7 +477,7 @@ void CONV_hp_kw (void)
 }
 
 
-void CONV_Mil_mm (void)
+void CONV_Mil_mm(void)
 {
     if (convInverse == 0)
         StackPush ((StackPop () / 1000.0) * 25.4);
@@ -485,7 +485,7 @@ void CONV_Mil_mm (void)
         StackPush ((StackPop () / 25.4) * 1000.0);
 }
 
-void CONV_ShortTons_lbs (void)
+void CONV_ShortTons_lbs(void)
 {
     if (convInverse == 0)
         StackPush (StackPop () * 2000.0);
@@ -493,7 +493,7 @@ void CONV_ShortTons_lbs (void)
         StackPush (StackPop () / 2000.0);
 }
 
-void CONV_LongTons_lbs (void)
+void CONV_LongTons_lbs(void)
 {
     if (convInverse == 0)
         StackPush (StackPop () * 2240.0);
@@ -501,7 +501,7 @@ void CONV_LongTons_lbs (void)
         StackPush (StackPop () / 2240.0);
 }
 
-void CONV_MetricTons_lbs (void)
+void CONV_MetricTons_lbs(void)
 {
     if (convInverse == 0)
         StackPush (StackPop () * 2205.0);

@@ -267,7 +267,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     SetTimer(calcMainWindow, TIMER_ONE_MINUTE,  60000, NULL);   // 1 Minute Timer
     SetTimer(calcMainWindow, TIMER_SLOW,        300,   NULL);   // 300ms Timer
     SetTimer(calcMainWindow, TIMER_FAST,        100,   NULL);   // 100ms Timer
-    
+
     srand((unsigned) time(NULL));   // Ensure random numbers are somewhat random!
 
     // Add the Excalibur Settings into the main menu
@@ -357,7 +357,7 @@ int CreateToolTipWindow(HWND hwnd, HINSTANCE hInstance)
 }
 
 // ---------------------------------------------------------------------------------------
-// This is our top-level Excalibur window handler... Essentially this handles any 
+// This is our top-level Excalibur window handler... Essentially this handles any
 // top-level functionality such as keyboard presses, global timers, window movement, etc.
 // ---------------------------------------------------------------------------------------
 LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
@@ -586,7 +586,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
                 inFocusTime++;
             UpdateTimeBar();
         }
-        
+
         if (wParam == TIMER_SLOW)        // 300 ms timer
         {
             fastTimer++;
@@ -605,7 +605,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
                 ptLowerRight.y = rc.bottom;
                 ScreenToClient(hwnd, &ptUpperLeft);
                 ScreenToClient(hwnd, &ptLowerRight);
-            
+
                 if ((pCursor.x >= 0 && pCursor.x <= ptLowerRight.x) && (pCursor.y >= 0 && pCursor.y <= ptLowerRight.y))
                 {
                     if (!IsWindowVisible(toolTipWnd))
@@ -639,7 +639,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
                 lastYpos = yPos;
             }
         }
-        
+
         if (wParam == TIMER_FAST)        // 100 ms timer
         {
             ticksUsed = GetTickCount() - lastTickCount;
@@ -651,7 +651,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
                 sprintf(tmpBuff, "%03d:%02d.%1d", (userTicks / 60000), (userTicks / 1000) % 60, (userTicks / 100) % 10);
                 SetDlgItemText(calcMainWindow, TIME_BAR, tmpBuff);
             }
-            
+
             if (GetFocus() == calcMainWindow)
             {
                 if (IsWindowVisible(toolTipWnd))
@@ -667,7 +667,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
                 }
             }
         }
-        
+
         return 0;
         break;
 
@@ -3865,7 +3865,6 @@ void CopyBufferToCurrentMacro(char *clipboardBuffer)
     unsigned short chksum, userChecksum;
     int preambleIndex;
     int maxLen;
-    char *ptr;
 
     userChecksum = 0xFFAA;
     playBackIdx = 0;
@@ -4521,7 +4520,7 @@ void ShowUsageStats(void)
 {
     char stackPushesStr[64];
     char stackPopsStr[64];
-    
+
     sprintf(stackPushesStr, "%I64u", stackPushes);
     PutCommas(stackPushesStr);
     sprintf(stackPopsStr, "%I64u", stackPops);
