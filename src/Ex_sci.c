@@ -66,11 +66,8 @@ extern void SCI_10x(void);
 extern void SCI_rand(void);
 extern void SCI_int(void);
 extern void SCI_frac(void);
-extern void SCI_const(void);
 extern void SCI_hyp(void);
-extern void BUSI_SdevX(void);
 extern void SCI_PdevX(void);
-extern void BUSI_SdevY(void);
 extern void SCI_PdevY(void);
 extern void SCI_sumPlus(void);
 extern void SCI_sumMinus(void);
@@ -88,21 +85,22 @@ extern void SCI_Pnr(void);
 extern void SCI_abs(void);
 extern void SCI_round(void);
 extern void SCI_floor(void);
-extern void Sci_Ceil(void);
-extern void Sci_GCD(void);
-extern void Sci_LCM(void);
-extern void Sci_MinR(void);
-extern void Sci_MaxR(void);
-extern void Sci_RoundYX(void);
-extern void Sci_prime(void);
-extern void Sci_elements(void);
-extern void Sci_resist(void);
-extern void Sci_metricPre(void);
-extern void Sci_LogBase2(void);
-extern void Sci_TimerStart(void);
-extern void Sci_TimerStop(void);
-extern void Sci_TimerClear(void);
-extern void Sci_TimerPush(void);
+extern void SCI_Ceil(void);
+extern void SCI_GCD(void);
+extern void SCI_LCM(void);
+extern void SCI_MinR(void);
+extern void SCI_MaxR(void);
+extern void SCI_RoundYX(void);
+extern void SCI_prime(void);
+extern void SCI_elements(void);
+extern void SCI_resist(void);
+extern void SCI_metricPre(void);
+extern void SCI_LogBase2(void);
+extern void SCI_TimerStart(void);
+extern void SCI_TimerStop(void);
+extern void SCI_TimerClear(void);
+extern void SCI_TimerPush(void);
+extern void Phys_Astro(void);
 
 struct funcStruct Scientific_funcs[MAX_FUNCS] = {
     {FN1,   UNI_SIN,    USES_F,     ALLOWREC,   ' ',    "SIN",      YES_L,  X_NEW,  SCI_sin,        T_SIN,        H_SIN},
@@ -128,23 +126,23 @@ struct funcStruct Scientific_funcs[MAX_FUNCS] = {
     {FN21,  UNI_COMB,   USES_F,     ALLOWREC,   ' ',    "Cn,r",     YES_L,  X_NEW,  SCI_Cnr,        T_COMB,       H_COMB},
     {FN22,  UNI_PERM,   USES_F,     ALLOWREC,   ' ',    "Pn,r",     YES_L,  X_NEW,  SCI_Pnr,        T_PERM,       H_PERM},
     {FN23,  UNI_PI,     USES_F,     ALLOWREC,   ' ',    " PI ",     YES_L,  X_NEW,  SCI_pi,         T_PI,         H_PI},
-    {FN24,  UNI_CONST,  USES_F,     NORECORD,   ' ',    "Const",    YES_L,  X_NEW,  SCI_const,      T_CONST,      H_CONST},
+    {FN24,  UNI_ASTRO,  USES_F,     NORECORD,   ' ',    "Astro",    YES_L,  X_NEW,  Phys_Astro,     T_ASTRO,      H_ASTRO},
     {FN25,  UNI_ROUND,  USES_F,     ALLOWREC,   ' ',    "Round",    YES_L,  X_NEW,  SCI_round,      T_ROUND,      H_ROUND},
     {FN26,  UNI_FLOOR,  USES_F,     ALLOWREC,   ' ',    "Floor",    YES_L,  X_NEW,  SCI_floor,      T_FLOOR,      H_FLOOR},
-    {FN27,  UNI_CEIL,   USES_F,     ALLOWREC,   ' ',    "Ceil",     YES_L,  X_NEW,  Sci_Ceil,       T_CEIL,       H_CEIL},
-    {FN28,  UNI_RNDXY,  USES_F,     ALLOWREC,   ' ',    "RndYX",    YES_L,  X_NEW,  Sci_RoundYX,    T_ROUNDYX,    H_ROUNDYX},
-    {FN29,  UNI_GCD,    USES_F,     ALLOWREC,   ' ',    "GCD",      YES_L,  X_NEW,  Sci_GCD,        T_GCD,        H_GCD},
-    {FN30,  UNI_LCM,    USES_F,     ALLOWREC,   ' ',    "LCM",      YES_L,  X_NEW,  Sci_LCM,        T_LCM,        H_LCM},
-    {FN31,  UNI_MINR,   USES_F,     ALLOWREC,   ' ',    "MinR",     YES_L,  X_NEW,  Sci_MinR,       T_MINR,       H_MINR},
-    {FN32,  UNI_MAXR,   USES_F,     ALLOWREC,   ' ',    "MaxR",     YES_L,  X_NEW,  Sci_MaxR,       T_MAXR,       H_MAXR},
-    {FN33,  UNI_PRIME,  USES_F,     NORECORD,   ' ',    "Prime#",   YES_L,  X_NEW,  Sci_prime,      T_PRIME,      H_PRIME},
-    {FN34,  UNI_RESIST, USES_F,     ALLOWREC,   ' ',    "Resist",   YES_L,  X_NEW,  Sci_resist,     T_RESIST,     H_RESIST},
-    {FN35,  UNI_ELEMENT,USES_F,     NORECORD,   ' ',    "Elmnts",   YES_L,  X_NEW,  Sci_elements,   T_ELEMENT,    H_ELEMENT},
-    {FN36,  UNI_LOG2,   USES_F,     ALLOWREC,   ' ',    "Log2",     YES_L,  X_NEW,  Sci_LogBase2,   T_LOG2,       H_LOG2},
-    {FN37,  UNI_TSTART, USES_F,     ALLOWREC,   ' ',    "T Start",  YES_L,  X_NEW,  Sci_TimerStart, T_TIMERSTART, H_TIMERSTART},
-    {FN38,  UNI_TSTOP,  USES_F,     ALLOWREC,   ' ',    "T Stop",   YES_L,  X_NEW,  Sci_TimerStop,  T_TIMERSTOP,  H_TIMERSTOP},
-    {FN39,  UNI_TCLR,   USES_F,     ALLOWREC,   ' ',    "T Clear",  YES_L,  X_NEW,  Sci_TimerClear, T_TIMERCLEAR, H_TIMERCLEAR},
-    {FN40,  UNI_TPUSH,  USES_F,     ALLOWREC,   ' ',    "T Push",   YES_L,  X_NEW,  Sci_TimerPush,  T_TIMERPUSH,  H_TIMERPUSH}
+    {FN27,  UNI_CEIL,   USES_F,     ALLOWREC,   ' ',    "Ceil",     YES_L,  X_NEW,  SCI_Ceil,       T_CEIL,       H_CEIL},
+    {FN28,  UNI_RNDXY,  USES_F,     ALLOWREC,   ' ',    "RndYX",    YES_L,  X_NEW,  SCI_RoundYX,    T_ROUNDYX,    H_ROUNDYX},
+    {FN29,  UNI_GCD,    USES_F,     ALLOWREC,   ' ',    "GCD",      YES_L,  X_NEW,  SCI_GCD,        T_GCD,        H_GCD},
+    {FN30,  UNI_LCM,    USES_F,     ALLOWREC,   ' ',    "LCM",      YES_L,  X_NEW,  SCI_LCM,        T_LCM,        H_LCM},
+    {FN31,  UNI_MINR,   USES_F,     ALLOWREC,   ' ',    "MinR",     YES_L,  X_NEW,  SCI_MinR,       T_MINR,       H_MINR},
+    {FN32,  UNI_MAXR,   USES_F,     ALLOWREC,   ' ',    "MaxR",     YES_L,  X_NEW,  SCI_MaxR,       T_MAXR,       H_MAXR},
+    {FN33,  UNI_PRIME,  USES_F,     NORECORD,   ' ',    "Prime#",   YES_L,  X_NEW,  SCI_prime,      T_PRIME,      H_PRIME},
+    {FN34,  UNI_RESIST, USES_F,     ALLOWREC,   ' ',    "Resist",   YES_L,  X_NEW,  SCI_resist,     T_RESIST,     H_RESIST},
+    {FN35,  UNI_ELEMENT,USES_F,     NORECORD,   ' ',    "Elmnts",   YES_L,  X_NEW,  SCI_elements,   T_ELEMENT,    H_ELEMENT},
+    {FN36,  UNI_LOG2,   USES_F,     ALLOWREC,   ' ',    "Log2",     YES_L,  X_NEW,  SCI_LogBase2,   T_LOG2,       H_LOG2},
+    {FN37,  UNI_TSTART, USES_F,     ALLOWREC,   ' ',    "T Start",  YES_L,  X_NEW,  SCI_TimerStart, T_TIMERSTART, H_TIMERSTART},
+    {FN38,  UNI_TSTOP,  USES_F,     ALLOWREC,   ' ',    "T Stop",   YES_L,  X_NEW,  SCI_TimerStop,  T_TIMERSTOP,  H_TIMERSTOP},
+    {FN39,  UNI_TCLR,   USES_F,     ALLOWREC,   ' ',    "T Clear",  YES_L,  X_NEW,  SCI_TimerClear, T_TIMERCLEAR, H_TIMERCLEAR},
+    {FN40,  UNI_TPUSH,  USES_F,     ALLOWREC,   ' ',    "T Push",   YES_L,  X_NEW,  SCI_TimerPush,  T_TIMERPUSH,  H_TIMERPUSH}
 };
 
 /* ------------- */
@@ -466,515 +464,6 @@ void SCI_Pnr(void)
 }
 
 
-
-BOOL CALLBACK fnDIALOG_REDEFINECONST(HWND, UINT, WPARAM, LPARAM);
-char constName[26];
-char constUnits[11];
-double constVal;
-int cancelRedefineConst = 0;
-void RedefineConst(void)
-{
-    DLGPROC lpfnDIALOG_REDEFINECONST;
-
-    lpfnDIALOG_REDEFINECONST = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_REDEFINECONST, hExcaliburInstance);
-
-    if ((DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_REDEFINE_CONST", calcMainWindow, lpfnDIALOG_REDEFINECONST)) == -1)
-    {
-        MessageBox(NULL, "Unable to display dialog", "System Error", MB_SYSTEMMODAL | MB_ICONHAND | MB_OK);
-    }
-    FreeProcInstance((FARPROC) lpfnDIALOG_REDEFINECONST);
-}
-
-BOOL CALLBACK fnDIALOG_REDEFINECONST(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
-{
-    char tmp[50];
-
-    switch(wMessage)
-    {
-    case WM_INITDIALOG:
-        SetDlgItemText(hDlg, IDC_EDIT1, constName);
-        SetDlgItemText(hDlg, IDC_EDIT2, constUnits);
-        sprintf(tmp, "%.12g", constVal);
-        SetDlgItemText(hDlg, IDC_EDIT3, tmp);
-
-        return TRUE;
-
-    case WM_COMMAND:
-
-        switch(wParam)
-        {
-        case(IDOK):           // OK
-            GetDlgItemText(hDlg, IDC_EDIT1, constName, 25);
-            constName[25] = '\0';
-            GetDlgItemText(hDlg, IDC_EDIT2, constUnits, 10);
-            constUnits[10] = '\0';
-            GetDlgItemText(hDlg, IDC_EDIT3, tmp, 20);
-            tmp[20] = '\0';
-            constVal = atof(tmp);
-            sprintf(tmp, "%.12g", constVal); // Make the Number the correct # significant digits...
-            constVal = atof(tmp);
-            EndDialog(hDlg, FALSE);
-            return TRUE;
-
-            break;
-        case(IDCANCEL):       // CANCEL
-            cancelRedefineConst = 1;
-            EndDialog(hDlg, FALSE);
-            return TRUE;
-
-        default:
-            return FALSE;
-        }
-
-    case WM_SYSCOMMAND:
-        switch(wParam & 0xFFF0)
-        {
-        case SC_CLOSE:
-            EndDialog(hDlg, FALSE);
-            return TRUE;
-        }
-    }
-    return FALSE;
-}
-
-struct constTableStruct constantsUsed[MAX_CONSTS];
-struct constTableStruct constants[MAX_CONST_BANKS][MAX_CONSTS] = 
-{
-    // Bank 1
-    {
-        {TRUE,  "Pi",                       "",             M_PI},
-        {TRUE,  "Speed Of Light",           "m/s",          299792458.0},
-        {TRUE,  "Acceleration Gravity",     "m/s²",         9.80665},
-        {TRUE,  "Plank's Constant",         "Js",           6.626E-34},
-        {TRUE,  "Avogadro's Number",        "mol",          6.022045E+23},
-        {TRUE,  "Electron Charge",          "col",          1.6021892E-19},
-        {TRUE,  "Atomic Mass Unit",         "kg",           1.6606E-27},
-        {TRUE,  "Electron Mass",            "kg",           9.109534E-31},
-        {TRUE,  "Proton Mass",              "kg",           1.6722E-27},
-        {TRUE,  "Electron-Proton Ratio",    "",             1836.1},
-        {TRUE,  "Ideal Gas Volume @ STP",   "l/mol",        22.4136},
-        {TRUE,  "Bohr Radius",              "m",            5.292E-11},
-        {TRUE,  "Electron Volt",            "J",            1.602E-19},
-        {TRUE,  "Boltzman Constant",        "JK-1",         1.380622e-23},
-        {TRUE,  "Faraday's Constant",       "col",          9.65E4},
-        {TRUE,  "Unit Atomic Energy",       "MeV",          931.34},
-        {TRUE,  "Universal Answer",         "",             42.0},
-        {FALSE, "None",                     "",             0.00}  // end of list...
-    },
-     
-    // Bank 2 
-    {
-        {FALSE, "None",                     "",             0.00}  // end of list...
-    },                                                
-    
-    // Bank 3
-    {                                                  
-        {FALSE, "None",                     "",             0.00}  // end of list...
-    },                                                
-    
-    // Bank 4
-    {                                                  
-        {FALSE, "None",                     "",             0.00}  // end of list...
-    },                                                
-    
-    // Bank 5
-    {                                                  
-        {FALSE, "None",                     "",             0.00}  // end of list...
-    },
-};
-
-
-char constantBankNames[MAX_CONST_BANKS][15] = {
-    {"Constants 1"},
-    {"Constants 2"},
-    {"Constants 3"},
-    {"Constants 4"},
-    {"Constants 5"}
-};
-
-BOOL CALLBACK constBankNamesProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
-{
-    switch(wMessage)
-    {
-    case WM_INITDIALOG:
-        SetDlgItemText(hDlg, IDC_EDIT1, constantBankNames[0]);
-        SetDlgItemText(hDlg, IDC_EDIT2, constantBankNames[1]);
-        SetDlgItemText(hDlg, IDC_EDIT3, constantBankNames[2]);
-        SetDlgItemText(hDlg, IDC_EDIT4, constantBankNames[3]);
-        SetDlgItemText(hDlg, IDC_EDIT5, constantBankNames[4]);
-        return TRUE;
-    case WM_COMMAND:
-        switch(LOWORD(wParam))
-        {
-        case(IDOK):           /* OK - Close */
-            GetDlgItemText(hDlg, IDC_EDIT1, constantBankNames[0], 15);
-            constantBankNames[0][14] = CNULL;
-            GetDlgItemText(hDlg, IDC_EDIT2, constantBankNames[1], 15);
-            constantBankNames[1][14] = CNULL;
-            GetDlgItemText(hDlg, IDC_EDIT3, constantBankNames[2], 15);
-            constantBankNames[2][14] = CNULL;
-            GetDlgItemText(hDlg, IDC_EDIT4, constantBankNames[3], 15);
-            constantBankNames[3][14] = CNULL;
-            GetDlgItemText(hDlg, IDC_EDIT5, constantBankNames[4], 15);
-            constantBankNames[4][14] = CNULL;
-            EndDialog(hDlg, FALSE);
-            return TRUE;
-        case(IDCANCEL):       /* Cancel */
-            EndDialog(hDlg, FALSE);
-            return TRUE;
-        default:
-            return FALSE;
-        }
-
-    case WM_SYSCOMMAND:
-        switch(wParam & 0xFFF0)
-        {
-        case SC_CLOSE:
-            EndDialog(hDlg, FALSE);
-            return TRUE;
-        }
-    }
-    return FALSE;
-}
-
-extern BOOL CALLBACK fnDIALOG_Constants(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
-void SCI_const(void)
-{
-    DLGPROC lpfnDIALOG_ConstantsProc;
-
-    lpfnDIALOG_ConstantsProc = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_Constants, hExcaliburInstance);
-
-    if ((DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_CONSTANTS", calcMainWindow, lpfnDIALOG_ConstantsProc)) == -1)
-    {
-        MessageBox(NULL, "Unable to display dialog", "System Error", MB_SYSTEMMODAL | MB_ICONHAND | MB_OK);
-    }
-    FreeProcInstance((FARPROC) lpfnDIALOG_ConstantsProc);
-}
-
-BOOL CALLBACK fnDIALOG_Constants(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
-{
-    int i, j;
-    char tmp[50];
-    LRESULT item;
-    static int lbTabStops[2] = { 170, 240 };
-
-    switch(wMessage)
-    {
-    case WM_INITDIALOG:
-        SendDlgItemMessage(hDlg, 101, LB_SETTABSTOPS, 2, (DWORD) lbTabStops);
-
-        j = 0;
-        for (i = 0; i < MAX_CONSTS; i++)
-        {
-            if (constants[lastConstBank][i].includeInList == TRUE)      // Only include those in the list the user wants...
-            {
-                sprintf(tmp, "%-25s\t%-14.12g \t%s",
-                         constants[lastConstBank][i].name,
-                         constants[lastConstBank][i].value, constants[lastConstBank][i].units);
-                makeInternational(tmp);        // To swap commas and DPs if needed
-                SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
-                memcpy(&constantsUsed[j], &constants[lastConstBank][i], sizeof(constants[lastConstBank][i]));
-                j++;
-            }
-        }
-        SetDlgItemText(hDlg, IDC_RADIO1, constantBankNames[0]);
-        SetDlgItemText(hDlg, IDC_RADIO2, constantBankNames[1]);
-        SetDlgItemText(hDlg, IDC_RADIO3, constantBankNames[2]);
-        SetDlgItemText(hDlg, IDC_RADIO4, constantBankNames[3]);
-        SetDlgItemText(hDlg, IDC_RADIO5, constantBankNames[4]);
-
-        SendDlgItemMessage(hDlg, IDC_RADIO1 + lastConstBank, BM_SETCHECK, 1, 0);       // Set up bank selection!
-        SendDlgItemMessage(hDlg, 101, LB_SETCURSEL, lastChosenConst, 0);
-        SetFocus(GetDlgItem(hDlg, 101));
-        return TRUE;
-    case WM_COMMAND:
-        switch(LOWORD(wParam))
-        {
-        case(101):
-            if (HIWORD(wParam) != LBN_DBLCLK)
-                break;
-            /* Else fall through!!!! */
-        case(102):            /* Insert constant number */
-            item = SendDlgItemMessage(hDlg, 101, LB_GETCURSEL, 0, 0L);
-            if (item == (LRESULT) LB_ERR)
-            {
-                MessageBox(hDlg, "No Item Selected In The List Box", "Excalibur User Error", MB_OK);
-            }
-            else
-            {
-                // Find item in list even with FALSE entries!
-                j = 0;
-                for (i = 0; i < MAX_CONSTS; i++)
-                {
-                    if (constants[lastConstBank][j].includeInList == TRUE)
-                    {
-                        if (item == j)
-                            break;
-                        j++;
-                    }
-                }
-                lastChosenConst = j;
-                PushConstant(constantsUsed[item].value);
-                EndDialog(hDlg, FALSE);
-            }
-            return TRUE;
-        case(105):            /* Add New Constant */
-            for (i = 0; i < MAX_CONSTS; i++)
-            {
-                if (constants[lastConstBank][i].includeInList == FALSE)
-                {
-                    constants[lastConstBank][i].includeInList = TRUE;
-                    strcpy(constants[lastConstBank][i].name, "New Constant");
-                    strcpy(constants[lastConstBank][i].units, "");
-                    constants[lastConstBank][i].value = 0.0;
-                    item = i;
-                    break;
-                }
-            }
-            if (i == MAX_CONSTS)        // no room in list!
-            {
-                MessageBox(hDlg, "Sorry, no room left in this constants bank...", "Excalibur Error", MB_OK);
-                break;
-            }
-
-            // NO BREAK!!! Fall through!
-        case(104):            /* Redefine Constant */
-            if (LOWORD(wParam) == 104)
-                item = SendDlgItemMessage(hDlg, 101, LB_GETCURSEL, 0, 0L);
-            if (item == (LRESULT) LB_ERR)
-            {
-                MessageBox(hDlg, "No Item Selected In The List Box", "Excalibur User Error", MB_OK);
-            }
-            else
-            {
-                // Find item in list even with FALSE entries!
-                j = 0;
-                for (i = 0; i < MAX_CONSTS; i++)
-                {
-                    if (constants[lastConstBank][j].includeInList == TRUE)
-                    {
-                        if (item == j)
-                            break;
-                        j++;
-                    }
-                }
-                lastChosenConst = j;
-                strcpy(constName, constants[lastConstBank][item].name);
-                strcpy(constUnits, constants[lastConstBank][item].units);
-                constVal = constants[lastConstBank][item].value;
-                cancelRedefineConst = 0;
-                RedefineConst();
-                if (cancelRedefineConst == 0)
-                {
-                    strcpy(constants[lastConstBank][item].name, constName);
-                    strcpy(constants[lastConstBank][item].units, constUnits);
-                    constants[lastConstBank][item].value = constVal;
-                    // Must add them to the list again...
-                    SendDlgItemMessage(hDlg, 101, LB_RESETCONTENT, 0, 0);
-                    j = 0;
-                    for (i = 0; i < MAX_CONSTS; i++)
-                    {
-                        if (constants[lastConstBank][i].includeInList == TRUE)  // Only include those in the list the user wants...
-                        {
-                            sprintf(tmp, "%-25s\t%-14.12g \t%s",
-                                     constants[lastConstBank][i].name,
-                                     constants[lastConstBank][i].value, constants[lastConstBank][i].units);
-                            makeInternational(tmp);    // To swap commas and DPs if needed
-                            SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
-                            memcpy(&constantsUsed[j], &constants[lastConstBank][i], sizeof(constants[lastConstBank][i]));
-                            j++;
-                        }
-                    }
-                    SendDlgItemMessage(hDlg, 101, LB_SETCURSEL, lastChosenConst, 0);
-                    SetFocus(GetDlgItem(hDlg, 101));
-                }
-            }
-            return TRUE;
-
-        case(106):            // Delete!
-            item = SendDlgItemMessage(hDlg, 101, LB_GETCURSEL, 0, 0L);
-            if (item == (LRESULT) LB_ERR)
-            {
-                MessageBox(hDlg, "No Item Selected In The List Box", "Excalibur User Error", MB_OK);
-            }
-            else
-            {
-                if (MessageBox
-                    (hDlg, "Are you sure you wish to delete this entry?", "Excalibur For Windows", MB_YESNO) == IDYES)
-                {
-                    // Find item in list even with FALSE entries!
-                    j = 0;
-                    for (i = 0; i < MAX_CONSTS; i++)
-                    {
-                        if (constants[lastConstBank][j].includeInList == TRUE)
-                        {
-                            if (item == j)
-                                break;
-                            j++;
-                        }
-                    }
-                    constants[lastConstBank][j].includeInList = FALSE;
-                    lastChosenConst = j - 1;
-                    if (lastChosenConst < 0)
-                        lastChosenConst = 0;
-
-                    // Now move existing entries down...
-                    for (i = j; i < MAX_CONSTS - 1; i++)
-                    {
-                        memcpy(&constants[lastConstBank][i],
-                                &constants[lastConstBank][i + 1], sizeof(constants[lastConstBank][i]));
-                    }
-                    constants[lastConstBank][i].includeInList = FALSE;  // Always set last list entry on delete to FALSE
-
-                    SendDlgItemMessage(hDlg, 101, LB_RESETCONTENT, 0, 0);
-                    j = 0;
-                    for (i = 0; i < MAX_CONSTS; i++)
-                    {
-                        if (constants[lastConstBank][i].includeInList == TRUE)  // Only include those in the list the user wants...
-                        {
-                            sprintf(tmp, "%-25s\t%-14.12g \t%s",
-                                     constants[lastConstBank][i].name,
-                                     constants[lastConstBank][i].value, constants[lastConstBank][i].units);
-                            makeInternational(tmp);    // To swap commas and DPs if needed
-                            SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
-                            memcpy(&constantsUsed[j], &constants[lastConstBank][i], sizeof(constants[lastConstBank][i]));
-                            j++;
-                        }
-                    }
-                    SendDlgItemMessage(hDlg, 101, LB_SETCURSEL, lastChosenConst, 0);
-                    SetFocus(GetDlgItem(hDlg, 101));
-                }
-            }
-            return TRUE;
-
-        case(IDC_RADIO1):
-            lastConstBank = 0;
-            SendDlgItemMessage(hDlg, 101, LB_RESETCONTENT, 0, 0);
-            j = 0;
-            for (i = 0; i < MAX_CONSTS; i++)
-            {
-                if (constants[lastConstBank][i].includeInList == TRUE)  // Only include those in the list the user wants...
-                {
-                    sprintf(tmp, "%-25s\t%-14.12g \t%s",
-                             constants[lastConstBank][i].name,
-                             constants[lastConstBank][i].value, constants[lastConstBank][i].units);
-                    makeInternational(tmp);    // To swap commas and DPs if needed
-                    SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
-                    memcpy(&constantsUsed[j], &constants[lastConstBank][i], sizeof(constants[lastConstBank][i]));
-                    j++;
-                }
-            }
-            SendDlgItemMessage(hDlg, 101, LB_SETCURSEL, lastChosenConst, 0);
-            SetFocus(GetDlgItem(hDlg, 101));
-            return TRUE;
-        case(IDC_RADIO2):
-            lastConstBank = 1;
-            SendDlgItemMessage(hDlg, 101, LB_RESETCONTENT, 0, 0);
-            j = 0;
-            for (i = 0; i < MAX_CONSTS; i++)
-            {
-                if (constants[lastConstBank][i].includeInList == TRUE)  // Only include those in the list the user wants...
-                {
-                    sprintf(tmp, "%-25s\t%-14.12g \t%s",
-                             constants[lastConstBank][i].name,
-                             constants[lastConstBank][i].value, constants[lastConstBank][i].units);
-                    makeInternational(tmp);    // To swap commas and DPs if needed
-                    SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
-                    memcpy(&constantsUsed[j], &constants[lastConstBank][i], sizeof(constants[lastConstBank][i]));
-                    j++;
-                }
-            }
-            SendDlgItemMessage(hDlg, 101, LB_SETCURSEL, lastChosenConst, 0);
-            SetFocus(GetDlgItem(hDlg, 101));
-            return TRUE;
-        case(IDC_RADIO3):
-            lastConstBank = 2;
-            SendDlgItemMessage(hDlg, 101, LB_RESETCONTENT, 0, 0);
-            j = 0;
-            for (i = 0; i < MAX_CONSTS; i++)
-            {
-                if (constants[lastConstBank][i].includeInList == TRUE)  // Only include those in the list the user wants...
-                {
-                    sprintf(tmp, "%-25s\t%-14.12g \t%s",
-                             constants[lastConstBank][i].name,
-                             constants[lastConstBank][i].value, constants[lastConstBank][i].units);
-                    makeInternational(tmp);    // To swap commas and DPs if needed
-                    SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
-                    memcpy(&constantsUsed[j], &constants[lastConstBank][i], sizeof(constants[lastConstBank][i]));
-                    j++;
-                }
-            }
-            SendDlgItemMessage(hDlg, 101, LB_SETCURSEL, lastChosenConst, 0);
-            SetFocus(GetDlgItem(hDlg, 101));
-            return TRUE;
-        case(IDC_RADIO4):
-            lastConstBank = 3;
-            SendDlgItemMessage(hDlg, 101, LB_RESETCONTENT, 0, 0);
-            j = 0;
-            for (i = 0; i < MAX_CONSTS; i++)
-            {
-                if (constants[lastConstBank][i].includeInList == TRUE)  // Only include those in the list the user wants...
-                {
-                    sprintf(tmp, "%-25s\t%-14.12g \t%s",
-                             constants[lastConstBank][i].name,
-                             constants[lastConstBank][i].value, constants[lastConstBank][i].units);
-                    makeInternational(tmp);    // To swap commas and DPs if needed
-                    SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
-                    memcpy(&constantsUsed[j], &constants[lastConstBank][i], sizeof(constants[lastConstBank][i]));
-                    j++;
-                }
-            }
-            SendDlgItemMessage(hDlg, 101, LB_SETCURSEL, lastChosenConst, 0);
-            SetFocus(GetDlgItem(hDlg, 101));
-            return TRUE;
-        case(IDC_RADIO5):
-            lastConstBank = 4;
-            SendDlgItemMessage(hDlg, 101, LB_RESETCONTENT, 0, 0);
-            j = 0;
-            for (i = 0; i < MAX_CONSTS; i++)
-            {
-                if (constants[lastConstBank][i].includeInList == TRUE)  // Only include those in the list the user wants...
-                {
-                    sprintf(tmp, "%-25s\t%-14.12g \t%s",
-                             constants[lastConstBank][i].name,
-                             constants[lastConstBank][i].value, constants[lastConstBank][i].units);
-                    makeInternational(tmp);    // To swap commas and DPs if needed
-                    SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
-                    memcpy(&constantsUsed[j], &constants[lastConstBank][i], sizeof(constants[lastConstBank][i]));
-                    j++;
-                }
-            }
-            SendDlgItemMessage(hDlg, 101, LB_SETCURSEL, lastChosenConst, 0);
-            SetFocus(GetDlgItem(hDlg, 101));
-            return TRUE;
-        case(107):            /* Redefine Bank Names */
-            DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_CONSTANT_BANK_NAMES", hDlg, constBankNamesProc);
-            SetDlgItemText(hDlg, IDC_RADIO1, constantBankNames[0]);
-            SetDlgItemText(hDlg, IDC_RADIO2, constantBankNames[1]);
-            SetDlgItemText(hDlg, IDC_RADIO3, constantBankNames[2]);
-            SetDlgItemText(hDlg, IDC_RADIO4, constantBankNames[3]);
-            SetDlgItemText(hDlg, IDC_RADIO5, constantBankNames[4]);
-            return TRUE;
-
-        case(103):            /* Cancel */
-            EndDialog(hDlg, FALSE);
-            return TRUE;
-        default:
-            return FALSE;
-        }
-
-    case WM_SYSCOMMAND:
-        switch(wParam & 0xFFF0)
-        {
-        case SC_CLOSE:
-            EndDialog(hDlg, FALSE);
-            return TRUE;
-        }
-    }
-    return FALSE;
-}
-
-
 void SCI_abs(void)
 {
     StackPush(fabs(StackPop()));
@@ -995,14 +484,14 @@ void SCI_floor(void)
     StackPush(temp);
 }
 
-void Sci_Ceil(void)
+void SCI_Ceil(void)
 {
     double temp;
     temp = ceil(MakeAccurate(StackPop()));
     StackPush(temp);
 }
 
-void Sci_GCD(void)
+void SCI_GCD(void)
 {
     long l1, l2, t1, t2;
     long try_value;
@@ -1037,7 +526,7 @@ void Sci_GCD(void)
     StackPush((double) try_value);
 }
 
-void Sci_LCM(void)
+void SCI_LCM(void)
 {
     long l1, l2, t1, t2;
     long try_value;
@@ -1080,18 +569,18 @@ void Sci_LCM(void)
         StackPush((double) try_value);
 }
 
-void Sci_MinR(void)
+void SCI_MinR(void)
 {
     StackPush(DBL_MIN);
 }
 
-void Sci_MaxR(void)
+void SCI_MaxR(void)
 {
     StackPush(DBL_MAX);
 }
 
 
-void Sci_RoundYX(void)
+void SCI_RoundYX(void)
 {
     long mult;
     double temp;
@@ -1109,7 +598,7 @@ void Sci_RoundYX(void)
 }
 
 extern BOOL CALLBACK fnDIALOG_PrimesProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
-void Sci_prime(void)
+void SCI_prime(void)
 {
     DLGPROC lpfnDIALOG_PrimesProc;
 
@@ -1196,7 +685,7 @@ BOOL CALLBACK fnDIALOG_PrimesProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARA
 
 
 extern BOOL CALLBACK fnDIALOG_ElementsProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
-void Sci_elements(void)
+void SCI_elements(void)
 {
     DLGPROC lpfnDIALOG_ElementsProc;
 
@@ -1392,7 +881,7 @@ BOOL CALLBACK fnDIALOG_ElementsProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
 }
 
 extern BOOL CALLBACK fnDIALOG_ResistorProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
-void Sci_resist(void)
+void SCI_resist(void)
 {
 
     DLGPROC lpfnDIALOG_ResistorProc;
@@ -1559,7 +1048,7 @@ BOOL CALLBACK fnDIALOG_ResistorProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
 }
 
 extern BOOL CALLBACK MetricPrefixDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
-void Sci_metricPre(void)
+void SCI_metricPre(void)
 {
     DLGPROC lpMetricPrefixDlgProc;
 
@@ -1651,7 +1140,7 @@ BOOL CALLBACK MetricPrefixDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARA
 }
 
 
-void Sci_LogBase2(void)
+void SCI_LogBase2(void)
 {
     double temp;
 
@@ -1667,24 +1156,24 @@ void Sci_LogBase2(void)
     }
 }
 
-void Sci_TimerStart(void)
+void SCI_TimerStart(void)
 {
     userTimer = 1;
 }
 
-void Sci_TimerStop(void)
+void SCI_TimerStop(void)
 {
     userTimer = 2;
 }
 
-void Sci_TimerClear(void)
+void SCI_TimerClear(void)
 {
     userTicks = 0;
     userTimer = 0;
     UpdateTimeBar();
 }
 
-void Sci_TimerPush(void)
+void SCI_TimerPush(void)
 {
     unsigned long ut;
     char tmp[21];

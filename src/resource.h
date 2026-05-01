@@ -2,7 +2,6 @@
 // Microsoft Developer Studio generated include file.
 // Used by excal.rc
 //
-
 #define T_NULL                          0
 #define H_NULL                          1
 #define T_SIN                           2

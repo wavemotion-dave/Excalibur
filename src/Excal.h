@@ -38,16 +38,16 @@ typedef unsigned __int32    uint32_t;
 typedef unsigned __int16    uint16_t;
 typedef unsigned __int8     uint8_t;
 
-#define MAX_FUNCS           40           // The 40th one is for help only
+#define MAX_FUNCS           40
 
 #define RPN_LAST_KEY        -1
 
 #define MAX_DIGITS          18
 
-#define X_NEW     01            /* Next keypress pushes stack and starts new edit */
-#define X_EDIT    02            /* Value is under edit */
-#define X_ENTER   03            /* Enter just pressed - next keypress replaces X */
-#define X_NULL    04
+#define X_NEW               01  /* Next keypress pushes stack and starts new edit */
+#define X_EDIT              02  /* Value is under edit and will have the _ at the end */
+#define X_ENTER             03  /* Enter just pressed - next keypress replaces X */
+#define X_NULL              04  /* No change to the X value - it will remain one of those above */
 
 #define MAX_IMPORT_CLIPBOARD_SIZE (1024 * 10)
 
@@ -269,7 +269,7 @@ extern void FloatsToLongs(void);
 extern void LongsToFloats(void);
 extern int Init(void);
 extern int ShowStatus(void);
-extern int UpdateSpareBar(char *msg);
+extern void UpdateSpareBar(char *msg);
 extern int UpdateTimeBar(void);
 extern int ShowFunctionBar(char *msg);
 extern double MakeAccurate(double val);
@@ -297,6 +297,7 @@ extern void PROG_dec(void);
 extern void cust_define(void);
 extern void RPN_clear(void);
 extern void RPN_clearL(void);
+extern void RPN_const(void);
 extern void RPN_enter(void);
 extern void RPN_dp(void);
 extern void RPN_Ex(void);
@@ -314,6 +315,7 @@ extern void RPN_rotateStackDn(void);
 extern void RPN_lastX(void);
 extern void RPN_store(void);
 extern void RPN_recall(void);
+extern void RPN_ExchangeReg(void);
 extern int GetMenuType(struct funcStruct *cFunc);
 extern void SetMenuType(int type);
 extern void SaveToDisk(void);
@@ -355,7 +357,8 @@ extern void RPN_larg(void);
 extern void RPN_frac(void);
 extern void RPN_edit(void);
 extern void RPN_Notes(void);
-extern void RPN_CopyX(void);
+extern void RPN_Copy(void);
+extern void RPN_Paste(void);
 extern void RPN_inverse(void);
 
 #define CUSTOM_SAVE_SCI       1
@@ -384,6 +387,15 @@ extern uint64_t stackPops;
 
 #define M_PI              3.14159265359
 #define CNULL            '\0'
+
+#define REG_STORE         0x01
+#define REG_RECALL        0x02
+#define REG_EXCHANGE      0x04
+#define REG_DP            0x08
+#define REG_PLUS          0x10
+#define REG_MINUS         0x20
+#define REG_MULTIPLY      0x40
+#define REG_DIVIDE        0x80
 
 extern int allowDigitBasedOnMaxStringSize(char *Xstr, char digit);
 extern void makeInternational(char *str);
@@ -455,7 +467,10 @@ extern uint8_t finRecall;
 extern uint8_t convInverse;
 extern uint8_t depreciationType;
 
-#define MAX_STO 26
+extern uint8_t  rpnStore;
+extern uint8_t  rpnRecall;
+
+#define MAX_STO 100
 extern double STO[MAX_STO];
 extern char STOlabels[MAX_STO][9];
 
@@ -482,202 +497,6 @@ extern int CreateDebugWindow(HWND hwnd, HINSTANCE hInstance);
 extern void RPN_SingleStep(void);
 extern HWND debugTraceWindow;
 int PreInit(void);
-void RPN_storeReg(int reg);
-void RPN_storeAddReg(int reg);
-void RPN_storeSubReg(int reg);
-void RPN_storeMulReg(int reg);
-void RPN_storeDivReg(int reg);
-void RPN_recallReg(int reg);
-
-void RPN_storeA(void);
-void RPN_storeB(void);
-void RPN_storeC(void);
-void RPN_storeD(void);
-void RPN_storeE(void);
-void RPN_storeF(void);
-void RPN_storeG(void);
-void RPN_storeH(void);
-void RPN_storeI(void);
-void RPN_storeJ(void);
-void RPN_storeK(void);
-void RPN_storeL(void);
-void RPN_storeM(void);
-void RPN_storeN(void);
-void RPN_storeO(void);
-void RPN_storeP(void);
-void RPN_storeQ(void);
-void RPN_storeR(void);
-void RPN_storeS(void);
-void RPN_storeT(void);
-void RPN_storeU(void);
-void RPN_storeV(void);
-void RPN_storeW(void);
-void RPN_storeX(void);
-void RPN_storeY(void);
-void RPN_storeZ(void);
-
-void RPN_storeAddA(void);
-void RPN_storeAddB(void);
-void RPN_storeAddC(void);
-void RPN_storeAddD(void);
-void RPN_storeAddE(void);
-void RPN_storeAddF(void);
-void RPN_storeAddG(void);
-void RPN_storeAddH(void);
-void RPN_storeAddI(void);
-void RPN_storeAddJ(void);
-void RPN_storeAddK(void);
-void RPN_storeAddL(void);
-void RPN_storeAddM(void);
-void RPN_storeAddN(void);
-void RPN_storeAddO(void);
-void RPN_storeAddP(void);
-void RPN_storeAddQ(void);
-void RPN_storeAddR(void);
-void RPN_storeAddS(void);
-void RPN_storeAddT(void);
-void RPN_storeAddU(void);
-void RPN_storeAddV(void);
-void RPN_storeAddW(void);
-void RPN_storeAddX(void);
-void RPN_storeAddY(void);
-void RPN_storeAddZ(void);
-
-void RPN_storeSubA(void);
-void RPN_storeSubB(void);
-void RPN_storeSubC(void);
-void RPN_storeSubD(void);
-void RPN_storeSubE(void);
-void RPN_storeSubF(void);
-void RPN_storeSubG(void);
-void RPN_storeSubH(void);
-void RPN_storeSubI(void);
-void RPN_storeSubJ(void);
-void RPN_storeSubK(void);
-void RPN_storeSubL(void);
-void RPN_storeSubM(void);
-void RPN_storeSubN(void);
-void RPN_storeSubO(void);
-void RPN_storeSubP(void);
-void RPN_storeSubQ(void);
-void RPN_storeSubR(void);
-void RPN_storeSubS(void);
-void RPN_storeSubT(void);
-void RPN_storeSubU(void);
-void RPN_storeSubV(void);
-void RPN_storeSubW(void);
-void RPN_storeSubX(void);
-void RPN_storeSubY(void);
-void RPN_storeSubZ(void);
-
-void RPN_storeMulA(void);
-void RPN_storeMulB(void);
-void RPN_storeMulC(void);
-void RPN_storeMulD(void);
-void RPN_storeMulE(void);
-void RPN_storeMulF(void);
-void RPN_storeMulG(void);
-void RPN_storeMulH(void);
-void RPN_storeMulI(void);
-void RPN_storeMulJ(void);
-void RPN_storeMulK(void);
-void RPN_storeMulL(void);
-void RPN_storeMulM(void);
-void RPN_storeMulN(void);
-void RPN_storeMulO(void);
-void RPN_storeMulP(void);
-void RPN_storeMulQ(void);
-void RPN_storeMulR(void);
-void RPN_storeMulS(void);
-void RPN_storeMulT(void);
-void RPN_storeMulU(void);
-void RPN_storeMulV(void);
-void RPN_storeMulW(void);
-void RPN_storeMulX(void);
-void RPN_storeMulY(void);
-void RPN_storeMulZ(void);
-
-void RPN_storeDivA(void);
-void RPN_storeDivB(void);
-void RPN_storeDivC(void);
-void RPN_storeDivD(void);
-void RPN_storeDivE(void);
-void RPN_storeDivF(void);
-void RPN_storeDivG(void);
-void RPN_storeDivH(void);
-void RPN_storeDivI(void);
-void RPN_storeDivJ(void);
-void RPN_storeDivK(void);
-void RPN_storeDivL(void);
-void RPN_storeDivM(void);
-void RPN_storeDivN(void);
-void RPN_storeDivO(void);
-void RPN_storeDivP(void);
-void RPN_storeDivQ(void);
-void RPN_storeDivR(void);
-void RPN_storeDivS(void);
-void RPN_storeDivT(void);
-void RPN_storeDivU(void);
-void RPN_storeDivV(void);
-void RPN_storeDivW(void);
-void RPN_storeDivX(void);
-void RPN_storeDivY(void);
-void RPN_storeDivZ(void);
-
-void RPN_recallA(void);
-void RPN_recallB(void);
-void RPN_recallC(void);
-void RPN_recallD(void);
-void RPN_recallE(void);
-void RPN_recallF(void);
-void RPN_recallG(void);
-void RPN_recallH(void);
-void RPN_recallI(void);
-void RPN_recallJ(void);
-void RPN_recallK(void);
-void RPN_recallL(void);
-void RPN_recallM(void);
-void RPN_recallN(void);
-void RPN_recallO(void);
-void RPN_recallP(void);
-void RPN_recallQ(void);
-void RPN_recallR(void);
-void RPN_recallS(void);
-void RPN_recallT(void);
-void RPN_recallU(void);
-void RPN_recallV(void);
-void RPN_recallW(void);
-void RPN_recallX(void);
-void RPN_recallY(void);
-void RPN_recallZ(void);
-
-void RPN_recallA(void);
-void RPN_recallB(void);
-void RPN_recallC(void);
-void RPN_recallD(void);
-void RPN_recallE(void);
-void RPN_recallF(void);
-void RPN_recallG(void);
-void RPN_recallH(void);
-void RPN_recallI(void);
-void RPN_recallJ(void);
-void RPN_recallK(void);
-void RPN_recallL(void);
-void RPN_recallM(void);
-void RPN_recallN(void);
-void RPN_recallO(void);
-void RPN_recallP(void);
-void RPN_recallQ(void);
-void RPN_recallR(void);
-void RPN_recallS(void);
-void RPN_recallT(void);
-void RPN_recallU(void);
-void RPN_recallV(void);
-void RPN_recallW(void);
-void RPN_recallX(void);
-void RPN_recallY(void);
-void RPN_recallZ(void);
-
 
 // Add to the end of this list but *NEVER* remove entries or else you will need to update excalibur config file...
 enum UniqueButtonIndexTag
@@ -713,169 +532,6 @@ enum UniqueButtonIndexTag
     UNI_PLAY,
     UNI_CLRA,
     UNI_EDIT,
-
-    UNI_ADDA,
-    UNI_ADDB,
-    UNI_ADDC,
-    UNI_ADDD,
-    UNI_ADDE,
-    UNI_ADDF,
-    UNI_ADDG,
-    UNI_ADDH,
-    UNI_ADDI,
-    UNI_ADDJ,
-    UNI_ADDK,
-    UNI_ADDL,
-    UNI_ADDM,
-    UNI_ADDN,
-    UNI_ADDO,
-    UNI_ADDP,
-    UNI_ADDQ,
-    UNI_ADDR,
-    UNI_ADDS,
-    UNI_ADDT,
-    UNI_ADDU,
-    UNI_ADDV,
-    UNI_ADDW,
-    UNI_ADDX,
-    UNI_ADDY,
-    UNI_ADDZ,
-
-    UNI_SUBA,
-    UNI_SUBB,
-    UNI_SUBC,
-    UNI_SUBD,
-    UNI_SUBE,
-    UNI_SUBF,
-    UNI_SUBG,
-    UNI_SUBH,
-    UNI_SUBI,
-    UNI_SUBJ,
-    UNI_SUBK,
-    UNI_SUBL,
-    UNI_SUBM,
-    UNI_SUBN,
-    UNI_SUBO,
-    UNI_SUBP,
-    UNI_SUBQ,
-    UNI_SUBR,
-    UNI_SUBS,
-    UNI_SUBT,
-    UNI_SUBU,
-    UNI_SUBV,
-    UNI_SUBW,
-    UNI_SUBX,
-    UNI_SUBY,
-    UNI_SUBZ,
-
-    UNI_MULA,
-    UNI_MULB,
-    UNI_MULC,
-    UNI_MULD,
-    UNI_MULE,
-    UNI_MULF,
-    UNI_MULG,
-    UNI_MULH,
-    UNI_MULI,
-    UNI_MULJ,
-    UNI_MULK,
-    UNI_MULL,
-    UNI_MULM,
-    UNI_MULN,
-    UNI_MULO,
-    UNI_MULP,
-    UNI_MULQ,
-    UNI_MULR,
-    UNI_MULS,
-    UNI_MULT,
-    UNI_MULU,
-    UNI_MULV,
-    UNI_MULW,
-    UNI_MULX,
-    UNI_MULY,
-    UNI_MULZ,
-
-    UNI_DIVA,
-    UNI_DIVB,
-    UNI_DIVC,
-    UNI_DIVD,
-    UNI_DIVE,
-    UNI_DIVF,
-    UNI_DIVG,
-    UNI_DIVH,
-    UNI_DIVI,
-    UNI_DIVJ,
-    UNI_DIVK,
-    UNI_DIVL,
-    UNI_DIVM,
-    UNI_DIVN,
-    UNI_DIVO,
-    UNI_DIVP,
-    UNI_DIVQ,
-    UNI_DIVR,
-    UNI_DIVS,
-    UNI_DIVT,
-    UNI_DIVU,
-    UNI_DIVV,
-    UNI_DIVW,
-    UNI_DIVX,
-    UNI_DIVY,
-    UNI_DIVZ,
-
-    UNI_STOA,
-    UNI_STOB,
-    UNI_STOC,
-    UNI_STOD,
-    UNI_STOE,
-    UNI_STOF,
-    UNI_STOG,
-    UNI_STOH,
-    UNI_STOI,
-    UNI_STOJ,
-    UNI_STOK,
-    UNI_STOL,
-    UNI_STOM,
-    UNI_STON,
-    UNI_STOO,
-    UNI_STOP,
-    UNI_STOQ,
-    UNI_STOR,
-    UNI_STOS,
-    UNI_STOT,
-    UNI_STOU,
-    UNI_STOV,
-    UNI_STOW,
-    UNI_STOX,
-    UNI_STOY,
-    UNI_STOZ,
-
-    UNI_RCLA,
-    UNI_RCLB,
-    UNI_RCLC,
-    UNI_RCLD,
-    UNI_RCLE,
-    UNI_RCLF,
-    UNI_RCLG,
-    UNI_RCLH,
-    UNI_RCLI,
-    UNI_RCLJ,
-    UNI_RCLK,
-    UNI_RCLL,
-    UNI_RCLM,
-    UNI_RCLN,
-    UNI_RCLO,
-    UNI_RCLP,
-    UNI_RCLQ,
-    UNI_RCLR,
-    UNI_RCLS,
-    UNI_RCLT,
-    UNI_RCLU,
-    UNI_RCLV,
-    UNI_RCLW,
-    UNI_RCLX,
-    UNI_RCLY,
-    UNI_RCLZ,
-
     UNI_DROP,
     UNI_LARG,
     UNI_FRAC,
@@ -1213,8 +869,14 @@ enum UniqueButtonIndexTag
     UNI_RCL2I,
     UNI_ENDCONST,
     UNI_STARTCONST,
+    UNI_COPY,
+    UNI_PASTE,
+    UNI_EXREG,
 
-    UNI_ADD_NEW_HERE
+    UNI_ADD_NEW_HERE,
+    
+    UNI_CONSTANTS_START = 1000,
+    UNI_CONSTANTS_END   = 1099,
 };
 
 extern struct keypadStruct RPNkeys[];
@@ -1271,14 +933,13 @@ extern uint32_t userTicks;
 #define RPN_LARG                        132
 #define RPN_FRAC                        133
 #define RPN_EDIT                        134
-#define RPN_RCL1                        135
-#define RPN_STO0                        136
-#define RPN_RCL0                        137
-#define RPN_STO1                        138
-#define RPN_NOTES                       139
-#define RPN_INV                         140
-#define RPN_CARRY                       141
-#define RPN_REC                         142
+#define RPN_CONST                       135
+#define RPN_NOTES                       136
+#define RPN_INV                         137
+#define RPN_REC                         139
+#define RPN_EXREG                       140
+#define RPN_COPY                        141
+#define RPN_PASTE                       142
 
 #define RPN_SCI                         200
 #define RPN_SCI2                        201
@@ -1298,6 +959,7 @@ extern uint32_t userTicks;
 #define SPARE_BAR                       304
 #define ANGLE_BAR                       305
 #define PROG_BAR                        306
+#define RPN_CARRY                       307 //TODO: CARRY_BAR?
 
 #define RPN_STACK                       400
 #define RPN_X_LABEL                     401

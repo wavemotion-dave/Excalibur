@@ -863,7 +863,7 @@ void Macro_RecallN(void)
     int i;
 
     i = (int) StackPop();
-    if (i >= 0 && i < 26)
+    if (i >= 0 && i < MAX_STO)
     {
         StackPush(STO[i]);
     }
@@ -878,7 +878,7 @@ void Macro_StoreN(void)
     int i;
 
     i = (int) StackPop();
-    if (i >= 0 && i < 26)
+    if (i >= 0 && i < MAX_STO)
     {
         STO[i] = X;
     }
@@ -1847,7 +1847,7 @@ void Macro_StoH(void)
 
 void Macro_Sto2i(void)
 {
-    if (indirectRegister >= 0 && indirectRegister < 26)
+    if (indirectRegister >= 0 && indirectRegister < MAX_STO)
     {
         STO[indirectRegister] = X;
     }
@@ -1859,7 +1859,7 @@ void Macro_Sto2i(void)
 
 void Macro_Rcl2i(void)
 {
-    if (indirectRegister >= 0 && indirectRegister < 26)
+    if (indirectRegister >= 0 && indirectRegister < MAX_STO)
     {
         StackPush(STO[indirectRegister]);
     }

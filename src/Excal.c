@@ -53,7 +53,7 @@
                   "if you want to donate to support the effort.\n\n"    \
                   "https://github.com/wavemotion-dave/Excalibur"
 
-#define CONFIG_VERSION_MAIN     0xF003      // If this changes, we wipe EVERYTHING
+#define CONFIG_VERSION_MAIN     0xF004      // If this changes, we wipe EVERYTHING
 #define CONFIG_VERSION_SUB      0xF001      // If this changes, we reset x,y window position and reset constant tables (currency, physics constants, etc)
 
 #define END_OF_PROGRAM_STR "<End Of Program>"
@@ -72,6 +72,8 @@ uint8_t  bExactFont = TRUE;
 int16_t  MacroStack[MAX_MACRO_STACK];
 int16_t  MacroStackIdx = 0;
 uint32_t macroFlags = 0x00000000;
+
+uint8_t  rpnStoreRecall = 0x00;
 
 uint32_t wordSize = 32;
 uint32_t wordSizeMask = 0xFFFFFFFF;
@@ -155,7 +157,7 @@ uint32_t indirectRegister = 0;      // For programming - (i) register
 uint8_t  progMode = PROG_NORMAL;    // Normal floating-point mode
 uint8_t  helpMode = 0;              // Used to determine if next key or button hit is for help
 
-double STO[MAX_STO];                // Storage registers R0-R25
+double STO[MAX_STO];                // Storage registers R0-R99
 char STOlabels[MAX_STO][9];         // Labels associated with the R0-R25 registers
 double SUM[SUM_MAX];                // Statistics registers for the Financial bank
 char excaliburNotes[NOTES_SIZE];    // A small scratchpad for the user to jot down some info
@@ -341,8 +343,8 @@ int CreateToolTipWindow(HWND hwnd, HINSTANCE hInstance)
                           WS_POPUP | WS_BORDER,       // window style
                           CW_USEDEFAULT,              // initial x position
                           CW_USEDEFAULT,              // initial y position
-                          100,                        // initial x size -- tbd can probably make zero
-                          50,                         // initial y size -- tbd same here...
+                          100,                        // initial x size (will get auto-resized)
+                          50,                         // initial y size (will get auto-resized)
                           hwnd,                       // parent window handle
                           NULL,                       // window menu handle
                           hInstance,                  // program instance handle
@@ -1341,6 +1343,44 @@ void NotImp(void)
     MessageBox(calcMainWindow, "Function is not implemented yet...", "Excalibur", MB_OK | MB_ICONINFORMATION);
 }
 
+void RPN_ClearModifiers(int updateSpare)
+{
+    hyperbolic = 0;
+    finStore = 0;
+    finRecall = 0;
+    rpnStoreRecall = 0x00;
+    convInverse = 0;
+    if (updateSpare) UpdateSpareBar(" ");
+}
+
+void UpdateSpareBar_StoreRecall(void)
+{
+    char tmpStr[16];
+    if (rpnStoreRecall)
+    {
+        if (rpnStoreRecall & REG_STORE)
+        {
+            strcpy(tmpStr, "STO");
+        }
+        else if (rpnStoreRecall & REG_RECALL)
+        {
+            strcpy(tmpStr, "RCL");
+        }
+        else if (rpnStoreRecall & REG_EXCHANGE)
+        {
+            strcpy(tmpStr, "EXCH");
+        }
+        if (rpnStoreRecall & REG_PLUS)     strcat(tmpStr, "+");
+        if (rpnStoreRecall & REG_MINUS)    strcat(tmpStr, "-");
+        if (rpnStoreRecall & REG_MULTIPLY) strcat(tmpStr, "×");
+        if (rpnStoreRecall & REG_DIVIDE)   strcat(tmpStr, "÷");
+        
+        if (rpnStoreRecall & REG_DP)   strcat(tmpStr, " ·");
+        
+        UpdateSpareBar(tmpStr);
+    }
+}
+
 // --------------------------------------------------------
 // Used when we switch into one of the 'Comp Sci' modes...
 // --------------------------------------------------------
@@ -1445,12 +1485,6 @@ int PreInit(void)
     B = 0.0;
     C = 0.0;
     D = 0.0;
-
-    for (i = 0; i < MAX_STO; i++)
-    {
-        STO[i] = 0.0;
-        strcpy(STOlabels[i], "no label");
-    }
 
     for (i = 0; i < MAX_MACROS; i++)
     {
@@ -1619,10 +1653,9 @@ int ShowStatus(void)
 
 char functionBar[60];
 
-int UpdateSpareBar(char *msg)
+void UpdateSpareBar(char *msg)
 {
     SetDlgItemText(calcMainWindow, SPARE_BAR, msg);
-    return(0);
 }
 
 int UpdateTimeBar()
@@ -1691,47 +1724,50 @@ double MakeAccurate(double val)
 
 // clang-format off
 struct keypadStruct RPNkeys[] = {
-    {RPN_DIGIT_0,   UNI_DIG0,   USES_FL, ALLOWREC, '0', NO_L,   X_EDIT,     RPN_digit0,         "Digit 0",              "Used in keypad number entry."},
-    {RPN_DIGIT_1,   UNI_DIG1,   USES_FL, ALLOWREC, '1', NO_L,   X_EDIT,     RPN_digit1,         "Digit 1",              "Used in keypad number entry."},
-    {RPN_DIGIT_2,   UNI_DIG2,   USES_FL, ALLOWREC, '2', NO_L,   X_EDIT,     RPN_digit2,         "Digit 2",              "Used in keypad number entry."},
-    {RPN_DIGIT_3,   UNI_DIG3,   USES_FL, ALLOWREC, '3', NO_L,   X_EDIT,     RPN_digit3,         "Digit 3",              "Used in keypad number entry."},
-    {RPN_DIGIT_4,   UNI_DIG4,   USES_FL, ALLOWREC, '4', NO_L,   X_EDIT,     RPN_digit4,         "Digit 4",              "Used in keypad number entry."},
-    {RPN_DIGIT_5,   UNI_DIG5,   USES_FL, ALLOWREC, '5', NO_L,   X_EDIT,     RPN_digit5,         "Digit 5",              "Used in keypad number entry."},
-    {RPN_DIGIT_6,   UNI_DIG6,   USES_FL, ALLOWREC, '6', NO_L,   X_EDIT,     RPN_digit6,         "Digit 6",              "Used in keypad number entry."},
-    {RPN_DIGIT_7,   UNI_DIG7,   USES_FL, ALLOWREC, '7', NO_L,   X_EDIT,     RPN_digit7,         "Digit 7",              "Used in keypad number entry."},
-    {RPN_DIGIT_8,   UNI_DIG8,   USES_FL, ALLOWREC, '8', NO_L,   X_EDIT,     RPN_digit8,         "Digit 8",              "Used in keypad number entry."},
-    {RPN_DIGIT_9,   UNI_DIG9,   USES_FL, ALLOWREC, '9', NO_L,   X_EDIT,     RPN_digit9,         "Digit 9",              "Used in keypad number entry."},
-    {RPN_DIGIT_DP,  UNI_DIGDP,  USES_FL, ALLOWREC, '.', NO_L,   X_EDIT,     RPN_dp,             "Decimal Point",        "Used in keypad number entry and can also be used to enter fractions into the X display (press twice)"},
+    {RPN_DIGIT_0,   UNI_DIG0,   USES_FL, ALLOWREC, '0', NO_L,   X_NULL,     RPN_digit0,         "Digit 0",              "Used in keypad number entry."},
+    {RPN_DIGIT_1,   UNI_DIG1,   USES_FL, ALLOWREC, '1', NO_L,   X_NULL,     RPN_digit1,         "Digit 1",              "Used in keypad number entry."},
+    {RPN_DIGIT_2,   UNI_DIG2,   USES_FL, ALLOWREC, '2', NO_L,   X_NULL,     RPN_digit2,         "Digit 2",              "Used in keypad number entry."},
+    {RPN_DIGIT_3,   UNI_DIG3,   USES_FL, ALLOWREC, '3', NO_L,   X_NULL,     RPN_digit3,         "Digit 3",              "Used in keypad number entry."},
+    {RPN_DIGIT_4,   UNI_DIG4,   USES_FL, ALLOWREC, '4', NO_L,   X_NULL,     RPN_digit4,         "Digit 4",              "Used in keypad number entry."},
+    {RPN_DIGIT_5,   UNI_DIG5,   USES_FL, ALLOWREC, '5', NO_L,   X_NULL,     RPN_digit5,         "Digit 5",              "Used in keypad number entry."},
+    {RPN_DIGIT_6,   UNI_DIG6,   USES_FL, ALLOWREC, '6', NO_L,   X_NULL,     RPN_digit6,         "Digit 6",              "Used in keypad number entry."},
+    {RPN_DIGIT_7,   UNI_DIG7,   USES_FL, ALLOWREC, '7', NO_L,   X_NULL,     RPN_digit7,         "Digit 7",              "Used in keypad number entry."},
+    {RPN_DIGIT_8,   UNI_DIG8,   USES_FL, ALLOWREC, '8', NO_L,   X_NULL,     RPN_digit8,         "Digit 8",              "Used in keypad number entry."},
+    {RPN_DIGIT_9,   UNI_DIG9,   USES_FL, ALLOWREC, '9', NO_L,   X_NULL,     RPN_digit9,         "Digit 9",              "Used in keypad number entry."},
+    {RPN_DIGIT_DP,  UNI_DIGDP,  USES_FL, ALLOWREC, '.', NO_L,   X_NULL,     RPN_dp,             "Decimal Point",        "Used in keypad number entry and can also be used to enter fractions into the X display (press twice)"},
     {RPN_CLEAR_X,   UNI_CLX,    USES_FL, ALLOWREC,  9,  NO_L,   X_NULL,     RPN_clearX,         "Clear X",              "Used to clear the X Register contents."},
-    {RPN_DIVIDE,    UNI_DIV,    USES_FL, ALLOWREC, '/', YES_L,  X_NEW,      RPN_divide,         "Divide",               "Division of Y by X(Y/X)"},
-    {RPN_MULTIPLY,  UNI_MUL,    USES_FL, ALLOWREC, '*', YES_L,  X_NEW,      RPN_multiply,       "Multiply",             "Multiplication of Y and X"},
-    {RPN_SUBTRACT,  UNI_SUB,    USES_FL, ALLOWREC, '-', YES_L,  X_NEW,      RPN_minus,          "Minus",                "Subtraction of X from Y(Y-X)"},
-    {RPN_PLUS,      UNI_PLUS,   USES_FL, ALLOWREC, '+', YES_L,  X_NEW,      RPN_plus,           "Plus",                 "Addition of X and Y"},
+    {RPN_DIVIDE,    UNI_DIV,    USES_FL, ALLOWREC, '/', YES_L,  X_NULL,     RPN_divide,         "Divide",               "Division of Y by X(Y/X)"},
+    {RPN_MULTIPLY,  UNI_MUL,    USES_FL, ALLOWREC, '*', YES_L,  X_NULL,     RPN_multiply,       "Multiply",             "Multiplication of Y and X"},
+    {RPN_SUBTRACT,  UNI_SUB,    USES_FL, ALLOWREC, '-', YES_L,  X_NULL,     RPN_minus,          "Minus",                "Subtraction of X from Y(Y-X)"},
+    {RPN_PLUS,      UNI_PLUS,   USES_FL, ALLOWREC, '+', YES_L,  X_NULL,     RPN_plus,           "Plus",                 "Addition of X and Y"},
     {RPN_ENTER,     UNI_ENT,    USES_FL, ALLOWREC, 13,  NO_L,   X_NULL,     RPN_enter,          "Enter",                "Used to separate numbers in the RPN stack"},
+    
     {RPN_EXCH_X_Y,  UNI_XCH,    USES_FL, ALLOWREC, 'x', NO_L,   X_NEW,      RPN_exchange_x_y,   "Exchange X and Y",     "Exchanges the contents of the X and Y registers"},
     {RPN_NEGATE,    UNI_CHS,    USES_FL, ALLOWREC, 'n', NO_L,   X_NULL,     RPN_negate_x,       "Change Sign",          "Used to change the sign of X"},
-    {RPN_E,         UNI_E,      USES_FL, ALLOWREC, 'E', NO_L,   X_NULL,     RPN_Ex,             "Exponent",             "Used to produce an exponential number(e.g. 3.45e+12)"},
-    {RPN_STO,       UNI_STO,    USES_FL, NORECORD, 'S', NO_L,   X_NEW,      RPN_store,          "Store Number",         "Used to store the current X number to one of 26 registers"},
-    {RPN_RCL,       UNI_RCL,    USES_FL, NORECORD, 'R', NO_L,   X_NEW,      RPN_recall,         "Recall Number",        "Used to recall a number from one of 26 registers to the X register"},
+    {RPN_E,         UNI_E,      USES_FL, ALLOWREC, 'e', NO_L,   X_NULL,     RPN_Ex,             "Exponent",             "Used to produce an exponential number(e.g. 3.45e+12)"},
+    {RPN_STO,       UNI_STO,    USES_FL, ALLOWREC, 's', NO_L,   X_NULL,     RPN_store,          "Store Register",       "Used to store X to one of the registers (next digit/dp selects R0-R19)"},
+    {RPN_RCL,       UNI_RCL,    USES_FL, ALLOWREC, 'r', NO_L,   X_NULL,     RPN_recall,         "Recall Register",      "Used to recall one of registers to X (next digit/dp selects R0-R19)"},
     {RPN_R_UP,      UNI_RUP,    USES_FL, ALLOWREC, 38,  NO_L,   X_NEW,      RPN_rotateStackUp,  "Rotate Stack Up",      "Rotates the contents of the stack up"},
     {RPN_R_DN,      UNI_RDN,    USES_FL, ALLOWREC, 40,  NO_L,   X_NEW,      RPN_rotateStackDn,  "Rotate Stack Down",    "Rotates the contents of the stack down"},
-    {RPN_LASTX,     UNI_LSTX,   USES_FL, ALLOWREC, 'L', NO_L,   X_NEW,      RPN_lastX,          "Last X",               "Retrieves the last value of X before the last operation occurred"},
-    {RPN_MODE,      UNI_MODE,   USES_FL, ALLOWREC, 'M', NO_L,   X_NEW,      RPN_mode,           "Select Mode",          "Used to select number format mode"},
+    {RPN_LASTX,     UNI_LSTX,   USES_FL, ALLOWREC, 'l', NO_L,   X_NEW,      RPN_lastX,          "Last X",               "Retrieves the last value of X before the last operation occurred"},
+    {RPN_MODE,      UNI_MODE,   USES_FL, ALLOWREC, 'm', NO_L,   X_NEW,      RPN_mode,           "Select Mode",          "Used to select number format mode"},
     {RPN_BKSP,      UNI_BKSP,   USES_FL, ALLOWREC,  8,  NO_L,   X_NULL,     RPN_backspace,      "Backspace",            "Used to correct mistakes in number entry"},
+    {RPN_CLEAR_ALL, UNI_CLRA,   USES_FL, ALLOWREC, 'c', YES_L,  X_ENTER,    RPN_clear,          "Clear Stack",          "Used to clear the entire stack contents."},
     {RPN_HELP,      UNI_HELP,   USES_FL, ALLOWREC, 'h', NO_L,   X_NULL,     RPN_help,           "Help",                 "After clicking this key, select another key for individual key help.\nSame as right-click of the mouse on any key."},
     {RPN_PLAYBACK,  UNI_PLAY,   USES_FL, NORECORD, 'p', NO_L,   X_NEW,      RPN_Playback,       "Playback",             "Plays back the last recorded sequence of button presses."},
-    {RPN_CLEAR_ALL, UNI_CLRA,   USES_FL, ALLOWREC, 'C', YES_L,  X_ENTER,    RPN_clear,          "Clear Stack",          "Used to clear the entire stack contents."},
-    {RPN_RCL0,      UNI_RCLA,   USES_FL, NORECORD, 'a', YES_L,  X_NEW,      RPN_recallA,        "Recall R0",            "Recalls the R0 register stored using the STO key."},
-    {RPN_EDIT,      UNI_EDIT,   USES_FL, ALLOWREC, ' ', NO_L,   X_NULL,     RPN_edit,           "Edit X Register",      "Used to place the X register back in edit mode if it is not already."},
-    {RPN_RCL1,      UNI_RCLB,   USES_FL, NORECORD, 'b', YES_L,  X_NEW,      RPN_recallB,        "Recall R1",            "Recalls the R1 register stored using the STO key."},
-    {RPN_STO0,      UNI_STOA,   USES_FL, NORECORD, ' ', YES_L,  X_NEW,      RPN_storeA,         "Store R0",             "Stores the R0 register shortcut for the STO key."},
-    {RPN_STO1,      UNI_STOB,   USES_FL, NORECORD, ' ', YES_L,  X_NEW,      RPN_storeB,         "Store R1",             "Stores the R1 register shortcut for the STO key."},
     {RPN_DROP,      UNI_DROP,   USES_FL, ALLOWREC, 'd', YES_L,  X_NEW,      RPN_drop,           "Drop Stack",           "Drops the X register and the rest of stack shifts down."},
     {RPN_LARG,      UNI_LARG,   USES_FL, ALLOWREC, ' ', NO_L,   X_NEW,      RPN_larg,           "Last Arguments",       "Retrieves the last X and Y pair before last operation."},
     {RPN_FRAC,      UNI_FRAC,   USES_FL, ALLOWREC, ' ', NO_L,   X_EDIT,     RPN_frac,           "Fraction Bar",         "Insert Fraction to current X edit"},
-    {RPN_REC,       UNI_REC,    USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_Record,         "Record Mode On/Off",   "When ON - Records button presses for playback."},
+    
+    {RPN_EDIT,      UNI_EDIT,   USES_FL, ALLOWREC, ' ', NO_L,   X_NULL,     RPN_edit,           "Edit X Register",      "Used to place the X register back in edit mode if it is not already."},
+    {RPN_CONST,     UNI_CONST,  USES_F,  NORECORD, ' ', YES_L,  X_NEW,      RPN_const,          "Constants",            "Recall or Store Constants to one of five banks."},
     {RPN_NOTES,     UNI_NOTES,  USES_FL, ALLOWREC, ' ', NO_L,   X_NULL,     RPN_Notes,          "Excalibur Notepad",    "Allows some simple notes to be stored/saved."},
     {RPN_INV,       UNI_INVX,   USES_FL, ALLOWREC, ' ', YES_L,  X_NEW,      RPN_inverse,        "Inverse X",            "Computes the inverse of X"},
+    {RPN_REC,       UNI_REC,    USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_Record,         "Record Mode On/Off",   "When ON - Records button presses for playback."},
+    {RPN_EXREG,     UNI_EXREG,  USES_FL, ALLOWREC, ' ', NO_L,   X_NULL,     RPN_ExchangeReg,    "Exchange X with Reg",  "Exchange X with one of the Registers (next digit/dp selects R0-R19)"},
+    {RPN_COPY,      UNI_COPY,   USES_FL, ALLOWREC, ' ', NO_L,   X_NULL,     RPN_Copy,           "Copy X Register",      "Copy X register to the clipboard"},
+    {RPN_PASTE,     UNI_PASTE,  USES_FL, ALLOWREC, ' ', NO_L,   X_NULL,     RPN_Paste,          "Paste X Register",     "Paste X register from the clipboard"},
+    
     {RPN_SCI,       UNI_SCI,    USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectSci,      "Select Scientific I",  "Selects the Scientific I Layout"},
     {RPN_SCI2,      UNI_SCI2,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectSci2,     "Select Scientific II", "Selects the Scientific II Layout"},
     {RPN_COMPSCI,   UNI_COMPSCI,USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectCompSci,  "Select Comp Sci",      "Selects the Computer Science Layout"},
@@ -1756,60 +1792,31 @@ struct keyPosStruct
 };
 
 struct keyPosStruct RPNkeyPos[] = {
-#if 0
-    {RPN_DIGIT_0,   0,          0},
-    {RPN_DIGIT_1,   0,          0},
-    {RPN_DIGIT_2,   0,          0},
-    {RPN_DIGIT_3,   0,          0},
-    {RPN_DIGIT_4,   0,          0},
-    {RPN_DIGIT_5,   0,          0},
-    {RPN_DIGIT_6,   0,          0},
-    {RPN_DIGIT_7,   0,          0},
-    {RPN_DIGIT_8,   0,          0},
-    {RPN_DIGIT_9,   0,          0},
-    {RPN_DIGIT_DP,  0,          0},
-    {RPN_CLEAR_X,   0,          0},
-    {RPN_DIVIDE,    0,          0},
-    {RPN_MULTIPLY,  0,          0},
-    {RPN_SUBTRACT,  0,          0},
-    {RPN_PLUS,      0,          0},
-    {RPN_ENTER,     0,          0},
-#endif
-    {RPN_EXCH_X_Y,  0,          0},
-    {RPN_NEGATE,    0,          0},
-    {RPN_E,         0,          0},
-    {RPN_STO,       0,          0},
-    {RPN_RCL,       0,          0},
-    {RPN_R_UP,      0,          0},
-    {RPN_R_DN,      0,          0},
-    {RPN_LASTX,     0,          0},
-    {RPN_MODE,      0,          0},
-    {RPN_BKSP,      0,          0},
-    {RPN_HELP,      0,          0},
-    {RPN_PLAYBACK,  0,          0},
-    {RPN_CLEAR_ALL, 0,          0},
-    {RPN_RCL0,      0,          0},
-    {RPN_EDIT,      0,          0},
-    {RPN_RCL1,      0,          0},
-    {RPN_STO0,      0,          0},
-    {RPN_STO1,      0,          0},
-    {RPN_DROP,      0,          0},
-    {RPN_LARG,      0,          0},
-    {RPN_FRAC,      0,          0},
-    {RPN_REC,       0,          0},
-    {RPN_NOTES,     0,          0},
-    {RPN_INV,       0,          0},
-    {RPN_SCI,       0,          0},
-    {RPN_SCI2,      0,          0},
-    {RPN_COMPSCI,   0,          0},
-    {RPN_FIN,       0,          0},
-    {RPN_CONV,      0,          0},
-    {RPN_GEOM,      0,          0},
-    {RPN_STAT,      0,          0},
-    {RPN_PROGI,     0,          0},
-    {RPN_PROGII,    0,          0},
-    {RPN_CUST,      0,          0},
-    {RPN_LAST_KEY,  0,          0}
+    {RPN_EXCH_X_Y   ,0,     0},
+    {RPN_NEGATE     ,0,     0},
+    {RPN_E          ,0,     0},
+    {RPN_STO        ,0,     0},
+    {RPN_RCL        ,0,     0},
+    {RPN_R_UP       ,0,     0},
+    {RPN_R_DN       ,0,     0},
+    {RPN_LASTX      ,0,     0},
+    {RPN_MODE       ,0,     0},
+    {RPN_BKSP       ,0,     0},
+    {RPN_CLEAR_ALL  ,0,     0},
+    {RPN_HELP       ,0,     0},
+    {RPN_PLAYBACK   ,0,     0},
+    {RPN_DROP       ,0,     0},
+    {RPN_LARG       ,0,     0},
+    {RPN_FRAC       ,0,     0},
+    {RPN_EDIT       ,0,     0},
+    {RPN_CONST      ,0,     0},
+    {RPN_NOTES      ,0,     0},
+    {RPN_INV        ,0,     0},
+    {RPN_REC        ,0,     0},
+    {RPN_EXREG      ,0,     0},
+    {RPN_COPY       ,0,     0},
+    {RPN_PASTE      ,0,     0},
+    {RPN_LAST_KEY,   0,     0}
 };
 
 
@@ -2352,19 +2359,28 @@ double StackPop(void)
 /* ----------------------- */
 void RPN_clear(void)
 {
-    if (progMode > 0) RPN_clearL();
-    X = 0.0;
-    Y = 0.0;
-    Z = 0.0;
-    T = 0.0;
-    A = 0.0;
-    B = 0.0;
-    C = 0.0;
-    D = 0.0;
-    LASTX = 0.0;
-    LASTY = 0.0;
-    progModecarry = 0;
-    strcpy(Xstr, "");
+    // Check if we should clear all registers
+    if (rpnStoreRecall & 0x03)
+    {
+        memset(STO, 0x00, sizeof(STO));
+    }
+    else
+    {
+        if (progMode > 0) RPN_clearL();
+        X = 0.0;
+        Y = 0.0;
+        Z = 0.0;
+        T = 0.0;
+        A = 0.0;
+        B = 0.0;
+        C = 0.0;
+        D = 0.0;
+        LASTX = 0.0;
+        LASTY = 0.0;
+        progModecarry = 0;
+        strcpy(Xstr, "");
+    }
+    RPN_ClearModifiers(TRUE);
 }
 
 void RPN_clearL(void)
@@ -2412,11 +2428,20 @@ void RPN_enter(void)
             StackPushL(XL);
         Xedit = X_ENTER;
     }
+    
+    RPN_ClearModifiers(TRUE);
 }
 
 void RPN_dp(void)
 {
     int i;
+    
+    if (rpnStoreRecall)
+    {
+        rpnStoreRecall |= REG_DP;
+        UpdateSpareBar_StoreRecall();
+        return;
+    }
 
     if (progMode == PROG_NORMAL)
     {
@@ -2452,6 +2477,9 @@ void RPN_dp(void)
             }
         }
     }
+    
+    RPN_ClearModifiers(TRUE);
+    Xedit = X_EDIT;
 }
 
 void RPN_Ex(void)
@@ -2489,6 +2517,88 @@ void RPN_Ex(void)
 void RPN_digit(WPARAM key)
 {
     double tmp1, tmp2, tmp3;
+    
+    // Handle Store and Recall of Registers
+    if (rpnStoreRecall)
+    {
+        uint8_t reg = (key - RPN_DIGIT_0) + (rpnStoreRecall & REG_DP ? 10:0);
+        
+        if (rpnStoreRecall & REG_STORE)
+        {
+            if (Xedit == X_EDIT) Xedit = X_NEW;
+            
+            if (rpnStoreRecall & REG_PLUS)
+            {
+                STO[reg] += X;
+            }
+            else if (rpnStoreRecall & REG_MINUS)
+            {
+                STO[reg] -= X;
+            }
+            else if (rpnStoreRecall & REG_MULTIPLY)
+            {
+                STO[reg] *= X;
+            }
+            else if (rpnStoreRecall & REG_DIVIDE)
+            {
+                if (X != 0.0) STO[reg] /= X;
+            }
+            else
+            {
+                STO[reg] = X;
+            }
+
+            blinkXDisplay();
+        }
+        else if (rpnStoreRecall & REG_RECALL)
+        {
+            if (Xedit == X_EDIT)
+            {
+                RPN_enter();
+            }
+            else if (Xedit == X_NEW)
+            {
+                if (progMode != PROG_NORMAL)
+                    StackPushL(0L);
+                else
+                    StackPush(0.0);
+            }
+            else Xedit = X_NEW;
+            
+            if (rpnStoreRecall & REG_PLUS)
+            {
+                X += STO[reg];
+            }
+            else if (rpnStoreRecall & REG_MINUS)
+            {
+                X -= STO[reg];
+            }
+            else if (rpnStoreRecall & REG_MULTIPLY)
+            {
+                X *= STO[reg];
+            }
+            else if (rpnStoreRecall & REG_DIVIDE)
+            {
+                if (STO[reg] != 0.0) X /= STO[reg];
+            }
+            else
+            {
+                X = STO[reg];
+            }
+        }
+        else if (rpnStoreRecall & REG_EXCHANGE)
+        {
+            tmp1 = X;
+            X = STO[reg];
+            STO[reg] = tmp1;
+            
+            if (Xedit == X_EDIT) Xedit = X_NEW;
+        }
+
+        XL = maskStackStuff((PROG_LONG) X);
+        RPN_ClearModifiers(TRUE);
+        return;
+    }
 
     if (progMode == PROG_BIN && key > RPN_DIGIT_1)
         return;
@@ -2546,6 +2656,8 @@ void RPN_digit(WPARAM key)
             X = 0.0;
     }
     XL = MakeProgStr(Xstr);
+
+    RPN_ClearModifiers(TRUE);
     Xedit = X_EDIT;
 }
 
@@ -2787,14 +2899,24 @@ void RPN_backspace(void)
 }
 
 
-
 void RPN_plus(void)
 {
     PROG_LONG xl, yl;
 
     Xedit = X_NEW;
+        
+    if (rpnStoreRecall & 0x03)
+    {
+        rpnStoreRecall &= 0x0F;
+        rpnStoreRecall |= REG_PLUS;
+        UpdateSpareBar_StoreRecall();
+        return;
+    }
+
     if (progMode == PROG_NORMAL)
+    {
         StackPush(StackPop() + StackPop());
+    }
     else
     {
         xl = StackPopL();
@@ -2806,6 +2928,14 @@ void RPN_plus(void)
 void RPN_multiply(void)
 {
     PROG_LONG xl, yl;
+
+    if (rpnStoreRecall & 0x03)
+    {
+        rpnStoreRecall &= 0x0F;
+        rpnStoreRecall |= REG_MULTIPLY;
+        UpdateSpareBar_StoreRecall();
+        return;
+    }
 
     Xedit = X_NEW;
     if (progMode == PROG_NORMAL)
@@ -2823,6 +2953,15 @@ void RPN_divide(void)
     double x, y;
     PROG_LONG xl, yl;
     PROG_SIGNEDLONG sxl, syl;
+
+    if (rpnStoreRecall & 0x03)
+    {
+        rpnStoreRecall &= 0x0F;
+        rpnStoreRecall |= REG_DIVIDE;
+        UpdateSpareBar_StoreRecall();
+        return;
+    }
+
 
     if (X == 0.0)
     {
@@ -2859,6 +2998,14 @@ void RPN_minus(void)
 {
     double x, y;
     PROG_LONG xl, yl;
+
+    if (rpnStoreRecall & 0x03)
+    {
+        rpnStoreRecall &= 0x0F;
+        rpnStoreRecall |= REG_MINUS;
+        UpdateSpareBar_StoreRecall();
+        return;
+    }
 
     Xedit = X_NEW;
     if (progMode == PROG_NORMAL)
@@ -3065,246 +3212,50 @@ BOOL CALLBACK StoNameDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
     return FALSE;
 }
 
-BOOL CALLBACK fnDIALOG_StoreProc(HWND, UINT, WPARAM, LPARAM);
-
 void RPN_store(void)
 {
-
-    DLGPROC lpfnDIALOG_StoreProc;
-
-    lpfnDIALOG_StoreProc = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_StoreProc, hExcaliburInstance);
-
-    if ((DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_STORE", calcMainWindow, lpfnDIALOG_StoreProc)) == -1)
+    rpnStoreRecall &= ~REG_EXCHANGE;
+    if (rpnStoreRecall & REG_STORE)
     {
-        MessageBox(NULL, "Unable to display dialog", "System Error", MB_SYSTEMMODAL | MB_ICONHAND | MB_OK);
+        UpdateSpareBar(" ");
+        rpnStoreRecall = 0x00;
     }
-    FreeProcInstance((FARPROC) lpfnDIALOG_StoreProc);
+    else
+    {
+        rpnStoreRecall ^= REG_STORE;
+        UpdateSpareBar_StoreRecall();
+    }
 }
 
-BOOL CALLBACK fnDIALOG_StoreProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
-{
-    int i;
-    LRESULT item;
-
-    switch(wMessage)
-    {
-    case WM_INITDIALOG:
-        SendMessage(GetDlgItem(hDlg, 101), WM_SETFONT, (WPARAM) hFixedFont, FALSE);
-        for (i = 0; i < MAX_STO; i++)
-        {
-            sprintf(tmpStr, "R%02d = %-18.11g {%-8s}", i, STO[i], STOlabels[i]);
-            makeInternational(tmpStr);
-            SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmpStr));
-        }
-        SendDlgItemMessage(hDlg, 101, LB_SETCURSEL, 0, 0);
-        SetFocus(GetDlgItem(hDlg, 101));
-        return TRUE;
-    case WM_COMMAND:
-
-        switch(LOWORD(wParam))
-        {
-        case(101):            // double click?!?
-            if (HIWORD(wParam) != LBN_DBLCLK)
-                break;
-        case(102):
-            item = SendDlgItemMessage(hDlg, 101, LB_GETCURSEL, 0, 0L);
-            if (item == (LRESULT) LB_ERR)
-            {
-                MessageBox(hDlg, "No Item Selected In The List Box", "Excalibur User Error", MB_OK);
-                return FALSE;
-            }
-            else
-            {
-                SendDlgItemMessage(hDlg, 101, LB_GETTEXT, item, (LPARAM) ((LPSTR) tmpStr));
-                RPN_storeReg(item);
-                Xedit = X_NEW;
-            }
-            EndDialog(hDlg, FALSE);
-            return TRUE;
-
-        case(103):
-            EndDialog(hDlg, FALSE);
-            return TRUE;
-
-        case(104):
-            item = SendDlgItemMessage(hDlg, 101, LB_GETCURSEL, 0, 0L);
-            if (item == (LRESULT) LB_ERR)
-            {
-                MessageBox(hDlg, "No Item Selected In The List Box", "Excalibur User Error", MB_OK);
-            }
-            else
-            {
-                SendDlgItemMessage(hDlg, 101, LB_GETTEXT, item, (LPARAM) ((LPSTR) tmpStr));
-                RPN_storeAddReg(item);
-                Xedit = X_NEW;
-            }
-            EndDialog(hDlg, FALSE);
-            return TRUE;
-        case(105):
-            item = SendDlgItemMessage(hDlg, 101, LB_GETCURSEL, 0, 0L);
-            if (item == (LRESULT) LB_ERR)
-            {
-                MessageBox(hDlg, "No Item Selected In The List Box", "Excalibur User Error", MB_OK);
-            }
-            else
-            {
-                SendDlgItemMessage(hDlg, 101, LB_GETTEXT, item, (LPARAM) ((LPSTR) tmpStr));
-                RPN_storeSubReg(item);
-                Xedit = X_NEW;
-            }
-            EndDialog(hDlg, FALSE);
-            return TRUE;
-        case(106):
-            item = SendDlgItemMessage(hDlg, 101, LB_GETCURSEL, 0, 0L);
-            if (item == (LRESULT) LB_ERR)
-            {
-                MessageBox(hDlg, "No Item Selected In The List Box", "Excalibur User Error", MB_OK);
-            }
-            else
-            {
-                SendDlgItemMessage(hDlg, 101, LB_GETTEXT, item, (LPARAM) ((LPSTR) tmpStr));
-                RPN_storeMulReg(item);
-                Xedit = X_NEW;
-            }
-            EndDialog(hDlg, FALSE);
-            return TRUE;
-        case(107):
-            item = SendDlgItemMessage(hDlg, 101, LB_GETCURSEL, 0, 0L);
-            if (item == (LRESULT) LB_ERR)
-            {
-                MessageBox(hDlg, "No Item Selected In The List Box", "Excalibur User Error", MB_OK);
-                return FALSE;
-            }
-            else
-            {
-                SendDlgItemMessage(hDlg, 101, LB_GETTEXT, item, (LPARAM) ((LPSTR) tmpStr));
-                RPN_storeDivReg(item);
-                Xedit = X_NEW;
-            }
-            EndDialog(hDlg, FALSE);
-            return TRUE;
-
-        case(108):
-            for (i = 0; i < MAX_STO; i++)
-                SendDlgItemMessage(hDlg, 101, LB_DELETESTRING, 0, 0);
-            for (i = 0; i < MAX_STO; i++)
-            {
-                STO[i] = 0.0;
-                strcpy(STOlabels[i], "no label");
-                sprintf(tmpStr, "R%02d = %-18.11g {%-8s}", i, STO[i], STOlabels[i]);
-                makeInternational(tmpStr);
-                SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmpStr));
-            }
-            SendDlgItemMessage(hDlg, 101, LB_SETCURSEL, 0, 0);
-            return TRUE;
-
-        case(109):            // Edit label
-            item = SendDlgItemMessage(hDlg, 101, LB_GETCURSEL, 0, 0L);
-            if (item == (LRESULT) LB_ERR)
-            {
-                MessageBox(hDlg, "No Item Selected In The List Box", "Excalibur User Error", MB_OK);
-                return FALSE;
-            }
-            else
-            {
-                strcpy(stoTmpStr, STOlabels[item]);
-                DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_STO_NAME", calcMainWindow, StoNameDlgProc);
-                strcpy(STOlabels[item], stoTmpStr);
-                SendDlgItemMessage(hDlg, 101, LB_RESETCONTENT, 0, 0);
-                for (i = 0; i < MAX_STO; i++)
-                {
-                    sprintf(tmpStr, "R%02d = %-18.11g {%-8s}", i, STO[i], STOlabels[i]);
-                    makeInternational(tmpStr);
-                    SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmpStr));
-                }
-                SendDlgItemMessage(hDlg, 101, LB_SETCURSEL, item, 0);
-            }
-            return TRUE;
-
-        default:
-            return FALSE;
-        }
-
-    case WM_SYSCOMMAND:
-        switch(wParam & 0xFFF0)
-        {
-        case SC_CLOSE:
-            EndDialog(hDlg, FALSE);
-            return TRUE;
-        }
-    }
-    return FALSE;
-}
-
-BOOL CALLBACK fnDIALOG_RecallProc(HWND, UINT, WPARAM, LPARAM);
 void RPN_recall(void)
 {
-    DLGPROC lpfnDIALOG_RecallProc;
-
-    lpfnDIALOG_RecallProc = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_RecallProc, hExcaliburInstance);
-
-    if ((DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_RECALL", calcMainWindow, lpfnDIALOG_RecallProc)) == -1)
+    rpnStoreRecall &= ~REG_EXCHANGE;
+    if (rpnStoreRecall & REG_RECALL)
     {
-        MessageBox(NULL, "Unable to display dialog", "System Error", MB_SYSTEMMODAL | MB_ICONHAND | MB_OK);
+        UpdateSpareBar(" ");
+        rpnStoreRecall = 0x00;
     }
-    FreeProcInstance((FARPROC) lpfnDIALOG_RecallProc);
+    else
+    {
+        rpnStoreRecall ^= REG_RECALL;
+        UpdateSpareBar_StoreRecall();
+    }
 }
 
-BOOL CALLBACK fnDIALOG_RecallProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
+void RPN_ExchangeReg(void)
 {
-    int i;
-    LRESULT item;
-
-    switch(wMessage)
+    rpnStoreRecall &= ~ (REG_STORE | REG_RECALL);
+    if (rpnStoreRecall & REG_EXCHANGE)
     {
-    case WM_INITDIALOG:
-        SendMessage(GetDlgItem(hDlg, 101), WM_SETFONT, (WPARAM) hFixedFont, FALSE);
-        for (i = 0; i < MAX_STO; i++)
-        {
-            sprintf(tmpStr, "R%02d = %-18.11g {%-8s}", i, STO[i], STOlabels[i]);
-            makeInternational(tmpStr);
-            SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmpStr));
-        }
-        SendDlgItemMessage(hDlg, 101, LB_SETCURSEL, 0, 0);
-        SetFocus(GetDlgItem(hDlg, 101));
-        return TRUE;
-    case WM_COMMAND:
-        switch(LOWORD(wParam))
-        {
-        case(101):
-            if (HIWORD(wParam) != LBN_DBLCLK)
-                break;
-        case(102):
-            item = SendDlgItemMessage(hDlg, 101, LB_GETCURSEL, 0, 0L);
-            if (item == (LRESULT) LB_ERR)
-            {
-                MessageBox(hDlg, "No Item Selected In The List Box", "Excalibur User Error", MB_OK);
-            }
-            else
-            {
-                RPN_recallReg(item);
-            }
-            EndDialog(hDlg, FALSE);
-            return TRUE;
-        case(103):
-            EndDialog(hDlg, FALSE);
-            return TRUE;
-
-        default:
-            return FALSE;
-        }
-
-    case WM_SYSCOMMAND:
-        switch(wParam & 0xFFF0)
-        {
-        case SC_CLOSE:
-            EndDialog(hDlg, FALSE);
-            return TRUE;
-        }
+        UpdateSpareBar(" ");
+        rpnStoreRecall = 0x00;
     }
-    return FALSE;
+    else
+    {
+        rpnStoreRecall ^= REG_EXCHANGE;
+        UpdateSpareBar_StoreRecall();
+    }
 }
-
 
 /* ------------------------------------------------------------------------ */
 /*                           SAVE STUFF TO DISK                             */
@@ -3321,7 +3272,7 @@ int GetMenuType(struct funcStruct *cFunc)
     if (cFunc == (struct funcStruct *) &Program1_funcs)    retVal = 6;
     if (cFunc == (struct funcStruct *) &Program2_funcs)    retVal = 7;
     if (cFunc == (struct funcStruct *) &Statistics_funcs)  retVal = 8;
-    if (cFunc == (struct funcStruct *) &Scientific2_funcs)     retVal = 9;
+    if (cFunc == (struct funcStruct *) &Scientific2_funcs) retVal = 9;
     if (cFunc == (struct funcStruct *) &Custom_funcs)      retVal = 10;
 
     return(retVal);
@@ -4642,6 +4593,7 @@ void RPN_clearX(void)
     XL = 0L;
     progModecarry = 0;
     Xedit = X_ENTER;
+    RPN_ClearModifiers(TRUE);
 }
 
 void RPN_drop(void)            // drop the stack
@@ -4907,20 +4859,6 @@ void mapButtonFuncs(void)
         j++;
     }
 
-    i = 0;
-    while (STOkeys[i].index != RPN_LAST_KEY) // Put all of the STO/RCL functions into the map
-    {
-        playBackMap[j].saveLastX = STOkeys[i].saveLastX;
-        playBackMap[j].newXedit = STOkeys[i].newXedit;
-        playBackMap[j].routine = STOkeys[i].routine;
-        strcpy(playBackMap[j].funcText, STOkeys[i].keyTitle);
-        playBackMap[j].uniqueIndex = STOkeys[i].uniqueIndex;
-        playBackMap[j].useFloatsLongs = STOkeys[i].useFloatsLongs;
-        playBackMap[j].allowRecord = STOkeys[i].allowRecord;
-        j++;
-        i++;
-    }
-
     totalMappedButtonFuncs = j;
 
     if (totalMappedButtonFuncs > MAX_FUNCTIONS)
@@ -5035,12 +4973,7 @@ void callButtonFunc(void(*routine) (void), char useFloatsLongs, char allowRecord
     if (newXedit != X_NULL)
     {
         Xedit = newXedit;
-        hyperbolic = 0;
-        finStore = 0;
-        finRecall = 0;
-        convInverse = 0;
-        if (updateSpareBar != FALSE)
-            UpdateSpareBar(" ");
+        RPN_ClearModifiers(updateSpareBar);
     }
 }
 
@@ -5084,10 +5017,7 @@ void callButtonFunc_fast(void(*routine) (void), char useFloatsLongs, int uniqueI
     if (newXedit != X_NULL)
     {
         Xedit = newXedit;
-        hyperbolic = 0;
-        finStore = 0;
-        finRecall = 0;
-        convInverse = 0;
+        RPN_ClearModifiers(FALSE);
     }
 }
 
@@ -5297,9 +5227,16 @@ void RPN_Notes(void)
     DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_NOTES", calcMainWindow, NotesDlgProc);
 }
 
-void RPN_CopyX(void)
+void RPN_Copy(void)
 {
     ClipboardCopySelection(calcMainWindow, 0);
+    blinkXDisplay();
+}
+
+void RPN_Paste(void)
+{
+    ClipboardCopySelection(calcMainWindow, 2);
+    blinkXDisplay();
 }
 
 void RPN_inverse(void)
@@ -5548,6 +5485,7 @@ void PushConstant(double value)
     else
         StackPush((double) value);
 
+    //@TODO convert this to a simple UNI_xxx value
     if (recModeON == 1) // If recording, generate key sequence to playback struct
     {
         sprintf(tmpStr, "%.12g", value);
@@ -5556,7 +5494,6 @@ void PushConstant(double value)
         {
             startPos=1;
         }
-        SaveProgramStep(UNI_STARTCONST);
         for (i=startPos; i<(int)strlen(tmpStr); i++)
         {
             switch(tmpStr[i])
@@ -5593,463 +5530,511 @@ void PushConstant(double value)
     }
 }
 
-//=================================================================================================================
-struct keypadStruct STOkeys[] = {
-    {0,  UNI_ADDA,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeAddA,  "Store Plus R0",  ""},
-    {0,  UNI_ADDB,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeAddB,  "Store Plus R1",  ""},
-    {0,  UNI_ADDC,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeAddC,  "Store Plus R2",  ""},
-    {0,  UNI_ADDD,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeAddD,  "Store Plus R3",  ""},
-    {0,  UNI_ADDE,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeAddE,  "Store Plus R4",  ""},
-    {0,  UNI_ADDF,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeAddF,  "Store Plus R5",  ""},
-    {0,  UNI_ADDG,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeAddG,  "Store Plus R6",  ""},
-    {0,  UNI_ADDH,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeAddH,  "Store Plus R7",  ""},
-    {0,  UNI_ADDI,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeAddI,  "Store Plus R8",  ""},
-    {0,  UNI_ADDJ,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeAddJ,  "Store Plus R9",  ""},
-    {0,  UNI_ADDK,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeAddK,  "Store Plus R10", ""},
-    {0,  UNI_ADDL,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeAddL,  "Store Plus R11", ""},
-    {0,  UNI_ADDM,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeAddM,  "Store Plus R12", ""},
-    {0,  UNI_ADDN,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeAddN,  "Store Plus R13", ""},
-    {0,  UNI_ADDO,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeAddO,  "Store Plus R14", ""},
-    {0,  UNI_ADDP,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeAddP,  "Store Plus R15", ""},
-    {0,  UNI_ADDQ,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeAddQ,  "Store Plus R16", ""},
-    {0,  UNI_ADDR,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeAddR,  "Store Plus R17", ""},
-    {0,  UNI_ADDS,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeAddS,  "Store Plus R18", ""},
-    {0,  UNI_ADDT,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeAddT,  "Store Plus R19", ""},
-    {0,  UNI_ADDU,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeAddU,  "Store Plus R20", ""},
-    {0,  UNI_ADDV,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeAddV,  "Store Plus R21", ""},
-    {0,  UNI_ADDW,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeAddW,  "Store Plus R22", ""},
-    {0,  UNI_ADDX,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeAddX,  "Store Plus R23", ""},
-    {0,  UNI_ADDY,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeAddY,  "Store Plus R24", ""},
-    {0,  UNI_ADDZ,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeAddZ,  "Store Plus R25", ""},
+BOOL CALLBACK fnDIALOG_REDEFINECONST(HWND, UINT, WPARAM, LPARAM);
+char constName[26];
+char constUnits[11];
+double constVal;
+int cancelRedefineConst = 0;
+void RedefineConst(void)
+{
+    DLGPROC lpfnDIALOG_REDEFINECONST;
 
-    {0,  UNI_SUBA,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeSubA,  "Store Minus R0",  ""},
-    {0,  UNI_SUBB,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeSubB,  "Store Minus R1",  ""},
-    {0,  UNI_SUBC,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeSubC,  "Store Minus R2",  ""},
-    {0,  UNI_SUBD,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeSubD,  "Store Minus R3",  ""},
-    {0,  UNI_SUBE,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeSubE,  "Store Minus R4",  ""},
-    {0,  UNI_SUBF,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeSubF,  "Store Minus R5",  ""},
-    {0,  UNI_SUBG,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeSubG,  "Store Minus R6",  ""},
-    {0,  UNI_SUBH,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeSubH,  "Store Minus R7",  ""},
-    {0,  UNI_SUBI,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeSubI,  "Store Minus R8",  ""},
-    {0,  UNI_SUBJ,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeSubJ,  "Store Minus R9",  ""},
-    {0,  UNI_SUBK,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeSubK,  "Store Minus R10", ""},
-    {0,  UNI_SUBL,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeSubL,  "Store Minus R11", ""},
-    {0,  UNI_SUBM,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeSubM,  "Store Minus R12", ""},
-    {0,  UNI_SUBN,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeSubN,  "Store Minus R13", ""},
-    {0,  UNI_SUBO,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeSubO,  "Store Minus R14", ""},
-    {0,  UNI_SUBP,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeSubP,  "Store Minus R15", ""},
-    {0,  UNI_SUBQ,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeSubQ,  "Store Minus R16", ""},
-    {0,  UNI_SUBR,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeSubR,  "Store Minus R17", ""},
-    {0,  UNI_SUBS,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeSubS,  "Store Minus R18", ""},
-    {0,  UNI_SUBT,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeSubT,  "Store Minus R19", ""},
-    {0,  UNI_SUBU,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeSubU,  "Store Minus R20", ""},
-    {0,  UNI_SUBV,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeSubV,  "Store Minus R21", ""},
-    {0,  UNI_SUBW,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeSubW,  "Store Minus R22", ""},
-    {0,  UNI_SUBX,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeSubX,  "Store Minus R23", ""},
-    {0,  UNI_SUBY,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeSubY,  "Store Minus R24", ""},
-    {0,  UNI_SUBZ,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeSubZ,  "Store Minus R25", ""},
+    lpfnDIALOG_REDEFINECONST = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_REDEFINECONST, hExcaliburInstance);
 
-    {0,  UNI_MULA,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeMulA,  "Store Mult R0",   ""},
-    {0,  UNI_MULB,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeMulB,  "Store Mult R1",   ""},
-    {0,  UNI_MULC,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeMulC,  "Store Mult R2",   ""},
-    {0,  UNI_MULD,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeMulD,  "Store Mult R3",   ""},
-    {0,  UNI_MULE,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeMulE,  "Store Mult R4",   ""},
-    {0,  UNI_MULF,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeMulF,  "Store Mult R5",   ""},
-    {0,  UNI_MULG,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeMulG,  "Store Mult R6",   ""},
-    {0,  UNI_MULH,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeMulH,  "Store Mult R7",   ""},
-    {0,  UNI_MULI,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeMulI,  "Store Mult R8",   ""},
-    {0,  UNI_MULJ,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeMulJ,  "Store Mult R9",   ""},
-    {0,  UNI_MULK,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeMulK,  "Store Mult R10",  ""},
-    {0,  UNI_MULL,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeMulL,  "Store Mult R11",  ""},
-    {0,  UNI_MULM,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeMulM,  "Store Mult R12",  ""},
-    {0,  UNI_MULN,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeMulN,  "Store Mult R13",  ""},
-    {0,  UNI_MULO,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeMulO,  "Store Mult R14",  ""},
-    {0,  UNI_MULP,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeMulP,  "Store Mult R15",  ""},
-    {0,  UNI_MULQ,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeMulQ,  "Store Mult R16",  ""},
-    {0,  UNI_MULR,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeMulR,  "Store Mult R17",  ""},
-    {0,  UNI_MULS,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeMulS,  "Store Mult R18",  ""},
-    {0,  UNI_MULT,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeMulT,  "Store Mult R19",  ""},
-    {0,  UNI_MULU,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeMulU,  "Store Mult R20",  ""},
-    {0,  UNI_MULV,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeMulV,  "Store Mult R21",  ""},
-    {0,  UNI_MULW,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeMulW,  "Store Mult R22",  ""},
-    {0,  UNI_MULX,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeMulX,  "Store Mult R23",  ""},
-    {0,  UNI_MULY,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeMulY,  "Store Mult R24",  ""},
-    {0,  UNI_MULZ,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeMulZ,  "Store Mult R25",  ""},
+    if ((DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_REDEFINE_CONST", calcMainWindow, lpfnDIALOG_REDEFINECONST)) == -1)
+    {
+        MessageBox(NULL, "Unable to display dialog", "System Error", MB_SYSTEMMODAL | MB_ICONHAND | MB_OK);
+    }
+    FreeProcInstance((FARPROC) lpfnDIALOG_REDEFINECONST);
+}
 
-    {0,  UNI_DIVA,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeDivA,  "Store Div R0",    ""},
-    {0,  UNI_DIVB,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeDivB,  "Store Div R1",    ""},
-    {0,  UNI_DIVC,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeDivC,  "Store Div R2",    ""},
-    {0,  UNI_DIVD,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeDivD,  "Store Div R3",    ""},
-    {0,  UNI_DIVE,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeDivE,  "Store Div R4",    ""},
-    {0,  UNI_DIVF,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeDivF,  "Store Div R5",    ""},
-    {0,  UNI_DIVG,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeDivG,  "Store Div R6",    ""},
-    {0,  UNI_DIVH,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeDivH,  "Store Div R7",    ""},
-    {0,  UNI_DIVI,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeDivI,  "Store Div R8",    ""},
-    {0,  UNI_DIVJ,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeDivJ,  "Store Div R9",    ""},
-    {0,  UNI_DIVK,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeDivK,  "Store Div R10",   ""},
-    {0,  UNI_DIVL,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeDivL,  "Store Div R11",   ""},
-    {0,  UNI_DIVM,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeDivM,  "Store Div R12",   ""},
-    {0,  UNI_DIVN,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeDivN,  "Store Div R13",   ""},
-    {0,  UNI_DIVO,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeDivO,  "Store Div R14",   ""},
-    {0,  UNI_DIVP,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeDivP,  "Store Div R15",   ""},
-    {0,  UNI_DIVQ,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeDivQ,  "Store Div R16",   ""},
-    {0,  UNI_DIVR,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeDivR,  "Store Div R17",   ""},
-    {0,  UNI_DIVS,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeDivS,  "Store Div R18",   ""},
-    {0,  UNI_DIVT,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeDivT,  "Store Div R19",   ""},
-    {0,  UNI_DIVU,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeDivU,  "Store Div R20",   ""},
-    {0,  UNI_DIVV,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeDivV,  "Store Div R21",   ""},
-    {0,  UNI_DIVW,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeDivW,  "Store Div R22",   ""},
-    {0,  UNI_DIVX,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeDivX,  "Store Div R23",   ""},
-    {0,  UNI_DIVY,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeDivY,  "Store Div R24",   ""},
-    {0,  UNI_DIVZ,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeDivZ,  "Store Div R25",   ""},
+BOOL CALLBACK fnDIALOG_REDEFINECONST(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
+{
+    char tmp[50];
 
+    switch(wMessage)
+    {
+    case WM_INITDIALOG:
+        SetDlgItemText(hDlg, IDC_EDIT1, constName);
+        SetDlgItemText(hDlg, IDC_EDIT2, constUnits);
+        sprintf(tmp, "%.12g", constVal);
+        SetDlgItemText(hDlg, IDC_EDIT3, tmp);
 
-    {0,  UNI_STOA,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeA,     "Store R0",        ""},
-    {0,  UNI_STOB,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeB,     "Store R1",        ""},
-    {0,  UNI_STOC,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeC,     "Store R2",        ""},
-    {0,  UNI_STOD,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeD,     "Store R3",        ""},
-    {0,  UNI_STOE,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeE,     "Store R4",        ""},
-    {0,  UNI_STOF,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeF,     "Store R5",        ""},
-    {0,  UNI_STOG,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeG,     "Store R6",        ""},
-    {0,  UNI_STOH,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeH,     "Store R7",        ""},
-    {0,  UNI_STOI,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeI,     "Store R8",        ""},
-    {0,  UNI_STOJ,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeJ,     "Store R9",        ""},
-    {0,  UNI_STOK,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeK,     "Store R10",       ""},
-    {0,  UNI_STOL,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeL,     "Store R11",       ""},
-    {0,  UNI_STOM,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeM,     "Store R12",       ""},
-    {0,  UNI_STON,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeN,     "Store R13",       ""},
-    {0,  UNI_STOO,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeO,     "Store R14",       ""},
-    {0,  UNI_STOP,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeP,     "Store R15",       ""},
-    {0,  UNI_STOQ,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeQ,     "Store R16",       ""},
-    {0,  UNI_STOR,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeR,     "Store R17",       ""},
-    {0,  UNI_STOS,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeS,     "Store R18",       ""},
-    {0,  UNI_STOT,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeT,     "Store R19",       ""},
-    {0,  UNI_STOU,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeU,     "Store R20",       ""},
-    {0,  UNI_STOV,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeV,     "Store R21",       ""},
-    {0,  UNI_STOW,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeW,     "Store R22",       ""},
-    {0,  UNI_STOX,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeX,     "Store R23",       ""},
-    {0,  UNI_STOY,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeY,     "Store R24",       ""},
-    {0,  UNI_STOZ,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_storeZ,     "Store R25",       ""},
+        return TRUE;
 
-    {0,  UNI_RCLA,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_recallA,    "Recall R0",       ""},
-    {0,  UNI_RCLB,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_recallB,    "Recall R1",       ""},
-    {0,  UNI_RCLC,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_recallC,    "Recall R2",       ""},
-    {0,  UNI_RCLD,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_recallD,    "Recall R3",       ""},
-    {0,  UNI_RCLE,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_recallE,    "Recall R4",       ""},
-    {0,  UNI_RCLF,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_recallF,    "Recall R5",       ""},
-    {0,  UNI_RCLG,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_recallG,    "Recall R6",       ""},
-    {0,  UNI_RCLH,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_recallH,    "Recall R7",       ""},
-    {0,  UNI_RCLI,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_recallI,    "Recall R8",       ""},
-    {0,  UNI_RCLJ,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_recallJ,    "Recall R9",       ""},
-    {0,  UNI_RCLK,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_recallK,    "Recall R10",      ""},
-    {0,  UNI_RCLL,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_recallL,    "Recall R11",      ""},
-    {0,  UNI_RCLM,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_recallM,    "Recall R12",      ""},
-    {0,  UNI_RCLN,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_recallN,    "Recall R13",      ""},
-    {0,  UNI_RCLO,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_recallO,    "Recall R14",      ""},
-    {0,  UNI_RCLP,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_recallP,    "Recall R15",      ""},
-    {0,  UNI_RCLQ,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_recallQ,    "Recall R16",      ""},
-    {0,  UNI_RCLR,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_recallR,    "Recall R17",      ""},
-    {0,  UNI_RCLS,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_recallS,    "Recall R18",      ""},
-    {0,  UNI_RCLT,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_recallT,    "Recall R19",      ""},
-    {0,  UNI_RCLU,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_recallU,    "Recall R20",      ""},
-    {0,  UNI_RCLV,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_recallV,    "Recall R21",      ""},
-    {0,  UNI_RCLW,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_recallW,    "Recall R22",      ""},
-    {0,  UNI_RCLX,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_recallX,    "Recall R23",      ""},
-    {0,  UNI_RCLY,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_recallY,    "Recall R24",      ""},
-    {0,  UNI_RCLZ,   USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_recallZ,    "Recall R25",      ""},
+    case WM_COMMAND:
 
-    {0,  UNI_STARTCONST,USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_endConst, "Start Const",    ""},
-    {0,  UNI_ENDCONST,  USES_FL, ALLOWREC, ' ', YES_L, X_NEW, RPN_endConst, "End Const",      ""},
+        switch(wParam)
+        {
+        case(IDOK):           // OK
+            GetDlgItemText(hDlg, IDC_EDIT1, constName, 25);
+            constName[25] = '\0';
+            GetDlgItemText(hDlg, IDC_EDIT2, constUnits, 10);
+            constUnits[10] = '\0';
+            GetDlgItemText(hDlg, IDC_EDIT3, tmp, 20);
+            tmp[20] = '\0';
+            constVal = atof(tmp);
+            sprintf(tmp, "%.12g", constVal); // Make the Number the correct # significant digits...
+            constVal = atof(tmp);
+            EndDialog(hDlg, FALSE);
+            return TRUE;
 
-    {RPN_LAST_KEY,  UNI_UNUSED, USES_FL, ALLOWREC, ' ', NO_L, X_NEW, NULL,  "Unused",         "Unused"}
+            break;
+        case(IDCANCEL):       // CANCEL
+            cancelRedefineConst = 1;
+            EndDialog(hDlg, FALSE);
+            return TRUE;
+
+        default:
+            return FALSE;
+        }
+
+    case WM_SYSCOMMAND:
+        switch(wParam & 0xFFF0)
+        {
+        case SC_CLOSE:
+            EndDialog(hDlg, FALSE);
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+struct constTableStruct constantsUsed[MAX_CONSTS];
+struct constTableStruct constants[MAX_CONST_BANKS][MAX_CONSTS] = 
+{
+    // Bank 1
+    {
+        {TRUE,  "Pi",                       "",             M_PI},
+        {TRUE,  "Speed Of Light",           "m/s",          299792458.0},
+        {TRUE,  "Acceleration Gravity",     "m/s²",         9.80665},
+        {TRUE,  "Plank's Constant",         "Js",           6.626E-34},
+        {TRUE,  "Avogadro's Number",        "mol",          6.022045E+23},
+        {TRUE,  "Electron Charge",          "col",          1.6021892E-19},
+        {TRUE,  "Atomic Mass Unit",         "kg",           1.6606E-27},
+        {TRUE,  "Electron Mass",            "kg",           9.109534E-31},
+        {TRUE,  "Proton Mass",              "kg",           1.6722E-27},
+        {TRUE,  "Electron-Proton Ratio",    "",             1836.1},
+        {TRUE,  "Ideal Gas Volume @ STP",   "l/mol",        22.4136},
+        {TRUE,  "Bohr Radius",              "m",            5.292E-11},
+        {TRUE,  "Electron Volt",            "J",            1.602E-19},
+        {TRUE,  "Boltzman Constant",        "JK-1",         1.380622e-23},
+        {TRUE,  "Faraday's Constant",       "col",          9.65E4},
+        {TRUE,  "Unit Atomic Energy",       "MeV",          931.34},
+        {TRUE,  "Universal Answer",         "",             42.0},
+        {FALSE, "None",                     "",             0.00}  // end of list...
+    },
+     
+    // Bank 2 
+    {
+        {FALSE, "None",                     "",             0.00}  // end of list...
+    },                                                
+    
+    // Bank 3
+    {                                                  
+        {FALSE, "None",                     "",             0.00}  // end of list...
+    },                                                
+    
+    // Bank 4
+    {                                                  
+        {FALSE, "None",                     "",             0.00}  // end of list...
+    },                                                
+    
+    // Bank 5
+    {                                                  
+        {FALSE, "None",                     "",             0.00}  // end of list...
+    },
 };
 
 
-void RPN_storeReg(int reg)
+char constantBankNames[MAX_CONST_BANKS][15] = {
+    {"Constants 1"},
+    {"Constants 2"},
+    {"Constants 3"},
+    {"Constants 4"},
+    {"Constants 5"}
+};
+
+BOOL CALLBACK constBankNamesProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
 {
-    if (progMode == PROG_NORMAL)
-        STO[reg] = X;
-    else
+    switch(wMessage)
     {
-        if (wordMode == PROG_SIGNED)
-            STO[reg] = (PROG_SIGNEDLONG) XL;
-        else
-            STO[reg] = XL;
-    }
-    if (recModeON == 1)
-    {
-        SaveProgramStep(UNI_STOA+reg);
-    }
-}
-
-void RPN_storeA(void) { RPN_storeReg(0); }
-void RPN_storeB(void) { RPN_storeReg(1); }
-void RPN_storeC(void) { RPN_storeReg(2); }
-void RPN_storeD(void) { RPN_storeReg(3); }
-void RPN_storeE(void) { RPN_storeReg(4); }
-void RPN_storeF(void) { RPN_storeReg(5); }
-void RPN_storeG(void) { RPN_storeReg(6); }
-void RPN_storeH(void) { RPN_storeReg(7); }
-void RPN_storeI(void) { RPN_storeReg(8); }
-void RPN_storeJ(void) { RPN_storeReg(9); }
-void RPN_storeK(void) { RPN_storeReg(10); }
-void RPN_storeL(void) { RPN_storeReg(11); }
-void RPN_storeM(void) { RPN_storeReg(12); }
-void RPN_storeN(void) { RPN_storeReg(13); }
-void RPN_storeO(void) { RPN_storeReg(14); }
-void RPN_storeP(void) { RPN_storeReg(15); }
-void RPN_storeQ(void) { RPN_storeReg(16); }
-void RPN_storeR(void) { RPN_storeReg(17); }
-void RPN_storeS(void) { RPN_storeReg(18); }
-void RPN_storeT(void) { RPN_storeReg(19); }
-void RPN_storeU(void) { RPN_storeReg(20); }
-void RPN_storeV(void) { RPN_storeReg(21); }
-void RPN_storeW(void) { RPN_storeReg(22); }
-void RPN_storeX(void) { RPN_storeReg(23); }
-void RPN_storeY(void) { RPN_storeReg(24); }
-void RPN_storeZ(void) { RPN_storeReg(25); }
-
-void RPN_storeAddReg(int reg)
-{
-    if (progMode == PROG_NORMAL)
-        STO[reg] += X;
-    else
-    {
-        if (wordMode == PROG_SIGNED)
-            STO[reg] += (PROG_SIGNEDLONG) XL;
-        else
-            STO[reg] += XL;
-    }
-    if (recModeON == 1)
-    {
-        SaveProgramStep(UNI_ADDA+reg);
-    }
-}
-
-
-void RPN_storeAddA(void) { RPN_storeAddReg(0); }
-void RPN_storeAddB(void) { RPN_storeAddReg(1); }
-void RPN_storeAddC(void) { RPN_storeAddReg(2); }
-void RPN_storeAddD(void) { RPN_storeAddReg(3); }
-void RPN_storeAddE(void) { RPN_storeAddReg(4); }
-void RPN_storeAddF(void) { RPN_storeAddReg(5); }
-void RPN_storeAddG(void) { RPN_storeAddReg(6); }
-void RPN_storeAddH(void) { RPN_storeAddReg(7); }
-void RPN_storeAddI(void) { RPN_storeAddReg(8); }
-void RPN_storeAddJ(void) { RPN_storeAddReg(9); }
-void RPN_storeAddK(void) { RPN_storeAddReg(10); }
-void RPN_storeAddL(void) { RPN_storeAddReg(11); }
-void RPN_storeAddM(void) { RPN_storeAddReg(12); }
-void RPN_storeAddN(void) { RPN_storeAddReg(13); }
-void RPN_storeAddO(void) { RPN_storeAddReg(14); }
-void RPN_storeAddP(void) { RPN_storeAddReg(15); }
-void RPN_storeAddQ(void) { RPN_storeAddReg(16); }
-void RPN_storeAddR(void) { RPN_storeAddReg(17); }
-void RPN_storeAddS(void) { RPN_storeAddReg(18); }
-void RPN_storeAddT(void) { RPN_storeAddReg(19); }
-void RPN_storeAddU(void) { RPN_storeAddReg(20); }
-void RPN_storeAddV(void) { RPN_storeAddReg(21); }
-void RPN_storeAddW(void) { RPN_storeAddReg(22); }
-void RPN_storeAddX(void) { RPN_storeAddReg(23); }
-void RPN_storeAddY(void) { RPN_storeAddReg(24); }
-void RPN_storeAddZ(void) { RPN_storeAddReg(25); }
-
-
-void RPN_storeSubReg(int reg)
-{
-    if (progMode == PROG_NORMAL)
-        STO[reg] -= X;
-    else
-    {
-        if (wordMode == PROG_SIGNED)
-            STO[reg] -= (PROG_SIGNEDLONG) XL;
-        else
-            STO[reg] -= XL;
-    }
-    if (recModeON == 1)
-    {
-        SaveProgramStep(UNI_SUBA+reg);
-    }
-}
-
-
-void RPN_storeSubA(void) { RPN_storeSubReg(0); }
-void RPN_storeSubB(void) { RPN_storeSubReg(1); }
-void RPN_storeSubC(void) { RPN_storeSubReg(2); }
-void RPN_storeSubD(void) { RPN_storeSubReg(3); }
-void RPN_storeSubE(void) { RPN_storeSubReg(4); }
-void RPN_storeSubF(void) { RPN_storeSubReg(5); }
-void RPN_storeSubG(void) { RPN_storeSubReg(6); }
-void RPN_storeSubH(void) { RPN_storeSubReg(7); }
-void RPN_storeSubI(void) { RPN_storeSubReg(8); }
-void RPN_storeSubJ(void) { RPN_storeSubReg(9); }
-void RPN_storeSubK(void) { RPN_storeSubReg(10); }
-void RPN_storeSubL(void) { RPN_storeSubReg(11); }
-void RPN_storeSubM(void) { RPN_storeSubReg(12); }
-void RPN_storeSubN(void) { RPN_storeSubReg(13); }
-void RPN_storeSubO(void) { RPN_storeSubReg(14); }
-void RPN_storeSubP(void) { RPN_storeSubReg(15); }
-void RPN_storeSubQ(void) { RPN_storeSubReg(16); }
-void RPN_storeSubR(void) { RPN_storeSubReg(17); }
-void RPN_storeSubS(void) { RPN_storeSubReg(18); }
-void RPN_storeSubT(void) { RPN_storeSubReg(19); }
-void RPN_storeSubU(void) { RPN_storeSubReg(20); }
-void RPN_storeSubV(void) { RPN_storeSubReg(21); }
-void RPN_storeSubW(void) { RPN_storeSubReg(22); }
-void RPN_storeSubX(void) { RPN_storeSubReg(23); }
-void RPN_storeSubY(void) { RPN_storeSubReg(24); }
-void RPN_storeSubZ(void) { RPN_storeSubReg(25); }
-
-
-void RPN_storeMulReg(int reg)
-{
-    if (progMode == PROG_NORMAL)
-        STO[reg] *= X;
-    else
-    {
-        if (wordMode == PROG_SIGNED)
-            STO[reg] *= (PROG_SIGNEDLONG) XL;
-        else
-            STO[reg] *= XL;
-    }
-    if (recModeON == 1)
-    {
-        SaveProgramStep(UNI_MULA+reg);
-    }
-}
-
-
-void RPN_storeMulA(void) { RPN_storeMulReg(0); }
-void RPN_storeMulB(void) { RPN_storeMulReg(1); }
-void RPN_storeMulC(void) { RPN_storeMulReg(2); }
-void RPN_storeMulD(void) { RPN_storeMulReg(3); }
-void RPN_storeMulE(void) { RPN_storeMulReg(4); }
-void RPN_storeMulF(void) { RPN_storeMulReg(5); }
-void RPN_storeMulG(void) { RPN_storeMulReg(6); }
-void RPN_storeMulH(void) { RPN_storeMulReg(7); }
-void RPN_storeMulI(void) { RPN_storeMulReg(8); }
-void RPN_storeMulJ(void) { RPN_storeMulReg(9); }
-void RPN_storeMulK(void) { RPN_storeMulReg(10); }
-void RPN_storeMulL(void) { RPN_storeMulReg(11); }
-void RPN_storeMulM(void) { RPN_storeMulReg(12); }
-void RPN_storeMulN(void) { RPN_storeMulReg(13); }
-void RPN_storeMulO(void) { RPN_storeMulReg(14); }
-void RPN_storeMulP(void) { RPN_storeMulReg(15); }
-void RPN_storeMulQ(void) { RPN_storeMulReg(16); }
-void RPN_storeMulR(void) { RPN_storeMulReg(17); }
-void RPN_storeMulS(void) { RPN_storeMulReg(18); }
-void RPN_storeMulT(void) { RPN_storeMulReg(19); }
-void RPN_storeMulU(void) { RPN_storeMulReg(20); }
-void RPN_storeMulV(void) { RPN_storeMulReg(21); }
-void RPN_storeMulW(void) { RPN_storeMulReg(22); }
-void RPN_storeMulX(void) { RPN_storeMulReg(23); }
-void RPN_storeMulY(void) { RPN_storeMulReg(24); }
-void RPN_storeMulZ(void) { RPN_storeMulReg(25); }
-
-void RPN_storeDivReg(int reg)
-{
-    if (progMode == PROG_NORMAL)
-    {
-        if (X != 0.0)
-            STO[reg] /= X;
-        else
-            RPN_error("STO: Divide by Zero");
-    }
-    else
-    {
-        if (XL != (PROG_LONG) 0)
+    case WM_INITDIALOG:
+        SetDlgItemText(hDlg, IDC_EDIT1, constantBankNames[0]);
+        SetDlgItemText(hDlg, IDC_EDIT2, constantBankNames[1]);
+        SetDlgItemText(hDlg, IDC_EDIT3, constantBankNames[2]);
+        SetDlgItemText(hDlg, IDC_EDIT4, constantBankNames[3]);
+        SetDlgItemText(hDlg, IDC_EDIT5, constantBankNames[4]);
+        return TRUE;
+    case WM_COMMAND:
+        switch(LOWORD(wParam))
         {
-            if (wordMode == PROG_SIGNED)
-                STO[reg] /= (PROG_SIGNEDLONG) XL;
-            else
-                STO[reg] /= XL;
+        case(IDOK):           /* OK - Close */
+            GetDlgItemText(hDlg, IDC_EDIT1, constantBankNames[0], 15);
+            constantBankNames[0][14] = CNULL;
+            GetDlgItemText(hDlg, IDC_EDIT2, constantBankNames[1], 15);
+            constantBankNames[1][14] = CNULL;
+            GetDlgItemText(hDlg, IDC_EDIT3, constantBankNames[2], 15);
+            constantBankNames[2][14] = CNULL;
+            GetDlgItemText(hDlg, IDC_EDIT4, constantBankNames[3], 15);
+            constantBankNames[3][14] = CNULL;
+            GetDlgItemText(hDlg, IDC_EDIT5, constantBankNames[4], 15);
+            constantBankNames[4][14] = CNULL;
+            EndDialog(hDlg, FALSE);
+            return TRUE;
+        case(IDCANCEL):       /* Cancel */
+            EndDialog(hDlg, FALSE);
+            return TRUE;
+        default:
+            return FALSE;
         }
-        else
-            RPN_error("STO: Divide by Zero");
-    }
 
-    if (recModeON == 1)
-    {
-        SaveProgramStep(UNI_DIVA+reg);
+    case WM_SYSCOMMAND:
+        switch(wParam & 0xFFF0)
+        {
+        case SC_CLOSE:
+            EndDialog(hDlg, FALSE);
+            return TRUE;
+        }
     }
+    return FALSE;
 }
 
 
-void RPN_storeDivA(void) { RPN_storeDivReg(0); }
-void RPN_storeDivB(void) { RPN_storeDivReg(1); }
-void RPN_storeDivC(void) { RPN_storeDivReg(2); }
-void RPN_storeDivD(void) { RPN_storeDivReg(3); }
-void RPN_storeDivE(void) { RPN_storeDivReg(4); }
-void RPN_storeDivF(void) { RPN_storeDivReg(5); }
-void RPN_storeDivG(void) { RPN_storeDivReg(6); }
-void RPN_storeDivH(void) { RPN_storeDivReg(7); }
-void RPN_storeDivI(void) { RPN_storeDivReg(8); }
-void RPN_storeDivJ(void) { RPN_storeDivReg(9); }
-void RPN_storeDivK(void) { RPN_storeDivReg(10); }
-void RPN_storeDivL(void) { RPN_storeDivReg(11); }
-void RPN_storeDivM(void) { RPN_storeDivReg(12); }
-void RPN_storeDivN(void) { RPN_storeDivReg(13); }
-void RPN_storeDivO(void) { RPN_storeDivReg(14); }
-void RPN_storeDivP(void) { RPN_storeDivReg(15); }
-void RPN_storeDivQ(void) { RPN_storeDivReg(16); }
-void RPN_storeDivR(void) { RPN_storeDivReg(17); }
-void RPN_storeDivS(void) { RPN_storeDivReg(18); }
-void RPN_storeDivT(void) { RPN_storeDivReg(19); }
-void RPN_storeDivU(void) { RPN_storeDivReg(20); }
-void RPN_storeDivV(void) { RPN_storeDivReg(21); }
-void RPN_storeDivW(void) { RPN_storeDivReg(22); }
-void RPN_storeDivX(void) { RPN_storeDivReg(23); }
-void RPN_storeDivY(void) { RPN_storeDivReg(24); }
-void RPN_storeDivZ(void) { RPN_storeDivReg(25); }
-
-
-void RPN_recallReg(int reg)
+extern BOOL CALLBACK fnDIALOG_Constants(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
+void RPN_const(void)
 {
-    if (progMode == PROG_NORMAL)
-    {
-        if (Xedit == X_ENTER)
-            X = STO[reg];
-        else
-            StackPush(STO[reg]);
-    }
-    else
-    {
-        if (Xedit == X_ENTER)
-            XL = maskStackStuff((PROG_LONG) STO[reg]);
-        else
-            StackPushL((PROG_LONG) STO[reg]);
-    }
+    DLGPROC lpfnDIALOG_ConstantsProc;
 
-    if (recModeON == 1)
+    lpfnDIALOG_ConstantsProc = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_Constants, hExcaliburInstance);
+
+    if ((DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_CONSTANTS", calcMainWindow, lpfnDIALOG_ConstantsProc)) == -1)
     {
-        SaveProgramStep(UNI_RCLA+reg);
+        MessageBox(NULL, "Unable to display dialog", "System Error", MB_SYSTEMMODAL | MB_ICONHAND | MB_OK);
     }
+    FreeProcInstance((FARPROC) lpfnDIALOG_ConstantsProc);
 }
 
-void RPN_recallA(void) { RPN_recallReg(0); }
-void RPN_recallB(void) { RPN_recallReg(1); }
-void RPN_recallC(void) { RPN_recallReg(2); }
-void RPN_recallD(void) { RPN_recallReg(3); }
-void RPN_recallE(void) { RPN_recallReg(4); }
-void RPN_recallF(void) { RPN_recallReg(5); }
-void RPN_recallG(void) { RPN_recallReg(6); }
-void RPN_recallH(void) { RPN_recallReg(7); }
-void RPN_recallI(void) { RPN_recallReg(8); }
-void RPN_recallJ(void) { RPN_recallReg(9); }
-void RPN_recallK(void) { RPN_recallReg(10); }
-void RPN_recallL(void) { RPN_recallReg(11); }
-void RPN_recallM(void) { RPN_recallReg(12); }
-void RPN_recallN(void) { RPN_recallReg(13); }
-void RPN_recallO(void) { RPN_recallReg(14); }
-void RPN_recallP(void) { RPN_recallReg(15); }
-void RPN_recallQ(void) { RPN_recallReg(16); }
-void RPN_recallR(void) { RPN_recallReg(17); }
-void RPN_recallS(void) { RPN_recallReg(18); }
-void RPN_recallT(void) { RPN_recallReg(19); }
-void RPN_recallU(void) { RPN_recallReg(20); }
-void RPN_recallV(void) { RPN_recallReg(21); }
-void RPN_recallW(void) { RPN_recallReg(22); }
-void RPN_recallX(void) { RPN_recallReg(23); }
-void RPN_recallY(void) { RPN_recallReg(24); }
-void RPN_recallZ(void) { RPN_recallReg(25); }
+BOOL CALLBACK fnDIALOG_Constants(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
+{
+    int i, j;
+    char tmp[50];
+    LRESULT item;
+    static int lbTabStops[2] = { 170, 240 };
+
+    switch(wMessage)
+    {
+    case WM_INITDIALOG:
+        SendDlgItemMessage(hDlg, 101, LB_SETTABSTOPS, 2, (DWORD) lbTabStops);
+
+        j = 0;
+        for (i = 0; i < MAX_CONSTS; i++)
+        {
+            if (constants[lastConstBank][i].includeInList == TRUE)      // Only include those in the list the user wants...
+            {
+                sprintf(tmp, "%-25s\t%-14.12g \t%s",
+                         constants[lastConstBank][i].name,
+                         constants[lastConstBank][i].value, constants[lastConstBank][i].units);
+                makeInternational(tmp);        // To swap commas and DPs if needed
+                SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+                memcpy(&constantsUsed[j], &constants[lastConstBank][i], sizeof(constants[lastConstBank][i]));
+                j++;
+            }
+        }
+        SetDlgItemText(hDlg, IDC_RADIO1, constantBankNames[0]);
+        SetDlgItemText(hDlg, IDC_RADIO2, constantBankNames[1]);
+        SetDlgItemText(hDlg, IDC_RADIO3, constantBankNames[2]);
+        SetDlgItemText(hDlg, IDC_RADIO4, constantBankNames[3]);
+        SetDlgItemText(hDlg, IDC_RADIO5, constantBankNames[4]);
+
+        SendDlgItemMessage(hDlg, IDC_RADIO1 + lastConstBank, BM_SETCHECK, 1, 0);       // Set up bank selection!
+        SendDlgItemMessage(hDlg, 101, LB_SETCURSEL, lastChosenConst, 0);
+        SetFocus(GetDlgItem(hDlg, 101));
+        return TRUE;
+    case WM_COMMAND:
+        switch(LOWORD(wParam))
+        {
+        case(101):
+            if (HIWORD(wParam) != LBN_DBLCLK)
+                break;
+            /* Else fall through!!!! */
+        case(102):            /* Insert constant number */
+            item = SendDlgItemMessage(hDlg, 101, LB_GETCURSEL, 0, 0L);
+            if (item == (LRESULT) LB_ERR)
+            {
+                MessageBox(hDlg, "No Item Selected In The List Box", "Excalibur User Error", MB_OK);
+            }
+            else
+            {
+                // Find item in list even with FALSE entries!
+                j = 0;
+                for (i = 0; i < MAX_CONSTS; i++)
+                {
+                    if (constants[lastConstBank][j].includeInList == TRUE)
+                    {
+                        if (item == j)
+                            break;
+                        j++;
+                    }
+                }
+                lastChosenConst = j;
+                PushConstant(constantsUsed[item].value);
+                EndDialog(hDlg, FALSE);
+            }
+            return TRUE;
+        case(105):            /* Add New Constant */
+            for (i = 0; i < MAX_CONSTS; i++)
+            {
+                if (constants[lastConstBank][i].includeInList == FALSE)
+                {
+                    constants[lastConstBank][i].includeInList = TRUE;
+                    strcpy(constants[lastConstBank][i].name, "New Constant");
+                    strcpy(constants[lastConstBank][i].units, "");
+                    constants[lastConstBank][i].value = 0.0;
+                    item = i;
+                    break;
+                }
+            }
+            if (i == MAX_CONSTS)        // no room in list!
+            {
+                MessageBox(hDlg, "Sorry, no room left in this constants bank...", "Excalibur Error", MB_OK);
+                break;
+            }
+
+            // NO BREAK!!! Fall through!
+        case(104):            /* Redefine Constant */
+            if (LOWORD(wParam) == 104)
+                item = SendDlgItemMessage(hDlg, 101, LB_GETCURSEL, 0, 0L);
+            if (item == (LRESULT) LB_ERR)
+            {
+                MessageBox(hDlg, "No Item Selected In The List Box", "Excalibur User Error", MB_OK);
+            }
+            else
+            {
+                // Find item in list even with FALSE entries!
+                j = 0;
+                for (i = 0; i < MAX_CONSTS; i++)
+                {
+                    if (constants[lastConstBank][j].includeInList == TRUE)
+                    {
+                        if (item == j)
+                            break;
+                        j++;
+                    }
+                }
+                lastChosenConst = j;
+                strcpy(constName, constants[lastConstBank][item].name);
+                strcpy(constUnits, constants[lastConstBank][item].units);
+                constVal = constants[lastConstBank][item].value;
+                cancelRedefineConst = 0;
+                RedefineConst();
+                if (cancelRedefineConst == 0)
+                {
+                    strcpy(constants[lastConstBank][item].name, constName);
+                    strcpy(constants[lastConstBank][item].units, constUnits);
+                    constants[lastConstBank][item].value = constVal;
+                    // Must add them to the list again...
+                    SendDlgItemMessage(hDlg, 101, LB_RESETCONTENT, 0, 0);
+                    j = 0;
+                    for (i = 0; i < MAX_CONSTS; i++)
+                    {
+                        if (constants[lastConstBank][i].includeInList == TRUE)  // Only include those in the list the user wants...
+                        {
+                            sprintf(tmp, "%-25s\t%-14.12g \t%s",
+                                     constants[lastConstBank][i].name,
+                                     constants[lastConstBank][i].value, constants[lastConstBank][i].units);
+                            makeInternational(tmp);    // To swap commas and DPs if needed
+                            SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+                            memcpy(&constantsUsed[j], &constants[lastConstBank][i], sizeof(constants[lastConstBank][i]));
+                            j++;
+                        }
+                    }
+                    SendDlgItemMessage(hDlg, 101, LB_SETCURSEL, lastChosenConst, 0);
+                    SetFocus(GetDlgItem(hDlg, 101));
+                }
+            }
+            return TRUE;
+
+        case(106):            // Delete!
+            item = SendDlgItemMessage(hDlg, 101, LB_GETCURSEL, 0, 0L);
+            if (item == (LRESULT) LB_ERR)
+            {
+                MessageBox(hDlg, "No Item Selected In The List Box", "Excalibur User Error", MB_OK);
+            }
+            else
+            {
+                if (MessageBox
+                    (hDlg, "Are you sure you wish to delete this entry?", "Excalibur For Windows", MB_YESNO) == IDYES)
+                {
+                    // Find item in list even with FALSE entries!
+                    j = 0;
+                    for (i = 0; i < MAX_CONSTS; i++)
+                    {
+                        if (constants[lastConstBank][j].includeInList == TRUE)
+                        {
+                            if (item == j)
+                                break;
+                            j++;
+                        }
+                    }
+                    constants[lastConstBank][j].includeInList = FALSE;
+                    lastChosenConst = j - 1;
+                    if (lastChosenConst < 0)
+                        lastChosenConst = 0;
+
+                    // Now move existing entries down...
+                    for (i = j; i < MAX_CONSTS - 1; i++)
+                    {
+                        memcpy(&constants[lastConstBank][i],
+                                &constants[lastConstBank][i + 1], sizeof(constants[lastConstBank][i]));
+                    }
+                    constants[lastConstBank][i].includeInList = FALSE;  // Always set last list entry on delete to FALSE
+
+                    SendDlgItemMessage(hDlg, 101, LB_RESETCONTENT, 0, 0);
+                    j = 0;
+                    for (i = 0; i < MAX_CONSTS; i++)
+                    {
+                        if (constants[lastConstBank][i].includeInList == TRUE)  // Only include those in the list the user wants...
+                        {
+                            sprintf(tmp, "%-25s\t%-14.12g \t%s",
+                                     constants[lastConstBank][i].name,
+                                     constants[lastConstBank][i].value, constants[lastConstBank][i].units);
+                            makeInternational(tmp);    // To swap commas and DPs if needed
+                            SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+                            memcpy(&constantsUsed[j], &constants[lastConstBank][i], sizeof(constants[lastConstBank][i]));
+                            j++;
+                        }
+                    }
+                    SendDlgItemMessage(hDlg, 101, LB_SETCURSEL, lastChosenConst, 0);
+                    SetFocus(GetDlgItem(hDlg, 101));
+                }
+            }
+            return TRUE;
+
+        case(IDC_RADIO1):
+            lastConstBank = 0;
+            SendDlgItemMessage(hDlg, 101, LB_RESETCONTENT, 0, 0);
+            j = 0;
+            for (i = 0; i < MAX_CONSTS; i++)
+            {
+                if (constants[lastConstBank][i].includeInList == TRUE)  // Only include those in the list the user wants...
+                {
+                    sprintf(tmp, "%-25s\t%-14.12g \t%s",
+                             constants[lastConstBank][i].name,
+                             constants[lastConstBank][i].value, constants[lastConstBank][i].units);
+                    makeInternational(tmp);    // To swap commas and DPs if needed
+                    SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+                    memcpy(&constantsUsed[j], &constants[lastConstBank][i], sizeof(constants[lastConstBank][i]));
+                    j++;
+                }
+            }
+            SendDlgItemMessage(hDlg, 101, LB_SETCURSEL, lastChosenConst, 0);
+            SetFocus(GetDlgItem(hDlg, 101));
+            return TRUE;
+        case(IDC_RADIO2):
+            lastConstBank = 1;
+            SendDlgItemMessage(hDlg, 101, LB_RESETCONTENT, 0, 0);
+            j = 0;
+            for (i = 0; i < MAX_CONSTS; i++)
+            {
+                if (constants[lastConstBank][i].includeInList == TRUE)  // Only include those in the list the user wants...
+                {
+                    sprintf(tmp, "%-25s\t%-14.12g \t%s",
+                             constants[lastConstBank][i].name,
+                             constants[lastConstBank][i].value, constants[lastConstBank][i].units);
+                    makeInternational(tmp);    // To swap commas and DPs if needed
+                    SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+                    memcpy(&constantsUsed[j], &constants[lastConstBank][i], sizeof(constants[lastConstBank][i]));
+                    j++;
+                }
+            }
+            SendDlgItemMessage(hDlg, 101, LB_SETCURSEL, lastChosenConst, 0);
+            SetFocus(GetDlgItem(hDlg, 101));
+            return TRUE;
+        case(IDC_RADIO3):
+            lastConstBank = 2;
+            SendDlgItemMessage(hDlg, 101, LB_RESETCONTENT, 0, 0);
+            j = 0;
+            for (i = 0; i < MAX_CONSTS; i++)
+            {
+                if (constants[lastConstBank][i].includeInList == TRUE)  // Only include those in the list the user wants...
+                {
+                    sprintf(tmp, "%-25s\t%-14.12g \t%s",
+                             constants[lastConstBank][i].name,
+                             constants[lastConstBank][i].value, constants[lastConstBank][i].units);
+                    makeInternational(tmp);    // To swap commas and DPs if needed
+                    SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+                    memcpy(&constantsUsed[j], &constants[lastConstBank][i], sizeof(constants[lastConstBank][i]));
+                    j++;
+                }
+            }
+            SendDlgItemMessage(hDlg, 101, LB_SETCURSEL, lastChosenConst, 0);
+            SetFocus(GetDlgItem(hDlg, 101));
+            return TRUE;
+        case(IDC_RADIO4):
+            lastConstBank = 3;
+            SendDlgItemMessage(hDlg, 101, LB_RESETCONTENT, 0, 0);
+            j = 0;
+            for (i = 0; i < MAX_CONSTS; i++)
+            {
+                if (constants[lastConstBank][i].includeInList == TRUE)  // Only include those in the list the user wants...
+                {
+                    sprintf(tmp, "%-25s\t%-14.12g \t%s",
+                             constants[lastConstBank][i].name,
+                             constants[lastConstBank][i].value, constants[lastConstBank][i].units);
+                    makeInternational(tmp);    // To swap commas and DPs if needed
+                    SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+                    memcpy(&constantsUsed[j], &constants[lastConstBank][i], sizeof(constants[lastConstBank][i]));
+                    j++;
+                }
+            }
+            SendDlgItemMessage(hDlg, 101, LB_SETCURSEL, lastChosenConst, 0);
+            SetFocus(GetDlgItem(hDlg, 101));
+            return TRUE;
+        case(IDC_RADIO5):
+            lastConstBank = 4;
+            SendDlgItemMessage(hDlg, 101, LB_RESETCONTENT, 0, 0);
+            j = 0;
+            for (i = 0; i < MAX_CONSTS; i++)
+            {
+                if (constants[lastConstBank][i].includeInList == TRUE)  // Only include those in the list the user wants...
+                {
+                    sprintf(tmp, "%-25s\t%-14.12g \t%s",
+                             constants[lastConstBank][i].name,
+                             constants[lastConstBank][i].value, constants[lastConstBank][i].units);
+                    makeInternational(tmp);    // To swap commas and DPs if needed
+                    SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+                    memcpy(&constantsUsed[j], &constants[lastConstBank][i], sizeof(constants[lastConstBank][i]));
+                    j++;
+                }
+            }
+            SendDlgItemMessage(hDlg, 101, LB_SETCURSEL, lastChosenConst, 0);
+            SetFocus(GetDlgItem(hDlg, 101));
+            return TRUE;
+        case(107):            /* Redefine Bank Names */
+            DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_CONSTANT_BANK_NAMES", hDlg, constBankNamesProc);
+            SetDlgItemText(hDlg, IDC_RADIO1, constantBankNames[0]);
+            SetDlgItemText(hDlg, IDC_RADIO2, constantBankNames[1]);
+            SetDlgItemText(hDlg, IDC_RADIO3, constantBankNames[2]);
+            SetDlgItemText(hDlg, IDC_RADIO4, constantBankNames[3]);
+            SetDlgItemText(hDlg, IDC_RADIO5, constantBankNames[4]);
+            return TRUE;
+
+        case(103):            /* Cancel */
+            EndDialog(hDlg, FALSE);
+            return TRUE;
+        default:
+            return FALSE;
+        }
+
+    case WM_SYSCOMMAND:
+        switch(wParam & 0xFFF0)
+        {
+        case SC_CLOSE:
+            EndDialog(hDlg, FALSE);
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
 

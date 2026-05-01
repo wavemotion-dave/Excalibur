@@ -77,7 +77,7 @@ extern void CONV_MetricTons_lbs (void);
 uint8_t convInverse = 0;
 
 struct funcStruct Conversion_funcs[MAX_FUNCS] = {
-    {FN1,   UNI_CINV,    USES_F,    ALLOWREC,   ' ',    "INVz",      NO_L,   X_NULL,     CONV_inverse,       T_CONV_INV,     H_CONV_INV},
+    {FN1,   UNI_CINV,    USES_F,    ALLOWREC,   ' ',    "INV",      NO_L,   X_NULL,     CONV_inverse,       T_CONV_INV,     H_CONV_INV},
     {FN2,   UNI_LBKG,    USES_F,    ALLOWREC,   ' ',    "lb»kg",    YES_L,  X_NEW,      CONV_lb_kg,         T_LB_KG,        H_LB_KG},
     {FN3,   UNI_OZGR,    USES_F,    ALLOWREC,   ' ',    "Oz»g",     YES_L,  X_NEW,      CONV_Oz_g,          T_OZ_GR,        H_OZ_GR},
     {FN4,   UNI_OZML,    USES_F,    ALLOWREC,   ' ',    "flOz»ml",  YES_L,  X_NEW,      CONV_flOz_ml,       T_FO_ML,        H_FO_ML},

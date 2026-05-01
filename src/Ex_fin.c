@@ -77,101 +77,101 @@ uint8_t CFn;
 
 char finTmpStr[50];
 
-extern void BUSI_tax(void);
-extern void BUSI_percent(void);
-extern void BUSI_percentChg(void);
-extern void BUSI_percentTot(void);
-extern void BUSI_store(void);
-extern void BUSI_clearReg(void);
-extern void BUSI_12div(void);
-extern void BUSI_12mult(void);
-extern void BUSI_fv(void);
-extern void BUSI_pv(void);
-extern void BUSI_amort(void);
-extern void BUSI_100div(void);
-extern void BUSI_100mult(void);
-extern void BUSI_pmt(void);
-extern void BUSI_n(void);
-extern void BUSI_i(void);
-extern void BUSI_recall(void);
-extern void BUSI_cashFlow0(void);
-extern void BUSI_cashFlowj(void);
-extern void BUSI_cashFlowNj(void);
-extern void BUSI_NPV(void);
-extern void BUSI_IRR(void);
-extern void BUSI_date(void);
-extern void BUSI_days(void);
-extern void BUSI_today(void);
-extern void BUSI_muc(void);
-extern void BUSI_mup(void);
-extern void BUSI_cost(void);
-extern void BUSI_price(void);
-extern void BUSI_payMode(void);
-extern void BUSI_bond(void);
-extern void BUSI_ytm(void);
-extern void BUSI_currency(void);
-extern void BUSI_SPPV(void);
-extern void BUSI_SPFV(void);
-extern void BUSI_USPV(void);
-extern void BUSI_USFV(void);
-extern void BUSI_INFL(void);
-extern void BUSI_EFF(void);
-extern void BUSI_Depr(void);
+extern void FIN_tax(void);
+extern void FIN_percent(void);
+extern void FIN_percentChg(void);
+extern void FIN_percentTot(void);
+extern void FIN_store(void);
+extern void FIN_clearReg(void);
+extern void FIN_12div(void);
+extern void FIN_12mult(void);
+extern void FIN_fv(void);
+extern void FIN_pv(void);
+extern void FIN_amort(void);
+extern void FIN_100div(void);
+extern void FIN_100mult(void);
+extern void FIN_pmt(void);
+extern void FIN_n(void);
+extern void FIN_i(void);
+extern void FIN_recall(void);
+extern void FIN_cashFlow0(void);
+extern void FIN_cashFlowj(void);
+extern void FIN_cashFlowNj(void);
+extern void FIN_NPV(void);
+extern void FIN_IRR(void);
+extern void FIN_date(void);
+extern void FIN_days(void);
+extern void FIN_today(void);
+extern void FIN_muc(void);
+extern void FIN_mup(void);
+extern void FIN_cost(void);
+extern void FIN_price(void);
+extern void FIN_payMode(void);
+extern void FIN_bond(void);
+extern void FIN_ytm(void);
+extern void FIN_currency(void);
+extern void FIN_SPPV(void);
+extern void FIN_SPFV(void);
+extern void FIN_USPV(void);
+extern void FIN_USFV(void);
+extern void FIN_INFL(void);
+extern void FIN_EFF(void);
+extern void FIN_Depr(void);
 
 struct funcStruct Financial_funcs[MAX_FUNCS] = {
-    {FN1,   UNI_TAX,    USES_F,     ALLOWREC,   ' ',    "TAX",      YES_L,  X_NEW,      BUSI_tax,           T_TAX,      H_TAX},
-    {FN2,   UNI_PERC,   USES_F,     ALLOWREC,   ' ',    " % ",      YES_L,  X_NEW,      BUSI_percent,       T_PERC,     H_PERC},
-    {FN3,   UNI_PERCC,  USES_F,     ALLOWREC,   ' ',    "%CHG",     YES_L,  X_NEW,      BUSI_percentChg,    T_PERCC,    H_PERCC},
-    {FN4,   UNI_PERCT,  USES_F,     ALLOWREC,   ' ',    "%TOT",     YES_L,  X_NEW,      BUSI_percentTot,    T_PERCT,    H_PERCT},
-    {FN5,   UNI_CLRF,   USES_F,     ALLOWREC,   ' ',    "CLRF",     YES_L,  X_NEW,      BUSI_clearReg,      T_CLRF,     H_CLRF},
-    {FN6,   UNI_STOFN,  USES_F,     ALLOWREC,   ' ',    "STOF",     NO_L,   X_NULL,     BUSI_store,         T_STOFN,    H_STOFN},
-    {FN7,   UNI_RCLFN,  USES_F,     ALLOWREC,   ' ',    "RCLF",     NO_L,   X_NULL,     BUSI_recall,        T_RCLFN,    H_RCLFN},
-    {FN8,   UNI_FINN,   USES_F,     ALLOWREC,   ' ',    "n",        YES_L,  X_NEW,      BUSI_n,             T_FINN,     H_FINN},
-    {FN9,   UNI_INTR,   USES_F,     ALLOWREC,   ' ',    "i%",       YES_L,  X_NEW,      BUSI_i,             T_INTR,     H_INTR},
-    {FN10,  UNI_FINPV,  USES_F,     ALLOWREC,   ' ',    "PV",       YES_L,  X_NEW,      BUSI_pv,            T_FINPV,    H_FINPV},
-    {FN11,  UNI_FINPMT, USES_F,     ALLOWREC,   ' ',    "PMT",      YES_L,  X_NEW,      BUSI_pmt,           T_FINPMT,   H_FINPMT},
-    {FN12,  UNI_FINFV,  USES_F,     ALLOWREC,   ' ',    "FV",       YES_L,  X_NEW,      BUSI_fv,            T_FINFV,    H_FINFV},
-    {FN13,  UNI_AMORT,  USES_F,     ALLOWREC,   ' ',    "Amort",    YES_L,  X_NEW,      BUSI_amort,         T_AMORT,    H_AMORT},
-    {FN14,  UNI_CF0,    USES_F,     ALLOWREC,   ' ',    "CF0",      YES_L,  X_NEW,      BUSI_cashFlow0,     T_CF0,      H_CF0},
-    {FN15,  UNI_CFJ,    USES_F,     ALLOWREC,   ' ',    "CFj",      YES_L,  X_NEW,      BUSI_cashFlowj,     T_CFJ,      H_CFJ},
-    {FN16,  UNI_CFNJ,   USES_F,     ALLOWREC,   ' ',    "CFNj",     YES_L,  X_NEW,      BUSI_cashFlowNj,    T_CFNJ,     H_CFNJ},
-    {FN17,  UNI_NPV,    USES_F,     ALLOWREC,   ' ',    "NPV",      YES_L,  X_NEW,      BUSI_NPV,           T_NPV,      H_NPV},
-    {FN18,  UNI_IIR,    USES_F,     ALLOWREC,   ' ',    "IRR",      YES_L,  X_NEW,      BUSI_IRR,           T_IRR,      H_IRR},
-    {FN19,  UNI_BOND,   USES_F,     ALLOWREC,   ' ',    "BOND",     YES_L,  X_NEW,      BUSI_bond,          T_BOND,     H_BOND},
-    {FN20,  UNI_YTM,    USES_F,     ALLOWREC,   ' ',    "YTM",      YES_L,  X_NEW,      BUSI_ytm,           T_YTM,      H_YTM},
-    {FN21,  UNI_DATE,   USES_F,     ALLOWREC,   ' ',    "DATE",     YES_L,  X_NEW,      BUSI_date,          T_DATE,     H_DATE},
-    {FN22,  UNI_DAYS,   USES_F,     ALLOWREC,   ' ',    "DAYS",     YES_L,  X_NEW,      BUSI_days,          T_DAYS,     H_DAYS},
-    {FN23,  UNI_TODAY,  USES_F,     ALLOWREC,   ' ',    "Today",    YES_L,  X_NEW,      BUSI_today,         T_TODAY,    H_TODAY},
-    {FN24,  UNI_DEPR,   USES_F,     ALLOWREC,   ' ',    "DEPR",     YES_L,  X_NEW,      BUSI_Depr,          T_DEPR,     H_DEPR},
-    {FN25,  UNI_DIV12,  USES_F,     ALLOWREC,   ' ',    "12÷",      YES_L,  X_NEW,      BUSI_12div,         T_DIV12,    H_DIV12},
-    {FN26,  UNI_MUL12,  USES_F,     ALLOWREC,   ' ',    "12×",      YES_L,  X_NEW,      BUSI_12mult,        T_MUL12,    H_MUL12},
-    {FN27,  UNI_DIV100, USES_F,     ALLOWREC,   ' ',    "100÷",     YES_L,  X_NEW,      BUSI_100div,        T_DIV100,   H_DIV100},
-    {FN28,  UNI_MUL100, USES_F,     ALLOWREC,   ' ',    "100×",     YES_L,  X_NEW,      BUSI_100mult,       T_MUL100,   H_MUL100},
-    {FN29,  UNI_MUC,    USES_F,     ALLOWREC,   ' ',    "MU%C",     YES_L,  X_NEW,      BUSI_muc,           T_MUC,      H_MUC},
-    {FN30,  UNI_MUP,    USES_F,     ALLOWREC,   ' ',    "MU%P",     YES_L,  X_NEW,      BUSI_mup,           T_MUP,      H_MUP},
-    {FN31,  UNI_COST,   USES_F,     ALLOWREC,   ' ',    "COST",     YES_L,  X_NEW,      BUSI_cost,          T_COST,     H_COST},
-    {FN32,  UNI_PRICE,  USES_F,     ALLOWREC,   ' ',    "PRICE",    YES_L,  X_NEW,      BUSI_price,         T_PRICE,    H_PRICE},
-    {FN33,  UNI_SPPV,   USES_F,     ALLOWREC,   ' ',    "SPPV",     YES_L,  X_NEW,      BUSI_SPPV,          T_SPPV,     H_SPPV},
-    {FN34,  UNI_SPFV,   USES_F,     ALLOWREC,   ' ',    "SPFV",     YES_L,  X_NEW,      BUSI_SPFV,          T_SPFV,     H_SPFV},
-    {FN35,  UNI_USPV,   USES_F,     ALLOWREC,   ' ',    "USPV",     YES_L,  X_NEW,      BUSI_USPV,          T_USPV,     H_USPV},
-    {FN36,  UNI_USFV,   USES_F,     ALLOWREC,   ' ',    "USFV",     YES_L,  X_NEW,      BUSI_USFV,          T_USFV,     H_USFV},
-    {FN37,  UNI_FMODE,  USES_F,     ALLOWREC,   ' ',    "fModes",   YES_L,  X_NEW,      BUSI_payMode,       T_FMODE,    H_FMODE},
-    {FN38,  UNI_CURR,   USES_F,     ALLOWREC,   ' ',    "CURR",     YES_L,  X_NEW,      BUSI_currency,      T_CURRENCY, H_CURRENCY},
-    {FN39,  UNI_EFF,    USES_F,     ALLOWREC,   ' ',    "EFF%",     YES_L,  X_NEW,      BUSI_EFF,           T_EFF,      H_EFF},
-    {FN40,  UNI_INFL,   USES_F,     ALLOWREC,   ' ',    "INFL",     YES_L,  X_NEW,      BUSI_INFL,          T_INFL,     H_INFL}
+    {FN1,   UNI_TAX,    USES_F,     ALLOWREC,   ' ',    "TAX",      YES_L,  X_NEW,      FIN_tax,           T_TAX,      H_TAX},
+    {FN2,   UNI_PERC,   USES_F,     ALLOWREC,   ' ',    " % ",      YES_L,  X_NEW,      FIN_percent,       T_PERC,     H_PERC},
+    {FN3,   UNI_PERCC,  USES_F,     ALLOWREC,   ' ',    "%CHG",     YES_L,  X_NEW,      FIN_percentChg,    T_PERCC,    H_PERCC},
+    {FN4,   UNI_PERCT,  USES_F,     ALLOWREC,   ' ',    "%TOT",     YES_L,  X_NEW,      FIN_percentTot,    T_PERCT,    H_PERCT},
+    {FN5,   UNI_CLRF,   USES_F,     ALLOWREC,   ' ',    "CLRF",     YES_L,  X_NEW,      FIN_clearReg,      T_CLRF,     H_CLRF},
+    {FN6,   UNI_STOFN,  USES_F,     ALLOWREC,   ' ',    "STOF",     NO_L,   X_NULL,     FIN_store,         T_STOFN,    H_STOFN},
+    {FN7,   UNI_RCLFN,  USES_F,     ALLOWREC,   ' ',    "RCLF",     NO_L,   X_NULL,     FIN_recall,        T_RCLFN,    H_RCLFN},
+    {FN8,   UNI_FINN,   USES_F,     ALLOWREC,   ' ',    "n",        YES_L,  X_NEW,      FIN_n,             T_FINN,     H_FINN},
+    {FN9,   UNI_INTR,   USES_F,     ALLOWREC,   ' ',    "i%",       YES_L,  X_NEW,      FIN_i,             T_INTR,     H_INTR},
+    {FN10,  UNI_FINPV,  USES_F,     ALLOWREC,   ' ',    "PV",       YES_L,  X_NEW,      FIN_pv,            T_FINPV,    H_FINPV},
+    {FN11,  UNI_FINPMT, USES_F,     ALLOWREC,   ' ',    "PMT",      YES_L,  X_NEW,      FIN_pmt,           T_FINPMT,   H_FINPMT},
+    {FN12,  UNI_FINFV,  USES_F,     ALLOWREC,   ' ',    "FV",       YES_L,  X_NEW,      FIN_fv,            T_FINFV,    H_FINFV},
+    {FN13,  UNI_AMORT,  USES_F,     ALLOWREC,   ' ',    "Amort",    YES_L,  X_NEW,      FIN_amort,         T_AMORT,    H_AMORT},
+    {FN14,  UNI_CF0,    USES_F,     ALLOWREC,   ' ',    "CF0",      YES_L,  X_NEW,      FIN_cashFlow0,     T_CF0,      H_CF0},
+    {FN15,  UNI_CFJ,    USES_F,     ALLOWREC,   ' ',    "CFj",      YES_L,  X_NEW,      FIN_cashFlowj,     T_CFJ,      H_CFJ},
+    {FN16,  UNI_CFNJ,   USES_F,     ALLOWREC,   ' ',    "CFNj",     YES_L,  X_NEW,      FIN_cashFlowNj,    T_CFNJ,     H_CFNJ},
+    {FN17,  UNI_NPV,    USES_F,     ALLOWREC,   ' ',    "NPV",      YES_L,  X_NEW,      FIN_NPV,           T_NPV,      H_NPV},
+    {FN18,  UNI_IIR,    USES_F,     ALLOWREC,   ' ',    "IRR",      YES_L,  X_NEW,      FIN_IRR,           T_IRR,      H_IRR},
+    {FN19,  UNI_BOND,   USES_F,     ALLOWREC,   ' ',    "BOND",     YES_L,  X_NEW,      FIN_bond,          T_BOND,     H_BOND},
+    {FN20,  UNI_YTM,    USES_F,     ALLOWREC,   ' ',    "YTM",      YES_L,  X_NEW,      FIN_ytm,           T_YTM,      H_YTM},
+    {FN21,  UNI_DATE,   USES_F,     ALLOWREC,   ' ',    "DATE",     YES_L,  X_NEW,      FIN_date,          T_DATE,     H_DATE},
+    {FN22,  UNI_DAYS,   USES_F,     ALLOWREC,   ' ',    "DAYS",     YES_L,  X_NEW,      FIN_days,          T_DAYS,     H_DAYS},
+    {FN23,  UNI_TODAY,  USES_F,     ALLOWREC,   ' ',    "Today",    YES_L,  X_NEW,      FIN_today,         T_TODAY,    H_TODAY},
+    {FN24,  UNI_DEPR,   USES_F,     ALLOWREC,   ' ',    "DEPR",     YES_L,  X_NEW,      FIN_Depr,          T_DEPR,     H_DEPR},
+    {FN25,  UNI_DIV12,  USES_F,     ALLOWREC,   ' ',    "12÷",      YES_L,  X_NEW,      FIN_12div,         T_DIV12,    H_DIV12},
+    {FN26,  UNI_MUL12,  USES_F,     ALLOWREC,   ' ',    "12×",      YES_L,  X_NEW,      FIN_12mult,        T_MUL12,    H_MUL12},
+    {FN27,  UNI_DIV100, USES_F,     ALLOWREC,   ' ',    "100÷",     YES_L,  X_NEW,      FIN_100div,        T_DIV100,   H_DIV100},
+    {FN28,  UNI_MUL100, USES_F,     ALLOWREC,   ' ',    "100×",     YES_L,  X_NEW,      FIN_100mult,       T_MUL100,   H_MUL100},
+    {FN29,  UNI_MUC,    USES_F,     ALLOWREC,   ' ',    "MU%C",     YES_L,  X_NEW,      FIN_muc,           T_MUC,      H_MUC},
+    {FN30,  UNI_MUP,    USES_F,     ALLOWREC,   ' ',    "MU%P",     YES_L,  X_NEW,      FIN_mup,           T_MUP,      H_MUP},
+    {FN31,  UNI_COST,   USES_F,     ALLOWREC,   ' ',    "COST",     YES_L,  X_NEW,      FIN_cost,          T_COST,     H_COST},
+    {FN32,  UNI_PRICE,  USES_F,     ALLOWREC,   ' ',    "PRICE",    YES_L,  X_NEW,      FIN_price,         T_PRICE,    H_PRICE},
+    {FN33,  UNI_SPPV,   USES_F,     ALLOWREC,   ' ',    "SPPV",     YES_L,  X_NEW,      FIN_SPPV,          T_SPPV,     H_SPPV},
+    {FN34,  UNI_SPFV,   USES_F,     ALLOWREC,   ' ',    "SPFV",     YES_L,  X_NEW,      FIN_SPFV,          T_SPFV,     H_SPFV},
+    {FN35,  UNI_USPV,   USES_F,     ALLOWREC,   ' ',    "USPV",     YES_L,  X_NEW,      FIN_USPV,          T_USPV,     H_USPV},
+    {FN36,  UNI_USFV,   USES_F,     ALLOWREC,   ' ',    "USFV",     YES_L,  X_NEW,      FIN_USFV,          T_USFV,     H_USFV},
+    {FN37,  UNI_FMODE,  USES_F,     ALLOWREC,   ' ',    "fModes",   YES_L,  X_NEW,      FIN_payMode,       T_FMODE,    H_FMODE},
+    {FN38,  UNI_CURR,   USES_F,     ALLOWREC,   ' ',    "CURR",     YES_L,  X_NEW,      FIN_currency,      T_CURRENCY, H_CURRENCY},
+    {FN39,  UNI_EFF,    USES_F,     ALLOWREC,   ' ',    "EFF%",     YES_L,  X_NEW,      FIN_EFF,           T_EFF,      H_EFF},
+    {FN40,  UNI_INFL,   USES_F,     ALLOWREC,   ' ',    "INFL",     YES_L,  X_NEW,      FIN_INFL,          T_INFL,     H_INFL}
 };
 
-void BUSI_tax(void)
+void FIN_tax(void)
 {
     StackPush(StackPop() * taxConstant);
 }
 
-void BUSI_percent(void)
+void FIN_percent(void)
 {
     StackPush((StackPop() / 100.0F) * X);
 }
 
-void BUSI_percentChg(void)
+void FIN_percentChg(void)
 {
     if (Y == 0.0)
         RPN_error("Percent Change:  Y register cannot equal 0");
@@ -179,7 +179,7 @@ void BUSI_percentChg(void)
         StackPush(100.0F * ((StackPop() - X) / X));
 }
 
-void BUSI_percentTot(void)
+void FIN_percentTot(void)
 {
     if (Y == 0.0)
         RPN_error("Percent Total:  Y register cannot equal 0");
@@ -187,7 +187,7 @@ void BUSI_percentTot(void)
         StackPush(100.0F * (StackPop() / X));
 }
 
-void BUSI_clearReg(void)
+void FIN_clearReg(void)
 {
     int i;
     for (i = 0; i < FIN_REG_MAX; i++)
@@ -195,7 +195,7 @@ void BUSI_clearReg(void)
     CFn = 0;
 }
 
-void BUSI_store(void)
+void FIN_store(void)
 {
     finRecall = 0;
     finStore ^= 1;
@@ -205,7 +205,7 @@ void BUSI_store(void)
         UpdateSpareBar("STOF");
 }
 
-void BUSI_recall(void)
+void FIN_recall(void)
 {
     finStore = 0;
     finRecall ^= 1;
@@ -215,17 +215,17 @@ void BUSI_recall(void)
         UpdateSpareBar("RCLF");
 }
 
-void BUSI_12div(void)
+void FIN_12div(void)
 {
     StackPush(StackPop() / 12.0);
 }
 
-void BUSI_12mult(void)
+void FIN_12mult(void)
 {
     StackPush(StackPop() * 12.0);
 }
 
-void BUSI_fv(void)
+void FIN_fv(void)
 {
     double fintemp1, fintemp2;
 
@@ -264,7 +264,7 @@ void BUSI_fv(void)
     }
 }
 
-void BUSI_pv(void)
+void FIN_pv(void)
 {
     double fintemp1, fintemp2;
 
@@ -308,7 +308,7 @@ void BUSI_pv(void)
 
 BOOL CALLBACK fnDIALOG_AmortProc(HWND, UINT, WPARAM, LPARAM);
 
-void BUSI_amort(void)
+void FIN_amort(void)
 {
     DLGPROC lpfnDIALOG_AmortProc;
 
@@ -441,17 +441,17 @@ BOOL CALLBACK fnDIALOG_AmortProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
 }
 
 
-void BUSI_100div(void)
+void FIN_100div(void)
 {
     StackPush(StackPop() / 100.0);
 }
 
-void BUSI_100mult(void)
+void FIN_100mult(void)
 {
     StackPush(StackPop() * 100.0);
 }
 
-void BUSI_pmt(void)
+void FIN_pmt(void)
 {
     double fintemp1, fintemp2;
 
@@ -493,7 +493,7 @@ void BUSI_pmt(void)
 }
 
 
-void BUSI_n(void)
+void FIN_n(void)
 {
     double n, fintemp1, fintemp2, fintemp3;
     int newSign, oldSign;
@@ -556,7 +556,7 @@ void BUSI_n(void)
         RPN_error("A solution could not be found...");
 }
 
-void BUSI_i(void)
+void FIN_i(void)
 {
     double i, fintemp1, fintemp2, fintemp3;
     int newSign, oldSign;
@@ -645,7 +645,7 @@ void BUSI_i(void)
         RPN_error("A solution could not be found...");
 }
 
-void BUSI_cashFlow0(void)
+void FIN_cashFlow0(void)
 {
     CFn = 0;
     fin_reg[FIN_REG_n] = 0.0;
@@ -653,7 +653,7 @@ void BUSI_cashFlow0(void)
     blinkXDisplay();
 }
 
-void BUSI_cashFlowj(void)
+void FIN_cashFlowj(void)
 {
     if (CFn >= MAX_CF - 1)
     {
@@ -668,7 +668,7 @@ void BUSI_cashFlowj(void)
     }
 }
 
-void BUSI_cashFlowNj(void)
+void FIN_cashFlowNj(void)
 {
     int loop, finalLoop;
 
@@ -699,7 +699,7 @@ void BUSI_cashFlowNj(void)
     }
 }
 
-void BUSI_NPV(void)
+void FIN_NPV(void)
 {
     int j;
     double npv;
@@ -713,7 +713,7 @@ void BUSI_NPV(void)
     fin_reg[FIN_REG_PV] = npv;
 }
 
-void BUSI_IRR(void)
+void FIN_IRR(void)
 {
     int j;
     double npv;
@@ -833,7 +833,7 @@ void ConvertFloatToDate(double flt, struct dateStruct *dt)
         dt->month = 12;
 }
 
-void BUSI_date(void)
+void FIN_date(void)
 {
     struct dateStruct d2;
     long numDays;
@@ -892,7 +892,7 @@ void BUSI_date(void)
     StackPush(atof(finTmpStr));
 }
 
-void BUSI_days(void)
+void FIN_days(void)
 {
     long diff;
     struct dateStruct d1;
@@ -908,7 +908,7 @@ void BUSI_days(void)
     StackPush((double) diff);
 }
 
-void BUSI_today(void)
+void FIN_today(void)
 {
     char datestr[16];
     int day, month, year;
@@ -932,7 +932,7 @@ void BUSI_today(void)
 }
 
 
-void BUSI_muc(void)
+void FIN_muc(void)
 {
     double muc;
 
@@ -962,7 +962,7 @@ void BUSI_muc(void)
     }
 }
 
-void BUSI_mup(void)
+void FIN_mup(void)
 {
     double muc;
 
@@ -992,7 +992,7 @@ void BUSI_mup(void)
     }
 }
 
-void BUSI_cost(void)
+void FIN_cost(void)
 {
     double cost;
 
@@ -1018,7 +1018,7 @@ void BUSI_cost(void)
     fin_reg[FIN_REG_COST] = X;
 }
 
-void BUSI_price(void)
+void FIN_price(void)
 {
     double price;
 
@@ -1045,7 +1045,7 @@ void BUSI_price(void)
 }
 
 extern BOOL CALLBACK fnDIALOG_FinancialProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
-void BUSI_payMode(void)
+void FIN_payMode(void)
 {
     DLGPROC lpfnDIALOG_FinancialProc;
     lpfnDIALOG_FinancialProc = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_FinancialProc, hExcaliburInstance);
@@ -1188,7 +1188,7 @@ double bondPrice(double fBeginDate, double fEndDate, double fYIELD, double fCPN,
     return(PRICE);
 }
 
-void BUSI_bond(void)
+void FIN_bond(void)
 {
     double fPRICE, fACCRU;
     double fYIELD, fCPN;
@@ -1214,7 +1214,7 @@ void BUSI_bond(void)
     StackPush(fPRICE);
 }
 
-void BUSI_ytm(void)
+void FIN_ytm(void)
 {
     double fPRICE, fACCRU;
     double fCPN;
@@ -1267,7 +1267,7 @@ void BUSI_ytm(void)
 }
 
 
-void BUSI_SPPV(void)
+void FIN_SPPV(void)
 {
     double sppv;
 
@@ -1275,7 +1275,7 @@ void BUSI_SPPV(void)
     StackPush(sppv);
 }
 
-void BUSI_SPFV(void)
+void FIN_SPFV(void)
 {
     double spfv;
 
@@ -1283,7 +1283,7 @@ void BUSI_SPFV(void)
     StackPush(spfv);
 }
 
-void BUSI_USPV(void)
+void FIN_USPV(void)
 {
     double uspv;
 
@@ -1292,7 +1292,7 @@ void BUSI_USPV(void)
     StackPush(uspv);
 }
 
-void BUSI_USFV(void)
+void FIN_USFV(void)
 {
     double usfv;
 
@@ -1301,7 +1301,7 @@ void BUSI_USFV(void)
     StackPush(usfv);
 }
 
-void BUSI_INFL(void)
+void FIN_INFL(void)
 {
     double infl;
 
@@ -1310,7 +1310,7 @@ void BUSI_INFL(void)
     StackPush(infl);
 }
 
-void BUSI_EFF(void)
+void FIN_EFF(void)
 {
     double eff;
 
@@ -1425,7 +1425,7 @@ BOOL CALLBACK fnDIALOG_REDEFINECURRENCY(HWND hDlg, UINT wMessage, WPARAM wParam,
 
 
 extern BOOL CALLBACK fnDIALOG_currency(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
-void BUSI_currency(void)
+void FIN_currency(void)
 {
     DLGPROC lpfnfnDIALOG_currency;
 
@@ -1574,7 +1574,7 @@ BOOL CALLBACK fnDIALOG_currency(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM 
     return FALSE;
 }
 
-void BUSI_Depr(void)
+void FIN_Depr(void)
 {
     double depr, remain;
     int i, j;

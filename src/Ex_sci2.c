@@ -37,7 +37,6 @@
 #include <ctype.h>
 #include "EXCAL.h"
 
-extern void Phys_Constants(void);
 extern void Phys_Moles(void);
 extern void Phys_Molecules(void);
 extern void Phys_GasVol(void);              // in liters
@@ -77,7 +76,7 @@ extern void COMP_hcos(void);
 extern void COMP_htan(void);
 
 struct funcStruct Scientific2_funcs[MAX_FUNCS] = {
-    {FN1,   UNI_CONST2,     USES_F,     NORECORD,   ' ',    "Const",    YES_L,      X_NEW,      Phys_Constants,         T_CONST,        H_CONST},
+    {FN1,   UNI_CONST2,     USES_F,     NORECORD,   ' ',    "Unused",   YES_L,      X_NEW,      NULL,                   T_CONST,        H_CONST},
     {FN2,   UNI_MOLES,      USES_F,     ALLOWREC,   ' ',    "Moles",    YES_L,      X_NEW,      Phys_Moles,             T_MOLES,        H_MOLES},
     {FN3,   UNI_MOLEC,      USES_F,     ALLOWREC,   ' ',    "Molec",    YES_L,      X_NEW,      Phys_Molecules,         T_MOLECULES,    H_MOLECULES},
     {FN4,   UNI_GASVOL,     USES_F,     ALLOWREC,   ' ',    "Gas Vol",  YES_L,      X_NEW,      Phys_GasVol,            T_GASVOL,       H_GASVOL},
@@ -118,12 +117,6 @@ struct funcStruct Scientific2_funcs[MAX_FUNCS] = {
     {FN39,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_NULL},
     {FN40,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_NULL},
 };
-
-void Phys_Constants(void)
-{
-    extern void SCI_const(void);
-    SCI_const();
-}
 
 void Phys_Moles(void)
 {
