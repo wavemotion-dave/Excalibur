@@ -2381,7 +2381,7 @@ void RPN_clear(void)
         progModecarry = 0;
         strcpy(Xstr, "");
     }
-    RPN_ClearModifiers(TRUE);
+    RPN_ClearModifiers(!macroPlayback);
 }
 
 void RPN_clearL(void)
@@ -2430,7 +2430,7 @@ void RPN_enter(void)
         Xedit = X_ENTER;
     }
     
-    RPN_ClearModifiers(TRUE);
+    RPN_ClearModifiers(!macroPlayback);
 }
 
 void RPN_dp(void)
@@ -2479,7 +2479,7 @@ void RPN_dp(void)
         }
     }
     
-    RPN_ClearModifiers(TRUE);
+    RPN_ClearModifiers(!macroPlayback);
     Xedit = X_EDIT;
 }
 
@@ -2597,7 +2597,7 @@ void RPN_digit(WPARAM key)
         }
 
         XL = maskStackStuff((PROG_LONG) X);
-        RPN_ClearModifiers(TRUE);
+        RPN_ClearModifiers(!macroPlayback);
         return;
     }
 
@@ -2658,7 +2658,7 @@ void RPN_digit(WPARAM key)
     }
     XL = MakeProgStr(Xstr);
 
-    RPN_ClearModifiers(TRUE);
+    RPN_ClearModifiers(!macroPlayback);
     Xedit = X_EDIT;
 }
 
@@ -4594,7 +4594,7 @@ void RPN_clearX(void)
     XL = 0L;
     progModecarry = 0;
     Xedit = X_ENTER;
-    RPN_ClearModifiers(TRUE);
+    RPN_ClearModifiers(!macroPlayback);
 }
 
 void RPN_drop(void)            // drop the stack
