@@ -1225,11 +1225,11 @@ void Macro_GotoInd(void)
                 case 7:  uniqueLabel=UNI_LBLH; break;
                 case 8:  uniqueLabel=UNI_LBLI; break;
                 case 9:  uniqueLabel=UNI_LBLJ; break;
-                case 10: uniqueLabel=UNI_LBLJ; break;
+                case 10: uniqueLabel=UNI_LBLK; break;
             }
             for (j = 0; j < playBackIdx; j++)
             {
-                if (playBackMap[playBack[j]].uniqueIndex == uniqueLabel)       // Unique Index for label J
+                if (playBackMap[playBack[j]].uniqueIndex == uniqueLabel)  // Unique Index for label
                 {
                     currentMacroPlaybackIdx = j;
                     break;
@@ -1238,7 +1238,7 @@ void Macro_GotoInd(void)
         }
         else
         {
-            RPN_error("Run Time Error: Value of indirect register must point to A=0 through K=10");
+            RPN_error("Run Time Error: Value of indirect Label must point to LabelA=0 through LabelK=10");
             endRunningMacro();
         }
     }
@@ -1268,11 +1268,11 @@ void Macro_GosubInd(void)
                     case 7:  uniqueLabel=UNI_LBLH; break;
                     case 8:  uniqueLabel=UNI_LBLI; break;
                     case 9:  uniqueLabel=UNI_LBLJ; break;
-                    case 10: uniqueLabel=UNI_LBLJ; break;
+                    case 10: uniqueLabel=UNI_LBLK; break;
                 }
                 for (j = 0; j < playBackIdx; j++)
                 {
-                    if (playBackMap[playBack[j]].uniqueIndex == uniqueLabel)       // Unique Index for label J
+                    if (playBackMap[playBack[j]].uniqueIndex == uniqueLabel)  // Unique Index for label
                     {
                         currentMacroPlaybackIdx = j;
                         break;
@@ -1281,7 +1281,7 @@ void Macro_GosubInd(void)
             }
             else
             {
-                RPN_error("Run Time Error: Value of indirect register must point to A=0 through K=10");
+                RPN_error("Run Time Error: Value of indirect Label must point to LabelA=0 through LabelK=10");
                 endRunningMacro();
             }
         }

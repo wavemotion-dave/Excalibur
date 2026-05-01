@@ -91,43 +91,43 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;hpj;bat;for;f90"
 # Begin Source File
 
-SOURCE=.\Ex_fin.c
+SOURCE=.\Financial.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Ex_complex.cpp
+SOURCE=.\ComplexMath.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\Ex_CompSci.c
+SOURCE=.\CompSci.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Ex_conv.c
+SOURCE=.\Conversion.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Ex_cust.c
+SOURCE=.\Custom.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Ex_geom.c
+SOURCE=.\Geometry.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\ex_sci2.c
+SOURCE=.\Constants.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Ex_prog.c
+SOURCE=.\Programming.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Ex_sci.c
+SOURCE=.\Scientific.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Ex_stat.c
+SOURCE=.\Statistics.c
 # End Source File
 # Begin Source File
 

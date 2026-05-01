@@ -44,17 +44,16 @@ ALL : "$(OUTDIR)\Excal32.exe"
 !ENDIF 
 
 CLEAN :
-	-@erase "$(INTDIR)\Ex_fin.obj"
-	-@erase "$(INTDIR)\Ex_complex.obj"
-	-@erase "$(INTDIR)\Ex_CompSci.obj"
-	-@erase "$(INTDIR)\Ex_conv.obj"
-	-@erase "$(INTDIR)\Ex_cust.obj"
-	-@erase "$(INTDIR)\Ex_geom.obj"
-	-@erase "$(INTDIR)\Ex_misc.obj"
-	-@erase "$(INTDIR)\Ex_sci2.obj"
-	-@erase "$(INTDIR)\Ex_prog.obj"
-	-@erase "$(INTDIR)\Ex_sci.obj"
-	-@erase "$(INTDIR)\Ex_stat.obj"
+	-@erase "$(INTDIR)\Financial.obj"
+	-@erase "$(INTDIR)\ComplexMath.obj"
+	-@erase "$(INTDIR)\CompSci.obj"
+	-@erase "$(INTDIR)\Conversion.obj"
+	-@erase "$(INTDIR)\Custom.obj"
+	-@erase "$(INTDIR)\Geometry.obj"
+	-@erase "$(INTDIR)\Constants.obj"
+	-@erase "$(INTDIR)\Programming.obj"
+	-@erase "$(INTDIR)\Scientific.obj"
+	-@erase "$(INTDIR)\Statistics.obj"
 	-@erase "$(INTDIR)\Excal.obj"
 	-@erase "$(INTDIR)\Excal.res"
 	-@erase "$(INTDIR)\vc50.idb"
@@ -113,16 +112,16 @@ LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
  odbccp32.lib /nologo /subsystem:windows /incremental:no\
  /pdb:"$(OUTDIR)\Excal32.pdb" /machine:I386 /out:"$(OUTDIR)\Excal32.exe" 
 LINK32_OBJS= \
-	"$(INTDIR)\Ex_fin.obj" \
-	"$(INTDIR)\Ex_complex.obj" \
-	"$(INTDIR)\Ex_CompSci.obj" \
-	"$(INTDIR)\Ex_conv.obj" \
-	"$(INTDIR)\Ex_cust.obj" \
-	"$(INTDIR)\Ex_geom.obj" \
-	"$(INTDIR)\ex_sci2.obj" \
-	"$(INTDIR)\Ex_prog.obj" \
-	"$(INTDIR)\Ex_sci.obj" \
-	"$(INTDIR)\Ex_stat.obj" \
+	"$(INTDIR)\Financial.obj" \
+	"$(INTDIR)\ComplexMath.obj" \
+	"$(INTDIR)\CompSci.obj" \
+	"$(INTDIR)\Conversion.obj" \
+	"$(INTDIR)\Custom.obj" \
+	"$(INTDIR)\Geometry.obj" \
+	"$(INTDIR)\Constants.obj" \
+	"$(INTDIR)\Programming.obj" \
+	"$(INTDIR)\Scientific.obj" \
+	"$(INTDIR)\Statistics.obj" \
 	"$(INTDIR)\Excal.obj" \
 	"$(INTDIR)\Excal.res"
 
@@ -150,16 +149,15 @@ ALL : "$(OUTDIR)\excal.exe"
 !ENDIF 
 
 CLEAN :
-	-@erase "$(INTDIR)\Ex_fin.obj"
-	-@erase "$(INTDIR)\Ex_complex.obj"
-	-@erase "$(INTDIR)\Ex_CompSci.obj"
-	-@erase "$(INTDIR)\Ex_conv.obj"
-	-@erase "$(INTDIR)\Ex_cust.obj"
-	-@erase "$(INTDIR)\Ex_geom.obj"
-	-@erase "$(INTDIR)\Ex_sci2.obj"
-	-@erase "$(INTDIR)\Ex_prog.obj"
-	-@erase "$(INTDIR)\Ex_sci.obj"
-	-@erase "$(INTDIR)\Ex_stat.obj"
+	-@erase "$(INTDIR)\Financial.obj"
+	-@erase "$(INTDIR)\ComplexMath.obj"
+	-@erase "$(INTDIR)\CompSci.obj"
+	-@erase "$(INTDIR)\Conversion.obj"
+	-@erase "$(INTDIR)\Custom.obj"
+	-@erase "$(INTDIR)\Geometry.obj"
+	-@erase "$(INTDIR)\Programming.obj"
+	-@erase "$(INTDIR)\Scientific.obj"
+	-@erase "$(INTDIR)\Statistics.obj"
 	-@erase "$(INTDIR)\Excal.obj"
 	-@erase "$(INTDIR)\Excal.res"
 	-@erase "$(INTDIR)\vc50.idb"
@@ -221,15 +219,15 @@ LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
  odbccp32.lib /nologo /subsystem:windows /incremental:yes\
  /pdb:"$(OUTDIR)\excal.pdb" /debug /machine:I386 /out:"$(OUTDIR)\excal.exe" 
 LINK32_OBJS= \
-	"$(INTDIR)\Ex_fin.obj" \
-	"$(INTDIR)\Ex_complex.obj" \
-	"$(INTDIR)\Ex_CompSci.obj" \
-	"$(INTDIR)\Ex_conv.obj" \
-	"$(INTDIR)\Ex_cust.obj" \
-	"$(INTDIR)\Ex_geom.obj" \
-	"$(INTDIR)\Ex_sci2.obj" \
-	"$(INTDIR)\Ex_prog.obj" \
-	"$(INTDIR)\Ex_sci.obj" \
+	"$(INTDIR)\Financial.obj" \
+	"$(INTDIR)\ComplexMath.obj" \
+	"$(INTDIR)\CompSci.obj" \
+	"$(INTDIR)\Conversion.obj" \
+	"$(INTDIR)\Custom.obj" \
+	"$(INTDIR)\Geometry.obj" \
+	"$(INTDIR)\Constants.obj" \
+	"$(INTDIR)\Programming.obj" \
+	"$(INTDIR)\Scientific.obj" \
 	"$(INTDIR)\Ex_stat.obj" \
 	"$(INTDIR)\Excal.obj" \
 	"$(INTDIR)\Excal.res"
@@ -243,84 +241,84 @@ LINK32_OBJS= \
 
 
 !IF "$(CFG)" == "excal - Win32 Release" || "$(CFG)" == "excal - Win32 Debug"
-SOURCE=.\Ex_fin.c
+SOURCE=.\Financial.c
 DEP_CPP_EX_BU=\
 	".\excal.h"\
 	
 
-"$(INTDIR)\Ex_fin.obj" : $(SOURCE) $(DEP_CPP_EX_BU) "$(INTDIR)"
+"$(INTDIR)\Financial.obj" : $(SOURCE) $(DEP_CPP_EX_BU) "$(INTDIR)"
 
 
-SOURCE=.\Ex_complex.cpp
+SOURCE=.\ComplexMath.cpp
 DEP_CPP_EX_CO=\
 	".\excal.h"\
 	
 
-"$(INTDIR)\Ex_complex.obj" : $(SOURCE) $(DEP_CPP_EX_CO) "$(INTDIR)"
+"$(INTDIR)\ComplexMath.obj" : $(SOURCE) $(DEP_CPP_EX_CO) "$(INTDIR)"
 
 
-SOURCE=.\Ex_CompSci.c
+SOURCE=.\CompSci.c
 DEP_CPP_EX_COMP=\
 	".\excal.h"\
 	
 
-"$(INTDIR)\Ex_CompSci.obj" : $(SOURCE) $(DEP_CPP_EX_COMP) "$(INTDIR)"
+"$(INTDIR)\CompSci.obj" : $(SOURCE) $(DEP_CPP_EX_COMP) "$(INTDIR)"
 
 
-SOURCE=.\Ex_conv.c
+SOURCE=.\Conversion.c
 DEP_CPP_EX_CON=\
 	".\excal.h"\
 	
 
-"$(INTDIR)\Ex_conv.obj" : $(SOURCE) $(DEP_CPP_EX_CON) "$(INTDIR)"
+"$(INTDIR)\Conversion.obj" : $(SOURCE) $(DEP_CPP_EX_CON) "$(INTDIR)"
 
 
-SOURCE=.\Ex_cust.c
+SOURCE=.\Custom.c
 DEP_CPP_EX_CU=\
 	".\excal.h"\
 	
 
-"$(INTDIR)\Ex_cust.obj" : $(SOURCE) $(DEP_CPP_EX_CU) "$(INTDIR)"
+"$(INTDIR)\Custom.obj" : $(SOURCE) $(DEP_CPP_EX_CU) "$(INTDIR)"
 
 
-SOURCE=.\Ex_geom.c
+SOURCE=.\Geometry.c
 DEP_CPP_EX_GE=\
 	".\excal.h"\
 	
 
-"$(INTDIR)\Ex_geom.obj" : $(SOURCE) $(DEP_CPP_EX_GE) "$(INTDIR)"
+"$(INTDIR)\Geometry.obj" : $(SOURCE) $(DEP_CPP_EX_GE) "$(INTDIR)"
 
 
-SOURCE=.\Ex_sci2.c
-DEP_CPP_EX_PH=\
+SOURCE=.\Constants.c
+DEP_CPP_EX_CO=\
 	".\excal.h"\
 	
 
-"$(INTDIR)\Ex_sci2.obj" : $(SOURCE) $(DEP_CPP_EX_PH) "$(INTDIR)"
+"$(INTDIR)\Constants.obj" : $(SOURCE) $(DEP_CPP_EX_CO) "$(INTDIR)"
 
 
-SOURCE=.\Ex_prog.c
+SOURCE=.\Programming.c
 DEP_CPP_EX_PR=\
 	".\excal.h"\
 	
 
-"$(INTDIR)\Ex_prog.obj" : $(SOURCE) $(DEP_CPP_EX_PR) "$(INTDIR)"
+"$(INTDIR)\Programming.obj" : $(SOURCE) $(DEP_CPP_EX_PR) "$(INTDIR)"
 
 
-SOURCE=.\Ex_sci.c
+SOURCE=.\Scientific.c
 DEP_CPP_EX_SC=\
 	".\excal.h"\
 	
 
-"$(INTDIR)\Ex_sci.obj" : $(SOURCE) $(DEP_CPP_EX_SC) "$(INTDIR)"
+"$(INTDIR)\Scientific.obj" : $(SOURCE) $(DEP_CPP_EX_SC) "$(INTDIR)"
 
 
-SOURCE=.\Ex_stat.c
+SOURCE=.\Statistics.c
 DEP_CPP_EX_ST=\
 	".\excal.h"\
 	
 
-"$(INTDIR)\Ex_stat.obj" : $(SOURCE) $(DEP_CPP_EX_ST) "$(INTDIR)"
+"$(INTDIR)\Statistics.obj" : $(SOURCE) $(DEP_CPP_EX_ST) "$(INTDIR)"
 
 
 SOURCE=.\Excal.c
