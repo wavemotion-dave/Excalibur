@@ -156,6 +156,7 @@ uint8_t  sci_format = 'g';          // Default scientific display format
 uint32_t indirectRegister = 0;      // For programming - (i) register
 uint8_t  progMode = PROG_NORMAL;    // Normal floating-point mode
 uint8_t  helpMode = 0;              // Used to determine if next key or button hit is for help
+uint16_t lastUniqueIndex = 0;       // Index of the last function that was called (useful in Financial Register handling)
 
 double STO[MAX_STO];                // Storage registers R0-R99
 char STOlabels[MAX_STO][9];         // Labels associated with the R0-R25 registers
@@ -3217,7 +3218,7 @@ void RPN_store(void)
     rpnStoreRecall &= ~REG_EXCHANGE;
     if (rpnStoreRecall & REG_STORE)
     {
-        UpdateSpareBar(" ");
+        if (!macroPlayback) UpdateSpareBar(" ");
         rpnStoreRecall = 0x00;
     }
     else
@@ -3232,7 +3233,7 @@ void RPN_recall(void)
     rpnStoreRecall &= ~REG_EXCHANGE;
     if (rpnStoreRecall & REG_RECALL)
     {
-        UpdateSpareBar(" ");
+        if (!macroPlayback) UpdateSpareBar(" ");
         rpnStoreRecall = 0x00;
     }
     else
@@ -3247,7 +3248,7 @@ void RPN_ExchangeReg(void)
     rpnStoreRecall &= ~ (REG_STORE | REG_RECALL);
     if (rpnStoreRecall & REG_EXCHANGE)
     {
-        UpdateSpareBar(" ");
+        if (!macroPlayback) UpdateSpareBar(" ");
         rpnStoreRecall = 0x00;
     }
     else
@@ -4964,6 +4965,8 @@ void callButtonFunc(void(*routine) (void), char useFloatsLongs, char allowRecord
     }
 
     routine();                 // This calls the actual button routine to perform things like SIN, COS, CLX, etc
+    
+    lastUniqueIndex = uniqueIndex;
 
     if ((recModeON == 1) && (allowRecord == ALLOWREC))
     {
@@ -5013,6 +5016,8 @@ void callButtonFunc_fast(void(*routine) (void), char useFloatsLongs, int uniqueI
     }
 
     routine();                 // This calls the actual button routine to perform things like SIN, COS, CLX, etc
+    
+    lastUniqueIndex = uniqueIndex;
 
     if (newXedit != X_NULL)
     {
@@ -5044,7 +5049,6 @@ void RPN_Playback(void)
     int flashRunning = 499;
     int flashRunningDsp = 0;
     MSG msg;
-    int xx = 2;
     DWORD initialTimer = 0;
 
     if (recModeON == 1)         // Always turn off rec mode before playback!
@@ -5104,7 +5108,7 @@ void RPN_Playback(void)
             {
                 initialTimer = fastTimer;
                 if ((++flashRunningDsp % 2) == 0)
-                    UpdateSpareBar("      ");
+                    UpdateSpareBar(" ");
                 else
                     UpdateSpareBar("Run...");
             }
@@ -5140,7 +5144,7 @@ void RPN_Playback(void)
         }
     }
 
-    UpdateSpareBar("      ");
+    UpdateSpareBar(" ");
     macroPlayback = FALSE;
 }
 
