@@ -164,8 +164,8 @@ struct funcStruct Financial_funcs[MAX_FUNCS] = {
 // ------------------------------------------------------------------------------------------
 uint8_t wasLastKeyFinReg(void)
 {
-    if ((lastUniqueIndex == UNI_FINN)  || (lastUniqueIndex == UNI_INTR)   || 
-        (lastUniqueIndex == UNI_FINPV) || (lastUniqueIndex == UNI_FINPMT) || 
+    if ((lastUniqueIndex == UNI_FINN)  || (lastUniqueIndex == UNI_INTR)   ||
+        (lastUniqueIndex == UNI_FINPV) || (lastUniqueIndex == UNI_FINPMT) ||
         (lastUniqueIndex == UNI_FINFV) || (lastUniqueIndex == UNI_CF0)    ||
         (lastUniqueIndex == UNI_CFJ)   || (lastUniqueIndex == UNI_CFNJ))
     {
@@ -491,7 +491,7 @@ void FIN_n(void)
     double n, fintemp1, fintemp2, fintemp3;
     int newSign, oldSign;
     int found;
-    
+
     if (rpnStoreRecall & REG_RECALL)
     {
         StackPush(fin_reg[FIN_REG_n]);
@@ -1200,7 +1200,7 @@ void FIN_bond(void)
         RPN_error("Bond: Maturity date must be in X, Settlement date in Y");
         return;
     }
-    
+
     fPRICE = bondPrice(fBeginDate, fEndDate, fYIELD, fCPN, &fACCRU);
 
     StackPush(fACCRU);

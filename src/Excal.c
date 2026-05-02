@@ -162,7 +162,7 @@ uint8_t  helpMode = 0;              // Used to determine if next key or button h
 uint16_t lastUniqueIndex = 0;       // Index of the last function that was called (useful in Financial Register handling)
 
 double STO[MAX_STO];                // Storage registers R0-R99
-char STOlabels[MAX_STO][9];         // Labels associated with the R0-R25 registers
+char STOlabels[MAX_STO][9];         // Labels associated with the R0-R99 registers
 double SUM[SUM_MAX];                // Statistics registers for the Financial bank
 char excaliburNotes[NOTES_SIZE];    // A small scratchpad for the user to jot down some info
 

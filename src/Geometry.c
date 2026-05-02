@@ -141,6 +141,7 @@ void GEOM_boxA(void)
     l = StackPop();
     w = StackPop();
     h = StackPop();
+    
     StackPush((2.0F * h * w) + (2.0F * h * l) + (2.0F * l * w));
 }
 

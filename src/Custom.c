@@ -37,8 +37,8 @@
 #include <ctype.h>
 #include "EXCAL.h"
 
-struct funcStruct Custom_funcsTmp[MAX_FUNCS];   // so that cancel can be
-                                                // pressed
+struct funcStruct Custom_funcsTmp[MAX_FUNCS];   // so that cancel can be pressed
+
 struct funcStruct Custom_funcs[MAX_FUNCS] = {
     {FN1,   UNI_UNUSED,     USES_F,     ALLOWREC, ' ', "   ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
     {FN2,   UNI_UNUSED,     USES_F,     ALLOWREC, ' ', "   ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},

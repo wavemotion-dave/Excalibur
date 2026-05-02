@@ -148,7 +148,7 @@ extern "C" void COMP_tan(void)
   std::complex<double> c1(a,b);
   std::complex<double> c2;
   std::complex<double> c3;
-  
+
   c2 = std::sin(c1);
   c3 = std::cos(c1);
   c3 = c2/c3;
@@ -194,7 +194,7 @@ extern "C" void COMP_htan(void)
   std::complex<double> c1(a,b);
   std::complex<double> c2;
   std::complex<double> c3;
-  
+
   c2 = std::sinh(c1);
   c3 = std::cosh(c1);
   c3 = c2/c3;
@@ -275,7 +275,7 @@ extern "C" void COMP_pow(void)
   StackPush(c3.imag());
   StackPush(c3.real());
 }
- 
+
 extern "C" void COMP_sqrt(void)
 {
   double a, b;
