@@ -875,6 +875,7 @@ enum UniqueButtonIndexTag
     UNI_COPY,
     UNI_PASTE,
     UNI_EXREG,
+    UNI_METRIC,
 
     UNI_ADD_NEW_HERE,
     

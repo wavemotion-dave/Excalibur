@@ -36,7 +36,7 @@
 #include <mmsystem.h>
 #include <ctype.h>
 #include <time.h>
-#include "EXCAL.h"
+#include "Excal.h"
 
 /* TVM Registers */
 #define FIN_REG_n      0

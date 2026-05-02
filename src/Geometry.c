@@ -35,7 +35,7 @@
 #include <dos.h>
 #include <mmsystem.h>
 #include <ctype.h>
-#include "EXCAL.h"
+#include "Excal.h"
 
 /* Geometry */
 extern void GEOM_circC(void);

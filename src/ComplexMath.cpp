@@ -38,7 +38,7 @@
 #include <mmsystem.h>
 #include <ctype.h>
 #include <complex>
-#include "EXCAL.h"
+#include "Excal.h"
 
 extern "C" struct funcStruct Scientific2_funcs[MAX_FUNCS];
 

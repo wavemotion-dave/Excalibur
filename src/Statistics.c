@@ -35,7 +35,7 @@
 #include <dos.h>
 #include <mmsystem.h>
 #include <ctype.h>
-#include "EXCAL.h"
+#include "Excal.h"
 
 extern void STAT_SdevX(void);
 extern void STAT_PdevX(void);

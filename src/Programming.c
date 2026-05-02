@@ -35,7 +35,7 @@
 #include <dos.h>
 #include <mmsystem.h>
 #include <ctype.h>
-#include "EXCAL.h"
+#include "Excal.h"
 
 HWND debugTraceWindow = NULL;
 

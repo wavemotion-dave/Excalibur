@@ -36,7 +36,7 @@
 #include <mmsystem.h>
 #include <ctype.h>
 #include <float.h>
-#include "EXCAL.h"
+#include "Excal.h"
 
 uint8_t  userTimer = 0;
 uint32_t userTicks = 0;
@@ -67,19 +67,6 @@ extern void SCI_rand(void);
 extern void SCI_int(void);
 extern void SCI_frac(void);
 extern void SCI_hyp(void);
-extern void SCI_PdevX(void);
-extern void SCI_PdevY(void);
-extern void SCI_sumPlus(void);
-extern void SCI_sumMinus(void);
-extern void SCI_sumCl(void);
-extern void SCI_aveX(void);
-extern void SCI_aveY(void);
-extern void SCI_sumX(void);
-extern void SCI_sumY(void);
-extern void SCI_sumXsq(void);
-extern void SCI_sumYsq(void);
-extern void SCI_sumXY(void);
-extern void SCI_n(void);
 extern void SCI_Cnr(void);
 extern void SCI_Pnr(void);
 extern void SCI_abs(void);
@@ -101,6 +88,43 @@ extern void SCI_TimerStop(void);
 extern void SCI_TimerClear(void);
 extern void SCI_TimerPush(void);
 extern void SCI_Astro(void);
+extern void SCI_Moles(void);
+extern void SCI_Molecules(void);
+extern void SCI_GasVol(void);              // in liters
+extern void SCI_OhmsE(void);               // Current in Y, Resistance in X
+extern void SCI_OhmsI(void);               // Voltage in Y, Resistance in X
+extern void SCI_OhmsR(void);               // Voltage in Y, Current in X
+extern void SCI_Gravitation(void);         // In newtons
+extern void SCI_Energy(void);              // in joules
+extern void SCI_CentripetalForce(void);    // In newtons
+extern void SCI_CentripetalAccel(void);    // in(m/sec^2)
+extern void SCI_AccelerationDist(void);    // in meters
+extern void SCI_ProjectileRange(void);     // In meters
+extern void SCI_ProjectileHeight(void);    // In meters
+extern void SCI_Astro(void);
+
+extern void COMP_plus(void);
+extern void COMP_minus(void);
+extern void COMP_div(void);
+extern void COMP_mult(void);
+extern void COMP_sin(void);
+extern void COMP_cos(void);
+extern void COMP_tan(void);
+extern void COMP_conj(void);
+extern void COMP_exp(void);
+extern void COMP_ln(void);
+extern void COMP_log(void);
+extern void COMP_pow(void);
+extern void COMP_sqrt(void);
+extern void COMP_abs(void);
+extern void COMP_CHS(void);
+extern void COMP_norm(void);
+extern void COMP_arg(void);
+extern void COMP_ToPolar(void);
+extern void COMP_FromPolar(void);
+extern void COMP_hsin(void);
+extern void COMP_hcos(void);
+extern void COMP_htan(void);
 
 struct funcStruct Scientific_funcs[MAX_FUNCS] = {
     {FN1,   UNI_SIN,    USES_F,     ALLOWREC,   ' ',    "SIN",      YES_L,  X_NEW,  SCI_sin,        T_SIN,        H_SIN},
@@ -145,6 +169,48 @@ struct funcStruct Scientific_funcs[MAX_FUNCS] = {
     {FN40,  UNI_TPUSH,  USES_F,     ALLOWREC,   ' ',    "T Push",   YES_L,  X_NEW,  SCI_TimerPush,  T_TIMERPUSH,  H_TIMERPUSH}
 };
 
+struct funcStruct Scientific2_funcs[MAX_FUNCS] = {
+    {FN1,   UNI_MOLES,      USES_F,     ALLOWREC,   ' ',    "Moles",    YES_L,      X_NEW,      SCI_Moles,              T_MOLES,        H_MOLES},
+    {FN2,   UNI_MOLEC,      USES_F,     ALLOWREC,   ' ',    "Molec",    YES_L,      X_NEW,      SCI_Molecules,          T_MOLECULES,    H_MOLECULES},
+    {FN3,   UNI_GASVOL,     USES_F,     ALLOWREC,   ' ',    "Gas Vol",  YES_L,      X_NEW,      SCI_GasVol,             T_GASVOL,       H_GASVOL},
+    {FN4,   UNI_OHME,       USES_F,     ALLOWREC,   ' ',    "Ohm's E",  YES_L,      X_NEW,      SCI_OhmsE,              T_OHMSE,        H_OHMSE},
+    {FN5,   UNI_OHMI,       USES_F,     ALLOWREC,   ' ',    "Ohm's I",  YES_L,      X_NEW,      SCI_OhmsI,              T_OHMSI,        H_OHMSI},
+    {FN6,   UNI_OHMR,       USES_F,     ALLOWREC,   ' ',    "Ohm's R",  YES_L,      X_NEW,      SCI_OhmsR,              T_OHMSR,        H_OHMSR},
+    {FN7,   UNI_GRAV,       USES_F,     ALLOWREC,   ' ',    "Grav",     YES_L,      X_NEW,      SCI_Gravitation,        T_GRAVITATION,  H_GRAVITATION},
+    {FN8,   UNI_ENERGY,     USES_F,     ALLOWREC,   ' ',    "Energy",   YES_L,      X_NEW,      SCI_Energy,             T_ENERGY,       H_ENERGY},
+    {FN9,   UNI_CENTF,      USES_F,     ALLOWREC,   ' ',    "Cent F",   YES_L,      X_NEW,      SCI_CentripetalForce,   T_CENTFORCE,    H_CENTFORCE},
+    {FN10,  UNI_CENTA,      USES_F,     ALLOWREC,   ' ',    "Cent A",   YES_L,      X_NEW,      SCI_CentripetalAccel,   T_CENTACCEL,    H_CENTACCEL},
+    {FN11,  UNI_ACELDIST,   USES_F,     ALLOWREC,   ' ',    "Acc D",    YES_L,      X_NEW,      SCI_AccelerationDist,   T_ACCELDIST,    H_ACCELDIST},
+    {FN12,  UNI_PROJRANGE,  USES_F,     ALLOWREC,   ' ',    "Proj R",   YES_L,      X_NEW,      SCI_ProjectileRange,    T_PROJRANGE,    H_PROJRANGE},
+    {FN13,  UNI_PROJHEIGHT, USES_F,     ALLOWREC,   ' ',    "Proj H",   YES_L,      X_NEW,      SCI_ProjectileHeight,   T_PROJHEIGHT,   H_PROJHEIGHT},
+    {FN14,  UNI_METRIC,     USES_F,     ALLOWREC,   ' ',    "Metric"    YES_L,      X_NEW,      SCI_metricPre,          T_NULL,         H_NULL}, //TODO: help
+    {FN15,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_ATLAS}, // hidden
+    {FN16,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_NULL},
+    {FN17,  UNI_CPLUS,      USES_F,     ALLOWREC,   ' ',    "Cpx +",    YES_L,      X_NEW,      COMP_plus,              T_CPLXADD,      H_CPLXADD},
+    {FN18,  UNI_CMINUS,     USES_F,     ALLOWREC,   ' ',    "Cpx --",   YES_L,      X_NEW,      COMP_minus,             T_CPLXSUB,      H_CPLXSUB},
+    {FN19,  UNI_CDIV,       USES_F,     ALLOWREC,   ' ',    "Cpx ÷",    YES_L,      X_NEW,      COMP_div,               T_CPLXDIV,      H_CPLXDIV},
+    {FN20,  UNI_CMUL,       USES_F,     ALLOWREC,   ' ',    "Cpx ×",    YES_L,      X_NEW,      COMP_mult,              T_CPLXMUL,      H_CPLXMUL},
+    {FN21,  UNI_CSIN,       USES_F,     ALLOWREC,   ' ',    "cSIN",     YES_L,      X_NEW,      COMP_sin,               T_CPLXSIN,      H_CPLXSIN},
+    {FN22,  UNI_CCOS,       USES_F,     ALLOWREC,   ' ',    "cCOS",     YES_L,      X_NEW,      COMP_cos,               T_CPLXCOS,      H_CPLXCOS},
+    {FN23,  UNI_CTAN,       USES_F,     ALLOWREC,   ' ',    "cTAN",     YES_L,      X_NEW,      COMP_tan,               T_CPLXTAN,      H_CPLXTAN},
+    {FN24,  UNI_TOPOLAR,    USES_F,     ALLOWREC,   ' ',    "»POLR",    YES_L,      X_NEW,      COMP_ToPolar,           T_TOPOLAR,      H_TOPOLAR},
+    {FN25,  UNI_CSINH,      USES_F,     ALLOWREC,   ' ',    "cSINH",    YES_L,      X_NEW,      COMP_hsin,              T_CSINH,        H_CSINH},
+    {FN26,  UNI_CCOSH,      USES_F,     ALLOWREC,   ' ',    "cCOSH",    YES_L,      X_NEW,      COMP_hcos,              T_CCOSH,        H_CCOSH},
+    {FN27,  UNI_CTANH,      USES_F,     ALLOWREC,   ' ',    "cTANH",    YES_L,      X_NEW,      COMP_htan,              T_CTANH,        H_CTANH},
+    {FN28,  UNI_FROMPOLAR,  USES_F,     ALLOWREC,   ' ',    "«POLR",    YES_L,      X_NEW,      COMP_FromPolar,         T_FROMPOLAR,    H_FROMPOLAR},
+    {FN29,  UNI_CCHS,       USES_F,     ALLOWREC,   ' ',    "cCHS",     YES_L,      X_NEW,      COMP_CHS,               T_CPLXCHS,      H_CPLXCHS},
+    {FN30,  UNI_CCONJ,      USES_F,     ALLOWREC,   ' ',    "cCONJ",    YES_L,      X_NEW,      COMP_conj,              T_CONJ,         H_CONJ},
+    {FN31,  UNI_CEXP,       USES_F,     ALLOWREC,   ' ',    "cEXP",     YES_L,      X_NEW,      COMP_exp,               T_CPLXEXP,      H_CPLXEXP},
+    {FN32,  UNI_CLN,        USES_F,     ALLOWREC,   ' ',    "cLN",      YES_L,      X_NEW,      COMP_ln,                T_CPLXLN,       H_CPLXLN},
+    {FN33,  UNI_CLOG,       USES_F,     ALLOWREC,   ' ',    "cLOG",     YES_L,      X_NEW,      COMP_log,               T_CPLXLOG,      H_CPLXLOG},
+    {FN34,  UNI_CPOW,       USES_F,     ALLOWREC,   ' ',    "cPOW",     YES_L,      X_NEW,      COMP_pow,               T_CPLXPOW,      H_CPLXPOW},
+    {FN35,  UNI_CSQRT,      USES_F,     ALLOWREC,   ' ',    "cSQRT",    YES_L,      X_NEW,      COMP_sqrt,              T_CPLXSQRT,     H_CPLXSQRT},
+    {FN36,  UNI_CABS,       USES_F,     ALLOWREC,   ' ',    "cABS",     YES_L,      X_NEW,      COMP_abs,               T_CPLXABS,      H_CPLXABS},
+    {FN37,  UNI_CNORM,      USES_F,     ALLOWREC,   ' ',    "cNORM",    YES_L,      X_NEW,      COMP_norm,              T_CNORM,        H_CNORM},
+    {FN38,  UNI_CARG,       USES_F,     ALLOWREC,   ' ',    "cARG",     YES_L,      X_NEW,      COMP_arg,               T_CARG,         H_CARG},
+    {FN39,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_NULL},
+    {FN40,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_NULL},
+};
 
 void SCI_hyp(void)
 {
@@ -1178,89 +1244,6 @@ void SCI_TimerPush(void)
     sprintf(tmp, "%d.%d", (ut/10), (ut%10));
     StackPush(atof(tmp));
 }
-
-
-
-extern void SCI_Moles(void);
-extern void SCI_Molecules(void);
-extern void SCI_GasVol(void);              // in liters
-extern void SCI_OhmsE(void);               // Current in Y, Resistance in X
-extern void SCI_OhmsI(void);               // Voltage in Y, Resistance in X
-extern void SCI_OhmsR(void);               // Voltage in Y, Current in X
-extern void SCI_Gravitation(void);         // In newtons
-extern void SCI_Energy(void);              // in joules
-extern void SCI_CentripetalForce(void);    // In newtons
-extern void SCI_CentripetalAccel(void);    // in(m/sec^2)
-extern void SCI_AccelerationDist(void);    // in meters
-extern void SCI_ProjectileRange(void);     // In meters
-extern void SCI_ProjectileHeight(void);    // In meters
-extern void SCI_Astro(void);
-
-extern void COMP_plus(void);
-extern void COMP_minus(void);
-extern void COMP_div(void);
-extern void COMP_mult(void);
-extern void COMP_sin(void);
-extern void COMP_cos(void);
-extern void COMP_tan(void);
-extern void COMP_conj(void);
-extern void COMP_exp(void);
-extern void COMP_ln(void);
-extern void COMP_log(void);
-extern void COMP_pow(void);
-extern void COMP_sqrt(void);
-extern void COMP_abs(void);
-extern void COMP_CHS(void);
-extern void COMP_norm(void);
-extern void COMP_arg(void);
-extern void COMP_ToPolar(void);
-extern void COMP_FromPolar(void);
-extern void COMP_hsin(void);
-extern void COMP_hcos(void);
-extern void COMP_htan(void);
-
-struct funcStruct Scientific2_funcs[MAX_FUNCS] = {
-    {FN1,   UNI_MOLES,      USES_F,     ALLOWREC,   ' ',    "Moles",    YES_L,      X_NEW,      SCI_Moles,             T_MOLES,        H_MOLES},
-    {FN2,   UNI_MOLEC,      USES_F,     ALLOWREC,   ' ',    "Molec",    YES_L,      X_NEW,      SCI_Molecules,         T_MOLECULES,    H_MOLECULES},
-    {FN3,   UNI_GASVOL,     USES_F,     ALLOWREC,   ' ',    "Gas Vol",  YES_L,      X_NEW,      SCI_GasVol,            T_GASVOL,       H_GASVOL},
-    {FN4,   UNI_OHME,       USES_F,     ALLOWREC,   ' ',    "Ohm's E",  YES_L,      X_NEW,      SCI_OhmsE,             T_OHMSE,        H_OHMSE},
-    {FN5,   UNI_OHMI,       USES_F,     ALLOWREC,   ' ',    "Ohm's I",  YES_L,      X_NEW,      SCI_OhmsI,             T_OHMSI,        H_OHMSI},
-    {FN6,   UNI_OHMR,       USES_F,     ALLOWREC,   ' ',    "Ohm's R",  YES_L,      X_NEW,      SCI_OhmsR,             T_OHMSR,        H_OHMSR},
-    {FN7,   UNI_GRAV,       USES_F,     ALLOWREC,   ' ',    "Grav",     YES_L,      X_NEW,      SCI_Gravitation,       T_GRAVITATION,  H_GRAVITATION},
-    {FN8,   UNI_ENERGY,     USES_F,     ALLOWREC,   ' ',    "Energy",   YES_L,      X_NEW,      SCI_Energy,            T_ENERGY,       H_ENERGY},
-    {FN9,   UNI_CENTF,      USES_F,     ALLOWREC,   ' ',    "Cent F",   YES_L,      X_NEW,      SCI_CentripetalForce,  T_CENTFORCE,    H_CENTFORCE},
-    {FN10,  UNI_CENTA,      USES_F,     ALLOWREC,   ' ',    "Cent A",   YES_L,      X_NEW,      SCI_CentripetalAccel,  T_CENTACCEL,    H_CENTACCEL},
-    {FN11,  UNI_ACELDIST,   USES_F,     ALLOWREC,   ' ',    "Acc D",    YES_L,      X_NEW,      SCI_AccelerationDist,  T_ACCELDIST,    H_ACCELDIST},
-    {FN12,  UNI_PROJRANGE,  USES_F,     ALLOWREC,   ' ',    "Proj R",   YES_L,      X_NEW,      SCI_ProjectileRange,   T_PROJRANGE,    H_PROJRANGE},
-    {FN13,  UNI_PROJHEIGHT, USES_F,     ALLOWREC,   ' ',    "Proj H",   YES_L,      X_NEW,      SCI_ProjectileHeight,  T_PROJHEIGHT,   H_PROJHEIGHT},
-    {FN14,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_NULL},
-    {FN15,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_ATLAS}, // hidden
-    {FN16,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_NULL},
-    {FN17,  UNI_CPLUS,      USES_F,     ALLOWREC,   ' ',    "Cpx +",    YES_L,      X_NEW,      COMP_plus,              T_CPLXADD,      H_CPLXADD},
-    {FN18,  UNI_CMINUS,     USES_F,     ALLOWREC,   ' ',    "Cpx --",   YES_L,      X_NEW,      COMP_minus,             T_CPLXSUB,      H_CPLXSUB},
-    {FN19,  UNI_CDIV,       USES_F,     ALLOWREC,   ' ',    "Cpx ÷",    YES_L,      X_NEW,      COMP_div,               T_CPLXDIV,      H_CPLXDIV},
-    {FN20,  UNI_CMUL,       USES_F,     ALLOWREC,   ' ',    "Cpx ×",    YES_L,      X_NEW,      COMP_mult,              T_CPLXMUL,      H_CPLXMUL},
-    {FN21,  UNI_CSIN,       USES_F,     ALLOWREC,   ' ',    "cSIN",     YES_L,      X_NEW,      COMP_sin,               T_CPLXSIN,      H_CPLXSIN},
-    {FN22,  UNI_CCOS,       USES_F,     ALLOWREC,   ' ',    "cCOS",     YES_L,      X_NEW,      COMP_cos,               T_CPLXCOS,      H_CPLXCOS},
-    {FN23,  UNI_CTAN,       USES_F,     ALLOWREC,   ' ',    "cTAN",     YES_L,      X_NEW,      COMP_tan,               T_CPLXTAN,      H_CPLXTAN},
-    {FN24,  UNI_TOPOLAR,    USES_F,     ALLOWREC,   ' ',    "»POLR",    YES_L,      X_NEW,      COMP_ToPolar,           T_TOPOLAR,      H_TOPOLAR},
-    {FN25,  UNI_CSINH,      USES_F,     ALLOWREC,   ' ',    "cSINH",    YES_L,      X_NEW,      COMP_hsin,              T_CSINH,        H_CSINH},
-    {FN26,  UNI_CCOSH,      USES_F,     ALLOWREC,   ' ',    "cCOSH",    YES_L,      X_NEW,      COMP_hcos,              T_CCOSH,        H_CCOSH},
-    {FN27,  UNI_CTANH,      USES_F,     ALLOWREC,   ' ',    "cTANH",    YES_L,      X_NEW,      COMP_htan,              T_CTANH,        H_CTANH},
-    {FN28,  UNI_FROMPOLAR,  USES_F,     ALLOWREC,   ' ',    "«POLR",    YES_L,      X_NEW,      COMP_FromPolar,         T_FROMPOLAR,    H_FROMPOLAR},
-    {FN29,  UNI_CCHS,       USES_F,     ALLOWREC,   ' ',    "cCHS",     YES_L,      X_NEW,      COMP_CHS,               T_CPLXCHS,      H_CPLXCHS},
-    {FN30,  UNI_CCONJ,      USES_F,     ALLOWREC,   ' ',    "cCONJ",    YES_L,      X_NEW,      COMP_conj,              T_CONJ,         H_CONJ},
-    {FN31,  UNI_CEXP,       USES_F,     ALLOWREC,   ' ',    "cEXP",     YES_L,      X_NEW,      COMP_exp,               T_CPLXEXP,      H_CPLXEXP},
-    {FN32,  UNI_CLN,        USES_F,     ALLOWREC,   ' ',    "cLN",      YES_L,      X_NEW,      COMP_ln,                T_CPLXLN,       H_CPLXLN},
-    {FN33,  UNI_CLOG,       USES_F,     ALLOWREC,   ' ',    "cLOG",     YES_L,      X_NEW,      COMP_log,               T_CPLXLOG,      H_CPLXLOG},
-    {FN34,  UNI_CPOW,       USES_F,     ALLOWREC,   ' ',    "cPOW",     YES_L,      X_NEW,      COMP_pow,               T_CPLXPOW,      H_CPLXPOW},
-    {FN35,  UNI_CSQRT,      USES_F,     ALLOWREC,   ' ',    "cSQRT",    YES_L,      X_NEW,      COMP_sqrt,              T_CPLXSQRT,     H_CPLXSQRT},
-    {FN36,  UNI_CABS,       USES_F,     ALLOWREC,   ' ',    "cABS",     YES_L,      X_NEW,      COMP_abs,               T_CPLXABS,      H_CPLXABS},
-    {FN37,  UNI_CNORM,      USES_F,     ALLOWREC,   ' ',    "cNORM",    YES_L,      X_NEW,      COMP_norm,              T_CNORM,        H_CNORM},
-    {FN38,  UNI_CARG,       USES_F,     ALLOWREC,   ' ',    "cARG",     YES_L,      X_NEW,      COMP_arg,               T_CARG,         H_CARG},
-    {FN39,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_NULL},
-    {FN40,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_NULL},
-};
 
 void SCI_Moles(void)
 {

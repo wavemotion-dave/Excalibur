@@ -40,7 +40,7 @@
 #include <float.h>
 #include <signal.h>
 #include <shlobj.h>
-#include "EXCAL.h"
+#include "Excal.h"
 
 void PushConstant(double value)
 {

@@ -35,7 +35,7 @@
 #include <dos.h>
 #include <mmsystem.h>
 #include <ctype.h>
-#include "EXCAL.h"
+#include "Excal.h"
 
 extern void CONV_inverse (void);
 extern void CONV_lb_kg (void);

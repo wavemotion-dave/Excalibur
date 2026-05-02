@@ -35,7 +35,7 @@
 #include <dos.h>
 #include <mmsystem.h>
 #include <ctype.h>
-#include "EXCAL.h"
+#include "Excal.h"
 
 struct funcStruct Custom_funcsTmp[MAX_FUNCS];   // so that cancel can be pressed
 
