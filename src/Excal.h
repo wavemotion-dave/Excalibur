@@ -294,7 +294,7 @@ extern PROG_LONG MakeProgStr(char *str);
 extern PROG_LONG maskStackStuff(PROG_LONG lng);
 extern void PROG_dec(void);
 extern void cust_define(void);
-extern void RPN_clear(void);
+extern void RPN_clearStack(void);
 extern void RPN_clearL(void);
 extern void RPN_const(void);
 extern void RPN_enter(void);
@@ -529,7 +529,7 @@ enum UniqueButtonIndexTag
     UNI_BKSP,
     UNI_HELP,
     UNI_PLAY,
-    UNI_CLRA,
+    UNI_CLRSTK,
     UNI_EDIT,
     UNI_DROP,
     UNI_LARG,
@@ -923,7 +923,7 @@ extern uint32_t userTicks;
 #define RPN_LASTX                       125
 #define RPN_MODE                        126
 #define RPN_BKSP                        127
-#define RPN_CLEAR_ALL                   128
+#define RPN_CLR_STACK                   128
 #define RPN_HELP                        129
 #define RPN_PLAYBACK                    130
 #define RPN_DROP                        131

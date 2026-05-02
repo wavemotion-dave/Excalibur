@@ -1749,7 +1749,7 @@ struct keypadStruct RPNkeys[] = {
     {RPN_LASTX,     UNI_LSTX,   USES_FL, ALLOWREC, 'l', NO_L,   X_NEW,      RPN_lastX,          "Last X",               "Retrieves the last value of X before the last operation occurred"},
     {RPN_MODE,      UNI_MODE,   USES_FL, ALLOWREC, 'm', NO_L,   X_NEW,      RPN_mode,           "Select Mode",          "Used to select number format mode"},
     {RPN_BKSP,      UNI_BKSP,   USES_FL, ALLOWREC,  8,  NO_L,   X_NULL,     RPN_backspace,      "Backspace",            "Used to correct mistakes in number entry"},
-    {RPN_CLEAR_ALL, UNI_CLRA,   USES_FL, ALLOWREC, 'c', YES_L,  X_ENTER,    RPN_clear,          "Clear Stack",          "Used to clear the entire stack contents."},
+    {RPN_CLR_STACK, UNI_CLRSTK, USES_FL, ALLOWREC, 'c', YES_L,  X_ENTER,    RPN_clearStack,     "Clear Stack",          "Used to clear the entire stack contents. Press twice to clear all registers as well."},
     {RPN_HELP,      UNI_HELP,   USES_FL, ALLOWREC, 'h', NO_L,   X_NULL,     RPN_help,           "Help",                 "After clicking this key, select another key for individual key help.\nSame as right-click of the mouse on any key."},
     {RPN_PLAYBACK,  UNI_PLAY,   USES_FL, NORECORD, 'p', NO_L,   X_NEW,      RPN_Playback,       "Run Program",          "Run the the currently loaded program."},
     {RPN_DROP,      UNI_DROP,   USES_FL, ALLOWREC, 'd', YES_L,  X_NEW,      RPN_drop,           "Drop Stack",           "Drops the X register and the rest of stack shifts down."},
@@ -1799,7 +1799,7 @@ struct keyPosStruct RPNkeyPos[] = {
     {RPN_LASTX      ,0,     0},
     {RPN_MODE       ,0,     0},
     {RPN_BKSP       ,0,     0},
-    {RPN_CLEAR_ALL  ,0,     0},
+    {RPN_CLR_STACK  ,0,     0},
     {RPN_HELP       ,0,     0},
     {RPN_PLAYBACK   ,0,     0},
     {RPN_DROP       ,0,     0},
@@ -2354,7 +2354,7 @@ double StackPop(void)
 /* ----------------------- */
 /* Basic keypad keypresses */
 /* ----------------------- */
-void RPN_clear(void)
+void RPN_clearStack(void)
 {
     // Check if we should clear all registers
     if (rpnStoreRecall & 0x03)
@@ -2363,6 +2363,23 @@ void RPN_clear(void)
     }
     else
     {
+        // A double press of CLS in a row will clear register memory as well...
+        if (lastUniqueIndex == UNI_CLRSTK)
+        {
+            char savedStr[64];
+            
+            memset(STO,      0x00, sizeof(STO));
+            memset(cashFlow, 0x00, sizeof(cashFlow));
+            memset(SUM,      0x00, sizeof(SUM));
+            memset(fin_reg,  0x00, sizeof(fin_reg));            
+            CFn = 0;
+
+            GetDlgItemText(calcMainWindow, RPN_STACK_X, savedStr, MAX_STACK_STRLEN);
+            SetDlgItemText(calcMainWindow, RPN_STACK_X, "  ...MEMORY CLEAR...  ");
+            Sleep(500);
+            GetDlgItemText(calcMainWindow, RPN_STACK_X, savedStr, MAX_STACK_STRLEN);            
+        }
+        
         if (progMode > 0) RPN_clearL();
         X = 0.0;
         Y = 0.0;
@@ -3424,7 +3441,8 @@ void SaveToDisk(void)
 
     if (ClearStackOnExit)
     {
-        RPN_clear();
+        lastUniqueIndex = UNI_CLRSTK; // Force register clear as well
+        RPN_clearStack();
         RPN_clearL();
     }
 

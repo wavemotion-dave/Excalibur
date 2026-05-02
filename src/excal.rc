@@ -113,7 +113,7 @@ BEGIN
     PUSHBUTTON      "FN39",FN39,318,159,33,15
     PUSHBUTTON      "FN40",FN40,355,159,33,15
     PUSHBUTTON      "Run",RPN_PLAYBACK,152,57,27,15
-    PUSHBUTTON      "CLS",RPN_CLEAR_ALL,119,159,27,15
+    PUSHBUTTON      "CLS",RPN_CLR_STACK,119,159,27,15
     LTEXT           "X",RPN_X_LABEL,5,39,8,8
     LTEXT           "Y",RPN_Y_LABEL,5,29,8,8
     LTEXT           "Z",RPN_Z_LABEL,5,18,8,8
@@ -747,39 +747,9 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,101,34,50,14
 END
 
-DIALOG_INPUTA DIALOG DISCARDABLE  145, 25, 186, 58
+DIALOG_INPUT_REG DIALOG DISCARDABLE  145, 25, 186, 58
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
-CAPTION "Input A Register"
-FONT 10, "MS Sans Serif"
-BEGIN
-    EDITTEXT        IDC_EDIT1,77,14,73,14,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "OK",IDOK,68,37,50,14
-    LTEXT           "Input Value:",-1,32,17,40,10
-END
-
-DIALOG_INPUTB DIALOG DISCARDABLE  145, 25, 186, 58
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
-CAPTION "Input B Register"
-FONT 10, "MS Sans Serif"
-BEGIN
-    EDITTEXT        IDC_EDIT1,77,14,73,14,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "OK",IDOK,68,37,50,14
-    LTEXT           "Input Value:",-1,32,17,40,10
-END
-
-DIALOG_INPUTC DIALOG DISCARDABLE  145, 25, 186, 58
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
-CAPTION "Input C Register"
-FONT 10, "MS Sans Serif"
-BEGIN
-    EDITTEXT        IDC_EDIT1,77,14,73,14,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "OK",IDOK,68,37,50,14
-    LTEXT           "Input Value:",-1,32,17,40,10
-END
-
-DIALOG_INPUTD DIALOG DISCARDABLE  145, 25, 186, 58
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
-CAPTION "Input D Register"
+CAPTION "Input Register"
 FONT 10, "MS Sans Serif"
 BEGIN
     EDITTEXT        IDC_EDIT1,77,14,73,14,ES_AUTOHSCROLL
@@ -1662,9 +1632,9 @@ BEGIN
     T_PROJHEIGHT            "Projectile Height"
     H_PROJHEIGHT            "Computes the height of a projectile (in meters) given firing angle X and initial velocity Y (in m/s)."
     T_RECALLN               "Recall Xth Register"
-    H_RECALLN               "Recall's the Xth register.  Convenient for macro record use. 0=A, 1=B, etc."
+    H_RECALLN               "Recall's the Xth register (R0-R99). Convenient for macro record use."
     T_STOREN                "Store Xth Register"
-    H_STOREN                "Stores the Xth Register.  Convenient for macro record use. 0=A, 1=B, etc."
+    H_STOREN                "Stores the Xth Register (R0-R99). Convenient for macro record use."
     T_GA_CM3                "Gallons to Cubic Centimeters"
     H_GA_CM3                "Gallons to Cubic Centimeters"
     T_PINT_LI               "Pints to Liters"
@@ -1799,10 +1769,10 @@ BEGIN
     H_TFX                   "Test Flag X (32 user flags - X must be whole number).  If TRUE, execute next program line, else skip next line."
     T_PAUSE                 "Pause Program"
     H_PAUSE                 "Pause Program 1 second to show stack."
-    T_INPA                  "Input A"
-    H_INPA                  "Prompt user for A register value."
-    T_INPB                  "Input B"
-    H_INPB                  "Prompt user for B register value."
+    T_INPA                  "Input R0"
+    H_INPA                  "Prompt user for R0 register value."
+    T_INPB                  "Input R1"
+    H_INPB                  "Prompt user for R1 register value."
     T_TRACE                 "Trace Program"
     H_TRACE                 "Auto Trace Program - Trace Delay is configured on File/Settings"
     T_FWD                   "Forward Step"
@@ -1828,22 +1798,14 @@ BEGIN
     T_LBLK                  "Label K"
     T_GOTOK                 "Goto K"
     T_GSBK                  "Gosub K"
-    T_INPC                  "Input C"
-    H_INPC                  "Prompt user for C register value."
+    T_INPC                  "Input R2"
+    H_INPC                  "Prompt user for R2 register value."
 END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-    T_INPD                  "Input D"
-    H_INPD                  "Prompt user for D register value."
-    T_STOC                  "Store C"
-    H_STOC                  "Stores C register value."
-    T_STOD                  "Store D"
-    H_STOD                  "Stores D register value."
-    T_RCLC                  "Recall C"
-    H_RCLC                  "Recalls C register value."
-    T_RCLD                  "Recall D"
-    H_RCLD                  "Recalls D register value."
+    T_INPD                  "Input R3"
+    H_INPD                  "Prompt user for R3 register value."
     T_STOIND                "Store Indirect Register"
     H_STOIND                "Stores X value to the Indirect Register"
     T_GOTOIND               "Goto Indirect"
@@ -1935,11 +1897,11 @@ END
 STRINGTABLE DISCARDABLE 
 BEGIN
     T_CLEARF                "Clear All 32 Flags"
-    H_CLEARF                "Clear flags register to 0"
+    H_CLEARF                "Clear programming flags register to 0x00000000"
     T_STO2I                 "Store Indirectly"
-    H_STO2I                 "Stores X to the register pointed to by the Indirect (0=A, 25=Z)"
+    H_STO2I                 "Stores X to the register (R0-R99) pointed to by the Indirect register"
     T_RCL2I                 "Recall Indirectly"
-    H_RCL2I                 "Recalls value from the register pointed to by the Indirect (0=A, 25=Z)"
+    H_RCL2I                 "Recalls value from the register (R0-R99) pointed to by the Indirect register"
     T_TOPOLAR               "Convert to Polar Coordinates from TBD"
     H_TOPOLAR               "Convert to Polar"
     T_CSINH                 "Complex sinh"

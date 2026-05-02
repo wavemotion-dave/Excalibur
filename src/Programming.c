@@ -62,11 +62,6 @@ extern void Macro_LblK(void);
 extern void Macro_GotoK(void);
 extern void Macro_GsbK(void);
 
-void Macro_InpC(void);
-void Macro_StoC(void);
-
-void Macro_InpD(void);
-
 void Macro_StoInd(void);
 void Macro_RclInd(void);
 void Macro_GotoInd(void);
@@ -109,6 +104,8 @@ extern void Macro_ClearF(void);
 extern void Macro_Pause(void);
 extern void Macro_InpA(void);
 extern void Macro_InpB(void);
+extern void Macro_InpC(void);
+extern void Macro_InpD(void);
 extern void Macro_BST(void);
 extern void Macro_Trace(void);
 extern void Macro_StopTrace(void);
@@ -248,6 +245,10 @@ void Macro_LblD(void) {}    // Function does nothing but anchors a label
 void Macro_LblE(void) {}    // Function does nothing but anchors a label
 void Macro_LblF(void) {}    // Function does nothing but anchors a label
 void Macro_LblG(void) {}    // Function does nothing but anchors a label
+void Macro_LblH(void) {}    // Function does nothing but anchors a label
+void Macro_LblI(void) {}    // Function does nothing but anchors a label
+void Macro_LblJ(void) {}    // Function does nothing but anchors a label
+void Macro_LblK(void) {}    // Function does nothing but anchors a label
 
 void rpn_goto(uint16_t uniqueIdx)
 {
@@ -273,6 +274,40 @@ void Macro_GotoD(void)  {rpn_goto(UNI_LBLD);}
 void Macro_GotoE(void)  {rpn_goto(UNI_LBLE);}
 void Macro_GotoF(void)  {rpn_goto(UNI_LBLF);}
 void Macro_GotoG(void)  {rpn_goto(UNI_LBLG);}
+void Macro_GotoH(void)  {rpn_goto(UNI_LBLG);}
+void Macro_GotoI(void)  {rpn_goto(UNI_LBLG);}
+void Macro_GotoJ(void)  {rpn_goto(UNI_LBLG);}
+void Macro_GotoK(void)  {rpn_goto(UNI_LBLG);}
+
+void RPN_gosub(uint16_t uniqueIdx)
+{
+    if (macroPlayback == TRUE)
+    {
+        if (MacroStackIdx < MAX_MACRO_STACK - 1)
+        {
+            MacroStack[MacroStackIdx++] = currentMacroPlaybackIdx;
+            rpn_goto(uniqueIdx);
+        }
+        else
+        {
+            RPN_error("Max Program Function Stack Reached - No more Gosubs!");
+            currentMacroPlaybackIdx = playBackIdx; // end program.
+        }
+    }
+}
+
+
+void Macro_GsbA(void)   {RPN_gosub(UNI_LBLA);}
+void Macro_GsbB(void)   {RPN_gosub(UNI_LBLB);}
+void Macro_GsbC(void)   {RPN_gosub(UNI_LBLC);}
+void Macro_GsbD(void)   {RPN_gosub(UNI_LBLD);}
+void Macro_GsbE(void)   {RPN_gosub(UNI_LBLE);}
+void Macro_GsbF(void)   {RPN_gosub(UNI_LBLF);}
+void Macro_GsbG(void)   {RPN_gosub(UNI_LBLG);}
+void Macro_GsbH(void)   {RPN_gosub(UNI_LBLH);}
+void Macro_GsbI(void)   {RPN_gosub(UNI_LBLI);}
+void Macro_GsbJ(void)   {RPN_gosub(UNI_LBLJ);}
+void Macro_GsbK(void)   {RPN_gosub(UNI_LBLK);}
 
 
 void Macro_XLessY(void)
@@ -396,126 +431,6 @@ void Macro_XNEZero(void)
     }
 }
 
-
-void Macro_GsbA(void)
-{
-    if (macroPlayback == TRUE)
-    {
-        if (MacroStackIdx < MAX_MACRO_STACK - 1)
-        {
-            MacroStack[MacroStackIdx++] = currentMacroPlaybackIdx;
-            Macro_GotoA();
-        }
-        else
-        {
-            RPN_error("Max Program Function Stack Reached - No more Gosubs!");
-            currentMacroPlaybackIdx = playBackIdx; // end program.
-        }
-    }
-}
-
-void Macro_GsbB(void)
-{
-    if (macroPlayback == TRUE)
-    {
-        if (MacroStackIdx < MAX_MACRO_STACK - 1)
-        {
-            MacroStack[MacroStackIdx++] = currentMacroPlaybackIdx;
-            Macro_GotoB();
-        }
-        else
-        {
-            RPN_error("Max Program Function Stack Reached - No more Gosubs!");
-            currentMacroPlaybackIdx = playBackIdx; // end program.
-        }
-    }
-}
-
-void Macro_GsbC(void)
-{
-    if (macroPlayback == TRUE)
-    {
-        if (MacroStackIdx < MAX_MACRO_STACK - 1)
-        {
-            MacroStack[MacroStackIdx++] = currentMacroPlaybackIdx;
-            Macro_GotoC();
-        }
-        else
-        {
-            RPN_error("Max Program Function Stack Reached - No more Gosubs!");
-            currentMacroPlaybackIdx = playBackIdx; // end program.
-        }
-    }
-}
-
-void Macro_GsbD(void)
-{
-    if (macroPlayback == TRUE)
-    {
-        if (MacroStackIdx < MAX_MACRO_STACK - 1)
-        {
-            MacroStack[MacroStackIdx++] = currentMacroPlaybackIdx;
-            Macro_GotoD();
-        }
-        else
-        {
-            RPN_error("Max Program Function Stack Reached - No more Gosubs!");
-            currentMacroPlaybackIdx = playBackIdx; // end program.
-        }
-    }
-}
-
-void Macro_GsbE(void)
-{
-    if (macroPlayback == TRUE)
-    {
-        if (MacroStackIdx < MAX_MACRO_STACK - 1)
-        {
-            MacroStack[MacroStackIdx++] = currentMacroPlaybackIdx;
-            Macro_GotoE();
-        }
-        else
-        {
-            RPN_error("Max Program Function Stack Reached - No more Gosubs!");
-            currentMacroPlaybackIdx = playBackIdx; // end program.
-        }
-    }
-}
-
-void Macro_GsbF(void)
-{
-    if (macroPlayback == TRUE)
-    {
-        if (MacroStackIdx < MAX_MACRO_STACK - 1)
-        {
-            MacroStack[MacroStackIdx++] = currentMacroPlaybackIdx;
-            Macro_GotoF();
-        }
-        else
-        {
-            RPN_error("Max Program Function Stack Reached - No more Gosubs!");
-            currentMacroPlaybackIdx = playBackIdx; // end program.
-        }
-    }
-}
-
-void Macro_GsbG(void)
-{
-    if (macroPlayback == TRUE)
-    {
-        if (MacroStackIdx < MAX_MACRO_STACK - 1)
-        {
-            MacroStack[MacroStackIdx++] = currentMacroPlaybackIdx;
-            Macro_GotoG();
-        }
-        else
-        {
-            RPN_error("Max Program Function Stack Reached - No more Gosubs!");
-            currentMacroPlaybackIdx = playBackIdx; // end program.
-        }
-    }
-}
-
 void Macro_Return(void)
 {
     if (macroPlayback == TRUE)
@@ -567,6 +482,7 @@ void Macro_TFx(void)
 void Macro_ClearF(void)
 {
     macroFlags = 0x00000000;
+    blinkXDisplay();
 }
 
 
@@ -579,14 +495,14 @@ void Macro_Pause(void)
     }
 }
 
-
-BOOL CALLBACK inputARegisterProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
+int RegisterToInput = 0;
+BOOL CALLBACK inputRegisterProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
 {
-    char tmp[75];
+    char tmp[64];
     switch(wMessage)
     {
     case WM_INITDIALOG:
-        MakeSciFormat(STO[0], tmp);
+        MakeSciFormat(STO[RegisterToInput], tmp);
         SetDlgItemText(hDlg, IDC_EDIT1, tmp);
         SetFocus(GetDlgItem(hDlg, IDC_EDIT1));
         return TRUE;
@@ -594,9 +510,9 @@ BOOL CALLBACK inputARegisterProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
     case WM_COMMAND:
         switch(wParam)
         {
-        case(IDOK):           // OK
-            GetDlgItemText(hDlg, IDC_EDIT1, tmp, 74);
-            STO[0] = atof(tmp);
+        case(IDOK):
+            GetDlgItemText(hDlg, IDC_EDIT1, tmp, 64);
+            STO[RegisterToInput] = atof(tmp);
             EndDialog(hDlg, FALSE);
             return TRUE;
             break;
@@ -610,41 +526,26 @@ BOOL CALLBACK inputARegisterProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
 
 void Macro_InpA(void)
 {
-    DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_INPUTA", calcMainWindow, inputARegisterProc);
-}
-
-
-BOOL CALLBACK inputBRegisterProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
-{
-    char tmp[75];
-    switch(wMessage)
-    {
-    case WM_INITDIALOG:
-        MakeSciFormat(STO[1], tmp);
-        SetDlgItemText(hDlg, IDC_EDIT1, tmp);
-        SetFocus(GetDlgItem(hDlg, IDC_EDIT1));
-        return TRUE;
-
-    case WM_COMMAND:
-        switch(wParam)
-        {
-        case(IDOK):           // OK
-            GetDlgItemText(hDlg, IDC_EDIT1, tmp, 74);
-            STO[1] = atof(tmp);
-            EndDialog(hDlg, FALSE);
-            return TRUE;
-            break;
-
-        default:
-            return FALSE;
-        }
-    }
-    return FALSE;
+    RegisterToInput = 0;
+    DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_INPUT_REG", calcMainWindow, inputRegisterProc);
 }
 
 void Macro_InpB(void)
 {
-    DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_INPUTB", calcMainWindow, inputBRegisterProc);
+    RegisterToInput = 1;
+    DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_INPUT_REG", calcMainWindow, inputRegisterProc);
+}
+
+void Macro_InpC(void)
+{
+    RegisterToInput = 2;
+    DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_INPUT_REG", calcMainWindow, inputRegisterProc);
+}
+
+void Macro_InpD(void)
+{
+    RegisterToInput = 3;
+    DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_INPUT_REG", calcMainWindow, inputRegisterProc);
 }
 
 void Macro_DEL(void)
@@ -751,7 +652,7 @@ void Macro_RecallN(void)
     }
     else
     {
-        RPN_error("Register Out Of Range(0=A to 25=Z)");
+        RPN_error("Register Out Of Range (R0 to R99)");
     }
 }
 
@@ -766,294 +667,9 @@ void Macro_StoreN(void)
     }
     else
     {
-        RPN_error("Register Out Of Range(0=A to 25=Z)");
+        RPN_error("Register Out Of Range (R0 to R99)");
     }
 }
-
-void Macro_LblH(void)
-{
-}
-
-void Macro_LblI(void)
-{
-}
-
-void Macro_LblJ(void)
-{
-}
-
-void Macro_LblK(void)
-{
-}
-
-void Macro_GotoH(void)
-{
-    int j;
-
-    if (macroPlayback == TRUE)
-    {
-        for (j = 0; j < playBackIdx; j++)
-        {
-            if (playBackMap[playBack[j]].uniqueIndex == UNI_LBLH)       // Unique Index for label H
-            {
-                currentMacroPlaybackIdx = j;
-                break;
-            }
-        }
-    }
-}
-
-void Macro_GotoI(void)
-{
-    int j;
-
-    if (macroPlayback == TRUE)
-    {
-        for (j = 0; j < playBackIdx; j++)
-        {
-            if (playBackMap[playBack[j]].uniqueIndex == UNI_LBLI)       // Unique Index for label I
-            {
-                currentMacroPlaybackIdx = j;
-                break;
-            }
-        }
-    }
-}
-
-void Macro_GotoJ(void)
-{
-    int j;
-
-    if (macroPlayback == TRUE)
-    {
-        for (j = 0; j < playBackIdx; j++)
-        {
-            if (playBackMap[playBack[j]].uniqueIndex == UNI_LBLJ)       // Unique Index for label J
-            {
-                currentMacroPlaybackIdx = j;
-                break;
-            }
-        }
-    }
-}
-
-void Macro_GotoK(void)
-{
-    int j;
-
-    if (macroPlayback == TRUE)
-    {
-        for (j = 0; j < playBackIdx; j++)
-        {
-            if (playBackMap[playBack[j]].uniqueIndex == UNI_LBLK)       // Unique Index for label K
-            {
-                currentMacroPlaybackIdx = j;
-                break;
-            }
-        }
-    }
-}
-
-
-void Macro_GsbH(void)
-{
-    if (macroPlayback == TRUE)
-    {
-        if (MacroStackIdx < MAX_MACRO_STACK - 1)
-        {
-            MacroStack[MacroStackIdx++] = currentMacroPlaybackIdx;
-            Macro_GotoH();
-        }
-        else
-        {
-            RPN_error("Max Program Function Stack Reached - No more Gosubs!");
-            currentMacroPlaybackIdx = playBackIdx; // end program.
-        }
-    }
-}
-
-void Macro_GsbI(void)
-{
-    if (macroPlayback == TRUE)
-    {
-        if (MacroStackIdx < MAX_MACRO_STACK - 1)
-        {
-            MacroStack[MacroStackIdx++] = currentMacroPlaybackIdx;
-            Macro_GotoI();
-        }
-        else
-        {
-            RPN_error("Max Program Function Stack Reached - No more Gosubs!");
-            currentMacroPlaybackIdx = playBackIdx; // end program.
-        }
-    }
-}
-
-void Macro_GsbJ(void)
-{
-    if (macroPlayback == TRUE)
-    {
-        if (MacroStackIdx < MAX_MACRO_STACK - 1)
-        {
-            MacroStack[MacroStackIdx++] = currentMacroPlaybackIdx;
-            Macro_GotoJ();
-        }
-        else
-        {
-            RPN_error("Max Program Function Stack Reached - No more Gosubs!");
-            currentMacroPlaybackIdx = playBackIdx; // end program.
-        }
-    }
-}
-
-void Macro_GsbK(void)
-{
-    if (macroPlayback == TRUE)
-    {
-        if (MacroStackIdx < MAX_MACRO_STACK - 1)
-        {
-            MacroStack[MacroStackIdx++] = currentMacroPlaybackIdx;
-            Macro_GotoK();
-        }
-        else
-        {
-            RPN_error("Max Program Function Stack Reached - No more Gosubs!");
-            currentMacroPlaybackIdx = playBackIdx; // end program.
-        }
-    }
-}
-
-BOOL CALLBACK inputCRegisterProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
-{
-    char tmp[75];
-    switch(wMessage)
-    {
-    case WM_INITDIALOG:
-        MakeSciFormat(STO[0], tmp);
-        SetDlgItemText(hDlg, IDC_EDIT1, tmp);
-        SetFocus(GetDlgItem(hDlg, IDC_EDIT1));
-        return TRUE;
-
-    case WM_COMMAND:
-        switch(wParam)
-        {
-        case(IDOK):           // OK
-            GetDlgItemText(hDlg, IDC_EDIT1, tmp, 74);
-            STO[2] = atof(tmp);
-            EndDialog(hDlg, FALSE);
-            return TRUE;
-            break;
-
-        default:
-            return FALSE;
-        }
-    }
-    return FALSE;
-}
-
-void Macro_InpC(void)
-{
-    DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_INPUTC", calcMainWindow, inputCRegisterProc);
-}
-
-
-BOOL CALLBACK inputDRegisterProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
-{
-    char tmp[75];
-    switch(wMessage)
-    {
-    case WM_INITDIALOG:
-        MakeSciFormat(STO[0], tmp);
-        SetDlgItemText(hDlg, IDC_EDIT1, tmp);
-        SetFocus(GetDlgItem(hDlg, IDC_EDIT1));
-        return TRUE;
-
-    case WM_COMMAND:
-        switch(wParam)
-        {
-        case(IDOK):           // OK
-            GetDlgItemText(hDlg, IDC_EDIT1, tmp, 74);
-            STO[3] = atof(tmp);
-            EndDialog(hDlg, FALSE);
-            return TRUE;
-            break;
-
-        default:
-            return FALSE;
-        }
-    }
-    return FALSE;
-}
-
-void Macro_InpD(void)
-{
-    DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_INPUTD", calcMainWindow, inputDRegisterProc);
-}
-
-
-
-void Macro_StoC(void)          // A quick way to store the A register.
-{
-    if (progMode == PROG_NORMAL)
-        STO[2] = X;
-    else
-    {
-        if (wordMode == PROG_SIGNED)
-            STO[2] = (PROG_SIGNEDLONG) XL;
-        else
-            STO[2] = XL;
-    }
-}
-
-void Macro_StoD(void)          // A quick way to store the B register.
-{
-    if (progMode == PROG_NORMAL)
-        STO[3] = X;
-    else
-    {
-        if (wordMode == PROG_SIGNED)
-            STO[3] = (PROG_SIGNEDLONG) XL;
-        else
-            STO[3] = XL;
-    }
-}
-
-void Macro_RclC(void)         // A quick way to recall the C register.
-{
-    if (Xedit == X_ENTER)
-    {
-        if (progMode == PROG_NORMAL)
-            X = STO[2];
-        else
-            XL = maskStackStuff((PROG_LONG) STO[2]);
-    }
-    else
-    {
-        if (progMode == PROG_NORMAL)
-            StackPush(STO[2]);
-        else
-            StackPushL((PROG_LONG) STO[2]);
-    }
-}
-
-void Macro_RclD(void)         // A quick way to recall the D register.
-{
-    if (Xedit == X_ENTER)
-    {
-        if (progMode == PROG_NORMAL)
-            X = STO[3];
-        else
-            XL = maskStackStuff((PROG_LONG) STO[3]);
-    }
-    else
-    {
-        if (progMode == PROG_NORMAL)
-            StackPush(STO[3]);
-        else
-            StackPushL((PROG_LONG) STO[3]);
-    }
-}
-
 
 void Macro_StoInd(void)
 {
@@ -1457,6 +1073,20 @@ void UpdateDebugRegs(void)
     makeInternational(tmp);
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
+    sprintf(tmp, " ");
+    SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+
+    sprintf(tmp, " CFn: %-18d", CFn);
+    makeInternational(tmp);
+    SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+
+    for (i = 0; i < MAX_CF; i++)
+    {
+        sprintf(tmp, " CF[%2d]:%-16.11g", i, cashFlow[i]);
+        makeInternational(tmp);
+        SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+    }
+
     for (i = 0; i < MAX_STO; i++)
     {
         sprintf(tmp, " R%02d: %-18.11g", i, STO[i]);
@@ -1467,7 +1097,7 @@ void UpdateDebugRegs(void)
 
 void UpdateDebugProgram(int resetProgramList)
 {
-    char tmp[60];
+    char tmp[64];
     int i;
 
     if (resetProgramList != 0)

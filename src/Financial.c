@@ -79,7 +79,6 @@ extern void FIN_tax(void);
 extern void FIN_percent(void);
 extern void FIN_percentChg(void);
 extern void FIN_percentTot(void);
-extern void FIN_store(void);
 extern void FIN_clearReg(void);
 extern void FIN_12div(void);
 extern void FIN_12mult(void);
@@ -91,7 +90,6 @@ extern void FIN_100mult(void);
 extern void FIN_pmt(void);
 extern void FIN_n(void);
 extern void FIN_i(void);
-extern void FIN_recall(void);
 extern void FIN_cashFlow0(void);
 extern void FIN_cashFlowj(void);
 extern void FIN_cashFlowNj(void);
@@ -122,8 +120,8 @@ struct funcStruct Financial_funcs[MAX_FUNCS] = {
     {FN3,   UNI_PERCC,  USES_F,     ALLOWREC,   ' ',    "%CHG",     YES_L,  X_NEW,      FIN_percentChg,    T_PERCC,    H_PERCC},
     {FN4,   UNI_PERCT,  USES_F,     ALLOWREC,   ' ',    "%TOT",     YES_L,  X_NEW,      FIN_percentTot,    T_PERCT,    H_PERCT},
     {FN5,   UNI_CLRF,   USES_F,     ALLOWREC,   ' ',    "CLRF",     YES_L,  X_NEW,      FIN_clearReg,      T_CLRF,     H_CLRF},
-    {FN6,   UNI_STO,   USES_FL,     ALLOWREC,   ' ',    "STO",      NO_L,   X_NULL,     RPN_store,         T_STOFN,    H_STOFN},
-    {FN7,   UNI_RCL,   USES_FL,     ALLOWREC,   ' ',    "RCL",      NO_L,   X_NULL,     RPN_recall,        T_RCLFN,    H_RCLFN},
+    {FN6,   UNI_STO,    USES_FL,    ALLOWREC,   ' ',    "STO",      NO_L,   X_NULL,     RPN_store,         T_STOFN,    H_STOFN},
+    {FN7,   UNI_RCL,    USES_FL,    ALLOWREC,   ' ',    "RCL",      NO_L,   X_NULL,     RPN_recall,        T_RCLFN,    H_RCLFN},
     {FN8,   UNI_FINN,   USES_F,     ALLOWREC,   ' ',    "n",        YES_L,  X_NEW,      FIN_n,             T_FINN,     H_FINN},
     {FN9,   UNI_INTR,   USES_F,     ALLOWREC,   ' ',    "i%",       YES_L,  X_NEW,      FIN_i,             T_INTR,     H_INTR},
     {FN10,  UNI_FINPV,  USES_F,     ALLOWREC,   ' ',    "PV",       YES_L,  X_NEW,      FIN_pv,            T_FINPV,    H_FINPV},
@@ -209,14 +207,7 @@ void FIN_clearReg(void)
     for (i = 0; i < FIN_REG_MAX; i++)
         fin_reg[i] = 0.0;
     CFn = 0;
-}
-
-void FIN_store(void)
-{
-}
-
-void FIN_recall(void)
-{
+    memset(cashFlow, 0x00, sizeof(cashFlow));
 }
 
 void FIN_12div(void)
