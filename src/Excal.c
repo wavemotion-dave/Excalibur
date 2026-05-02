@@ -1751,7 +1751,7 @@ struct keypadStruct RPNkeys[] = {
     {RPN_BKSP,      UNI_BKSP,   USES_FL, ALLOWREC,  8,  NO_L,   X_NULL,     RPN_backspace,      "Backspace",            "Used to correct mistakes in number entry"},
     {RPN_CLEAR_ALL, UNI_CLRA,   USES_FL, ALLOWREC, 'c', YES_L,  X_ENTER,    RPN_clear,          "Clear Stack",          "Used to clear the entire stack contents."},
     {RPN_HELP,      UNI_HELP,   USES_FL, ALLOWREC, 'h', NO_L,   X_NULL,     RPN_help,           "Help",                 "After clicking this key, select another key for individual key help.\nSame as right-click of the mouse on any key."},
-    {RPN_PLAYBACK,  UNI_PLAY,   USES_FL, NORECORD, 'p', NO_L,   X_NEW,      RPN_Playback,       "Playback",             "Plays back the last recorded sequence of button presses."},
+    {RPN_PLAYBACK,  UNI_PLAY,   USES_FL, NORECORD, 'p', NO_L,   X_NEW,      RPN_Playback,       "Run Program",          "Run the the currently loaded program."},
     {RPN_DROP,      UNI_DROP,   USES_FL, ALLOWREC, 'd', YES_L,  X_NEW,      RPN_drop,           "Drop Stack",           "Drops the X register and the rest of stack shifts down."},
     {RPN_LARG,      UNI_LARG,   USES_FL, ALLOWREC, ' ', NO_L,   X_NEW,      RPN_larg,           "Last Arguments",       "Retrieves the last X and Y pair before last operation."},
     {RPN_FRAC,      UNI_FRAC,   USES_FL, ALLOWREC, ' ', NO_L,   X_EDIT,     RPN_frac,           "Fraction Bar",         "Insert Fraction to current X edit"},
@@ -5066,6 +5066,8 @@ void RPN_Playback(void)
         ShowWindow(toolTipWnd, SW_HIDE);
         toolTipCounter = 0;
     }
+    
+    SetWindowText(GetDlgItem(calcMainWindow, RPN_PLAYBACK), "Stop");
 
     // ------------------------------------------------------------------------------------------------
     // This is the main macro playback loop... it has been somewhat optimized so that we push through
@@ -5140,6 +5142,8 @@ void RPN_Playback(void)
         }
     }
 
+    SetWindowText(GetDlgItem(calcMainWindow, RPN_PLAYBACK), "Run");
+    
     UpdateSpareBar(" ");
     macroPlayback = FALSE;
 }

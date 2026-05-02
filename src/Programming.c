@@ -1186,7 +1186,7 @@ void Macro_Halt(void)
 
 BOOL CALLBACK inputDebugValue(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
 {
-    char tmp[75];
+    char tmp[64];
     switch(wMessage)
     {
     case WM_INITDIALOG:
@@ -1199,7 +1199,8 @@ BOOL CALLBACK inputDebugValue(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lP
         switch(wParam)
         {
         case(IDOK):           // OK
-            GetDlgItemText(hDlg, IDC_EDIT1, tmp, 74);
+            GetDlgItemText(hDlg, IDC_EDIT1, tmp, 63);
+            tmp[63] = CNULL;
             debugValue = atof(tmp);
             EndDialog(hDlg, FALSE);
             return TRUE;
@@ -1235,6 +1236,7 @@ BOOL CALLBACK debugWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam
           
      case WM_SIZE: 
      {
+        // Allow the Debug/Trace window to be resized
         RECT rect1, rect2, rect3;
         int newHeight = HIWORD(lParam);
 
@@ -1246,7 +1248,7 @@ BOOL CALLBACK debugWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam
         MapWindowPoints(HWND_DESKTOP, hwnd, (LPPOINT)&rect2, 2);
         MapWindowPoints(HWND_DESKTOP, hwnd, (LPPOINT)&rect3, 2);
 
-        // Resize the listbox to fill the entire window
+        // Resize the listbox to fill the entire window vertically (with a small border at the bottom)
         MoveWindow(GetDlgItem(hwnd, TRACE_PROGRAM), rect1.left, rect1.top, (rect1.right - rect1.left), newHeight - 40, TRUE);
         MoveWindow(GetDlgItem(hwnd, TRACE_REGS1),   rect2.left, rect2.top, (rect2.right - rect2.left), newHeight - 40, TRUE);
         MoveWindow(GetDlgItem(hwnd, TRACE_REGS2),   rect3.left, rect3.top, (rect3.right - rect3.left), newHeight - 40, TRUE);
