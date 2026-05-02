@@ -83,31 +83,31 @@ typedef unsigned __int8     uint8_t;
 
 struct funcStruct
 {
-    int16_t index;
-    int16_t uniqueIndex;
-    uint8_t useFloatsLongs;
-    uint8_t allowRecord;
-    uint8_t op;
-    char desc[9];
-    uint8_t saveLastX;             /* Do we save LASTX here? */
-    uint8_t newXedit;              /* The new Xedit */
+    int16_t  index;
+    uint16_t uniqueIndex;
+    uint8_t  useFloatsLongs;
+    uint8_t  allowRecord;
+    uint8_t  op;
+    char     desc[9];
+    uint8_t  saveLastX;             /* Do we save LASTX here? */
+    uint8_t  newXedit;              /* The new Xedit */
     void(*routine) (void);
-    int32_t keyTitle;
-    int32_t keyHelp;
+    int32_t  keyTitle;
+    int32_t  keyHelp;
 };
 
 struct keypadStruct
 {
-    int16_t index;
-    int16_t uniqueIndex;
-    uint8_t useFloatsLongs;
-    uint8_t allowRecord;
-    uint8_t op;
-    uint8_t saveLastX;             /* Do we save LASTX here? */
-    uint8_t newXedit;              /* The new Xedit */
+    int16_t  index;
+    uint16_t uniqueIndex;
+    uint8_t  useFloatsLongs;
+    uint8_t  allowRecord;
+    uint8_t  op;
+    uint8_t  saveLastX;             /* Do we save LASTX here? */
+    uint8_t  newXedit;              /* The new Xedit */
     void(*routine) (void);
-    char keyTitle[26];
-    char keyHelp[128];
+    char    keyTitle[26];
+    char    keyHelp[128];
 };
 
 
@@ -236,7 +236,6 @@ extern double SUM[SUM_MAX];
 #define MAX_CF          100
 extern double cashFlow[MAX_CF];
 extern uint8_t CFn;
-extern uint8_t hyperbolic;
 extern uint8_t binMode;
 
 #define FIN_REG_MAX     9
@@ -286,7 +285,7 @@ extern void ShowStack(void);
 extern void StackPush(double temp);
 extern double StackPop(void);
 extern void PushConstant(double value);
-extern void SaveProgramStep(int uniqueIndex);
+extern void SaveProgramStep(uint16_t uniqueIndex);
 extern void ExcaliburHelp(void);
 extern void MakeRadixStr(PROG_LONG val, char *tmpL);
 extern void StackPushL(PROG_LONG temp);
@@ -396,6 +395,11 @@ extern uint64_t stackPops;
 #define REG_MINUS         0x20
 #define REG_MULTIPLY      0x40
 #define REG_DIVIDE        0x80
+extern uint8_t rpnStoreRecall;
+
+#define MOD_HYPERBOLIC    0x01
+#define MOD_INVERSE       0x02
+extern uint8_t modifiers;
 
 extern int allowDigitBasedOnMaxStringSize(char *Xstr, char digit);
 extern void makeInternational(char *str);
@@ -411,13 +415,13 @@ extern void turnOnNumLock(void);
 #define MAX_MACRO_FUNC_TEXT 30
 struct playbackStruct
 {
-    int16_t uniqueIndex;
-    uint8_t useFloatsLongs;
-    uint8_t allowRecord;
-    uint8_t saveLastX;             /* Do we save LASTX here? */
-    uint8_t newXedit;              /* The new Xedit */
+    uint16_t uniqueIndex;
+    uint8_t  useFloatsLongs;
+    uint8_t  allowRecord;
+    uint8_t  saveLastX;             /* Do we save LASTX here? */
+    uint8_t  newXedit;              /* The new Xedit */
     void(*routine) (void);
-    char funcText[MAX_MACRO_FUNC_TEXT];
+    char     funcText[MAX_MACRO_FUNC_TEXT];
 };
 
 extern struct playbackStruct playBackMap[MAX_FUNCTIONS + 1];
@@ -431,6 +435,7 @@ extern int16_t playBack[MAX_REC_PLAYBACK + 1];
 extern int16_t playBackIdx;
 extern uint8_t progModecarry;
 extern uint8_t recModeON;
+extern uint16_t lastUniqueIndex;
 
 #define MAX_CONST_BANKS     5
 #define MAX_CONSTS          64
@@ -462,13 +467,7 @@ extern int32_t lastChosenConst;
 extern int32_t lastConstBank;
 extern char constantBankNames[MAX_CONST_BANKS][15];
 
-extern uint8_t finStore;
-extern uint8_t finRecall;
-extern uint8_t convInverse;
 extern uint8_t depreciationType;
-
-extern uint8_t  rpnStore;
-extern uint8_t  rpnRecall;
 
 #define MAX_STO 100
 extern double STO[MAX_STO];
@@ -626,8 +625,6 @@ enum UniqueButtonIndexTag
     UNI_PERCC,
     UNI_PERCT,
     UNI_CLRF,
-    UNI_STOFN,
-    UNI_RCLFN,
     UNI_FINN,
     UNI_INTR,
     UNI_FINPV,

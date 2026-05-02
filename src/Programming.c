@@ -200,10 +200,10 @@ struct funcStruct Program2_funcs[MAX_FUNCS] =
     {FN7,   UNI_GSBK,       USES_FL,    ALLOWREC,   ' ',    "Gsb K",    YES_L,      X_NEW,   Macro_GsbK,     T_GSBK,     H_GOSUBS},
     {FN8,   UNI_LOOPK,      USES_FL,    ALLOWREC,   ' ',    "Loop K",   YES_L,      X_NEW,   Macro_LoopK,    T_LOOPK,    H_LOOPK},
                                     
-    {FN9,   UNI_INPA,       USES_FL,    ALLOWREC,   ' ',    "Inp R1",   YES_L,      X_NEW,   Macro_InpA,     T_INPA,     H_INPA},
-    {FN10,  UNI_INPB,       USES_FL,    ALLOWREC,   ' ',    "Inp R2",   YES_L,      X_NEW,   Macro_InpB,     T_INPB,     H_INPB},
-    {FN11,  UNI_INPC,       USES_FL,    ALLOWREC,   ' ',    "Inp R3",   YES_L,      X_NEW,   Macro_InpC,     T_INPC,     H_INPC},
-    {FN12,  UNI_INPD,       USES_FL,    ALLOWREC,   ' ',    "Inp R4",   YES_L,      X_NEW,   Macro_InpD,     T_INPD,     H_INPD},
+    {FN9,   UNI_INPA,       USES_FL,    ALLOWREC,   ' ',    "Inp R0",   YES_L,      X_NEW,   Macro_InpA,     T_INPA,     H_INPA},
+    {FN10,  UNI_INPB,       USES_FL,    ALLOWREC,   ' ',    "Inp R1",   YES_L,      X_NEW,   Macro_InpB,     T_INPB,     H_INPB},
+    {FN11,  UNI_INPC,       USES_FL,    ALLOWREC,   ' ',    "Inp R2",   YES_L,      X_NEW,   Macro_InpC,     T_INPC,     H_INPC},
+    {FN12,  UNI_INPD,       USES_FL,    ALLOWREC,   ' ',    "Inp R3",   YES_L,      X_NEW,   Macro_InpD,     T_INPD,     H_INPD},
                                     
     {FN13,  UNI_SFX,        USES_FL,    ALLOWREC,   ' ',    "SFx",      YES_L,      X_NEW,   Macro_SFx,      T_SFX,      H_SFX},
     {FN14,  UNI_CFX,        USES_FL,    ALLOWREC,   ' ',    "CFx",      YES_L,      X_NEW,   Macro_CFx,      T_CFX,      H_CFX},
@@ -242,36 +242,15 @@ struct funcStruct Program2_funcs[MAX_FUNCS] =
 };
 
 
-void Macro_LblA(void)
-{
-}
+void Macro_LblA(void) {}    // Function does nothing but anchors a label
+void Macro_LblB(void) {}    // Function does nothing but anchors a label
+void Macro_LblC(void) {}    // Function does nothing but anchors a label
+void Macro_LblD(void) {}    // Function does nothing but anchors a label
+void Macro_LblE(void) {}    // Function does nothing but anchors a label
+void Macro_LblF(void) {}    // Function does nothing but anchors a label
+void Macro_LblG(void) {}    // Function does nothing but anchors a label
 
-void Macro_LblB(void)
-{
-}
-
-void Macro_LblC(void)
-{
-}
-
-void Macro_LblD(void)
-{
-}
-
-void Macro_LblE(void)
-{
-}
-
-void Macro_LblF(void)
-{
-}
-
-void Macro_LblG(void)
-{
-}
-
-
-void Macro_GotoA(void)
+void rpn_goto(uint16_t uniqueIdx)
 {
     int j;
 
@@ -279,7 +258,7 @@ void Macro_GotoA(void)
     {
         for (j = 0; j < playBackIdx; j++)
         {
-            if (playBackMap[playBack[j]].uniqueIndex == UNI_LBLA)       // Unique Index for label A
+            if (playBackMap[playBack[j]].uniqueIndex == uniqueIdx)
             {
                 currentMacroPlaybackIdx = j;
                 break;
@@ -288,109 +267,13 @@ void Macro_GotoA(void)
     }
 }
 
-void Macro_GotoB(void)
-{
-    int j;
-
-    if (macroPlayback == TRUE)
-    {
-        for (j = 0; j < playBackIdx; j++)
-        {
-            if (playBackMap[playBack[j]].uniqueIndex == UNI_LBLB)       // Unique Index for label B
-            {
-                currentMacroPlaybackIdx = j;
-                break;
-            }
-        }
-    }
-}
-
-
-void Macro_GotoC(void)
-{
-    int j;
-
-    if (macroPlayback == TRUE)
-    {
-        for (j = 0; j < playBackIdx; j++)
-        {
-            if (playBackMap[playBack[j]].uniqueIndex == UNI_LBLC)       // Unique Index for label C
-            {
-                currentMacroPlaybackIdx = j;
-                break;
-            }
-        }
-    }
-}
-
-void Macro_GotoD(void)
-{
-    int j;
-
-    if (macroPlayback == TRUE)
-    {
-        for (j = 0; j < playBackIdx; j++)
-        {
-            if (playBackMap[playBack[j]].uniqueIndex == UNI_LBLD)       // Unique Index for label D
-            {
-                currentMacroPlaybackIdx = j;
-                break;
-            }
-        }
-    }
-}
-
-void Macro_GotoE(void)
-{
-    int j;
-
-    if (macroPlayback == TRUE)
-    {
-        for (j = 0; j < playBackIdx; j++)
-        {
-            if (playBackMap[playBack[j]].uniqueIndex == UNI_LBLE)       // Unique Index for label E
-            {
-                currentMacroPlaybackIdx = j;
-                break;
-            }
-        }
-    }
-}
-
-void Macro_GotoF(void)
-{
-    int j;
-
-    if (macroPlayback == TRUE)
-    {
-        for (j = 0; j < playBackIdx; j++)
-        {
-            if (playBackMap[playBack[j]].uniqueIndex == UNI_LBLF)       // Unique Index for label F
-            {
-                currentMacroPlaybackIdx = j;
-                break;
-            }
-        }
-    }
-}
-
-void Macro_GotoG(void)
-{
-    int j;
-
-    if (macroPlayback == TRUE)
-    {
-        for (j = 0; j < playBackIdx; j++)
-        {
-            if (playBackMap[playBack[j]].uniqueIndex == UNI_LBLG)       // Unique Index for label G
-            {
-                currentMacroPlaybackIdx = j;
-                break;
-            }
-        }
-    }
-}
-
+void Macro_GotoA(void)  {rpn_goto(UNI_LBLA);}
+void Macro_GotoB(void)  {rpn_goto(UNI_LBLB);}
+void Macro_GotoC(void)  {rpn_goto(UNI_LBLC);}
+void Macro_GotoD(void)  {rpn_goto(UNI_LBLD);}
+void Macro_GotoE(void)  {rpn_goto(UNI_LBLE);}
+void Macro_GotoF(void)  {rpn_goto(UNI_LBLF);}
+void Macro_GotoG(void)  {rpn_goto(UNI_LBLG);}
 
 
 void Macro_XLessY(void)
@@ -1206,7 +1089,7 @@ void Macro_RclInd(void)
 
 void Macro_GotoInd(void)
 {
-    int uniqueLabel = 0;
+    uint16_t uniqueLabel = 0;
     int j;
 
     if (macroPlayback == TRUE)
@@ -1246,7 +1129,7 @@ void Macro_GotoInd(void)
 
 void Macro_GosubInd(void)
 {
-    int uniqueLabel = 0;
+    uint16_t uniqueLabel = 0;
     int j;
 
     if (macroPlayback == TRUE)

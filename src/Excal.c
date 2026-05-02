@@ -63,6 +63,8 @@ int16_t  playBackIdxSave[MAX_MACROS];
 uint8_t  recModeON = 0;
 uint8_t  macroPlayback = FALSE;      /* TRUE if macro playback in progress */
 
+uint8_t  modifiers = 0x00;
+
 int16_t  playBack[MAX_REC_PLAYBACK + 1];
 int16_t  playBackIdx = 0;
 int16_t  currentMacroPlaybackIdx = 0;
@@ -105,6 +107,7 @@ char     helpMsg[256];
 char     statusBar[32];
 char     tmpStr[256];
 BYTE     keyState[256];
+char     functionBar[64];
 
 // -------------------------------------
 // Buffers for editing the X register
@@ -178,7 +181,7 @@ extern void RPN_digit8(void);
 extern void RPN_digit9(void);
 
 extern void callButtonFunc(void(*routine) (void), char useFloatsLongs,
-                            char allowRecord, int uniqueIndex, char saveLastX, char newXedit, int updateSpareBar);
+                            char allowRecord, uint16_t uniqueIndex, char saveLastX, char newXedit, int updateSpareBar);
 extern void mapButtonFuncs(void);
 void DoMacroSaveRecall(void);
 
@@ -1323,10 +1326,8 @@ HFONT GetSystemFontFixed(void)
 
 void SetUpFonts(HWND hwnd)
 {
-    HDC hDC;
-
     // Get the display context.
-    hDC = GetDC(hwnd);
+    HDC hDC = GetDC(hwnd);
 
     hMainFont     = GetSystemFont();        // Get the font used for buttons and most UI elements (proportional font)
     hNumberFont   = GetMainNumberFont();    // Get the font used for the main stack display of numbers(slightly bigger/bolder)
@@ -1344,13 +1345,10 @@ void NotImp(void)
     MessageBox(calcMainWindow, "Function is not implemented yet...", "Excalibur", MB_OK | MB_ICONINFORMATION);
 }
 
-void RPN_ClearModifiers(int updateSpare)
+__inline void RPN_ClearModifiers(int updateSpare)
 {
-    hyperbolic = 0;
-    finStore = 0;
-    finRecall = 0;
+    modifiers = 0x00;
     rpnStoreRecall = 0x00;
-    convInverse = 0;
     if (updateSpare) UpdateSpareBar(" ");
 }
 
@@ -1651,8 +1649,6 @@ int ShowStatus(void)
 
     return(0);
 }
-
-char functionBar[60];
 
 void UpdateSpareBar(char *msg)
 {
@@ -4888,7 +4884,7 @@ void mapButtonFuncs(void)
     }
 }
 
-void SaveProgramStep(int uniqueIndex)
+void SaveProgramStep(uint16_t uniqueIndex)
 {
     int i, k;
 
@@ -4925,7 +4921,7 @@ void SaveProgramStep(int uniqueIndex)
 }
 
 void callButtonFunc(void(*routine) (void), char useFloatsLongs, char allowRecord,
-                    int uniqueIndex, char saveLastX, char newXedit, int updateSpareBar)
+                    uint16_t uniqueIndex, char saveLastX, char newXedit, int updateSpareBar)
 {
     if (IsWindowVisible(toolTipWnd))      // A button press reset's the window!
     {
@@ -4983,7 +4979,7 @@ void callButtonFunc(void(*routine) (void), char useFloatsLongs, char allowRecord
 // -------------------------------------------------------------------------------------------------
 // This version is streamlined for use when a macro is playing back for relatively blazing speed...
 // -------------------------------------------------------------------------------------------------
-void callButtonFunc_fast(void(*routine) (void), char useFloatsLongs, int uniqueIndex, char saveLastX, char newXedit)
+void callButtonFunc_fast(void(*routine) (void), char useFloatsLongs, uint16_t uniqueIndex, char saveLastX, char newXedit)
 {
     if (progMode != PROG_NORMAL)        // Always ensure floats are "in-sync" with longs before any press!
     {
@@ -5081,7 +5077,7 @@ void RPN_Playback(void)
         static int dampenSystemProcessing = 0;
 
         // Don't need to peek THAT often... allows macro to run faster
-        if (!(++dampenSystemProcessing & 0x3F))
+        if ((!(++dampenSystemProcessing & 0x3F)) || traceMacroPlayback)
         {
             while (PeekMessage(&msg, calcMainWindow, 0, 0, PM_REMOVE))
             {

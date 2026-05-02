@@ -56,8 +56,6 @@ double taxConstant = 1.05;
 uint8_t payMode = 0;                // Pay mode END
 uint8_t dateMode = 1;               // MM.DDYYYY
 uint8_t depreciationType = 0;       // Straight Line(1==SOYD, 2=DB)
-uint8_t finStore = 0;               // Financial Store flag
-uint8_t finRecall = 0;              // Financial Recall flag
 
 double fin_reg[FIN_REG_MAX];
 char finRegDesc[FIN_REG_MAX][18] = {
@@ -124,8 +122,8 @@ struct funcStruct Financial_funcs[MAX_FUNCS] = {
     {FN3,   UNI_PERCC,  USES_F,     ALLOWREC,   ' ',    "%CHG",     YES_L,  X_NEW,      FIN_percentChg,    T_PERCC,    H_PERCC},
     {FN4,   UNI_PERCT,  USES_F,     ALLOWREC,   ' ',    "%TOT",     YES_L,  X_NEW,      FIN_percentTot,    T_PERCT,    H_PERCT},
     {FN5,   UNI_CLRF,   USES_F,     ALLOWREC,   ' ',    "CLRF",     YES_L,  X_NEW,      FIN_clearReg,      T_CLRF,     H_CLRF},
-    {FN6,   UNI_STOFN,  USES_F,     ALLOWREC,   ' ',    "STOF",     NO_L,   X_NULL,     FIN_store,         T_STOFN,    H_STOFN},
-    {FN7,   UNI_RCLFN,  USES_F,     ALLOWREC,   ' ',    "RCLF",     NO_L,   X_NULL,     FIN_recall,        T_RCLFN,    H_RCLFN},
+    {FN6,   UNI_STO,   USES_FL,     ALLOWREC,   ' ',    "STO",      NO_L,   X_NULL,     RPN_store,         T_STOFN,    H_STOFN},
+    {FN7,   UNI_RCL,   USES_FL,     ALLOWREC,   ' ',    "RCL",      NO_L,   X_NULL,     RPN_recall,        T_RCLFN,    H_RCLFN},
     {FN8,   UNI_FINN,   USES_F,     ALLOWREC,   ' ',    "n",        YES_L,  X_NEW,      FIN_n,             T_FINN,     H_FINN},
     {FN9,   UNI_INTR,   USES_F,     ALLOWREC,   ' ',    "i%",       YES_L,  X_NEW,      FIN_i,             T_INTR,     H_INTR},
     {FN10,  UNI_FINPV,  USES_F,     ALLOWREC,   ' ',    "PV",       YES_L,  X_NEW,      FIN_pv,            T_FINPV,    H_FINPV},
@@ -160,6 +158,24 @@ struct funcStruct Financial_funcs[MAX_FUNCS] = {
     {FN39,  UNI_EFF,    USES_F,     ALLOWREC,   ' ',    "EFF%",     YES_L,  X_NEW,      FIN_EFF,           T_EFF,      H_EFF},
     {FN40,  UNI_INFL,   USES_F,     ALLOWREC,   ' ',    "INFL",     YES_L,  X_NEW,      FIN_INFL,          T_INFL,     H_INFL}
 };
+
+
+// ------------------------------------------------------------------------------------------
+// Check if the last keypress was one of the financial register inputs.
+// If so, this means we should actually be performing the appropriate financial calculation.
+// ------------------------------------------------------------------------------------------
+uint8_t wasLastKeyFinReg(void)
+{
+    if ((lastUniqueIndex == UNI_FINN)  || (lastUniqueIndex == UNI_INTR)   || 
+        (lastUniqueIndex == UNI_FINPV) || (lastUniqueIndex == UNI_FINPMT) || 
+        (lastUniqueIndex == UNI_FINFV) || (lastUniqueIndex == UNI_CF0)    ||
+        (lastUniqueIndex == UNI_CFJ)   || (lastUniqueIndex == UNI_CFNJ))
+    {
+        return 1;
+    }
+    return 0;
+}
+
 
 void FIN_tax(void)
 {
@@ -197,22 +213,10 @@ void FIN_clearReg(void)
 
 void FIN_store(void)
 {
-    finRecall = 0;
-    finStore ^= 1;
-    if (finStore == 0)
-        UpdateSpareBar(" ");
-    else
-        UpdateSpareBar("STOF");
 }
 
 void FIN_recall(void)
 {
-    finStore = 0;
-    finRecall ^= 1;
-    if (finRecall == 0)
-        UpdateSpareBar(" ");
-    else
-        UpdateSpareBar("RCLF");
 }
 
 void FIN_12div(void)
@@ -229,17 +233,17 @@ void FIN_fv(void)
 {
     double fintemp1, fintemp2;
 
-    if (finStore == 1)
+    if (rpnStoreRecall & REG_RECALL)
+    {
+        StackPush(fin_reg[FIN_REG_FV]);
+        Xedit = X_NEW;
+        return;
+    }
+    else if (!wasLastKeyFinReg())
     {
         fin_reg[FIN_REG_FV] = X;
         Xedit = X_NEW;
         blinkXDisplay();
-        return;
-    }
-    if (finRecall == 1)
-    {
-        StackPush(fin_reg[FIN_REG_FV]);
-        Xedit = X_NEW;
         return;
     }
 
@@ -268,17 +272,17 @@ void FIN_pv(void)
 {
     double fintemp1, fintemp2;
 
-    if (finStore == 1)
+    if (rpnStoreRecall & REG_RECALL)
+    {
+        StackPush(fin_reg[FIN_REG_PV]);
+        Xedit = X_NEW;
+        return;
+    }
+    else if (!wasLastKeyFinReg())
     {
         fin_reg[FIN_REG_PV] = X;
         Xedit = X_NEW;
         blinkXDisplay();
-        return;
-    }
-    if (finRecall == 1)
-    {
-        StackPush(fin_reg[FIN_REG_PV]);
-        Xedit = X_NEW;
         return;
     }
 
@@ -338,15 +342,13 @@ BOOL CALLBACK fnDIALOG_AmortProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
 
         if (fin_reg[FIN_REG_i] <= 0.0)
         {
-            RPN_error
-                ("AMORT:  Interest must be positive.\nUse the STOF key to store values into the financial registers.");
+            RPN_error("AMORT:  Interest must be positive.\nUse the STOF key to store values into the financial registers.");
             EndDialog(hDlg, FALSE);
             return TRUE;
         }
         else if (fin_reg[FIN_REG_n] <= 0.0)
         {
-            RPN_error
-                ("AMORT: Number of Periods(n) must be greater than 0.\nUse the STOF key to store values into the financial registers.");
+            RPN_error("AMORT: Number of Periods(n) must be greater than 0.\nUse the STOF key to store values into the financial registers.");
             EndDialog(hDlg, FALSE);
             return TRUE;
         }
@@ -362,7 +364,7 @@ BOOL CALLBACK fnDIALOG_AmortProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
         pmt = -1.0 * pmt;
 
         principal = fin_reg[FIN_REG_PV];
-        sprintf(finTmpStr, "%3d     %-9.2f %-9.2f  %-9.2f %-9.2f", 0, 0.0, 0.0, 0.0, principal);
+        sprintf(finTmpStr, "%3d  %13.2f  %13.2f  %13.2f  %13.2f", 0, 0.0, 0.0, 0.0, principal);
         makeInternational(finTmpStr);
         SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) finTmpStr));
         finTemp1 = 0.0;
@@ -387,14 +389,14 @@ BOOL CALLBACK fnDIALOG_AmortProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
             if (interest < 0.005)
                 interest = 0.0;
 
-            sprintf(finTmpStr, "%3d     %-9.2f %-9.2f  %-9.2f %-9.2f", i + 1, pmt, bulk, interest, principal);
+            sprintf(finTmpStr, "%3d  %13.2f  %13.2f  %13.2f  %13.2f", i + 1, pmt, bulk, interest, principal);
             makeInternational(finTmpStr);
             SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) finTmpStr));
             finTemp1 += pmt;
             finTemp2 += bulk;
             finTemp3 += interest;
         }
-        sprintf(finTmpStr, "Tot:    %-9.2f %-9.2f  %-9.2f", finTemp1, finTemp2, finTemp3);
+        sprintf(finTmpStr, "Tot: %13.2f  %13.2f  %13.2f", finTemp1, finTemp2, finTemp3);
         makeInternational(finTmpStr);
         SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) finTmpStr));
         return TRUE;
@@ -455,17 +457,17 @@ void FIN_pmt(void)
 {
     double fintemp1, fintemp2;
 
-    if (finStore == 1)
+    if (rpnStoreRecall & REG_RECALL)
+    {
+        StackPush(fin_reg[FIN_REG_PMT]);
+        Xedit = X_NEW;
+        return;
+    }
+    else if (!wasLastKeyFinReg())
     {
         fin_reg[FIN_REG_PMT] = X;
         Xedit = X_NEW;
         blinkXDisplay();
-        return;
-    }
-    if (finRecall == 1)
-    {
-        StackPush(fin_reg[FIN_REG_PMT]);
-        Xedit = X_NEW;
         return;
     }
 
@@ -498,18 +500,18 @@ void FIN_n(void)
     double n, fintemp1, fintemp2, fintemp3;
     int newSign, oldSign;
     int found;
-
-    if (finStore == 1)
+    
+    if (rpnStoreRecall & REG_RECALL)
+    {
+        StackPush(fin_reg[FIN_REG_n]);
+        Xedit = X_NEW;
+        return;
+    }
+    else if (!wasLastKeyFinReg())
     {
         fin_reg[FIN_REG_n] = X;
         Xedit = X_NEW;
         blinkXDisplay();
-        return;
-    }
-    if (finRecall == 1)
-    {
-        StackPush(fin_reg[FIN_REG_n]);
-        Xedit = X_NEW;
         return;
     }
 
@@ -564,17 +566,17 @@ void FIN_i(void)
     int found;
     char tmpBuff[16];
 
-    if (finStore == 1)
+    if (rpnStoreRecall & REG_RECALL)
+    {
+        StackPush(fin_reg[FIN_REG_i]);
+        Xedit = X_NEW;
+        return;
+    }
+    else if (!wasLastKeyFinReg())
     {
         fin_reg[FIN_REG_i] = X;
         Xedit = X_NEW;
         blinkXDisplay();
-        return;
-    }
-    if (finRecall == 1)
-    {
-        StackPush(fin_reg[FIN_REG_i]);
-        Xedit = X_NEW;
         return;
     }
 
@@ -936,17 +938,17 @@ void FIN_muc(void)
 {
     double muc;
 
-    if (finStore == 1)
+    if (rpnStoreRecall & REG_RECALL)
+    {
+        StackPush(fin_reg[FIN_REG_MUC]);
+        Xedit = X_NEW;
+        return;
+    }
+    else if (!wasLastKeyFinReg())
     {
         fin_reg[FIN_REG_MUC] = X;
         Xedit = X_NEW;
         blinkXDisplay();
-        return;
-    }
-    if (finRecall == 1)
-    {
-        StackPush(fin_reg[FIN_REG_MUC]);
-        Xedit = X_NEW;
         return;
     }
 
@@ -966,17 +968,17 @@ void FIN_mup(void)
 {
     double muc;
 
-    if (finStore == 1)
+    if (rpnStoreRecall & REG_RECALL)
+    {
+        StackPush(fin_reg[FIN_REG_MUP]);
+        Xedit = X_NEW;
+        return;
+    }
+    else if (!wasLastKeyFinReg())
     {
         fin_reg[FIN_REG_MUP] = X;
         Xedit = X_NEW;
         blinkXDisplay();
-        return;
-    }
-    if (finRecall == 1)
-    {
-        StackPush(fin_reg[FIN_REG_MUP]);
-        Xedit = X_NEW;
         return;
     }
 
@@ -996,17 +998,17 @@ void FIN_cost(void)
 {
     double cost;
 
-    if (finStore == 1)
+    if (rpnStoreRecall & REG_RECALL)
+    {
+        StackPush(fin_reg[FIN_REG_COST]);
+        Xedit = X_NEW;
+        return;
+    }
+    else if (!wasLastKeyFinReg())
     {
         fin_reg[FIN_REG_COST] = X;
         Xedit = X_NEW;
         blinkXDisplay();
-        return;
-    }
-    if (finRecall == 1)
-    {
-        StackPush(fin_reg[FIN_REG_COST]);
-        Xedit = X_NEW;
         return;
     }
 
@@ -1022,17 +1024,17 @@ void FIN_price(void)
 {
     double price;
 
-    if (finStore == 1)
+    if (rpnStoreRecall & REG_RECALL)
+    {
+        StackPush(fin_reg[FIN_REG_PRICE]);
+        Xedit = X_NEW;
+        return;
+    }
+    else if (!wasLastKeyFinReg())
     {
         fin_reg[FIN_REG_PRICE] = X;
         Xedit = X_NEW;
         blinkXDisplay();
-        return;
-    }
-    if (finRecall == 1)
-    {
-        StackPush(fin_reg[FIN_REG_PRICE]);
-        Xedit = X_NEW;
         return;
     }
 

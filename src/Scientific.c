@@ -145,23 +145,19 @@ struct funcStruct Scientific_funcs[MAX_FUNCS] = {
     {FN40,  UNI_TPUSH,  USES_F,     ALLOWREC,   ' ',    "T Push",   YES_L,  X_NEW,  SCI_TimerPush,  T_TIMERPUSH,  H_TIMERPUSH}
 };
 
-/* ------------- */
-/* SCI functions */
-/* ------------- */
-uint8_t hyperbolic = 0;
 
 void SCI_hyp(void)
 {
-    hyperbolic ^= 1;
-    if (hyperbolic == 0)
-        UpdateSpareBar(" ");
-    else
+    modifiers ^= MOD_HYPERBOLIC;
+    if (modifiers & MOD_HYPERBOLIC)
         UpdateSpareBar("HYP");
+    else
+        UpdateSpareBar(" ");
 }
 
 void SCI_sin(void)
 {
-    if (hyperbolic)
+    if (modifiers & MOD_HYPERBOLIC)
         SCI_sinh();
     else
         StackPush(sin(ToRadians(StackPop())));
@@ -169,7 +165,7 @@ void SCI_sin(void)
 
 void SCI_cos(void)
 {
-    if (hyperbolic)
+    if (modifiers & MOD_HYPERBOLIC)
         SCI_cosh();
     else
         StackPush(cos(ToRadians(StackPop())));
@@ -177,7 +173,7 @@ void SCI_cos(void)
 
 void SCI_tan(void)
 {
-    if (hyperbolic)
+    if (modifiers & MOD_HYPERBOLIC)
         SCI_tanh();
     else
         StackPush(tan(ToRadians(StackPop())));
@@ -193,7 +189,7 @@ void SCI_square(void)
 
 void SCI_asin(void)
 {
-    if (hyperbolic)
+    if (modifiers & MOD_HYPERBOLIC)
         SCI_asinh();
     else
     {
@@ -205,7 +201,7 @@ void SCI_asin(void)
 }
 void SCI_acos(void)
 {
-    if (hyperbolic)
+    if (modifiers & MOD_HYPERBOLIC)
         SCI_acosh();
     else
     {
@@ -217,7 +213,7 @@ void SCI_acos(void)
 }
 void SCI_atan(void)
 {
-    if (hyperbolic)
+    if (modifiers & MOD_HYPERBOLIC)
         SCI_atanh();
     else
         StackPush(FromRadians(atan(StackPop())));
