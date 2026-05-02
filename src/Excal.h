@@ -260,7 +260,7 @@ extern uint8_t numberDisplayMode;
 extern int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCmdShow);
 extern void SelectNewFunc(struct funcStruct *funcs);
 extern BOOL FAR PASCAL MainWndProcSuper(HWND hWnd, WORD wMessage, WORD wParam, LONG lParam);
-extern int ClipboardCopySelection(HWND hWnd, int copytype);
+extern int ClipboardCopySelection(HWND hWnd, uint8_t copytype);
 extern void SetUpFonts(HWND hWnd);
 extern BOOL CALLBACK MainWndProc(HWND hWnd, UINT wMessage, WPARAM wParam, LPARAM lParam);
 extern void NotImp(void);
@@ -428,6 +428,12 @@ extern struct playbackStruct playBackMap[MAX_FUNCTIONS + 1];
 
 extern char macroName[MAX_MACROS][51];
 extern char macro_short_names[MAX_MACROS][7];
+
+#define COPY_X_TO_CLIPBOARD         0
+#define COPY_ALL_TO_CLIPBOARD       1
+#define COPY_X_FROM_CLIPBOARD       2
+#define COPY_MACRO_TO_CLIPBOARD     3
+
 
 extern int16_t playBackSave[MAX_MACROS][MAX_REC_PLAYBACK + 1];
 extern int16_t playBackIdxSave[MAX_MACROS];

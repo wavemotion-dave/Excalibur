@@ -450,22 +450,22 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
                 break;
             case IDM_COPYXTOCLIPBOARD:
                 {
-                    ClipboardCopySelection(hwnd, 0);
+                    ClipboardCopySelection(hwnd, COPY_X_TO_CLIPBOARD);
                 }
                 break;
             case IDM_COPYALLTOCLIPBOARD:
                 {
-                    ClipboardCopySelection(hwnd, 1);
+                    ClipboardCopySelection(hwnd, COPY_ALL_TO_CLIPBOARD);
                 }
                 break;
             case IDM_COPYCLIPBOARDTOX:
                 {
-                    ClipboardCopySelection(hwnd, 2);
+                    ClipboardCopySelection(hwnd, COPY_X_FROM_CLIPBOARD);
                 }
                 break;
             case IDM_COPYMACROTOCLIPBOARD:
                 {
-                    ClipboardCopySelection(hwnd, 3);
+                    ClipboardCopySelection(hwnd, COPY_MACRO_TO_CLIPBOARD);
                 }
                 break;
             case IDM_SCIENTIFIC:
@@ -708,17 +708,24 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 
         case('V'):            // Paste
             if (GetKeyState(VK_CONTROL) < 0)
-                ClipboardCopySelection(hwnd, 2);
+            {
+                ClipboardCopySelection(hwnd, COPY_X_FROM_CLIPBOARD);
+            }
             break;
 
         case('C'):            // Copy
             if (GetKeyState(VK_CONTROL) < 0)
-                ClipboardCopySelection(hwnd, 0);
+            {
+                ClipboardCopySelection(hwnd, COPY_X_TO_CLIPBOARD);
+                blinkXDisplay();
+            }
             break;
 
         case('A'):            // Copy All
             if (GetKeyState(VK_CONTROL) < 0)
-                ClipboardCopySelection(hwnd, 1);
+            {
+                ClipboardCopySelection(hwnd, COPY_ALL_TO_CLIPBOARD);
+            }
             break;
 
         case('S'):            // Settings
@@ -1080,7 +1087,7 @@ LRESULT CALLBACK helpWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 }
 
 
-int ClipboardCopySelection(HWND hwnd, int copytype)
+int ClipboardCopySelection(HWND hwnd, uint8_t copytype)
 {
     HGLOBAL tptr;
     HANDLE hMem;
@@ -1091,14 +1098,19 @@ int ClipboardCopySelection(HWND hwnd, int copytype)
     int i, j, k;
     unsigned short chksum = 0x0000;
 
-    if (copytype == 0)          // Copy X to clipboard
+    if (copytype == COPY_X_TO_CLIPBOARD)          // Copy X to clipboard
     {
         tptr = GlobalAlloc(GHND, (DWORD) 64L);
         cptr = GlobalLock(tptr);
         GetDlgItemText(calcMainWindow, RPN_STACK_X, tmpStr, MAX_STACK_STRLEN);  // X register
         k = 0;                  // Strip leading spaces!
-        while ((tmpStr[k] == ' ') && k < 20)
-            k++;
+        while ((tmpStr[k] == ' ') && k < 20) k++;
+        j = strlen(tmpStr)-1;   // Strip trailing spaces!
+        while ((tmpStr[j] == ' ') && j > 1) {tmpStr[j] = 0; j--;}
+        if (progMode != PROG_NORMAL)
+        {
+            if (tmpStr[strlen(tmpStr)-1] == 'd') tmpStr[strlen(tmpStr)-1] = ' ';
+        }
         lstrcpy(cptr, (LPSTR) & tmpStr[k]);
         OpenClipboard(hwnd);
         EmptyClipboard();
@@ -1109,7 +1121,7 @@ int ClipboardCopySelection(HWND hwnd, int copytype)
         ShowStack();
         return(0);
     }
-    if (copytype == 2)          //  Copy to X register!!!
+    if (copytype == COPY_X_FROM_CLIPBOARD)          //  Copy to X register!!!
     {
         OpenClipboard(hwnd);
         hMem = GetClipboardData(CF_TEXT);
@@ -1166,7 +1178,7 @@ int ClipboardCopySelection(HWND hwnd, int copytype)
         ShowStack();
         return(0);
     }
-    if (copytype == 1)          // Copy All to clipboard
+    if (copytype == COPY_ALL_TO_CLIPBOARD)          // Copy All to clipboard
     {
         tptr = GlobalAlloc(GHND, (DWORD) 128L);
         cptr = GlobalLock(tptr);
@@ -1204,7 +1216,7 @@ int ClipboardCopySelection(HWND hwnd, int copytype)
         ShowStack();
         return(0);
     }
-    if (copytype == 3)          // Copy current macro to clipboard
+    if (copytype == COPY_MACRO_TO_CLIPBOARD)          // Copy current macro to clipboard
     {
         tptr = GlobalAlloc(GHND, (DWORD) MAX_IMPORT_CLIPBOARD_SIZE);
         cptr = GlobalLock(tptr);
@@ -4245,7 +4257,7 @@ BOOL CALLBACK fnDIALOG_MACRO(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
             return TRUE;
 
         case(109):            // Copy Loaded to Clipboard
-            ClipboardCopySelection(calcMainWindow, 3);
+            ClipboardCopySelection(calcMainWindow, COPY_MACRO_TO_CLIPBOARD);
             MessageBox(hDlg, "The currently loaded program has been saved to the clipboard.", "Excalibur For Windows", MB_ICONINFORMATION | MB_OK);
             return TRUE;
 
@@ -5251,13 +5263,13 @@ void RPN_Notes(void)
 
 void RPN_Copy(void)
 {
-    ClipboardCopySelection(calcMainWindow, 0);
+    ClipboardCopySelection(calcMainWindow, COPY_X_TO_CLIPBOARD);
     blinkXDisplay();
 }
 
 void RPN_Paste(void)
 {
-    ClipboardCopySelection(calcMainWindow, 2);
+    ClipboardCopySelection(calcMainWindow, COPY_X_FROM_CLIPBOARD);
     blinkXDisplay();
 }
 
