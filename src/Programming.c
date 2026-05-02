@@ -37,7 +37,6 @@
 #include <ctype.h>
 #include "EXCAL.h"
 
-unsigned long loop = 0;
 HWND debugTraceWindow = NULL;
 
 double debugValue = 0.0;
@@ -1233,6 +1232,27 @@ BOOL CALLBACK debugWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam
      {
      case WM_INITDIALOG:
           return TRUE;
+          
+     case WM_SIZE: 
+     {
+        RECT rect1, rect2, rect3;
+        int newHeight = HIWORD(lParam);
+
+        GetWindowRect(GetDlgItem(hwnd, TRACE_PROGRAM), &rect1);
+        GetWindowRect(GetDlgItem(hwnd, TRACE_REGS1),   &rect2);
+        GetWindowRect(GetDlgItem(hwnd, TRACE_REGS2),   &rect3);
+        
+        MapWindowPoints(HWND_DESKTOP, hwnd, (LPPOINT)&rect1, 2);
+        MapWindowPoints(HWND_DESKTOP, hwnd, (LPPOINT)&rect2, 2);
+        MapWindowPoints(HWND_DESKTOP, hwnd, (LPPOINT)&rect3, 2);
+
+        // Resize the listbox to fill the entire window
+        MoveWindow(GetDlgItem(hwnd, TRACE_PROGRAM), rect1.left, rect1.top, (rect1.right - rect1.left), newHeight - 40, TRUE);
+        MoveWindow(GetDlgItem(hwnd, TRACE_REGS1),   rect2.left, rect2.top, (rect2.right - rect2.left), newHeight - 40, TRUE);
+        MoveWindow(GetDlgItem(hwnd, TRACE_REGS2),   rect3.left, rect3.top, (rect3.right - rect3.left), newHeight - 40, TRUE);
+        
+        return 0;
+     }
 
      case WM_COMMAND:
             switch(LOWORD(wParam))
