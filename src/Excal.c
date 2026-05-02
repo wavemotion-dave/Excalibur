@@ -2222,7 +2222,9 @@ void ShowStack(void)
             PutCommas(tmpStr);
         }
         else
+        {
             MakeSciFormat(X, tmpStr);
+        }
 
         if (rightAlignStack == 1)
         {
@@ -2230,8 +2232,9 @@ void ShowStack(void)
             SetDlgItemText(calcMainWindow, RPN_STACK_X, stackStr);
         }
         else
+        {
             SetDlgItemText(calcMainWindow, RPN_STACK_X, tmpStr);
-
+        }
 
         MakeSciFormat(Y, tmpStr);
         if (rightAlignStack == 1)
@@ -2240,7 +2243,9 @@ void ShowStack(void)
             SetDlgItemText(calcMainWindow, RPN_STACK_Y, stackStr);
         }
         else
+        {
             SetDlgItemText(calcMainWindow, RPN_STACK_Y, tmpStr);
+        }
 
         if (recModeON == 0 && showTrace == FALSE)
         {
@@ -2266,7 +2271,9 @@ void ShowStack(void)
     else
     {
         if (Xedit == X_EDIT)
+        {
             XL = MakeProgStr(Xstr);
+        }
 
         MakeRadixStr(XL, stackStr);
         sprintf(tmpStr, (bExactFont ? "%23s%c%c":"%20s%c%c"), stackStr, Radix(progMode), RadixBIN(progMode));
@@ -2306,7 +2313,7 @@ void StackPush(double temp)
     // This checks the number for NAN and INF, etc...
     if (_finite(temp) == 0)
     {
-        MessageBox(calcMainWindow, "Overflow:  Result is too large or too small to be represented.", "Excalibur Floating Point", MB_OK);
+        MessageBox(calcMainWindow, "Overflow:  Result is too large to be represented.", "Excalibur Floating Point", MB_OK);
         temp = 0.0;
         endRunningMacro();
     }

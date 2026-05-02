@@ -696,6 +696,11 @@
 #define H_CNORM                         689
 #define T_CARG                          690
 #define H_CARG                          691
+#define T_N_LBF                         692
+#define H_N_LBF                         693
+#define T_HZ_AF                         694
+#define H_HZ_AF                         695
+
 #define IDC_FORMAT                      998
 #define IDC_EDIT1                       1002
 #define IDC_EDIT2                       1003

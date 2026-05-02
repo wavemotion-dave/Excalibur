@@ -209,8 +209,8 @@ extern uint8_t eexMode;
 extern uint8_t numLockMode;
 
 extern HINSTANCE hExcaliburInstance;
-extern HWND hWndSuperMain;
 extern HWND calcMainWindow;
+extern HWND debugTraceWindow;
 
 extern HFONT holdsfont;
 extern HFONT hMainFont;
@@ -257,12 +257,9 @@ extern uint32_t wordSizeMask;
 
 extern uint8_t numberDisplayMode;
 
-extern int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCmdShow);
 extern void SelectNewFunc(struct funcStruct *funcs);
-extern BOOL FAR PASCAL MainWndProcSuper(HWND hWnd, WORD wMessage, WORD wParam, LONG lParam);
 extern int ClipboardCopySelection(HWND hWnd, uint8_t copytype);
 extern void SetUpFonts(HWND hWnd);
-extern BOOL CALLBACK MainWndProc(HWND hWnd, UINT wMessage, WPARAM wParam, LPARAM lParam);
 extern void NotImp(void);
 extern void FloatsToLongs(void);
 extern void LongsToFloats(void);
@@ -333,7 +330,6 @@ extern void RPN_SelectProgI(void);
 extern void RPN_Playback(void);
 extern void RPN_Record(void);
 extern void RPN_dp(void);
-extern void RPN_clear(void);
 extern void RPN_divide(void);
 extern void RPN_multiply(void);
 extern void RPN_minus(void);
@@ -500,12 +496,12 @@ extern LRESULT CALLBACK helpWndProc(HWND hwnd, UINT message, WPARAM wParam, LPAR
 extern int CreateToolTipWindow(HWND hwnd, HINSTANCE hInstance);
 extern int CreateDebugWindow(HWND hwnd, HINSTANCE hInstance);
 extern void RPN_SingleStep(void);
-extern HWND debugTraceWindow;
-int PreInit(void);
+extern int PreInit(void);
 
 // Add to the end of this list but *NEVER* remove entries or else you will need to update excalibur config file...
 enum UniqueButtonIndexTag
 {
+    UNI_UNUSED = 99,
     UNI_DIG0 = 100,
     UNI_DIG1,
     UNI_DIG2,
@@ -554,7 +550,6 @@ enum UniqueButtonIndexTag
     UNI_PROG1,
     UNI_PROG2,
     UNI_CUST,
-    UNI_UNUSED,
     UNI_SIN,
     UNI_COS,
     UNI_TAN,
@@ -844,8 +839,6 @@ enum UniqueButtonIndexTag
     UNI_GOTOIND,
     UNI_GOSUBIND,
     UNI_RCLIND,
-    UNI_SLOOP,
-    UNI_LOOP,
     UNI_DEBUG,
     UNI_TRACE,
     UNI_STEP,
@@ -875,10 +868,12 @@ enum UniqueButtonIndexTag
     UNI_COPY,
     UNI_PASTE,
     UNI_EXREG,
-    UNI_METRIC,
+    UNI_NEWLBF,
+    UNI_HZTOAF,
+    UNI_MPAPSI,
 
     UNI_ADD_NEW_HERE,
-    
+
     UNI_CONSTANTS_START = 1000,
     UNI_CONSTANTS_END   = 1099,
 };

@@ -249,10 +249,12 @@ BOOL CALLBACK constBankNamesProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
             constantBankNames[4][14] = CNULL;
             EndDialog(hDlg, FALSE);
             return TRUE;
+        
         case(IDCANCEL):       /* Cancel */
             EndDialog(hDlg, FALSE);
             return TRUE;
-        default:
+        
+            default:
             return FALSE;
         }
 

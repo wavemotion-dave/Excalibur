@@ -1888,6 +1888,10 @@ BEGIN
     H_CNORM                 "Complex Norm"
     T_CARG                  "Complex Arg"
     H_CARG                  "Complex Arg"
+    T_N_LBF                 "Newtons to Pounds Force"
+    H_N_LBF                 "Convert from Newtons to Pounds Force"
+    T_HZ_AF                 "Hertz to Angual Frequency"
+    H_HZ_AF                 "Convert from Hertz to Angual Frequency (rad/sec)"
 END
 
 #endif    // English (U.S.) resources

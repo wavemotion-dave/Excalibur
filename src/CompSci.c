@@ -125,7 +125,6 @@ struct funcStruct CompSci_funcs[MAX_FUNCS] = {
 };
 
 
-
 void MakeRadixStr(PROG_LONG val, char *tmpL)
 {
     char temp[60];

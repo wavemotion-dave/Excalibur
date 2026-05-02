@@ -37,42 +37,46 @@
 #include <ctype.h>
 #include "Excal.h"
 
-extern void CONV_inverse (void);
-extern void CONV_lb_kg (void);
-extern void CONV_Oz_g (void);
-extern void CONV_flOz_ml (void);
-extern void CONV_gal_l (void);
-extern void CONV_gal_cm3 (void);
-extern void CONV_pin_l (void);
-extern void CONV_Igal_l (void);
-extern void CONV_F_C (void);
-extern void CONV_F_K (void);
-extern void CONV_In_Cm (void);
-extern void CONV_In_mm (void);
-extern void CONV_Ft_Mi (void);
-extern void CONV_Ft_Km (void);
-extern void CONV_Ft_Fa (void);
-extern void CONV_Mi_Km (void);
-extern void CONV_J_Cal (void);
-extern void CONV_H_Ms (void);
-extern void CONV_Deg_Rad (void);
-extern void CONV_R_P (void);
-extern void CONV_Ft_m (void);
-extern void CONV_in2_cm2 (void);
-extern void CONV_ft2_m2 (void);
-extern void CONV_in3_cm3 (void);
-extern void CONV_ft3_m3 (void);
-extern void CONV_at_psi (void);
-extern void CONV_acre_ft2 (void);
-extern void CONV_ah_col (void);
-extern void CONV_ah_far (void);
-extern void CONV_kmh_mps (void);
-extern void CONV_knot_mph (void);
-extern void CONV_hp_kw (void);
-extern void CONV_Mil_mm (void);
-extern void CONV_ShortTons_lbs (void);
-extern void CONV_LongTons_lbs (void);
-extern void CONV_MetricTons_lbs (void);
+extern void CONV_inverse(void);
+extern void CONV_lb_kg(void);
+extern void CONV_Oz_g(void);
+extern void CONV_flOz_ml(void);
+extern void CONV_gal_l(void);
+extern void CONV_gal_cm3(void);
+extern void CONV_pin_l(void);
+extern void CONV_Igal_l(void);
+extern void CONV_F_C(void);
+extern void CONV_F_K(void);
+extern void CONV_In_Cm(void);
+extern void CONV_In_mm(void);
+extern void CONV_Ft_Mi(void);
+extern void CONV_Ft_Km(void);
+extern void CONV_Ft_Fa(void);
+extern void CONV_Mi_Km(void);
+extern void CONV_J_Cal(void);
+extern void CONV_H_Ms(void);
+extern void CONV_Deg_Rad(void);
+extern void CONV_R_P(void);
+extern void CONV_Ft_m(void);
+extern void CONV_in2_cm2(void);
+extern void CONV_ft2_m2(void);
+extern void CONV_in3_cm3(void);
+extern void CONV_ft3_m3(void);
+extern void CONV_at_psi(void);
+extern void CONV_acre_ft2(void);
+extern void CONV_ah_col(void);
+extern void CONV_ah_far(void);
+extern void CONV_kmh_mps(void);
+extern void CONV_knot_mph(void);
+extern void CONV_hp_kw(void);
+extern void CONV_Mil_mm(void);
+extern void CONV_ShortTons_lbs(void);
+extern void CONV_LongTons_lbs(void);
+extern void CONV_MetricTons_lbs(void);
+extern void CONV_N_lbf(void);
+extern void CONV_Hz_AF(void);
+extern void CONV_MPa_PSI(void);
+extern void SCI_metricPre(void); // Borrowed from the Scientific II bank
 
 struct funcStruct Conversion_funcs[MAX_FUNCS] = {
     {FN1,   UNI_CINV,    USES_F,    ALLOWREC,   ' ',    "INV",      NO_L,   X_NULL,     CONV_inverse,       T_CONV_INV,     H_CONV_INV},
@@ -103,6 +107,7 @@ struct funcStruct Conversion_funcs[MAX_FUNCS] = {
     {FN21,  UNI_FT3M3,   USES_F,    ALLOWREC,   ' ',    "Ft³»m³",   YES_L,  X_NEW,      CONV_ft3_m3,        T_CF_CM,        H_CF_CM},
     {FN22,  UNI_ACRFT2,  USES_F,    ALLOWREC,   ' ',    "Acr»ft²",  YES_L,  X_NEW,      CONV_acre_ft2,      T_ACR_FT2,      H_ACR_FT2},
     {FN23,  UNI_ATPSI,   USES_F,    ALLOWREC,   ' ',    "At»PSI",   YES_L,  X_NEW,      CONV_at_psi,        T_AT_PSI,       H_AT_PSI},
+
     {FN24,  UNI_HHMS,    USES_F,    ALLOWREC,   ' ',    "h»h.ms",   YES_L,  X_NEW,      CONV_H_Ms,          T_HMS,          H_HMS},
                                                                                             
     {FN25,  UNI_DRAD,    USES_F,    ALLOWREC,   ' ',    "D»Rad",    YES_L,  X_NEW,      CONV_Deg_Rad,       T_DE_RA,        H_DE_RA},
@@ -120,12 +125,11 @@ struct funcStruct Conversion_funcs[MAX_FUNCS] = {
     {FN35,  UNI_LTONLB,  USES_F,    ALLOWREC,   ' ',    "lTon»lb",  YES_L,  X_NEW,      CONV_LongTons_lbs,  T_LTON_LB,      H_LTON_LB},
     {FN36,  UNI_MTONLB,  USES_F,    ALLOWREC,   ' ',    "mTon»lb",  YES_L,  X_NEW,      CONV_MetricTons_lbs,T_MTON_LB,      H_MTON_LB},
                                     
-    {FN37,  UNI_UNUSED,  USES_F,    ALLOWREC,   ' ',    "    ",     YES_L,  X_NEW,      NULL,               T_NULL,         H_NULL},
-    {FN38,  UNI_UNUSED,  USES_F,    ALLOWREC,   ' ',    "    ",     YES_L,  X_NEW,      NULL,               T_NULL,         H_NULL},
-    {FN39,  UNI_UNUSED,  USES_F,    ALLOWREC,   ' ',    "    ",     YES_L,  X_NEW,      NULL,               T_NULL,         H_NULL},
-    {FN40,  UNI_UNUSED,  USES_F,    ALLOWREC,   ' ',    "    ",     YES_L,  X_NEW,      NULL,               T_NULL,         H_NULL}
+    {FN37,  UNI_NEWLBF,  USES_F,    ALLOWREC,   ' ',    "N»lbf",    YES_L,  X_NEW,      CONV_N_lbf,         T_N_LBF,        H_N_LBF}, 
+    {FN38,  UNI_HZTOAF,  USES_F,    ALLOWREC,   ' ',    "Hz»AF",    YES_L,  X_NEW,      CONV_Hz_AF,         T_HZ_AF,        H_HZ_AF},
+    {FN39,  UNI_MPAPSI,  USES_F,    ALLOWREC,   ' ',    "MPa»PSI",  YES_L,  X_NEW,      CONV_MPa_PSI,       T_NULL,         H_NULL}, // TODO: help
+    {FN40,  UNI_METRIC,  USES_F,    ALLOWREC,   ' ',    "Metric",   YES_L,  X_NEW,      SCI_metricPre,      T_NULL,         H_NULL} // TODO: help
 };
-
 
 static double inverse(double x)
 {
@@ -507,4 +511,26 @@ void CONV_MetricTons_lbs(void)
         StackPush (StackPop () / 2205.0);
 }
 
+void CONV_N_lbf(void)
+{
+    if (!(modifiers & MOD_INVERSE))
+        StackPush (StackPop () * 0.224809);
+    else
+        StackPush (StackPop () / 0.224809);
+}
 
+void CONV_Hz_AF(void)
+{
+    if (!(modifiers & MOD_INVERSE))
+        StackPush (StackPop () * (2.0 * M_PI));
+    else
+        StackPush (StackPop () / (2.0 * M_PI));
+}
+
+void CONV_MPa_PSI(void)
+{
+    if (!(modifiers & MOD_INVERSE))
+        StackPush (StackPop () * 145.038);
+    else
+        StackPush (StackPop () / 145.038);
+}

@@ -183,7 +183,7 @@ struct funcStruct Scientific2_funcs[MAX_FUNCS] = {
     {FN11,  UNI_ACELDIST,   USES_F,     ALLOWREC,   ' ',    "Acc D",    YES_L,      X_NEW,      SCI_AccelerationDist,   T_ACCELDIST,    H_ACCELDIST},
     {FN12,  UNI_PROJRANGE,  USES_F,     ALLOWREC,   ' ',    "Proj R",   YES_L,      X_NEW,      SCI_ProjectileRange,    T_PROJRANGE,    H_PROJRANGE},
     {FN13,  UNI_PROJHEIGHT, USES_F,     ALLOWREC,   ' ',    "Proj H",   YES_L,      X_NEW,      SCI_ProjectileHeight,   T_PROJHEIGHT,   H_PROJHEIGHT},
-    {FN14,  UNI_METRIC,     USES_F,     ALLOWREC,   ' ',    "Metric"    YES_L,      X_NEW,      SCI_metricPre,          T_NULL,         H_NULL}, //TODO: help
+    {FN14,  UNI_METRIC,     USES_F,     ALLOWREC,   ' ',    "Metric",   YES_L,      X_NEW,      SCI_metricPre,          T_NULL,         H_NULL}, //TODO: help
     {FN15,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_ATLAS}, // hidden
     {FN16,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_NULL},
     {FN17,  UNI_CPLUS,      USES_F,     ALLOWREC,   ' ',    "Cpx +",    YES_L,      X_NEW,      COMP_plus,              T_CPLXADD,      H_CPLXADD},
