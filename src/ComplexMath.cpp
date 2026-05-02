@@ -44,334 +44,333 @@ extern "C" struct funcStruct Scientific2_funcs[MAX_FUNCS];
 
 extern "C" void COMP_plus(void)
 {
-  double a, b, c, d;
+    double a, b, c, d;
 
-  a = StackPop();
-  b = StackPop();
-  c = StackPop();
-  d = StackPop();
+    a = StackPop();
+    b = StackPop();
+    c = StackPop();
+    d = StackPop();
 
-  std::complex<double> c1(a,b);
-  std::complex<double> c2(c,d);
-  std::complex<double> c3;
-  c3 = c1+c2;
-  StackPush(c3.imag());
-  StackPush(c3.real());
+    std::complex<double> c1(a, b);
+    std::complex<double> c2(c, d);
+    std::complex<double> c3;
+    c3 = c1 + c2;
+    StackPush(c3.imag());
+    StackPush(c3.real());
 }
 
 extern "C" void COMP_minus(void)
 {
-  double a, b, c, d;
+    double a, b, c, d;
 
-  a = StackPop();
-  b = StackPop();
-  c = StackPop();
-  d = StackPop();
+    a = StackPop();
+    b = StackPop();
+    c = StackPop();
+    d = StackPop();
 
-  std::complex<double> c1(a,b);
-  std::complex<double> c2(c,d);
-  std::complex<double> c3;
-  c3 = c2-c1;
-  StackPush(c3.imag());
-  StackPush(c3.real());
+    std::complex<double> c1(a, b);
+    std::complex<double> c2(c, d);
+    std::complex<double> c3;
+    c3 = c2 - c1;
+    StackPush(c3.imag());
+    StackPush(c3.real());
 }
 
 extern "C" void COMP_div(void)
 {
-  double a, b, c, d;
+    double a, b, c, d;
 
-  a = StackPop();
-  b = StackPop();
-  c = StackPop();
-  d = StackPop();
+    a = StackPop();
+    b = StackPop();
+    c = StackPop();
+    d = StackPop();
 
-  std::complex<double> c1(a,b);
-  std::complex<double> c2(c,d);
-  std::complex<double> c3;
-  c3 = c2/c1;
-  StackPush(c3.imag());
-  StackPush(c3.real());
+    std::complex<double> c1(a, b);
+    std::complex<double> c2(c, d);
+    std::complex<double> c3;
+    c3 = c2 / c1;
+    StackPush(c3.imag());
+    StackPush(c3.real());
 }
 
 extern "C" void COMP_mult(void)
 {
-  double a, b, c, d;
+    double a, b, c, d;
 
-  a = StackPop();
-  b = StackPop();
-  c = StackPop();
-  d = StackPop();
+    a = StackPop();
+    b = StackPop();
+    c = StackPop();
+    d = StackPop();
 
-  std::complex<double> c1(a,b);
-  std::complex<double> c2(c,d);
-  std::complex<double> c3;
-  c3 = c1*c2;
-  StackPush(c3.imag());
-  StackPush(c3.real());
+    std::complex<double> c1(a, b);
+    std::complex<double> c2(c, d);
+    std::complex<double> c3;
+    c3 = c1 * c2;
+    StackPush(c3.imag());
+    StackPush(c3.real());
 }
 
 extern "C" void COMP_sin(void)
 {
-  double a, b;
+    double a, b;
 
-  a = StackPop();
-  b = StackPop();
+    a = StackPop();
+    b = StackPop();
 
-  std::complex<double> c1(a,b);
-  std::complex<double> c3;
-  c3 = std::sin(c1);
-  StackPush(c3.imag());
-  StackPush(c3.real());
+    std::complex<double> c1(a, b);
+    std::complex<double> c3;
+    c3 = std::sin(c1);
+    StackPush(c3.imag());
+    StackPush(c3.real());
 }
 
 extern "C" void COMP_cos(void)
 {
-  double a, b;
+    double a, b;
 
-  a = StackPop();
-  b = StackPop();
+    a = StackPop();
+    b = StackPop();
 
-  std::complex<double> c1(a,b);
-  std::complex<double> c3;
-  c3 = std::cos(c1);
-  StackPush(c3.imag());
-  StackPush(c3.real());
+    std::complex<double> c1(a, b);
+    std::complex<double> c3;
+    c3 = std::cos(c1);
+    StackPush(c3.imag());
+    StackPush(c3.real());
 }
 
 extern "C" void COMP_tan(void)
 {
-  double a, b;
+    double a, b;
 
-  a = StackPop();
-  b = StackPop();
+    a = StackPop();
+    b = StackPop();
 
-  std::complex<double> c1(a,b);
-  std::complex<double> c2;
-  std::complex<double> c3;
+    std::complex<double> c1(a, b);
+    std::complex<double> c2;
+    std::complex<double> c3;
 
-  c2 = std::sin(c1);
-  c3 = std::cos(c1);
-  c3 = c2/c3;
-  StackPush(c3.imag());
-  StackPush(c3.real());
+    c2 = std::sin(c1);
+    c3 = std::cos(c1);
+    c3 = c2 / c3;
+    StackPush(c3.imag());
+    StackPush(c3.real());
 }
 
 extern "C" void COMP_hsin(void)
 {
-  double a, b;
+    double a, b;
 
-  a = StackPop();
-  b = StackPop();
+    a = StackPop();
+    b = StackPop();
 
-  std::complex<double> c1(a,b);
-  std::complex<double> c3;
-  c3 = std::sinh(c1);
-  StackPush(c3.imag());
-  StackPush(c3.real());
+    std::complex<double> c1(a, b);
+    std::complex<double> c3;
+    c3 = std::sinh(c1);
+    StackPush(c3.imag());
+    StackPush(c3.real());
 }
 
 extern "C" void COMP_hcos(void)
 {
-  double a, b;
+    double a, b;
 
-  a = StackPop();
-  b = StackPop();
+    a = StackPop();
+    b = StackPop();
 
-  std::complex<double> c1(a,b);
-  std::complex<double> c3;
-  c3 = std::cosh(c1);
-  StackPush(c3.imag());
-  StackPush(c3.real());
+    std::complex<double> c1(a, b);
+    std::complex<double> c3;
+    c3 = std::cosh(c1);
+    StackPush(c3.imag());
+    StackPush(c3.real());
 }
 
 extern "C" void COMP_htan(void)
 {
-  double a, b;
+    double a, b;
 
-  a = StackPop();
-  b = StackPop();
+    a = StackPop();
+    b = StackPop();
 
-  std::complex<double> c1(a,b);
-  std::complex<double> c2;
-  std::complex<double> c3;
+    std::complex<double> c1(a, b);
+    std::complex<double> c2;
+    std::complex<double> c3;
 
-  c2 = std::sinh(c1);
-  c3 = std::cosh(c1);
-  c3 = c2/c3;
-  StackPush(c3.imag());
-  StackPush(c3.real());
+    c2 = std::sinh(c1);
+    c3 = std::cosh(c1);
+    c3 = c2 / c3;
+    StackPush(c3.imag());
+    StackPush(c3.real());
 }
-
 
 extern "C" void COMP_conj(void)
 {
-  double a, b;
+    double a, b;
 
-  a = StackPop();
-  b = StackPop();
+    a = StackPop();
+    b = StackPop();
 
-  std::complex<double> c1(a,b);
-  std::complex<double> c3;
-  c3 = std::conj(c1);
-  StackPush(c3.imag());
-  StackPush(c3.real());
+    std::complex<double> c1(a, b);
+    std::complex<double> c3;
+    c3 = std::conj(c1);
+    StackPush(c3.imag());
+    StackPush(c3.real());
 }
 
 extern "C" void COMP_exp(void)
 {
-  double a, b;
+    double a, b;
 
-  a = StackPop();
-  b = StackPop();
+    a = StackPop();
+    b = StackPop();
 
-  std::complex<double> c1(a,b);
-  std::complex<double> c3;
-  c3 = std::exp(c1);
-  StackPush(c3.imag());
-  StackPush(c3.real());
+    std::complex<double> c1(a, b);
+    std::complex<double> c3;
+    c3 = std::exp(c1);
+    StackPush(c3.imag());
+    StackPush(c3.real());
 }
 
 extern "C" void COMP_ln(void)
 {
-  double a, b;
+    double a, b;
 
-  a = StackPop();
-  b = StackPop();
+    a = StackPop();
+    b = StackPop();
 
-  std::complex<double> c1(a,b);
-  std::complex<double> c3;
-  c3 = std::log(c1);
-  StackPush(c3.imag());
-  StackPush(c3.real());
+    std::complex<double> c1(a, b);
+    std::complex<double> c3;
+    c3 = std::log(c1);
+    StackPush(c3.imag());
+    StackPush(c3.real());
 }
 
 extern "C" void COMP_log(void)
 {
-  double a, b;
+    double a, b;
 
-  a = StackPop();
-  b = StackPop();
+    a = StackPop();
+    b = StackPop();
 
-  std::complex<double> c1(a,b);
-  std::complex<double> c3;
-  c3 = std::log10(c1);
-  StackPush(c3.imag());
-  StackPush(c3.real());
+    std::complex<double> c1(a, b);
+    std::complex<double> c3;
+    c3 = std::log10(c1);
+    StackPush(c3.imag());
+    StackPush(c3.real());
 }
 
 extern "C" void COMP_pow(void)
 {
-  double a, b, c, d;
+    double a, b, c, d;
 
-  a = StackPop();
-  b = StackPop();
-  c = StackPop();
-  d = StackPop();
+    a = StackPop();
+    b = StackPop();
+    c = StackPop();
+    d = StackPop();
 
-  std::complex<double> c1(c,d);
-  std::complex<double> c2(a,b);
-  std::complex<double> c3;
-  c3 = std::pow(c1, c2);
-  StackPush(c3.imag());
-  StackPush(c3.real());
+    std::complex<double> c1(c, d);
+    std::complex<double> c2(a, b);
+    std::complex<double> c3;
+    c3 = std::pow(c1, c2);
+    StackPush(c3.imag());
+    StackPush(c3.real());
 }
 
 extern "C" void COMP_sqrt(void)
 {
-  double a, b;
+    double a, b;
 
-  a = StackPop();
-  b = StackPop();
+    a = StackPop();
+    b = StackPop();
 
-  std::complex<double> c1(a,b);
-  std::complex<double> c3;
-  c3 = std::sqrt(c1);
-  StackPush(c3.imag());
-  StackPush(c3.real());
+    std::complex<double> c1(a, b);
+    std::complex<double> c3;
+    c3 = std::sqrt(c1);
+    StackPush(c3.imag());
+    StackPush(c3.real());
 }
 
 extern "C" void COMP_abs(void)
 {
-  double a, b;
+    double a, b;
 
-  a = StackPop();
-  b = StackPop();
+    a = StackPop();
+    b = StackPop();
 
-  std::complex<double> c1(a,b);
-  std::complex<double> c3;
-  c3 = std::abs(c1);
-  StackPush(c3.imag());
-  StackPush(c3.real());
+    std::complex<double> c1(a, b);
+    std::complex<double> c3;
+    c3 = std::abs(c1);
+    StackPush(c3.imag());
+    StackPush(c3.real());
 }
 
 extern "C" void COMP_CHS(void)
 {
-  double a, b;
+    double a, b;
 
-  a = StackPop();
-  b = StackPop();
+    a = StackPop();
+    b = StackPop();
 
-  std::complex<double> c1(a,b);
-  std::complex<double> c3;
+    std::complex<double> c1(a, b);
+    std::complex<double> c3;
 
-  c3 = -c1;
-  StackPush(c3.imag());
-  StackPush(c3.real());
+    c3 = -c1;
+    StackPush(c3.imag());
+    StackPush(c3.real());
 }
 
 extern "C" void COMP_norm(void)
 {
-  double a, b;
+    double a, b;
 
-  a = StackPop();
-  b = StackPop();
+    a = StackPop();
+    b = StackPop();
 
-  std::complex<double> c1(a,b);
-  std::complex<double> c3;
-  c3 = std::norm(c1);
-  StackPush(c3.imag());
-  StackPush(c3.real());
+    std::complex<double> c1(a, b);
+    std::complex<double> c3;
+    c3 = std::norm(c1);
+    StackPush(c3.imag());
+    StackPush(c3.real());
 }
 
 extern "C" void COMP_arg(void)
 {
-  double a, b;
+    double a, b;
 
-  a = StackPop();
-  b = StackPop();
+    a = StackPop();
+    b = StackPop();
 
-  std::complex<double> c1(a,b);
-  std::complex<double> c3;
-  c3 = std::arg(c1);
-  StackPush(c3.imag());
-  StackPush(c3.real());
+    std::complex<double> c1(a, b);
+    std::complex<double> c3;
+    c3 = std::arg(c1);
+    StackPush(c3.imag());
+    StackPush(c3.real());
 }
 
 extern "C" void COMP_ToPolar(void)
 {
-  double a, b, r, theta;
+    double a, b, r, theta;
 
-  a = StackPop();
-  b = StackPop();
+    a = StackPop();
+    b = StackPop();
 
-  std::complex<double> c1(a,b);
+    std::complex<double> c1(a, b);
 
-  r = std::abs(c1);     // Magnitude
-  theta = std::arg(c1); // Phase angle in radians
-  StackPush(theta);
-  StackPush(r);
+    r = std::abs(c1);     // Magnitude
+    theta = std::arg(c1); // Phase angle in radians
+    StackPush(theta);
+    StackPush(r);
 }
 
 extern "C" void COMP_FromPolar(void)
 {
-  double a, b;
+    double a, b;
 
-  a = StackPop();
-  b = StackPop();
+    a = StackPop();
+    b = StackPop();
 
-  std::complex<double> c1 = std::polar(a,b);
-  std::complex<double> c3;
-  c3 = std::arg(c1);
-  StackPush(c3.imag());
-  StackPush(c3.real());
+    std::complex<double> c1 = std::polar(a, b);
+    std::complex<double> c3;
+    c3 = std::arg(c1);
+    StackPush(c3.imag());
+    StackPush(c3.real());
 }
