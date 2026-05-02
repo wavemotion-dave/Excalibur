@@ -497,6 +497,7 @@ extern int CreateToolTipWindow(HWND hwnd, HINSTANCE hInstance);
 extern int CreateDebugWindow(HWND hwnd, HINSTANCE hInstance);
 extern void RPN_SingleStep(void);
 extern int PreInit(void);
+extern void trim(char *str);
 
 // Add to the end of this list but *NEVER* remove entries or else you will need to update excalibur config file...
 enum UniqueButtonIndexTag

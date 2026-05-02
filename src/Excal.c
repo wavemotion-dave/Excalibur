@@ -1095,7 +1095,7 @@ int ClipboardCopySelection(HWND hwnd, uint8_t copytype)
     char far *cptr;
     char tmp2[32];
     char tmp3[32];
-    int i, j, k;
+    int i, j;
     unsigned short chksum = 0x0000;
 
     if (copytype == COPY_X_TO_CLIPBOARD)          // Copy X to clipboard
@@ -1103,15 +1103,12 @@ int ClipboardCopySelection(HWND hwnd, uint8_t copytype)
         tptr = GlobalAlloc(GHND, (DWORD) 64L);
         cptr = GlobalLock(tptr);
         GetDlgItemText(calcMainWindow, RPN_STACK_X, tmpStr, MAX_STACK_STRLEN);  // X register
-        k = 0;                  // Strip leading spaces!
-        while ((tmpStr[k] == ' ') && k < 20) k++;
-        j = strlen(tmpStr)-1;   // Strip trailing spaces!
-        while ((tmpStr[j] == ' ') && j > 1) {tmpStr[j] = 0; j--;}
-        if (progMode != PROG_NORMAL)
+        trim(tmpStr);
+        if (progMode == PROG_DEC)
         {
-            if (tmpStr[strlen(tmpStr)-1] == 'd') tmpStr[strlen(tmpStr)-1] = ' ';
+            if (tmpStr[strlen(tmpStr)-1] == 'd') tmpStr[strlen(tmpStr)-1] = 0;
         }
-        lstrcpy(cptr, (LPSTR) & tmpStr[k]);
+        lstrcpy(cptr, (LPSTR) tmpStr);
         OpenClipboard(hwnd);
         EmptyClipboard();
         GlobalUnlock(tptr);
@@ -1184,28 +1181,36 @@ int ClipboardCopySelection(HWND hwnd, uint8_t copytype)
         cptr = GlobalLock(tptr);
         lstrcpy(cptr, "");
         GetDlgItemText(calcMainWindow, RPN_STACK_T, tmpStr, MAX_STACK_STRLEN);  // T register
-        k = 0;                  // Strip leading spaces!
-        while ((tmpStr[k] == ' ') && k < 20)
-            k++;
-        lstrcat(cptr, (LPSTR) & tmpStr[k]);
+        trim(tmpStr);
+        if (progMode == PROG_DEC)
+        {
+            if (tmpStr[strlen(tmpStr)-1] == 'd') tmpStr[strlen(tmpStr)-1] = 0;
+        }
+        lstrcat(cptr, (LPSTR) tmpStr);
         lstrcat(cptr, (LPSTR) "\r\n");
         GetDlgItemText(calcMainWindow, RPN_STACK_Z, tmpStr, MAX_STACK_STRLEN);  // Z register
-        k = 0;                  // Strip leading spaces!
-        while ((tmpStr[k] == ' ') && k < 20)
-            k++;
-        lstrcat(cptr, (LPSTR) & tmpStr[k]);
+        trim(tmpStr);
+        if (progMode == PROG_DEC)
+        {
+            if (tmpStr[strlen(tmpStr)-1] == 'd') tmpStr[strlen(tmpStr)-1] = 0;
+        }
+        lstrcat(cptr, (LPSTR) tmpStr);
         lstrcat(cptr, (LPSTR) "\r\n");
         GetDlgItemText(calcMainWindow, RPN_STACK_Y, tmpStr, MAX_STACK_STRLEN);  // Y register
-        k = 0;                  // Strip leading spaces!
-        while ((tmpStr[k] == ' ') && k < 20)
-            k++;
-        lstrcat(cptr, (LPSTR) & tmpStr[k]);
+        trim(tmpStr);
+        if (progMode == PROG_DEC)
+        {
+            if (tmpStr[strlen(tmpStr)-1] == 'd') tmpStr[strlen(tmpStr)-1] = 0;
+        }
+        lstrcat(cptr, (LPSTR) tmpStr);
         lstrcat(cptr, (LPSTR) "\r\n");
         GetDlgItemText(calcMainWindow, RPN_STACK_X, tmpStr, MAX_STACK_STRLEN);  // X register
-        k = 0;                  // Strip leading spaces!
-        while ((tmpStr[k] == ' ') && k < 20)
-            k++;
-        lstrcat(cptr, (LPSTR) & tmpStr[k]);
+        trim(tmpStr);
+        if (progMode == PROG_DEC)
+        {
+            if (tmpStr[strlen(tmpStr)-1] == 'd') tmpStr[strlen(tmpStr)-1] = 0;
+        }
+        lstrcat(cptr, (LPSTR) tmpStr);
         lstrcat(cptr, (LPSTR) "\r\n");
         OpenClipboard(hwnd);
         EmptyClipboard();
@@ -5517,5 +5522,37 @@ void turnOnNumLock(void)
         GetKeyboardState(keyState);
         keyState[VK_NUMLOCK] = (char) 0x81;
         SetKeyboardState(keyState);
+    }
+}
+
+
+void trim(char *str)
+{
+    char *start = str;
+    char *end;
+
+    // 1. Move 'start' pointer forward to skip leading whitespace
+    while (isspace((unsigned char)*start)) {
+        start++;
+    }
+
+    // 2. If the string is all whitespace, null-terminate and return
+    if (*start == 0) {
+        *str = '\0';
+        return;
+    }
+
+    // 3. Find the end of the string and move backward to skip trailing whitespace
+    end = start + strlen(start) - 1;
+    while (end > start && isspace((unsigned char)*end)) {
+        end--;
+    }
+
+    // 4. Write new null terminator after the last non-space character
+    *(end + 1) = '\0';
+
+    // 5. Shift the trimmed string back to the beginning of the original buffer
+    if (start != str) {
+        memmove(str, start, end - start + 2);
     }
 }
