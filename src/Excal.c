@@ -1528,7 +1528,7 @@ int PreInit(void)
 
     // Get regional time setting for 24-hour format!
     GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_ITIME, tmpStr, 5);
-    tmpStr[4] = '\0';
+    tmpStr[4] = CNULL;
     if (atoi(tmpStr) == 1)
         showTime24HourFormat = TRUE;
 
@@ -1592,7 +1592,7 @@ int Init(void)
     return(0);
 }
 
-int ShowStatus(void)
+void ShowStatus(void)
 {
     if (progMode != PROG_NORMAL)
     {
@@ -1603,14 +1603,11 @@ int ShowStatus(void)
         SetDlgItemText(calcMainWindow, RPN_CARRY, tmpStr);
     }
 
-
     if (recModeON == 0)
         sprintf(tmpStr, "   ");
     else
         sprintf(tmpStr, "REC ");
     SetDlgItemText(calcMainWindow, REC_BAR, tmpStr);
-
-
 
     if (progMode != PROG_NORMAL)
     {
@@ -1663,8 +1660,6 @@ int ShowStatus(void)
     if (AngleMode == 2)
         sprintf(tmpStr, "GRA");
     SetDlgItemText(calcMainWindow, ANGLE_BAR, tmpStr);
-
-    return(0);
 }
 
 void UpdateSpareBar(char *msg)
@@ -1672,7 +1667,7 @@ void UpdateSpareBar(char *msg)
     SetDlgItemText(calcMainWindow, SPARE_BAR, msg);
 }
 
-int UpdateTimeBar()
+void UpdateTimeBar()
 {
     int temp_hour, temp_min;
 
@@ -1702,15 +1697,12 @@ int UpdateTimeBar()
 
     if (userTimer == 0)         // Only if we don't have stopwatch!
         SetDlgItemText(calcMainWindow, TIME_BAR, tmpStr);
-
-    return(0);
 }
 
-int ShowFunctionBar(char *msg)
+void ShowFunctionBar(char *msg)
 {
     sprintf(functionBar, "%s", msg);
     SetDlgItemText(calcMainWindow, FUNC_BAR, functionBar);
-    return(0);
 }
 
 void RPN_error(char *msg)
