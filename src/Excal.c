@@ -1713,62 +1713,62 @@ double MakeAccurate(double val)
 }
 
 // clang-format off
-struct keypadStruct RPNkeys[] = {
-    {RPN_DIGIT_0,   UNI_DIG0,   USES_FL, ALLOWREC, '0', NO_L,   X_NULL,     RPN_digit0,         "Digit 0",              "Used in keypad number entry."},
-    {RPN_DIGIT_1,   UNI_DIG1,   USES_FL, ALLOWREC, '1', NO_L,   X_NULL,     RPN_digit1,         "Digit 1",              "Used in keypad number entry."},
-    {RPN_DIGIT_2,   UNI_DIG2,   USES_FL, ALLOWREC, '2', NO_L,   X_NULL,     RPN_digit2,         "Digit 2",              "Used in keypad number entry."},
-    {RPN_DIGIT_3,   UNI_DIG3,   USES_FL, ALLOWREC, '3', NO_L,   X_NULL,     RPN_digit3,         "Digit 3",              "Used in keypad number entry."},
-    {RPN_DIGIT_4,   UNI_DIG4,   USES_FL, ALLOWREC, '4', NO_L,   X_NULL,     RPN_digit4,         "Digit 4",              "Used in keypad number entry."},
-    {RPN_DIGIT_5,   UNI_DIG5,   USES_FL, ALLOWREC, '5', NO_L,   X_NULL,     RPN_digit5,         "Digit 5",              "Used in keypad number entry."},
-    {RPN_DIGIT_6,   UNI_DIG6,   USES_FL, ALLOWREC, '6', NO_L,   X_NULL,     RPN_digit6,         "Digit 6",              "Used in keypad number entry."},
-    {RPN_DIGIT_7,   UNI_DIG7,   USES_FL, ALLOWREC, '7', NO_L,   X_NULL,     RPN_digit7,         "Digit 7",              "Used in keypad number entry."},
-    {RPN_DIGIT_8,   UNI_DIG8,   USES_FL, ALLOWREC, '8', NO_L,   X_NULL,     RPN_digit8,         "Digit 8",              "Used in keypad number entry."},
-    {RPN_DIGIT_9,   UNI_DIG9,   USES_FL, ALLOWREC, '9', NO_L,   X_NULL,     RPN_digit9,         "Digit 9",              "Used in keypad number entry."},
-    {RPN_DIGIT_DP,  UNI_DIGDP,  USES_FL, ALLOWREC, '.', NO_L,   X_NULL,     RPN_dp,             "Decimal Point",        "Used in keypad number entry and can also be used to enter fractions into the X display (press twice)"},
-    {RPN_CLEAR_X,   UNI_CLX,    USES_FL, ALLOWREC,  9,  NO_L,   X_NULL,     RPN_clearX,         "Clear X",              "Used to clear the X Register contents."},
-    {RPN_DIVIDE,    UNI_DIV,    USES_FL, ALLOWREC, '/', YES_L,  X_NULL,     RPN_divide,         "Divide",               "Division of Y by X(Y/X)"},
-    {RPN_MULTIPLY,  UNI_MUL,    USES_FL, ALLOWREC, '*', YES_L,  X_NULL,     RPN_multiply,       "Multiply",             "Multiplication of Y and X"},
-    {RPN_SUBTRACT,  UNI_SUB,    USES_FL, ALLOWREC, '-', YES_L,  X_NULL,     RPN_minus,          "Minus",                "Subtraction of X from Y(Y-X)"},
-    {RPN_PLUS,      UNI_PLUS,   USES_FL, ALLOWREC, '+', YES_L,  X_NULL,     RPN_plus,           "Plus",                 "Addition of X and Y"},
-    {RPN_ENTER,     UNI_ENT,    USES_FL, ALLOWREC, 13,  NO_L,   X_NULL,     RPN_enter,          "Enter",                "Used to separate numbers in the RPN stack"},
+struct funcStruct RPNkeys[] = {
+    {RPN_DIGIT_0,   UNI_DIG0,   USES_FL, ALLOWREC, '0', "", NO_L,   X_NULL,     RPN_digit0,         "Digit 0",              "Used in keypad number entry."},
+    {RPN_DIGIT_1,   UNI_DIG1,   USES_FL, ALLOWREC, '1', "", NO_L,   X_NULL,     RPN_digit1,         "Digit 1",              "Used in keypad number entry."},
+    {RPN_DIGIT_2,   UNI_DIG2,   USES_FL, ALLOWREC, '2', "", NO_L,   X_NULL,     RPN_digit2,         "Digit 2",              "Used in keypad number entry."},
+    {RPN_DIGIT_3,   UNI_DIG3,   USES_FL, ALLOWREC, '3', "", NO_L,   X_NULL,     RPN_digit3,         "Digit 3",              "Used in keypad number entry."},
+    {RPN_DIGIT_4,   UNI_DIG4,   USES_FL, ALLOWREC, '4', "", NO_L,   X_NULL,     RPN_digit4,         "Digit 4",              "Used in keypad number entry."},
+    {RPN_DIGIT_5,   UNI_DIG5,   USES_FL, ALLOWREC, '5', "", NO_L,   X_NULL,     RPN_digit5,         "Digit 5",              "Used in keypad number entry."},
+    {RPN_DIGIT_6,   UNI_DIG6,   USES_FL, ALLOWREC, '6', "", NO_L,   X_NULL,     RPN_digit6,         "Digit 6",              "Used in keypad number entry."},
+    {RPN_DIGIT_7,   UNI_DIG7,   USES_FL, ALLOWREC, '7', "", NO_L,   X_NULL,     RPN_digit7,         "Digit 7",              "Used in keypad number entry."},
+    {RPN_DIGIT_8,   UNI_DIG8,   USES_FL, ALLOWREC, '8', "", NO_L,   X_NULL,     RPN_digit8,         "Digit 8",              "Used in keypad number entry."},
+    {RPN_DIGIT_9,   UNI_DIG9,   USES_FL, ALLOWREC, '9', "", NO_L,   X_NULL,     RPN_digit9,         "Digit 9",              "Used in keypad number entry."},
+    {RPN_DIGIT_DP,  UNI_DIGDP,  USES_FL, ALLOWREC, '.', "", NO_L,   X_NULL,     RPN_dp,             "Decimal Point",        "Used in keypad number entry and can also be used to enter fractions into the X display (press twice)"},
+    {RPN_CLEAR_X,   UNI_CLX,    USES_FL, ALLOWREC,  9,  "", NO_L,   X_NULL,     RPN_clearX,         "Clear X",              "Used to clear the X Register contents."},
+    {RPN_DIVIDE,    UNI_DIV,    USES_FL, ALLOWREC, '/', "", YES_L,  X_NULL,     RPN_divide,         "Divide",               "Division of Y by X(Y/X)"},
+    {RPN_MULTIPLY,  UNI_MUL,    USES_FL, ALLOWREC, '*', "", YES_L,  X_NULL,     RPN_multiply,       "Multiply",             "Multiplication of Y and X"},
+    {RPN_SUBTRACT,  UNI_SUB,    USES_FL, ALLOWREC, '-', "", YES_L,  X_NULL,     RPN_minus,          "Minus",                "Subtraction of X from Y(Y-X)"},
+    {RPN_PLUS,      UNI_PLUS,   USES_FL, ALLOWREC, '+', "", YES_L,  X_NULL,     RPN_plus,           "Plus",                 "Addition of X and Y"},
+    {RPN_ENTER,     UNI_ENT,    USES_FL, ALLOWREC, 13,  "", NO_L,   X_NULL,     RPN_enter,          "Enter",                "Used to separate numbers in the RPN stack"},
 
-    {RPN_EXCH_X_Y,  UNI_XCH,    USES_FL, ALLOWREC, 'x', NO_L,   X_NEW,      RPN_exchange_x_y,   "Exchange X and Y",     "Exchanges the contents of the X and Y registers"},
-    {RPN_NEGATE,    UNI_CHS,    USES_FL, ALLOWREC, 'n', NO_L,   X_NULL,     RPN_negate_x,       "Change Sign",          "Used to change the sign of X"},
-    {RPN_E,         UNI_E,      USES_FL, ALLOWREC, 'e', NO_L,   X_NULL,     RPN_Ex,             "Exponent",             "Used to produce an exponential number(e.g. 3.45e+12)"},
-    {RPN_STO,       UNI_STO,    USES_FL, ALLOWREC, 's', NO_L,   X_NULL,     RPN_store,          "Store Register",       "Used to store X to one of the registers (next digit/dp selects R0-R19)"},
-    {RPN_RCL,       UNI_RCL,    USES_FL, ALLOWREC, 'r', NO_L,   X_NULL,     RPN_recall,         "Recall Register",      "Used to recall one of registers to X (next digit/dp selects R0-R19)"},
-    {RPN_R_UP,      UNI_RUP,    USES_FL, ALLOWREC, 38,  NO_L,   X_NEW,      RPN_rotateStackUp,  "Rotate Stack Up",      "Rotates the contents of the stack up"},
-    {RPN_R_DN,      UNI_RDN,    USES_FL, ALLOWREC, 40,  NO_L,   X_NEW,      RPN_rotateStackDn,  "Rotate Stack Down",    "Rotates the contents of the stack down"},
-    {RPN_LASTX,     UNI_LSTX,   USES_FL, ALLOWREC, 'l', NO_L,   X_NEW,      RPN_lastX,          "Last X",               "Retrieves the last value of X before the last operation occurred"},
-    {RPN_MODE,      UNI_MODE,   USES_FL, ALLOWREC, 'm', NO_L,   X_NEW,      RPN_mode,           "Select Mode",          "Used to select number format mode"},
-    {RPN_BKSP,      UNI_BKSP,   USES_FL, ALLOWREC,  8,  NO_L,   X_NULL,     RPN_backspace,      "Backspace",            "Used to correct mistakes in number entry"},
-    {RPN_CLR_STACK, UNI_CLRSTK, USES_FL, ALLOWREC, 'c', YES_L,  X_ENTER,    RPN_clearStack,     "Clear Stack",          "Used to clear the entire stack contents. Press twice to clear all registers as well."},
-    {RPN_HELP,      UNI_HELP,   USES_FL, ALLOWREC, 'h', NO_L,   X_NULL,     RPN_help,           "Help",                 "After clicking this key, select another key for individual key help.\nSame as right-click of the mouse on any key."},
-    {RPN_PLAYBACK,  UNI_PLAY,   USES_FL, NORECORD, 'p', NO_L,   X_NEW,      RPN_Playback,       "Run Program",          "Run the the currently loaded program."},
-    {RPN_DROP,      UNI_DROP,   USES_FL, ALLOWREC, 'd', YES_L,  X_NEW,      RPN_drop,           "Drop Stack",           "Drops the X register and the rest of stack shifts down."},
-    {RPN_LARG,      UNI_LARG,   USES_FL, ALLOWREC, ' ', NO_L,   X_NEW,      RPN_larg,           "Last Arguments",       "Retrieves the last X and Y pair before last operation."},
-    {RPN_FRAC,      UNI_FRAC,   USES_FL, ALLOWREC, ' ', NO_L,   X_EDIT,     RPN_frac,           "Fraction Bar",         "Insert Fraction to current X edit"},
+    {RPN_EXCH_X_Y,  UNI_XCH,    USES_FL, ALLOWREC, 'x', "", NO_L,   X_NEW,      RPN_exchange_x_y,   "Exchange X and Y",     "Exchanges the contents of the X and Y registers"},
+    {RPN_NEGATE,    UNI_CHS,    USES_FL, ALLOWREC, 'n', "", NO_L,   X_NULL,     RPN_negate_x,       "Change Sign",          "Used to change the sign of X"},
+    {RPN_E,         UNI_E,      USES_FL, ALLOWREC, 'e', "", NO_L,   X_NULL,     RPN_Ex,             "Exponent",             "Used to produce an exponential number(e.g. 3.45e+12)"},
+    {RPN_STO,       UNI_STO,    USES_FL, ALLOWREC, 's', "", NO_L,   X_NULL,     RPN_store,          "Store Register",       "Used to store X to one of the registers (next digit/dp selects R0-R19)"},
+    {RPN_RCL,       UNI_RCL,    USES_FL, ALLOWREC, 'r', "", NO_L,   X_NULL,     RPN_recall,         "Recall Register",      "Used to recall one of registers to X (next digit/dp selects R0-R19)"},
+    {RPN_R_UP,      UNI_RUP,    USES_FL, ALLOWREC, 38,  "", NO_L,   X_NEW,      RPN_rotateStackUp,  "Rotate Stack Up",      "Rotates the contents of the stack up"},
+    {RPN_R_DN,      UNI_RDN,    USES_FL, ALLOWREC, 40,  "", NO_L,   X_NEW,      RPN_rotateStackDn,  "Rotate Stack Down",    "Rotates the contents of the stack down"},
+    {RPN_LASTX,     UNI_LSTX,   USES_FL, ALLOWREC, 'l', "", NO_L,   X_NEW,      RPN_lastX,          "Last X",               "Retrieves the last value of X before the last operation occurred"},
+    {RPN_MODE,      UNI_MODE,   USES_FL, ALLOWREC, 'm', "", NO_L,   X_NEW,      RPN_mode,           "Select Mode",          "Used to select number format mode"},
+    {RPN_BKSP,      UNI_BKSP,   USES_FL, ALLOWREC,  8,  "", NO_L,   X_NULL,     RPN_backspace,      "Backspace",            "Used to correct mistakes in number entry"},
+    {RPN_CLR_STACK, UNI_CLRSTK, USES_FL, ALLOWREC, 'c', "", YES_L,  X_ENTER,    RPN_clearStack,     "Clear Stack",          "Used to clear the entire stack contents. Press twice to clear all registers as well."},
+    {RPN_HELP,      UNI_HELP,   USES_FL, ALLOWREC, 'h', "", NO_L,   X_NULL,     RPN_help,           "Help",                 "After clicking this key, select another key for individual key help.\nSame as right-click of the mouse on any key."},
+    {RPN_PLAYBACK,  UNI_PLAY,   USES_FL, NORECORD, 'p', "", NO_L,   X_NEW,      RPN_Playback,       "Run Program",          "Run the the currently loaded program."},
+    {RPN_DROP,      UNI_DROP,   USES_FL, ALLOWREC, 'd', "", YES_L,  X_NEW,      RPN_drop,           "Drop Stack",           "Drops the X register and the rest of stack shifts down."},
+    {RPN_LARG,      UNI_LARG,   USES_FL, ALLOWREC, ' ', "", NO_L,   X_NEW,      RPN_larg,           "Last Arguments",       "Retrieves the last X and Y pair before last operation."},
+    {RPN_FRAC,      UNI_FRAC,   USES_FL, ALLOWREC, ' ', "", NO_L,   X_EDIT,     RPN_frac,           "Fraction Bar",         "Insert Fraction to current X edit"},
 
-    {RPN_EDIT,      UNI_EDIT,   USES_FL, ALLOWREC, ' ', NO_L,   X_NULL,     RPN_edit,           "Edit X Register",      "Used to place the X register back in edit mode if it is not already."},
-    {RPN_CONST,     UNI_CONST,  USES_F,  NORECORD, ' ', YES_L,  X_NEW,      RPN_const,          "Constants",            "Recall or Store Constants to one of five banks."},
-    {RPN_NOTES,     UNI_NOTES,  USES_FL, ALLOWREC, ' ', NO_L,   X_NULL,     RPN_Notes,          "Excalibur Notepad",    "Allows some simple notes to be stored/saved."},
-    {RPN_INV,       UNI_INVX,   USES_FL, ALLOWREC, ' ', YES_L,  X_NEW,      RPN_inverse,        "Inverse X",            "Computes the inverse of X"},
-    {RPN_REC,       UNI_REC,    USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_Record,         "Record Mode On/Off",   "When ON - Records button presses for playback."},
-    {RPN_EXREG,     UNI_EXREG,  USES_FL, ALLOWREC, ' ', NO_L,   X_NULL,     RPN_ExchangeReg,    "Exchange X with Reg",  "Exchange X with one of the Registers (next digit/dp selects R0-R19)"},
-    {RPN_COPY,      UNI_COPY,   USES_FL, ALLOWREC, ' ', NO_L,   X_NULL,     RPN_Copy,           "Copy X Register",      "Copy X register to the clipboard"},
-    {RPN_PASTE,     UNI_PASTE,  USES_FL, ALLOWREC, ' ', NO_L,   X_NULL,     RPN_Paste,          "Paste X Register",     "Paste X register from the clipboard"},
+    {RPN_EDIT,      UNI_EDIT,   USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_edit,           "Edit X Register",      "Used to place the X register back in edit mode if it is not already."},
+    {RPN_CONST,     UNI_CONST,  USES_F,  NORECORD, ' ', "", YES_L,  X_NEW,      RPN_const,          "Constants",            "Recall or Store Constants to one of five banks."},
+    {RPN_NOTES,     UNI_NOTES,  USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_Notes,          "Excalibur Notepad",    "Allows some simple notes to be stored/saved."},
+    {RPN_INV,       UNI_INVX,   USES_FL, ALLOWREC, ' ', "", YES_L,  X_NEW,      RPN_inverse,        "Inverse X",            "Computes the inverse of X"},
+    {RPN_REC,       UNI_REC,    USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_Record,         "Record Mode On/Off",   "When ON - Records button presses for playback."},
+    {RPN_EXREG,     UNI_EXREG,  USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_ExchangeReg,    "Exchange X with Reg",  "Exchange X with one of the Registers (next digit/dp selects R0-R19)"},
+    {RPN_COPY,      UNI_COPY,   USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_Copy,           "Copy X Register",      "Copy X register to the clipboard"},
+    {RPN_PASTE,     UNI_PASTE,  USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_Paste,          "Paste X Register",     "Paste X register from the clipboard"},
 
-    {RPN_SCI,       UNI_SCI,    USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectSci,      "Select Scientific I",  "Selects the Scientific I Layout"},
-    {RPN_SCI2,      UNI_SCI2,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectSci2,     "Select Scientific II", "Selects the Scientific II Layout"},
-    {RPN_COMPSCI,   UNI_COMPSCI,USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectCompSci,  "Select Comp Sci",      "Selects the Computer Science Layout"},
-    {RPN_FIN,       UNI_BUSI,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectFin,      "Select Financial",     "Selects the Financial Layout"},
-    {RPN_CONV,      UNI_CONV,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectConv,     "Select Conversion",    "Selects the Conversion Layout"},
-    {RPN_STAT,      UNI_STAT,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectStat,     "Select Statistics",    "Selects the Statistical Layout"},
-    {RPN_PROGI,     UNI_PROG1,  USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectProgI,    "Select Program I",     "Selects Program Bank I"},
-    {RPN_PROGII,    UNI_PROG2,  USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectProgII,   "Select Program II",    "Selects Program Bank II"},
-    {RPN_CUST,      UNI_CUST,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectCustom,   "Select Custom",        "Selects the Custom Layout"},
+    {RPN_SCI,       UNI_SCI,    USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectSci,      "Select Scientific I",  "Selects the Scientific I Layout"},
+    {RPN_SCI2,      UNI_SCI2,   USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectSci2,     "Select Scientific II", "Selects the Scientific II Layout"},
+    {RPN_COMPSCI,   UNI_COMPSCI,USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectCompSci,  "Select Comp Sci",      "Selects the Computer Science Layout"},
+    {RPN_FIN,       UNI_BUSI,   USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectFin,      "Select Financial",     "Selects the Financial Layout"},
+    {RPN_CONV,      UNI_CONV,   USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectConv,     "Select Conversion",    "Selects the Conversion Layout"},
+    {RPN_STAT,      UNI_STAT,   USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectStat,     "Select Statistics",    "Selects the Statistical Layout"},
+    {RPN_PROGI,     UNI_PROG1,  USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectProgI,    "Select Program I",     "Selects Program Bank I"},
+    {RPN_PROGII,    UNI_PROG2,  USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectProgII,   "Select Program II",    "Selects Program Bank II"},
+    {RPN_CUST,      UNI_CUST,   USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectCustom,   "Select Custom",        "Selects the Custom Layout"},
 
-    {RPN_LAST_KEY,  UNI_UNUSED, USES_FL, ALLOWREC, ' ', NO_L,   X_NEW,      NULL,               "Unused",               "Unused"}
+    {RPN_LAST_KEY,  UNI_UNUSED, USES_FL, ALLOWREC, ' ', "", NO_L,   X_NEW,      NULL,               "Unused",               "Unused"}
 };
 
 struct keyPosStruct
@@ -3730,7 +3730,7 @@ void ProcessCusomSave(void)
             break;
         case(CUSTOM_SAVE_MAC):        // Macros - SPECIAL!
             memcpy(&Custom_funcs[newIdx], &MacroFuncs[index], sizeof(struct funcStruct));
-            strcpy(Custom_funcs[newIdx].desc, macro_short_names[index]);
+            Custom_funcs[newIdx].desc = macro_short_names[index];
             Custom_funcs[newIdx].keyTitle = macroName[index];
             Custom_funcs[newIdx].keyHelp  = "Program Assigned Key";
             break;

@@ -96,28 +96,13 @@ struct funcStruct
     uint8_t     useFloatsLongs;
     uint8_t     allowRecord;
     uint8_t     op;
-    char        desc[9];
+    const char *desc;
     uint8_t     saveLastX;
     uint8_t     newXedit;
     func_t      routine;
     const char *keyTitle;
     const char *keyHelp;
 };
-
-struct keypadStruct
-{
-    int16_t     index;
-    uint16_t    uniqueIndex;
-    uint8_t     useFloatsLongs;
-    uint8_t     allowRecord;
-    uint8_t     op;
-    uint8_t     saveLastX;
-    uint8_t     newXedit;
-    func_t      routine;
-    const char *keyTitle;
-    const char *keyHelp;
-};
-
 
 // For record/playback
 #define ALLOWREC     1
@@ -879,8 +864,7 @@ enum UniqueButtonIndexTag
     UNI_CONSTANTS_END   = 1099,
 };
 
-extern struct keypadStruct RPNkeys[];
-extern struct keypadStruct STOkeys[];
+extern struct funcStruct RPNkeys[];
 
 extern uint8_t  userTimer;
 extern uint32_t userTicks;

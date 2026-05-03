@@ -295,7 +295,7 @@ BOOL CALLBACK CustomDefDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM l
             if (macroItem != (LRESULT) - 1)     // should we copy the macro instead...
             {
                 memcpy(&Custom_funcs[newIdx], &MacroFuncs[macroItem], sizeof(struct funcStruct));
-                strcpy(Custom_funcs[newIdx].desc, macro_short_names[macroItem]);
+                Custom_funcs[newIdx].desc = macro_short_names[macroItem];
                 customSave[newIdx].custom_save_idx = CUSTOM_SAVE_MAC;
                 customSave[newIdx].func_idx = (int16_t)macroItem;
                 Custom_funcs[newIdx].keyTitle = macroName[macroItem];
