@@ -106,7 +106,6 @@ extern void Macro_InpA(void);
 extern void Macro_InpB(void);
 extern void Macro_InpC(void);
 extern void Macro_InpD(void);
-extern void Macro_BST(void);
 extern void Macro_Trace(void);
 extern void Macro_StopTrace(void);
 extern void Macro_DEL(void);

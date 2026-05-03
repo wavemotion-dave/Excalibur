@@ -38,6 +38,9 @@ typedef unsigned __int32    uint32_t;
 typedef unsigned __int16    uint16_t;
 typedef unsigned __int8     uint8_t;
 
+#define PROG_LONG           uint32_t    /* We handle signed and other word sizes in ex_prog.c */
+#define PROG_SIGNEDLONG     int32_t     /* Needed when we convert Signed to float... */
+
 #define MAX_FUNCS           40
 
 #define RPN_LAST_KEY        -1
@@ -63,23 +66,24 @@ typedef unsigned __int8     uint8_t;
 #define   IDM_EXCALIBURHELP                 109
 #define   IDM_ABOUTPROGRAM                  110
 #define   IDM_SCIENTIFIC                    111
-#define   IDM_SCI2                          112
+#define   IDM_SCIENTIFIC2                   112
 #define   IDM_FINANCIAL                     113
 #define   IDM_CONVERSION                    114
 #define   IDM_COMPSCI                       115
-#define   IDM_GEOMETRY                      116
-#define   IDM_PROGI                         117
-#define   IDM_PROGII                        118
-#define   IDM_CUSTOM                        119
-#define   IDM_DEFINECUSTOM                  120
-#define   IDM_STATS                         121
-#define   IDM_USAGESTATS                    122
-#define   IDM_COPYCLIPBOARDTOX              123
+#define   IDM_PROGI                         116
+#define   IDM_PROGII                        117
+#define   IDM_CUSTOM                        118
+#define   IDM_DEFINECUSTOM                  119
+#define   IDM_STATS                         120
+#define   IDM_USAGESTATS                    121
+#define   IDM_COPYCLIPBOARDTOX              122
 
 // Function prototypes for dialog and subdialog modules
 
 #define YES_L   ((char) 1)
 #define NO_L    ((char) 2)
+
+typedef void (*func_t)(void);
 
 struct funcStruct
 {
@@ -89,25 +93,25 @@ struct funcStruct
     uint8_t  allowRecord;
     uint8_t  op;
     char     desc[9];
-    uint8_t  saveLastX;             /* Do we save LASTX here? */
-    uint8_t  newXedit;              /* The new Xedit */
-    void(*routine) (void);
+    uint8_t  saveLastX;
+    uint8_t  newXedit;
+    func_t   routine;
     int32_t  keyTitle;
     int32_t  keyHelp;
 };
 
 struct keypadStruct
 {
-    int16_t  index;
-    uint16_t uniqueIndex;
-    uint8_t  useFloatsLongs;
-    uint8_t  allowRecord;
-    uint8_t  op;
-    uint8_t  saveLastX;             /* Do we save LASTX here? */
-    uint8_t  newXedit;              /* The new Xedit */
-    void(*routine) (void);
-    char    keyTitle[26];
-    char    keyHelp[128];
+    int16_t     index;
+    uint16_t    uniqueIndex;
+    uint8_t     useFloatsLongs;
+    uint8_t     allowRecord;
+    uint8_t     op;
+    uint8_t     saveLastX;
+    uint8_t     newXedit;
+    func_t      routine;
+    const char *keyTitle;
+    const char *keyHelp;
 };
 
 
@@ -130,8 +134,7 @@ struct keypadStruct
 #define FUNC_BAR_TEXT_BUIS     "FINANCIAL"
 #define FUNC_BAR_TEXT_STATS    "STATISTICS"
 #define FUNC_BAR_TEXT_CONV     "CONVERSION"
-#define FUNC_BAR_TEXT_GEOM     "GEOMETRY"
-#define FUNC_BAR_TEXT_COMPSCI  "COMP SCI"
+#define FUNC_BAR_TEXT_COMPSCI  "COMP-SCI"
 #define FUNC_BAR_TEXT_PROG1    "PROGRAM I"
 #define FUNC_BAR_TEXT_PROG2    "PROGRAM II"
 #define FUNC_BAR_TEXT_CUSTOM   "CUSTOM BANK"
@@ -140,39 +143,34 @@ struct keypadStruct
 /* PROTOTYPES */
 /* ---------- */
 #ifdef CPPLUS
-extern "C" void StackPush(double temp);
+extern "C" void   StackPush(double temp);
 extern "C" double StackPop(void);
-extern "C" void RPN_error(char *msg);
-extern "C" void RPN_help(void);
+extern "C" void   RPN_error(char *msg);
+extern "C" void   RPN_help(void);
 extern "C" double FromRadians(double t);
 extern "C" double ToRadians(double t);
 #else
-extern void StackPush(double temp);
+extern void   StackPush(double temp);
 extern double StackPop(void);
-extern void RPN_error(char *msg);
-extern void RPN_help(void);
+extern void   RPN_error(char *msg);
+extern void   RPN_help(void);
 extern double FromRadians(double t);
 extern double ToRadians(double t);
 #endif
-
-#define PROG_LONG        uint32_t    /* We handle signed and other word sizes in ex_prog.c */
-#define PROG_SIGNEDLONG  int32_t     /* Needed when we convert Signed to float... */
-
 
 #define TIMER_ONE_MINUTE    1
 #define TIMER_SLOW          2
 #define TIMER_FAST          3
 
 extern struct funcStruct Scientific_funcs[];
+extern struct funcStruct Scientific2_funcs[];
 extern struct funcStruct Financial_funcs[];
 extern struct funcStruct Conversion_funcs[];
 extern struct funcStruct CompSci_funcs[];
-extern struct funcStruct Geometry_funcs[];
-extern struct funcStruct Custom_funcs[];
 extern struct funcStruct Program1_funcs[];
 extern struct funcStruct Program2_funcs[];
 extern struct funcStruct Statistics_funcs[];
-extern struct funcStruct Scientific2_funcs[];
+extern struct funcStruct Custom_funcs[];
 extern struct funcStruct MacroFuncs[];
 
 extern uint8_t Xedit;
@@ -361,10 +359,9 @@ extern void RPN_inverse(void);
 #define CUSTOM_SAVE_FIN       3
 #define CUSTOM_SAVE_STATS     4
 #define CUSTOM_SAVE_CONV      5
-#define CUSTOM_SAVE_GEO       6
-#define CUSTOM_SAVE_COMPSCI   7
-#define CUSTOM_SAVE_PROG1     8
-#define CUSTOM_SAVE_PROG2     9
+#define CUSTOM_SAVE_COMPSCI   6
+#define CUSTOM_SAVE_PROG1     7
+#define CUSTOM_SAVE_PROG2     8
 #define CUSTOM_SAVE_MAC       99        // macros
 
 struct customSaveStruct
@@ -405,24 +402,25 @@ extern void turnOnNumLock(void);
 
 #define MAX_STACK_STRLEN    29
 
-#define MAX_FUNCTIONS       650
-#define MAX_REC_PLAYBACK    256
-#define MAX_MACROS          64
-#define MAX_MACRO_FUNC_TEXT 30
+#define MAX_FUNCTIONS       400     // Total Excalibur function keys across all banks
+#define MAX_REC_PLAYBACK    256     // Maximum number of program steps per program
+#define MAX_MACROS          64      // Maximum number of total programs (each getting the max steps)
+#define MAX_MACRO_FUNC_TEXT 30      // Maximum macro text that can be assigned to any key
+
 struct playbackStruct
 {
     uint16_t uniqueIndex;
     uint8_t  useFloatsLongs;
     uint8_t  allowRecord;
-    uint8_t  saveLastX;             /* Do we save LASTX here? */
-    uint8_t  newXedit;              /* The new Xedit */
-    void(*routine) (void);
+    uint8_t  saveLastX;
+    uint8_t  newXedit;
+    func_t   routine;
     char     funcText[MAX_MACRO_FUNC_TEXT];
 };
 
 extern struct playbackStruct playBackMap[MAX_FUNCTIONS + 1];
 
-extern char macroName[MAX_MACROS][51];
+extern char macroName[MAX_MACROS][MAX_MACRO_FUNC_TEXT];
 extern char macro_short_names[MAX_MACROS][7];
 
 #define COPY_X_TO_CLIPBOARD         0
@@ -546,7 +544,6 @@ enum UniqueButtonIndexTag
     UNI_BUSI,
     UNI_STAT,
     UNI_CONV,
-    UNI_GEOM,
     UNI_COMPSCI,
     UNI_PROG1,
     UNI_PROG2,
@@ -946,11 +943,10 @@ extern uint32_t userTicks;
 #define RPN_FIN                         202
 #define RPN_STAT                        203
 #define RPN_CONV                        204
-#define RPN_GEOM                        205
-#define RPN_COMPSCI                     206
-#define RPN_PROGI                       207
-#define RPN_PROGII                      208
-#define RPN_CUST                        209
+#define RPN_COMPSCI                     205
+#define RPN_PROGI                       206
+#define RPN_PROGII                      207
+#define RPN_CUST                        208
 
 #define STATUS_BAR                      300
 #define FUNC_BAR                        301
@@ -1033,11 +1029,10 @@ extern uint32_t userTicks;
 #define IDC_CUSTOM_FIN                  192
 #define IDC_CUSTOM_STAT                 193
 #define IDC_CUSTOM_CONV                 194
-#define IDC_CUSTOM_GEOM                 195
-#define IDC_CUSTOM_COMPSCI              196
-#define IDC_CUSTOM_PROG1                197
-#define IDC_CUSTOM_PROG2                198
-#define IDC_CUSTOM_FUNCNAME             199
+#define IDC_CUSTOM_COMPSCI              195
+#define IDC_CUSTOM_PROG1                196
+#define IDC_CUSTOM_PROG2                197
+#define IDC_CUSTOM_FUNCNAME             198
 
 #define IDC_CUSTOM_CANCEL               299
 

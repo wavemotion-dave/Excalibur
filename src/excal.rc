@@ -43,7 +43,7 @@ STYLE DS_CENTER | WS_MINIMIZEBOX | WS_CAPTION | WS_SYSMENU
 CAPTION "Excalibur 32-bit"
 MENU EXCALIBUR_MENU
 CLASS "EXCALIBUR"
-FONT 10, "MS Sans Serif", 0, 0, 0x1
+FONT 10, "MS Sans Serif"
 BEGIN
     PUSHBUTTON      "0",RPN_DIGIT_0,3,152,18,20
     PUSHBUTTON      "1",RPN_DIGIT_1,3,126,18,20
@@ -138,16 +138,15 @@ BEGIN
     PUSHBUTTON      "Const",RPN_CONST,152,142,27,15
     PUSHBUTTON      "Drop",RPN_DROP,152,108,27,15
     LTEXT           "C",RPN_CARRY,313,185,8,8,NOT WS_VISIBLE
-    RADIOBUTTON     "Scientific I",RPN_SCI,187,20,45,10
-    RADIOBUTTON     "Statistics",RPN_STAT,187,65,44,10
-    RADIOBUTTON     "Financial",RPN_FIN,187,50,44,10
-    RADIOBUTTON     "Conversion",RPN_CONV,187,80,47,10
-    RADIOBUTTON     "Geometry",RPN_GEOM,187,95,46,10
-    RADIOBUTTON     "Comp Sci",RPN_COMPSCI,187,110,46,10
-    RADIOBUTTON     "Scientific II",RPN_SCI2,187,35,47,10
-    RADIOBUTTON     "Program I",RPN_PROGI,187,125,46,10
-    RADIOBUTTON     "Program II",RPN_PROGII,187,140,48,10
-    RADIOBUTTON     "Custom",RPN_CUST,187,155,39,10
+    RADIOBUTTON     "Scientific I",RPN_SCI,187,21,45,10
+    RADIOBUTTON     "Statistics",RPN_STAT,187,71,44,10
+    RADIOBUTTON     "Financial",RPN_FIN,187,54,44,10
+    RADIOBUTTON     "Conversion",RPN_CONV,187,88,47,10
+    RADIOBUTTON     "Comp Sci",RPN_COMPSCI,187,105,46,10
+    RADIOBUTTON     "Scientific II",RPN_SCI2,187,37,47,10
+    RADIOBUTTON     "Program I",RPN_PROGI,187,122,46,10
+    RADIOBUTTON     "Program II",RPN_PROGII,187,139,48,10
+    RADIOBUTTON     "Custom",RPN_CUST,187,156,39,10
     GROUPBOX        "Function Bank",IDC_STATIC,183,4,57,169
     CONTROL         "",IDC_STATIC,"Static",SS_SIMPLE | SS_SUNKEN | WS_GROUP,
                     2,181,383,16,WS_EX_CLIENTEDGE
@@ -256,8 +255,6 @@ BEGIN
                     10,50,50,10
     CONTROL         "Conversion",IDC_CUSTOM_CONV,"Button",BS_AUTORADIOBUTTON,
                     10,78,50,10
-    CONTROL         "Geometry",IDC_CUSTOM_GEOM,"Button",BS_AUTORADIOBUTTON,
-                    10,92,50,10
     CONTROL         "Comp Sci",IDC_CUSTOM_COMPSCI,"Button",
                     BS_AUTORADIOBUTTON,10,106,50,10
     CONTROL         "Scientific II",IDC_CUSTOM_SCI2,"Button",
@@ -807,11 +804,10 @@ BEGIN
     POPUP "&Bank"
     BEGIN
         MENUITEM "&Scientific I",               IDM_SCIENTIFIC
-        MENUITEM "&Scientific II",              IDM_SCI2
+        MENUITEM "&Scientific II",              IDM_SCIENTIFIC2
         MENUITEM "&Financial",                  IDM_FINANCIAL
         MENUITEM "&Statistics",                 IDM_STATS
         MENUITEM "&Conversion",                 IDM_CONVERSION
-        MENUITEM "&Geometry",                   IDM_GEOMETRY
         MENUITEM "&Comp Sci",                   IDM_COMPSCI
         MENUITEM "&Program I",                  IDM_PROGI
         MENUITEM "&Program II",                 IDM_PROGII
@@ -1892,6 +1888,8 @@ BEGIN
     H_N_LBF                 "Convert from Newtons to Pounds Force"
     T_HZ_AF                 "Hertz to Angual Frequency"
     H_HZ_AF                 "Convert from Hertz to Angual Frequency (rad/sec)"
+    T_METRIC                "Metric Table"
+    H_METRIC                "Metric Prefixes and their magnitudes"
 END
 
 #endif    // English (U.S.) resources

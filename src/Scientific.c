@@ -102,6 +102,10 @@ extern void SCI_AccelerationDist(void);    // in meters
 extern void SCI_ProjectileRange(void);     // In meters
 extern void SCI_ProjectileHeight(void);    // In meters
 extern void SCI_Astro(void);
+extern void SCI_pyth(void);
+extern void SCI_quad(void);
+extern void SCI_circA(void);
+extern void SCI_SphrV(void);
 
 extern void COMP_plus(void);
 extern void COMP_minus(void);
@@ -183,9 +187,9 @@ struct funcStruct Scientific2_funcs[MAX_FUNCS] = {
     {FN11,  UNI_ACELDIST,   USES_F,     ALLOWREC,   ' ',    "Acc D",    YES_L,      X_NEW,      SCI_AccelerationDist,   T_ACCELDIST,    H_ACCELDIST},
     {FN12,  UNI_PROJRANGE,  USES_F,     ALLOWREC,   ' ',    "Proj R",   YES_L,      X_NEW,      SCI_ProjectileRange,    T_PROJRANGE,    H_PROJRANGE},
     {FN13,  UNI_PROJHEIGHT, USES_F,     ALLOWREC,   ' ',    "Proj H",   YES_L,      X_NEW,      SCI_ProjectileHeight,   T_PROJHEIGHT,   H_PROJHEIGHT},
-    {FN14,  UNI_METRIC,     USES_F,     ALLOWREC,   ' ',    "Metric",   YES_L,      X_NEW,      SCI_metricPre,          T_NULL,         H_NULL}, //TODO: help
-    {FN15,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_ATLAS}, // hidden
-    {FN16,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_NULL},
+    {FN14,  UNI_METRIC,     USES_F,     ALLOWREC,   ' ',    "Metric",   YES_L,      X_NEW,      SCI_metricPre,          T_METRIC,       H_METRIC},
+    {FN15,  UNI_QUAD,       USES_F,     ALLOWREC,   ' ',    "Quad",     YES_L,      X_NEW,      SCI_quad,               T_QUAD,         H_QUAD},
+    {FN16,  UNI_PYTH,       USES_F,     ALLOWREC,   ' ',    "Pyth",     YES_L,      X_NEW,      SCI_pyth,               T_PYTHAG,       H_PYTHAG},
     {FN17,  UNI_CPLUS,      USES_F,     ALLOWREC,   ' ',    "Cpx +",    YES_L,      X_NEW,      COMP_plus,              T_CPLXADD,      H_CPLXADD},
     {FN18,  UNI_CMINUS,     USES_F,     ALLOWREC,   ' ',    "Cpx --",   YES_L,      X_NEW,      COMP_minus,             T_CPLXSUB,      H_CPLXSUB},
     {FN19,  UNI_CDIV,       USES_F,     ALLOWREC,   ' ',    "Cpx ÷",    YES_L,      X_NEW,      COMP_div,               T_CPLXDIV,      H_CPLXDIV},
@@ -208,8 +212,8 @@ struct funcStruct Scientific2_funcs[MAX_FUNCS] = {
     {FN36,  UNI_CABS,       USES_F,     ALLOWREC,   ' ',    "cABS",     YES_L,      X_NEW,      COMP_abs,               T_CPLXABS,      H_CPLXABS},
     {FN37,  UNI_CNORM,      USES_F,     ALLOWREC,   ' ',    "cNORM",    YES_L,      X_NEW,      COMP_norm,              T_CNORM,        H_CNORM},
     {FN38,  UNI_CARG,       USES_F,     ALLOWREC,   ' ',    "cARG",     YES_L,      X_NEW,      COMP_arg,               T_CARG,         H_CARG},
-    {FN39,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_NULL},
-    {FN40,  UNI_UNUSED,     USES_F,     ALLOWREC,   ' ',    "   ",      YES_L,      X_NEW,      NULL,                   T_NULL,         H_NULL},
+    {FN39,  UNI_CIRCA,      USES_F,     ALLOWREC,   ' ',    "Circ A",   YES_L,      X_NEW,      SCI_circA,              T_CIRCA,        H_CIRCA},
+    {FN40,  UNI_SPHV,       USES_F,     ALLOWREC,   ' ',    "Sphr V",   YES_L,      X_NEW,      SCI_SphrV,              T_SPHV,         H_SPHV},
 };
 
 void SCI_hyp(void)
@@ -1664,3 +1668,49 @@ void SCI_Astro(void)
     DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_ASTRO", calcMainWindow, AstroDlgProc);
 }
 
+void SCI_quad(void)
+{
+    double a, b, c, temp1;
+    double X1, X2;
+
+    a = StackPop();
+    b = StackPop();
+    c = StackPop();
+    temp1 = (b * b) - (4.0 * a * c);
+    if (temp1 < 0.0)
+    {
+        RPN_error("Quadratic Equation: Square-Root of negative number");
+    }
+    else
+    {
+        X1 = ((-1.0 * b) + sqrt(temp1)) / (2.0 * a);
+        X2 = ((-1.0 * b) - sqrt(temp1)) / (2.0 * a);
+        StackPush(X2);
+        StackPush(X1);
+    }
+}
+
+void SCI_pyth(void)
+{
+    double a, b, c;
+
+    a = StackPop();
+    b = StackPop();
+    c = sqrt(a * a + b * b);
+    StackPush(c);
+}
+
+void SCI_circA(void)
+{
+    double temp;
+    temp = StackPop();
+    StackPush((temp * temp) * M_PI);
+}
+
+void SCI_SphrV(void)
+{
+    double r;
+
+    r = StackPop();
+    StackPush((4.0F / 3.0F) * M_PI * (r * r * r));
+}

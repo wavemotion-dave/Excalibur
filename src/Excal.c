@@ -45,7 +45,7 @@
 #define WINDOW_TITLE "Excalibur 32-bit"
 
 #define ABOUT_MSG "Excalibur for Windows 32-bit\n"                      \
-                  "Version 3.XX-01  -  April 26, 2026\n\n"              \
+                  "Version 3.XX-01  -  May 04, 2026\n\n"                \
                   "Copyright 1994-2026 David Bernazzani\n\n"            \
                   "Please read the disclaimer and understand the\n"     \
                   "accuracy and precision issues before using.\n\n"     \
@@ -53,7 +53,7 @@
                   "if you want to donate to support the effort.\n\n"    \
                   "https://github.com/wavemotion-dave/Excalibur"
 
-#define CONFIG_VERSION_MAIN     0xF004      // If this changes, we wipe EVERYTHING
+#define CONFIG_VERSION_MAIN     0xF001      // If this changes, we wipe EVERYTHING
 #define CONFIG_VERSION_SUB      0xF001      // If this changes, we reset x,y window position and reset constant tables (currency, physics constants, etc)
 
 #define END_OF_PROGRAM_STR "<End Of Program>"
@@ -61,7 +61,7 @@
 int16_t  playBackSave[MAX_MACROS][MAX_REC_PLAYBACK + 1];
 int16_t  playBackIdxSave[MAX_MACROS];
 uint8_t  recModeON = 0;
-uint8_t  macroPlayback = FALSE;      /* TRUE if macro playback in progress */
+uint8_t  macroPlayback = FALSE;
 
 uint8_t  modifiers = 0x00;
 
@@ -99,15 +99,15 @@ int32_t  lastChosenMacro = 0;
 uint8_t  showTime24HourFormat = FALSE;
 uint8_t  alwaysOnTop = 0;
 
-char     macroName[MAX_MACROS][51];
+char     macroName[MAX_MACROS][MAX_MACRO_FUNC_TEXT];
 char     macro_short_names[MAX_MACROS][7];
 char     clipboardBuffer[MAX_IMPORT_CLIPBOARD_SIZE+1];
-char     helpTitle[64];
-char     helpMsg[256];
 char     statusBar[32];
+char     helpTitle[64];
+char     functionBar[64];
+char     helpMsg[256];
 char     tmpStr[256];
 BYTE     keyState[256];
-char     functionBar[64];
 
 // -------------------------------------
 // Buffers for editing the X register
@@ -118,33 +118,34 @@ char     Xstr[50];
 /* ---------------- */
 /* Global registers */
 /* ---------------- */
-double X;                       /* Main register X */
-double Y;                       /* Main register Y */
-double Z;                       /* Main register Z */
-double T;                       /* Main Register T */
-double A;                       /* Extended Stack A */
-double B;                       /* Extended Stack B */
-double C;                       /* Extended Stack C */
-double D;                       /* Extended Stack D */
-double LASTX;                   /* LAST X register */
-double LASTY;                   /* LAST Y register */
+double X;                           // Main register X
+double Y;                           // Main register Y
+double Z;                           // Main register Z
+double T;                           // Main Register T
+double A;                           // Extended Stack A
+double B;                           // Extended Stack B
+double C;                           // Extended Stack C
+double D;                           // Extended Stack D
+double LASTX;                       // LAST X register
+double LASTY;                       // LAST Y register
 
-PROG_LONG XL;                   /* The main register X when in Comp-Sci mode */
-PROG_LONG YL;                   /* The main register Y when in Comp-Sci mode */
-PROG_LONG ZL;                   /* The main register Z when in Comp-Sci mode */
-PROG_LONG TL;                   /* The main register T when in Comp-Sci mode */
-PROG_LONG AL;                   /* The extended stack A when in Comp-Sci mode */
-PROG_LONG BL;                   /* The extended stack B when in Comp-Sci mode */
-PROG_LONG CL;                   /* The extended stack C when in Comp-Sci mode */
-PROG_LONG DL;                   /* The extended stack D when in Comp-Sci mode */
-PROG_LONG LASTXL;               /* LAST X when in Comp-Sci mode */
-PROG_LONG LASTYL;               /* LAST Y when in Comp-Sci mode */
+PROG_LONG XL;                       // The main register X when in Comp-Sci mode
+PROG_LONG YL;                       // The main register Y when in Comp-Sci mode
+PROG_LONG ZL;                       // The main register Z when in Comp-Sci mode
+PROG_LONG TL;                       // The main register T when in Comp-Sci mode
+PROG_LONG AL;                       // The extended stack A when in Comp-Sci mode
+PROG_LONG BL;                       // The extended stack B when in Comp-Sci mode
+PROG_LONG CL;                       // The extended stack C when in Comp-Sci mode
+PROG_LONG DL;                       // The extended stack D when in Comp-Sci mode
+PROG_LONG LASTXL;                   // LAST X when in Comp-Sci mode
+PROG_LONG LASTYL;                   // LAST Y when in Comp-Sci mode
 
 // Some statistics registers
 uint64_t stackPushes = 0;           // Total number of Stack Pushes
 uint64_t stackPops = 0;             // Total number of Stack Pops
 uint32_t inFocusTime = 0;           // Number of minutes Excalibur window in 'focus'
 
+// A number of status registers
 uint8_t  AngleMode = 0;             // 0=Degrees, 1=Radians, 2=Gradients
 uint8_t  commaMode = 1;             // 0=International, 1=American
 uint8_t  eexMode = 1;               // 0=EEX, 1=E
@@ -161,6 +162,7 @@ uint8_t  progMode = PROG_NORMAL;    // Normal floating-point mode
 uint8_t  helpMode = 0;              // Used to determine if next key or button hit is for help
 uint16_t lastUniqueIndex = 0;       // Index of the last function that was called (useful in Financial Register handling)
 
+// Various storage arrays for RPN use
 double STO[MAX_STO];                // Storage registers R0-R99
 char STOlabels[MAX_STO][9];         // Labels associated with the R0-R99 registers
 double SUM[SUM_MAX];                // Statistics registers for the Financial bank
@@ -168,7 +170,6 @@ char excaliburNotes[NOTES_SIZE];    // A small scratchpad for the user to jot do
 
 struct playbackStruct playBackMap[MAX_FUNCTIONS + 1];
 
-extern void Macro_BST(void);
 extern void RPN_digit0(void);
 extern void RPN_digit1(void);
 extern void RPN_digit2(void);
@@ -223,12 +224,6 @@ void ProcessCusomSave(void);
 void SetLastMenuType(int type);
 WORD GetMouseHelp(WORD xPos, WORD yPos);
 void init_key_pos(void);        // for tool tips
-
-#ifdef __cplusplus
-typedef void(*fptr) (int);
-#else
-typedef void(*fptr) ();
-#endif
 
 // ---------------------------------------------------------------------------------------------------------
 // This is the classic Win32 entry point (think of this like main() for traditional C console programs).
@@ -480,16 +475,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
             case IDM_COMPSCI:
                 SelectNewFunc((struct funcStruct *) &CompSci_funcs);
                 break;
-            case IDM_GEOMETRY:
-                SelectNewFunc((struct funcStruct *) &Geometry_funcs);
-                break;
             case IDM_CUSTOM:
                 SelectNewFunc((struct funcStruct *) &Custom_funcs);
                 break;
             case IDM_STATS:
                 SelectNewFunc((struct funcStruct *) &Statistics_funcs);
                 break;
-            case IDM_SCI2:
+            case IDM_SCIENTIFIC2:
                 SelectNewFunc((struct funcStruct *) &Scientific2_funcs);
                 break;
             case IDM_PROGI:
@@ -972,17 +964,15 @@ void SelectNewFunc(struct funcStruct *funcs)
     CheckMenuItem(hMainMenu, IDM_FINANCIAL,     MF_UNCHECKED);
     CheckMenuItem(hMainMenu, IDM_CONVERSION,    MF_UNCHECKED);
     CheckMenuItem(hMainMenu, IDM_PROGII,        MF_UNCHECKED);
-    CheckMenuItem(hMainMenu, IDM_GEOMETRY,      MF_UNCHECKED);
     CheckMenuItem(hMainMenu, IDM_CUSTOM,        MF_UNCHECKED);
     CheckMenuItem(hMainMenu, IDM_STATS,         MF_UNCHECKED);
-    CheckMenuItem(hMainMenu, IDM_SCI2,          MF_UNCHECKED);
+    CheckMenuItem(hMainMenu, IDM_SCIENTIFIC2,   MF_UNCHECKED);
     CheckMenuItem(hMainMenu, IDM_PROGI,         MF_UNCHECKED);
 
     SendMessage(GetDlgItem(calcMainWindow, RPN_SCI),     BM_SETCHECK, (WORD) 0, (DWORD) 0L);
     SendMessage(GetDlgItem(calcMainWindow, RPN_STAT),    BM_SETCHECK, (WORD) 0, (DWORD) 0L);
     SendMessage(GetDlgItem(calcMainWindow, RPN_FIN),     BM_SETCHECK, (WORD) 0, (DWORD) 0L);
     SendMessage(GetDlgItem(calcMainWindow, RPN_CONV),    BM_SETCHECK, (WORD) 0, (DWORD) 0L);
-    SendMessage(GetDlgItem(calcMainWindow, RPN_GEOM),    BM_SETCHECK, (WORD) 0, (DWORD) 0L);
     SendMessage(GetDlgItem(calcMainWindow, RPN_COMPSCI), BM_SETCHECK, (WORD) 0, (DWORD) 0L);
     SendMessage(GetDlgItem(calcMainWindow, RPN_SCI2),    BM_SETCHECK, (WORD) 0, (DWORD) 0L);
     SendMessage(GetDlgItem(calcMainWindow, RPN_PROGI),   BM_SETCHECK, (WORD) 0, (DWORD) 0L);
@@ -1017,12 +1007,6 @@ void SelectNewFunc(struct funcStruct *funcs)
         SendMessage(GetDlgItem(calcMainWindow, RPN_CONV), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_CONV);
     }
-    if (funcs == (struct funcStruct *) &Geometry_funcs)
-    {
-        CheckMenuItem(hMainMenu, IDM_GEOMETRY, MF_CHECKED);
-        SendMessage(GetDlgItem(calcMainWindow, RPN_GEOM), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
-        ShowFunctionBar(FUNC_BAR_TEXT_GEOM);
-    }
     if (funcs == (struct funcStruct *) &Custom_funcs)
     {
         CheckMenuItem(hMainMenu, IDM_CUSTOM, MF_CHECKED);
@@ -1037,7 +1021,7 @@ void SelectNewFunc(struct funcStruct *funcs)
     }
     if (funcs == (struct funcStruct *) &Scientific2_funcs)
     {
-        CheckMenuItem(hMainMenu, IDM_SCI2, MF_CHECKED);
+        CheckMenuItem(hMainMenu, IDM_SCIENTIFIC2, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, RPN_SCI2), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_SCI2);
     }
@@ -1390,9 +1374,9 @@ void UpdateSpareBar_StoreRecall(void)
         if (rpnStoreRecall & REG_MINUS)    strcat(tmpStr, "-");
         if (rpnStoreRecall & REG_MULTIPLY) strcat(tmpStr, "×");
         if (rpnStoreRecall & REG_DIVIDE)   strcat(tmpStr, "÷");
-        
+
         if (rpnStoreRecall & REG_DP)   strcat(tmpStr, " ·");
-        
+
         UpdateSpareBar(tmpStr);
     }
 }
@@ -1747,7 +1731,7 @@ struct keypadStruct RPNkeys[] = {
     {RPN_SUBTRACT,  UNI_SUB,    USES_FL, ALLOWREC, '-', YES_L,  X_NULL,     RPN_minus,          "Minus",                "Subtraction of X from Y(Y-X)"},
     {RPN_PLUS,      UNI_PLUS,   USES_FL, ALLOWREC, '+', YES_L,  X_NULL,     RPN_plus,           "Plus",                 "Addition of X and Y"},
     {RPN_ENTER,     UNI_ENT,    USES_FL, ALLOWREC, 13,  NO_L,   X_NULL,     RPN_enter,          "Enter",                "Used to separate numbers in the RPN stack"},
-    
+
     {RPN_EXCH_X_Y,  UNI_XCH,    USES_FL, ALLOWREC, 'x', NO_L,   X_NEW,      RPN_exchange_x_y,   "Exchange X and Y",     "Exchanges the contents of the X and Y registers"},
     {RPN_NEGATE,    UNI_CHS,    USES_FL, ALLOWREC, 'n', NO_L,   X_NULL,     RPN_negate_x,       "Change Sign",          "Used to change the sign of X"},
     {RPN_E,         UNI_E,      USES_FL, ALLOWREC, 'e', NO_L,   X_NULL,     RPN_Ex,             "Exponent",             "Used to produce an exponential number(e.g. 3.45e+12)"},
@@ -1764,7 +1748,7 @@ struct keypadStruct RPNkeys[] = {
     {RPN_DROP,      UNI_DROP,   USES_FL, ALLOWREC, 'd', YES_L,  X_NEW,      RPN_drop,           "Drop Stack",           "Drops the X register and the rest of stack shifts down."},
     {RPN_LARG,      UNI_LARG,   USES_FL, ALLOWREC, ' ', NO_L,   X_NEW,      RPN_larg,           "Last Arguments",       "Retrieves the last X and Y pair before last operation."},
     {RPN_FRAC,      UNI_FRAC,   USES_FL, ALLOWREC, ' ', NO_L,   X_EDIT,     RPN_frac,           "Fraction Bar",         "Insert Fraction to current X edit"},
-    
+
     {RPN_EDIT,      UNI_EDIT,   USES_FL, ALLOWREC, ' ', NO_L,   X_NULL,     RPN_edit,           "Edit X Register",      "Used to place the X register back in edit mode if it is not already."},
     {RPN_CONST,     UNI_CONST,  USES_F,  NORECORD, ' ', YES_L,  X_NEW,      RPN_const,          "Constants",            "Recall or Store Constants to one of five banks."},
     {RPN_NOTES,     UNI_NOTES,  USES_FL, ALLOWREC, ' ', NO_L,   X_NULL,     RPN_Notes,          "Excalibur Notepad",    "Allows some simple notes to be stored/saved."},
@@ -1773,13 +1757,12 @@ struct keypadStruct RPNkeys[] = {
     {RPN_EXREG,     UNI_EXREG,  USES_FL, ALLOWREC, ' ', NO_L,   X_NULL,     RPN_ExchangeReg,    "Exchange X with Reg",  "Exchange X with one of the Registers (next digit/dp selects R0-R19)"},
     {RPN_COPY,      UNI_COPY,   USES_FL, ALLOWREC, ' ', NO_L,   X_NULL,     RPN_Copy,           "Copy X Register",      "Copy X register to the clipboard"},
     {RPN_PASTE,     UNI_PASTE,  USES_FL, ALLOWREC, ' ', NO_L,   X_NULL,     RPN_Paste,          "Paste X Register",     "Paste X register from the clipboard"},
-    
+
     {RPN_SCI,       UNI_SCI,    USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectSci,      "Select Scientific I",  "Selects the Scientific I Layout"},
     {RPN_SCI2,      UNI_SCI2,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectSci2,     "Select Scientific II", "Selects the Scientific II Layout"},
     {RPN_COMPSCI,   UNI_COMPSCI,USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectCompSci,  "Select Comp Sci",      "Selects the Computer Science Layout"},
     {RPN_FIN,       UNI_BUSI,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectFin,      "Select Financial",     "Selects the Financial Layout"},
     {RPN_CONV,      UNI_CONV,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectConv,     "Select Conversion",    "Selects the Conversion Layout"},
-    {RPN_GEOM,      UNI_GEOM,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectGeom,     "Select Geometry",      "Selects the Geometry Layout"},
     {RPN_STAT,      UNI_STAT,   USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectStat,     "Select Statistics",    "Selects the Statistical Layout"},
     {RPN_PROGI,     UNI_PROG1,  USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectProgI,    "Select Program I",     "Selects Program Bank I"},
     {RPN_PROGII,    UNI_PROG2,  USES_FL, NORECORD, ' ', NO_L,   X_NULL,     RPN_SelectProgII,   "Select Program II",    "Selects Program Bank II"},
@@ -2383,19 +2366,19 @@ void RPN_clearStack(void)
         if (lastUniqueIndex == UNI_CLRSTK)
         {
             char savedStr[64];
-            
+
             memset(STO,      0x00, sizeof(STO));
             memset(cashFlow, 0x00, sizeof(cashFlow));
             memset(SUM,      0x00, sizeof(SUM));
-            memset(fin_reg,  0x00, sizeof(fin_reg));            
+            memset(fin_reg,  0x00, sizeof(fin_reg));
             CFn = 0;
 
             GetDlgItemText(calcMainWindow, RPN_STACK_X, savedStr, MAX_STACK_STRLEN);
             SetDlgItemText(calcMainWindow, RPN_STACK_X, "  ...MEMORY CLEAR...  ");
             Sleep(500);
-            GetDlgItemText(calcMainWindow, RPN_STACK_X, savedStr, MAX_STACK_STRLEN);            
+            GetDlgItemText(calcMainWindow, RPN_STACK_X, savedStr, MAX_STACK_STRLEN);
         }
-        
+
         if (progMode > 0) RPN_clearL();
         X = 0.0;
         Y = 0.0;
@@ -2458,14 +2441,14 @@ void RPN_enter(void)
             StackPushL(XL);
         Xedit = X_ENTER;
     }
-    
+
     RPN_ClearModifiers(!macroPlayback);
 }
 
 void RPN_dp(void)
 {
     int i;
-    
+
     if (rpnStoreRecall)
     {
         rpnStoreRecall |= REG_DP;
@@ -2507,7 +2490,7 @@ void RPN_dp(void)
             }
         }
     }
-    
+
     RPN_ClearModifiers(!macroPlayback);
     Xedit = X_EDIT;
 }
@@ -2547,16 +2530,16 @@ void RPN_Ex(void)
 void RPN_digit(WPARAM key)
 {
     double tmp1, tmp2, tmp3;
-    
+
     // Handle Store and Recall of Registers
     if (rpnStoreRecall)
     {
         uint8_t reg = (key - RPN_DIGIT_0) + (rpnStoreRecall & REG_DP ? 10:0);
-        
+
         if (rpnStoreRecall & REG_STORE)
         {
             if (Xedit == X_EDIT) Xedit = X_NEW;
-            
+
             if (rpnStoreRecall & REG_PLUS)
             {
                 STO[reg] += X;
@@ -2594,7 +2577,7 @@ void RPN_digit(WPARAM key)
                     StackPush(0.0);
             }
             else Xedit = X_NEW;
-            
+
             if (rpnStoreRecall & REG_PLUS)
             {
                 X += STO[reg];
@@ -2621,7 +2604,7 @@ void RPN_digit(WPARAM key)
             tmp1 = X;
             X = STO[reg];
             STO[reg] = tmp1;
-            
+
             if (Xedit == X_EDIT) Xedit = X_NEW;
         }
 
@@ -2934,7 +2917,7 @@ void RPN_plus(void)
     PROG_LONG xl, yl;
 
     Xedit = X_NEW;
-        
+
     if (rpnStoreRecall & 0x03)
     {
         rpnStoreRecall &= 0x0F;
@@ -3298,12 +3281,11 @@ int GetMenuType(struct funcStruct *cFunc)
     if (cFunc == (struct funcStruct *) &Financial_funcs)   retVal = 2;
     if (cFunc == (struct funcStruct *) &CompSci_funcs)     retVal = 3;
     if (cFunc == (struct funcStruct *) &Conversion_funcs)  retVal = 4;
-    if (cFunc == (struct funcStruct *) &Geometry_funcs)    retVal = 5;
-    if (cFunc == (struct funcStruct *) &Program1_funcs)    retVal = 6;
-    if (cFunc == (struct funcStruct *) &Program2_funcs)    retVal = 7;
-    if (cFunc == (struct funcStruct *) &Statistics_funcs)  retVal = 8;
-    if (cFunc == (struct funcStruct *) &Scientific2_funcs) retVal = 9;
-    if (cFunc == (struct funcStruct *) &Custom_funcs)      retVal = 10;
+    if (cFunc == (struct funcStruct *) &Program1_funcs)    retVal = 5;
+    if (cFunc == (struct funcStruct *) &Program2_funcs)    retVal = 6;
+    if (cFunc == (struct funcStruct *) &Statistics_funcs)  retVal = 7;
+    if (cFunc == (struct funcStruct *) &Scientific2_funcs) retVal = 8;
+    if (cFunc == (struct funcStruct *) &Custom_funcs)      retVal = 9;
 
     return(retVal);
 }
@@ -3337,36 +3319,30 @@ void SetMenuType(int type)
         ShowFunctionBar(FUNC_BAR_TEXT_CONV);
         break;
     case(5):
-        currentFuncs = (struct funcStruct *) &Geometry_funcs;
-        CheckMenuItem(hMainMenu, IDM_GEOMETRY, MF_CHECKED);
-        SendMessage(GetDlgItem(calcMainWindow, RPN_GEOM), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
-        ShowFunctionBar(FUNC_BAR_TEXT_GEOM);
-        break;
-    case(6):
         currentFuncs = (struct funcStruct *) &Program1_funcs;
         CheckMenuItem(hMainMenu, IDM_PROGI, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, RPN_PROGI), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_PROG1);
         break;
-    case(7):
+    case(6):
         currentFuncs = (struct funcStruct *) &Program2_funcs;
         CheckMenuItem(hMainMenu, IDM_PROGII, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, RPN_PROGII), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_PROG2);
         break;
-    case(8):
+    case(7):
         currentFuncs = (struct funcStruct *) &Statistics_funcs;
         CheckMenuItem(hMainMenu, IDM_STATS, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, RPN_STAT), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_STATS);
         break;
-    case(9):
+    case(8):
         currentFuncs = (struct funcStruct *) &Scientific2_funcs;
-        CheckMenuItem(hMainMenu, IDM_SCI2, MF_CHECKED);
+        CheckMenuItem(hMainMenu, IDM_SCIENTIFIC2, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, RPN_SCI2), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_SCI2);
         break;
-    case(10):
+    case(9):
         currentFuncs = (struct funcStruct *) &Custom_funcs;
         CheckMenuItem(hMainMenu, IDM_CUSTOM, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, RPN_CUST), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
@@ -3392,21 +3368,18 @@ void SetLastMenuType(int type)
         lastFuncs = (struct funcStruct *) &Conversion_funcs;
         break;
     case(5):
-        lastFuncs = (struct funcStruct *) &Geometry_funcs;
-        break;
-    case(6):
         lastFuncs = (struct funcStruct *) &Program1_funcs;
         break;
-    case(7):
+    case(6):
         lastFuncs = (struct funcStruct *) &Program2_funcs;
         break;
-    case(8):
+    case(7):
         lastFuncs = (struct funcStruct *) &Statistics_funcs;
         break;
-    case(9):
+    case(8):
         lastFuncs = (struct funcStruct *) &Scientific2_funcs;
         break;
-    case(10):
+    case(9):
         lastFuncs = (struct funcStruct *) &Custom_funcs;
         break;
     }
@@ -3746,9 +3719,6 @@ void ProcessCusomSave(void)
             break;
         case(CUSTOM_SAVE_STATS):      // Statistics
             memcpy(&Custom_funcs[newIdx], &Statistics_funcs[index], sizeof(struct funcStruct));
-            break;
-        case(CUSTOM_SAVE_GEO):        // Geometry
-            memcpy(&Custom_funcs[newIdx], &Geometry_funcs[index], sizeof(struct funcStruct));
             break;
         case(CUSTOM_SAVE_CONV):       // Conversion
             memcpy(&Custom_funcs[newIdx], &Conversion_funcs[index], sizeof(struct funcStruct));
@@ -4735,11 +4705,6 @@ void RPN_SelectConv(void)
     SelectNewFunc((struct funcStruct *) &Conversion_funcs);
 }
 
-void RPN_SelectGeom(void)
-{
-    SelectNewFunc((struct funcStruct *) &Geometry_funcs);
-}
-
 void RPN_SelectCompSci(void)
 {
     SelectNewFunc((struct funcStruct *) &CompSci_funcs);
@@ -4830,17 +4795,6 @@ void mapButtonFuncs(void)
         j++;
     }
 
-    for (i = 0; i < MAX_FUNCS; i++)
-    {
-        playBackMap[j].saveLastX = Geometry_funcs[i].saveLastX;
-        playBackMap[j].newXedit = Geometry_funcs[i].newXedit;
-        playBackMap[j].routine = Geometry_funcs[i].routine;
-        LoadString(hExcaliburInstance, Geometry_funcs[i].keyTitle, playBackMap[j].funcText, MAX_MACRO_FUNC_TEXT-1);
-        playBackMap[j].uniqueIndex = Geometry_funcs[i].uniqueIndex;
-        playBackMap[j].useFloatsLongs = Geometry_funcs[i].useFloatsLongs;
-        playBackMap[j].allowRecord = Geometry_funcs[i].allowRecord;
-        j++;
-    }
 
     for (i = 0; i < MAX_FUNCS; i++)
     {
@@ -4887,10 +4841,11 @@ void mapButtonFuncs(void)
         playBackMap[j].uniqueIndex = Program2_funcs[i].uniqueIndex;
         playBackMap[j].useFloatsLongs = Program2_funcs[i].useFloatsLongs;
         playBackMap[j].allowRecord = Program2_funcs[i].allowRecord;
-        j++;
+        totalMappedButtonFuncs++;
     }
 
     totalMappedButtonFuncs = j;
+    STO[99] = totalMappedButtonFuncs;
 
     if (totalMappedButtonFuncs > MAX_FUNCTIONS)
     {
@@ -4995,7 +4950,7 @@ void callButtonFunc(void(*routine) (void), char useFloatsLongs, char allowRecord
     }
 
     routine();                 // This calls the actual button routine to perform things like SIN, COS, CLX, etc
-    
+
     lastUniqueIndex = uniqueIndex;
 
     if ((recModeON == 1) && (allowRecord == ALLOWREC))
@@ -5046,7 +5001,7 @@ void callButtonFunc_fast(void(*routine) (void), char useFloatsLongs, uint16_t un
     }
 
     routine();                 // This calls the actual button routine to perform things like SIN, COS, CLX, etc
-    
+
     lastUniqueIndex = uniqueIndex;
 
     if (newXedit != X_NULL)
@@ -5100,7 +5055,7 @@ void RPN_Playback(void)
         ShowWindow(toolTipWnd, SW_HIDE);
         toolTipCounter = 0;
     }
-    
+
     SetWindowText(GetDlgItem(calcMainWindow, RPN_PLAYBACK), "Stop");
 
     // ------------------------------------------------------------------------------------------------
@@ -5177,7 +5132,7 @@ void RPN_Playback(void)
     }
 
     SetWindowText(GetDlgItem(calcMainWindow, RPN_PLAYBACK), "Run");
-    
+
     UpdateSpareBar(" ");
     macroPlayback = FALSE;
 }

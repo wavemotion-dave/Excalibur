@@ -352,11 +352,6 @@ BOOL CALLBACK CustomDefDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM l
                 customPullFuncs = (struct funcStruct *) &Statistics_funcs;
                 processCustomFuncs(hDlg);
                 break;
-            case(IDC_CUSTOM_GEOM):        // Geometry funcs
-                savedIndexFunc = CUSTOM_SAVE_GEO;
-                customPullFuncs = (struct funcStruct *) &Geometry_funcs;
-                processCustomFuncs(hDlg);
-                break;
             case(IDC_CUSTOM_CONV):        // Conversion funcs
                 savedIndexFunc = CUSTOM_SAVE_CONV;
                 customPullFuncs = (struct funcStruct *) &Conversion_funcs;

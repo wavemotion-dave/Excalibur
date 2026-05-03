@@ -700,6 +700,8 @@
 #define H_N_LBF                         693
 #define T_HZ_AF                         694
 #define H_HZ_AF                         695
+#define T_METRIC                        696
+#define H_METRIC                        697
 
 #define IDC_FORMAT                      998
 #define IDC_EDIT1                       1002
