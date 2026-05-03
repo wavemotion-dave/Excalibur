@@ -56,7 +56,8 @@
 #define CONFIG_VERSION_MAIN     0xF001      // If this changes, we wipe EVERYTHING
 #define CONFIG_VERSION_SUB      0xF001      // If this changes, we reset x,y window position and reset constant tables (currency, physics constants, etc)
 
-#define END_OF_PROGRAM_STR "<End Of Program>"
+#define END_OF_PROGRAM_STR          "<End Of Program>"
+#define PROGRAM_ASSIGNED_KEY_STR    "Program Assigned Key"
 
 int16_t  playBackSave[MAX_MACROS][MAX_REC_PLAYBACK + 1];
 int16_t  playBackIdxSave[MAX_MACROS];
@@ -220,7 +221,7 @@ static HBRUSH helpWindowBackgroundBrush;
 
 void HelpAbout(void);
 void ShowUsageStats(void);
-void ProcessCusomSave(void);
+void ProcessCustomSave(void);
 void SetLastMenuType(int type);
 WORD GetMouseHelp(WORD xPos, WORD yPos);
 void init_key_pos(void);        // for tool tips
@@ -3387,7 +3388,7 @@ char reserved[RESERVED_SIZE];
 char *GetConfigurationDirectory(void)
 {
     static TCHAR Buffer[MAX_PATH];     // buffer for concatenated string
-    static TCHAR szPath[MAX_PATH];
+    TCHAR szPath[MAX_PATH];
     LPITEMIDLIST pidl = NULL;
     LPTSTR lpszSystemInfo;     // pointer to system information string
 
@@ -3561,7 +3562,7 @@ void ReadFromDisk(void)
             main_x = -1;
             SetMenuType(1);
             SaveToDisk();
-            ProcessCusomSave();
+            ProcessCustomSave();
             return;
         }
 
@@ -3682,17 +3683,17 @@ void ReadFromDisk(void)
         }
 
         fclose(infile);
-        ProcessCusomSave();
+        ProcessCustomSave();
     }
     else
     {
         SetMenuType(1);
-        ProcessCusomSave();
+        ProcessCustomSave();
         main_cx = -1;       // Window will auto resize because main_cx == -1
     }
 }
 
-void ProcessCusomSave(void)
+void ProcessCustomSave(void)
 {
     int i, index, newIdx, saveIdx;
 
@@ -3729,9 +3730,9 @@ void ProcessCusomSave(void)
             break;
         case(CUSTOM_SAVE_MAC):        // Macros - SPECIAL!
             memcpy(&Custom_funcs[newIdx], &MacroFuncs[index], sizeof(struct funcStruct));
-            Custom_funcs[newIdx].desc = macro_short_names[index];
+            Custom_funcs[newIdx].desc     = macro_short_names[index];
             Custom_funcs[newIdx].keyTitle = macroName[index];
-            Custom_funcs[newIdx].keyHelp  = "Program Assigned Key";
+            Custom_funcs[newIdx].keyHelp  = PROGRAM_ASSIGNED_KEY_STR;
             break;
         }
         Custom_funcs[newIdx].index = saveIdx;
@@ -4242,7 +4243,7 @@ BOOL CALLBACK fnDIALOG_MACRO(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
     case WM_DESTROY:
     case WM_CLOSE:
         EndDialog(hDlg, FALSE);
-        ProcessCusomSave();    // Always update the keypad for custom layout...
+        ProcessCustomSave();    // Always update the keypad for custom layout...
         break;
 
     case WM_SYSCOMMAND:
@@ -4713,11 +4714,11 @@ void RPN_SelectProgII(void)
     SelectNewFunc((struct funcStruct *) &Program2_funcs);
 }
 
-// Good old bubble sort... not the most efficient but this is only done once
-// at startup and the list is small so who cares?  I just want it to be simple and work.
+// Good old bubble sort... not the most efficient but this is only done once at
+// startup and the list is small so who cares?  I just want it to be simple and work.
 void sortPlaybackList(void)
 {
-    int i,j;
+    int i, j;
     uint8_t exchangeMade;
     struct playbackStruct tmpPlayBack;
     
@@ -4729,9 +4730,9 @@ void sortPlaybackList(void)
             if (playBackMap[j].uniqueIndex > playBackMap[j + 1].uniqueIndex)
             {
                 // Need to swap...
-                memcpy(&tmpPlayBack, &playBackMap[j], sizeof(tmpPlayBack));
-                memcpy(&playBackMap[j], &playBackMap[j + 1], sizeof(tmpPlayBack));
-                memcpy(&playBackMap[j + 1], &tmpPlayBack, sizeof(tmpPlayBack));
+                memcpy(&tmpPlayBack,        &playBackMap[j],     sizeof(tmpPlayBack));
+                memcpy(&playBackMap[j],     &playBackMap[j + 1], sizeof(tmpPlayBack));
+                memcpy(&playBackMap[j + 1], &tmpPlayBack,        sizeof(tmpPlayBack));
                 exchangeMade = TRUE; // At least one swap was performed
             }
         }
