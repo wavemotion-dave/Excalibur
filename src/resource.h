@@ -13,15 +13,9 @@
 #define IDC_EDIT5                       2005
 
 #define IDC_CHECK1                      2006
-#define IDC_BUTTON1                     2007
 #define IDC_CHECK2                      2008
-#define IDC_BUTTON2                     2009
-#define IDC_RICHEDIT1                   2010
 #define IDC_CHECK3                      2011
-#define IDC_BUTTON3                     2012
-#define IDC_RICHEDIT2                   2013
 #define IDC_CHECK4                      2014
-#define IDC_BUTTON4                     2015
 #define IDC_LIST1                       2016
 #define IDC_LIST2                       2017
 #define IDC_CHECKSUM1                   2018
