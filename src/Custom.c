@@ -82,70 +82,71 @@ struct funcStruct Custom_funcs[MAX_FUNCS] = {
     {FN40,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL}
 };
 
-extern void Cust_MacroPlayback1(void);
-extern void Cust_MacroPlayback2(void);
-extern void Cust_MacroPlayback3(void);
-extern void Cust_MacroPlayback4(void);
-extern void Cust_MacroPlayback5(void);
-extern void Cust_MacroPlayback6(void);
-extern void Cust_MacroPlayback7(void);
-extern void Cust_MacroPlayback8(void);
-extern void Cust_MacroPlayback9(void);
-extern void Cust_MacroPlayback10(void);
-extern void Cust_MacroPlayback11(void);
-extern void Cust_MacroPlayback12(void);
-extern void Cust_MacroPlayback13(void);
-extern void Cust_MacroPlayback14(void);
-extern void Cust_MacroPlayback15(void);
-extern void Cust_MacroPlayback16(void);
-extern void Cust_MacroPlayback17(void);
-extern void Cust_MacroPlayback18(void);
-extern void Cust_MacroPlayback19(void);
-extern void Cust_MacroPlayback20(void);
-extern void Cust_MacroPlayback21(void);
-extern void Cust_MacroPlayback22(void);
-extern void Cust_MacroPlayback23(void);
-extern void Cust_MacroPlayback24(void);
-extern void Cust_MacroPlayback25(void);
-extern void Cust_MacroPlayback26(void);
-extern void Cust_MacroPlayback27(void);
-extern void Cust_MacroPlayback28(void);
-extern void Cust_MacroPlayback29(void);
-extern void Cust_MacroPlayback30(void);
-extern void Cust_MacroPlayback31(void);
-extern void Cust_MacroPlayback32(void);
-extern void Cust_MacroPlayback33(void);
-extern void Cust_MacroPlayback34(void);
-extern void Cust_MacroPlayback35(void);
-extern void Cust_MacroPlayback36(void);
-extern void Cust_MacroPlayback37(void);
-extern void Cust_MacroPlayback38(void);
-extern void Cust_MacroPlayback39(void);
-extern void Cust_MacroPlayback40(void);
-extern void Cust_MacroPlayback41(void);
-extern void Cust_MacroPlayback42(void);
-extern void Cust_MacroPlayback43(void);
-extern void Cust_MacroPlayback44(void);
-extern void Cust_MacroPlayback45(void);
-extern void Cust_MacroPlayback46(void);
-extern void Cust_MacroPlayback47(void);
-extern void Cust_MacroPlayback48(void);
-extern void Cust_MacroPlayback49(void);
-extern void Cust_MacroPlayback50(void);
-extern void Cust_MacroPlayback51(void);
-extern void Cust_MacroPlayback52(void);
-extern void Cust_MacroPlayback53(void);
-extern void Cust_MacroPlayback54(void);
-extern void Cust_MacroPlayback55(void);
-extern void Cust_MacroPlayback56(void);
-extern void Cust_MacroPlayback57(void);
-extern void Cust_MacroPlayback58(void);
-extern void Cust_MacroPlayback59(void);
-extern void Cust_MacroPlayback60(void);
-extern void Cust_MacroPlayback61(void);
-extern void Cust_MacroPlayback62(void);
-extern void Cust_MacroPlayback63(void);
-extern void Cust_MacroPlayback64(void);
+extern void CustMacroPlayback(int item);
+void Cust_MacroPlayback1(void)  { CustMacroPlayback(0);  }
+void Cust_MacroPlayback2(void)  { CustMacroPlayback(1);  }
+void Cust_MacroPlayback3(void)  { CustMacroPlayback(2);  }
+void Cust_MacroPlayback4(void)  { CustMacroPlayback(3);  }
+void Cust_MacroPlayback5(void)  { CustMacroPlayback(4);  }
+void Cust_MacroPlayback6(void)  { CustMacroPlayback(5);  }
+void Cust_MacroPlayback7(void)  { CustMacroPlayback(6);  }
+void Cust_MacroPlayback8(void)  { CustMacroPlayback(7);  }
+void Cust_MacroPlayback9(void)  { CustMacroPlayback(8);  }
+void Cust_MacroPlayback10(void) { CustMacroPlayback(9);  }
+void Cust_MacroPlayback11(void) { CustMacroPlayback(10); }
+void Cust_MacroPlayback12(void) { CustMacroPlayback(11); }
+void Cust_MacroPlayback13(void) { CustMacroPlayback(12); }
+void Cust_MacroPlayback14(void) { CustMacroPlayback(13); }
+void Cust_MacroPlayback15(void) { CustMacroPlayback(14); }
+void Cust_MacroPlayback16(void) { CustMacroPlayback(15); }
+void Cust_MacroPlayback17(void) { CustMacroPlayback(16); }
+void Cust_MacroPlayback18(void) { CustMacroPlayback(17); }
+void Cust_MacroPlayback19(void) { CustMacroPlayback(18); }
+void Cust_MacroPlayback20(void) { CustMacroPlayback(19); }
+void Cust_MacroPlayback21(void) { CustMacroPlayback(20); }
+void Cust_MacroPlayback22(void) { CustMacroPlayback(21); }
+void Cust_MacroPlayback23(void) { CustMacroPlayback(22); }
+void Cust_MacroPlayback24(void) { CustMacroPlayback(23); }
+void Cust_MacroPlayback25(void) { CustMacroPlayback(24); }
+void Cust_MacroPlayback26(void) { CustMacroPlayback(25); }
+void Cust_MacroPlayback27(void) { CustMacroPlayback(26); }
+void Cust_MacroPlayback28(void) { CustMacroPlayback(27); }
+void Cust_MacroPlayback29(void) { CustMacroPlayback(28); }
+void Cust_MacroPlayback30(void) { CustMacroPlayback(29); }
+void Cust_MacroPlayback31(void) { CustMacroPlayback(30); }
+void Cust_MacroPlayback32(void) { CustMacroPlayback(31); }
+void Cust_MacroPlayback33(void) { CustMacroPlayback(32); }
+void Cust_MacroPlayback34(void) { CustMacroPlayback(33); }
+void Cust_MacroPlayback35(void) { CustMacroPlayback(34); }
+void Cust_MacroPlayback36(void) { CustMacroPlayback(35); }
+void Cust_MacroPlayback37(void) { CustMacroPlayback(36); }
+void Cust_MacroPlayback38(void) { CustMacroPlayback(37); }
+void Cust_MacroPlayback39(void) { CustMacroPlayback(38); }
+void Cust_MacroPlayback40(void) { CustMacroPlayback(39); }
+void Cust_MacroPlayback41(void) { CustMacroPlayback(40); }
+void Cust_MacroPlayback42(void) { CustMacroPlayback(41); }
+void Cust_MacroPlayback43(void) { CustMacroPlayback(42); }
+void Cust_MacroPlayback44(void) { CustMacroPlayback(43); }
+void Cust_MacroPlayback45(void) { CustMacroPlayback(44); }
+void Cust_MacroPlayback46(void) { CustMacroPlayback(45); }
+void Cust_MacroPlayback47(void) { CustMacroPlayback(46); }
+void Cust_MacroPlayback48(void) { CustMacroPlayback(47); }
+void Cust_MacroPlayback49(void) { CustMacroPlayback(48); }
+void Cust_MacroPlayback50(void) { CustMacroPlayback(49); }
+void Cust_MacroPlayback51(void) { CustMacroPlayback(50); }
+void Cust_MacroPlayback52(void) { CustMacroPlayback(51); }
+void Cust_MacroPlayback53(void) { CustMacroPlayback(52); }
+void Cust_MacroPlayback54(void) { CustMacroPlayback(53); }
+void Cust_MacroPlayback55(void) { CustMacroPlayback(54); }
+void Cust_MacroPlayback56(void) { CustMacroPlayback(55); }
+void Cust_MacroPlayback57(void) { CustMacroPlayback(56); }
+void Cust_MacroPlayback58(void) { CustMacroPlayback(57); }
+void Cust_MacroPlayback59(void) { CustMacroPlayback(58); }
+void Cust_MacroPlayback60(void) { CustMacroPlayback(59); }
+void Cust_MacroPlayback61(void) { CustMacroPlayback(60); }
+void Cust_MacroPlayback62(void) { CustMacroPlayback(61); }
+void Cust_MacroPlayback63(void) { CustMacroPlayback(62); }
+void Cust_MacroPlayback64(void) { CustMacroPlayback(63); }
 
 
 struct funcStruct MacroFuncs[MAX_MACROS] = {
@@ -238,12 +239,12 @@ extern int processCustomFuncs(HWND hDlg);
 extern int processCustomFuncsSolo(HWND hDlg, int i);
 BOOL CALLBACK CustomDefDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
 {
-    char tmp[60];
+    char tmp[64];
     int saveIdx;
     int newIdx;
     int i, id;
     static LRESULT macroItem;
-    static int index;
+    static int controlID;
     static int lbTabStops[1] = { 40 };
 
     switch(wMessage)
@@ -284,14 +285,14 @@ BOOL CALLBACK CustomDefDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM l
         if (wParam >= IDC_CUSTOM_PB1 && wParam <= IDC_CUSTOM_PB40)
         {
             macroItem = (LRESULT) - 1;
-            index = wParam - IDC_CUSTOM_PB1;
-            SetDlgItemText(hDlg, IDC_CUSTOM_FUNCNAME, customPullFuncs[index].keyTitle);
+            controlID = wParam - IDC_CUSTOM_PB1;
+            SetDlgItemText(hDlg, IDC_CUSTOM_FUNCNAME, customPullFuncs[controlID].keyTitle);
             SetFocus(hDlg);
         }
         else if (wParam >= IDC_CUSTOM_PB41 && wParam <= IDC_CUSTOM_PB80)
         {
             newIdx = wParam - IDC_CUSTOM_PB41;
-            saveIdx = Custom_funcs[newIdx].index;
+            saveIdx = Custom_funcs[newIdx].controlID;
             if (macroItem != (LRESULT) - 1)     // should we copy the macro instead...
             {
                 memcpy(&Custom_funcs[newIdx], &MacroFuncs[macroItem], sizeof(struct funcStruct));
@@ -302,11 +303,11 @@ BOOL CALLBACK CustomDefDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM l
             }
             else
             {
-                memcpy(&Custom_funcs[newIdx], &customPullFuncs[index], sizeof(struct funcStruct));
+                memcpy(&Custom_funcs[newIdx], &customPullFuncs[controlID], sizeof(struct funcStruct));
                 customSave[newIdx].custom_save_idx = savedIndexFunc;
-                customSave[newIdx].func_idx = (int16_t)index;
+                customSave[newIdx].func_idx = (int16_t)controlID;
             }
-            Custom_funcs[newIdx].index = saveIdx;
+            Custom_funcs[newIdx].controlID = saveIdx;
             processCustomFuncsSolo(hDlg, newIdx);
             SetFocus(hDlg);
         }
@@ -331,36 +332,43 @@ BOOL CALLBACK CustomDefDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM l
                 customPullFuncs = (struct funcStruct *) &Scientific_funcs;
                 processCustomFuncs(hDlg);
                 break;
+
             case(IDC_CUSTOM_SCI2):        // Scientific II funcs
                 savedIndexFunc = CUSTOM_SAVE_SCI2;
                 customPullFuncs = (struct funcStruct *) &Scientific2_funcs;
                 processCustomFuncs(hDlg);
                 break;
+
             case(IDC_CUSTOM_FIN):        // Financial funcs
                 savedIndexFunc = CUSTOM_SAVE_FIN;
                 customPullFuncs = (struct funcStruct *) &Financial_funcs;
                 processCustomFuncs(hDlg);
                 break;
+
             case(IDC_CUSTOM_COMPSCI):     // Comp-Sci funcs
                 savedIndexFunc = CUSTOM_SAVE_COMPSCI;
                 customPullFuncs = (struct funcStruct *) &CompSci_funcs;
                 processCustomFuncs(hDlg);
                 break;
+
             case(IDC_CUSTOM_STAT):        // Stats funcs
                 savedIndexFunc = CUSTOM_SAVE_STATS;
                 customPullFuncs = (struct funcStruct *) &Statistics_funcs;
                 processCustomFuncs(hDlg);
                 break;
+
             case(IDC_CUSTOM_CONV):        // Conversion funcs
                 savedIndexFunc = CUSTOM_SAVE_CONV;
                 customPullFuncs = (struct funcStruct *) &Conversion_funcs;
                 processCustomFuncs(hDlg);
                 break;
+
             case(IDC_CUSTOM_PROG1):        // Program Bank 1 funcs
                 savedIndexFunc = CUSTOM_SAVE_PROG1;
                 customPullFuncs = (struct funcStruct *) &Program1_funcs;
                 processCustomFuncs(hDlg);
                 break;
+
             case(IDC_CUSTOM_PROG2):        // Program Bank II funcs
                 savedIndexFunc = CUSTOM_SAVE_PROG2;
                 customPullFuncs = (struct funcStruct *) &Program2_funcs;
@@ -424,68 +432,3 @@ void CustMacroPlayback(int item)
     playBackIdx = playBackIdxTmp;
     memcpy(playBack, playBackTmp, sizeof(playBack));
 }
-
-void Cust_MacroPlayback1(void)  { CustMacroPlayback(0);  }
-void Cust_MacroPlayback2(void)  { CustMacroPlayback(1);  }
-void Cust_MacroPlayback3(void)  { CustMacroPlayback(2);  }
-void Cust_MacroPlayback4(void)  { CustMacroPlayback(3);  }
-void Cust_MacroPlayback5(void)  { CustMacroPlayback(4);  }
-void Cust_MacroPlayback6(void)  { CustMacroPlayback(5);  }
-void Cust_MacroPlayback7(void)  { CustMacroPlayback(6);  }
-void Cust_MacroPlayback8(void)  { CustMacroPlayback(7);  }
-void Cust_MacroPlayback9(void)  { CustMacroPlayback(8);  }
-void Cust_MacroPlayback10(void) { CustMacroPlayback(9);  }
-void Cust_MacroPlayback11(void) { CustMacroPlayback(10); }
-void Cust_MacroPlayback12(void) { CustMacroPlayback(11); }
-void Cust_MacroPlayback13(void) { CustMacroPlayback(12); }
-void Cust_MacroPlayback14(void) { CustMacroPlayback(13); }
-void Cust_MacroPlayback15(void) { CustMacroPlayback(14); }
-void Cust_MacroPlayback16(void) { CustMacroPlayback(15); }
-void Cust_MacroPlayback17(void) { CustMacroPlayback(16); }
-void Cust_MacroPlayback18(void) { CustMacroPlayback(17); }
-void Cust_MacroPlayback19(void) { CustMacroPlayback(18); }
-void Cust_MacroPlayback20(void) { CustMacroPlayback(19); }
-void Cust_MacroPlayback21(void) { CustMacroPlayback(20); }
-void Cust_MacroPlayback22(void) { CustMacroPlayback(21); }
-void Cust_MacroPlayback23(void) { CustMacroPlayback(22); }
-void Cust_MacroPlayback24(void) { CustMacroPlayback(23); }
-void Cust_MacroPlayback25(void) { CustMacroPlayback(24); }
-void Cust_MacroPlayback26(void) { CustMacroPlayback(25); }
-void Cust_MacroPlayback27(void) { CustMacroPlayback(26); }
-void Cust_MacroPlayback28(void) { CustMacroPlayback(27); }
-void Cust_MacroPlayback29(void) { CustMacroPlayback(28); }
-void Cust_MacroPlayback30(void) { CustMacroPlayback(29); }
-void Cust_MacroPlayback31(void) { CustMacroPlayback(30); }
-void Cust_MacroPlayback32(void) { CustMacroPlayback(31); }
-void Cust_MacroPlayback33(void) { CustMacroPlayback(32); }
-void Cust_MacroPlayback34(void) { CustMacroPlayback(33); }
-void Cust_MacroPlayback35(void) { CustMacroPlayback(34); }
-void Cust_MacroPlayback36(void) { CustMacroPlayback(35); }
-void Cust_MacroPlayback37(void) { CustMacroPlayback(36); }
-void Cust_MacroPlayback38(void) { CustMacroPlayback(37); }
-void Cust_MacroPlayback39(void) { CustMacroPlayback(38); }
-void Cust_MacroPlayback40(void) { CustMacroPlayback(39); }
-void Cust_MacroPlayback41(void) { CustMacroPlayback(40); }
-void Cust_MacroPlayback42(void) { CustMacroPlayback(41); }
-void Cust_MacroPlayback43(void) { CustMacroPlayback(42); }
-void Cust_MacroPlayback44(void) { CustMacroPlayback(43); }
-void Cust_MacroPlayback45(void) { CustMacroPlayback(44); }
-void Cust_MacroPlayback46(void) { CustMacroPlayback(45); }
-void Cust_MacroPlayback47(void) { CustMacroPlayback(46); }
-void Cust_MacroPlayback48(void) { CustMacroPlayback(47); }
-void Cust_MacroPlayback49(void) { CustMacroPlayback(48); }
-void Cust_MacroPlayback50(void) { CustMacroPlayback(49); }
-void Cust_MacroPlayback51(void) { CustMacroPlayback(50); }
-void Cust_MacroPlayback52(void) { CustMacroPlayback(51); }
-void Cust_MacroPlayback53(void) { CustMacroPlayback(52); }
-void Cust_MacroPlayback54(void) { CustMacroPlayback(53); }
-void Cust_MacroPlayback55(void) { CustMacroPlayback(54); }
-void Cust_MacroPlayback56(void) { CustMacroPlayback(55); }
-void Cust_MacroPlayback57(void) { CustMacroPlayback(56); }
-void Cust_MacroPlayback58(void) { CustMacroPlayback(57); }
-void Cust_MacroPlayback59(void) { CustMacroPlayback(58); }
-void Cust_MacroPlayback60(void) { CustMacroPlayback(59); }
-void Cust_MacroPlayback61(void) { CustMacroPlayback(60); }
-void Cust_MacroPlayback62(void) { CustMacroPlayback(61); }
-void Cust_MacroPlayback63(void) { CustMacroPlayback(62); }
-void Cust_MacroPlayback64(void) { CustMacroPlayback(63); }

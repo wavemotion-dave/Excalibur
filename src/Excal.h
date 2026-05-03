@@ -90,7 +90,7 @@ typedef void (*func_t)(void);
 
 struct funcStruct
 {
-    int16_t     index;              // Index of the function in its bank
+    int16_t     controlID;          // This is the Windows Control ID (IDC) for this button. This is not unique as we map many functions to the same button.
     uint16_t    uniqueIndex;        // Unique index for this function across all banks (used for config file and playback recording)
     uint8_t     useFloatsLongs;     // 1 = uses floats, 2 = uses longs, 3 = can use either (for recording whether to record the float or long value)
     uint8_t     allowRecord;        // Whether this function should be allowed to be recorded in macros (PROGRAM steps) or not
@@ -529,7 +529,7 @@ enum UniqueButtonIndexTag
     UNI_PASTE,
     UNI_CPYX,
     UNI_UNUSED,
-    
+
     UNI_SCI,
     UNI_SCI2,
     UNI_COMPSCI,
@@ -597,18 +597,16 @@ enum UniqueButtonIndexTag
     UNI_METRIC,
     UNI_QUAD,
     UNI_PYTH,
-    UNI_CPLUS,
-    UNI_CMINUS,
-    UNI_CDIV,
-    UNI_CMUL,
+    UNI_CIRCA,
+    UNI_SPHV,
+    UNI_TOPOLAR,
+    UNI_FROMPOLAR,
     UNI_CSIN,
     UNI_CCOS,
     UNI_CTAN,
-    UNI_TOPOLAR,
     UNI_CSINH,
     UNI_CCOSH,
     UNI_CTANH,
-    UNI_FROMPOLAR,
     UNI_CCHS,
     UNI_CCONJ,
     UNI_CEXP,
@@ -619,8 +617,10 @@ enum UniqueButtonIndexTag
     UNI_CABS,
     UNI_CNORM,
     UNI_CARG,
-    UNI_CIRCA,
-    UNI_SPHV,
+    UNI_CPLUS,
+    UNI_CMINUS,
+    UNI_CDIV,
+    UNI_CMUL,
 
     UNI_TAX,
     UNI_PERC,
@@ -989,7 +989,7 @@ extern uint32_t userTicks;
 #define FN39                            1039
 #define FN40                            1040
 
-// These are pushed way up in index values as they are special
+// These are pushed way up in values as they are special
 #define RPN_STACK_T                     2003
 #define RPN_STACK_Z                     2002
 #define RPN_STACK_Y                     2001

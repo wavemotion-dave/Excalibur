@@ -27,7 +27,6 @@
 // TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 // OR OTHER DEALINGS IN THE SOFTWARE.
 // ========================================================================================
-
 #include <stdio.h>
 #include <string.h>
 #include <windows.h>
@@ -53,7 +52,7 @@
                   "if you want to donate to support the effort.\n\n"    \
                   "https://github.com/wavemotion-dave/Excalibur"
 
-#define CONFIG_VERSION_MAIN     0xF001      // If this changes, we wipe EVERYTHING
+#define CONFIG_VERSION_MAIN     0xF002      // If this changes, we wipe EVERYTHING
 #define CONFIG_VERSION_SUB      0xF001      // If this changes, we reset x,y window position and reset constant tables (currency, physics constants, etc)
 
 #define END_OF_PROGRAM_STR          "<End Of Program>"
@@ -1751,7 +1750,6 @@ struct funcStruct RPNkeys[] = {
     {RPN_DROP,      UNI_DROP,   USES_FL, ALLOWREC, 'd', "", YES_L,  X_NEW,      RPN_drop,           "Drop Stack",           "Drops the X register and the rest of stack shifts down."},
     {RPN_LARG,      UNI_LARG,   USES_FL, ALLOWREC, ' ', "", NO_L,   X_NEW,      RPN_larg,           "Last Arguments",       "Retrieves the last X and Y pair before last operation."},
     {RPN_FRAC,      UNI_FRAC,   USES_FL, ALLOWREC, ' ', "", NO_L,   X_EDIT,     RPN_frac,           "Fraction Bar",         "Insert Fraction to current X edit"},
-
     {RPN_EDIT,      UNI_EDIT,   USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_edit,           "Edit X Register",      "Used to place the X register back in edit mode if it is not already."},
     {RPN_CONST,     UNI_CONST,  USES_F,  NORECORD, ' ', "", YES_L,  X_NEW,      RPN_const,          "Constants",            "Recall or Store Constants to one of five banks."},
     {RPN_NOTES,     UNI_NOTES,  USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_Notes,          "Excalibur Notepad",    "Allows some simple notes to be stored/saved."},
@@ -1776,13 +1774,17 @@ struct funcStruct RPNkeys[] = {
 
 struct keyPosStruct
 {
-    int index;
-    int x;
-    int y;
-    int h;
-    int w;
+    int16_t  controlID;
+    int32_t x;
+    int32_t y;
+    int32_t h;
+    int32_t w;
 };
 
+// -------------------------------------------------------------------------------------------------------
+// We don't bother with tooltips on any of the basic RPN keyps up through RPN_ENTER so this table starts
+// with the Exchange of X/Y key and goes through the rest of the RPN keys and then the function bank keys.
+// -------------------------------------------------------------------------------------------------------
 struct keyPosStruct RPNkeyPos[] = {
     {RPN_EXCH_X_Y   ,0,     0},
     {RPN_NEGATE     ,0,     0},
@@ -1810,7 +1812,6 @@ struct keyPosStruct RPNkeyPos[] = {
     {RPN_PASTE      ,0,     0},
     {RPN_LAST_KEY,   0,     0}
 };
-
 
 struct keyPosStruct FunctionBankKeyPos[] = {
     {FN1,           0,          0},
@@ -1862,15 +1863,14 @@ int selectFuncs(WPARAM key)
     int i;
     for (i = 0; i < MAX_FUNCS; i++)
     {
-        if (key == (WPARAM) currentFuncs[i].index)
+        if (key == (WPARAM) currentFuncs[i].controlID)
         {
             if (currentFuncs[i].routine != NULL)
             {
-                callButtonFunc(currentFuncs[i].routine,
-                                currentFuncs[i].useFloatsLongs,
-                                currentFuncs[i].allowRecord,
-                                currentFuncs[i].uniqueIndex, currentFuncs[i].saveLastX, currentFuncs[i].newXedit, TRUE);
+                callButtonFunc(currentFuncs[i].routine, currentFuncs[i].useFloatsLongs, currentFuncs[i].allowRecord,
+                               currentFuncs[i].uniqueIndex, currentFuncs[i].saveLastX, currentFuncs[i].newXedit, TRUE);
             }
+            break;
         }
     }
     return(0);
@@ -1882,8 +1882,8 @@ int processFuncs()
 
     for (i = 0; i < MAX_FUNCS; i++)
     {
-        SendMessage(GetDlgItem(calcMainWindow, currentFuncs[i].index), WM_SETFONT, (WPARAM) hMainFont, FALSE);
-        SetDlgItemText(calcMainWindow, currentFuncs[i].index, currentFuncs[i].desc);
+        SendMessage(GetDlgItem(calcMainWindow, currentFuncs[i].controlID), WM_SETFONT, (WPARAM) hMainFont, FALSE);
+        SetDlgItemText(calcMainWindow, currentFuncs[i].controlID, currentFuncs[i].desc);
     }
 
     UpdateWindow(calcMainWindow);
@@ -1910,26 +1910,29 @@ int ProcessDirectKeyHit(WPARAM key)
             if (currentFuncs[i].routine != NULL)
             {
                 callButtonFunc(currentFuncs[i].routine,
-                                currentFuncs[i].useFloatsLongs,
-                                currentFuncs[i].allowRecord,
-                                currentFuncs[i].uniqueIndex, currentFuncs[i].saveLastX, currentFuncs[i].newXedit, TRUE);
+                               currentFuncs[i].useFloatsLongs,
+                               currentFuncs[i].allowRecord,
+                               currentFuncs[i].uniqueIndex, currentFuncs[i].saveLastX, currentFuncs[i].newXedit, TRUE);
             }
+            break;
         }
     }
+
     if (!found)                 // Now check the RPN keys themselves...
     {
         i = 0;
-        while (RPNkeys[i].index != RPN_LAST_KEY)
+        while (RPNkeys[i].controlID != RPN_LAST_KEY)
         {
             if (toupper(keyStroke) == toupper(RPNkeys[i].op) && toupper(keyStroke) != ' ')
             {
                 if (RPNkeys[i].routine != NULL)
                 {
                     callButtonFunc(RPNkeys[i].routine,
-                                    RPNkeys[i].useFloatsLongs,
-                                    RPNkeys[i].allowRecord,
-                                    RPNkeys[i].uniqueIndex, RPNkeys[i].saveLastX, RPNkeys[i].newXedit, TRUE);
+                                   RPNkeys[i].useFloatsLongs,
+                                   RPNkeys[i].allowRecord,
+                                   RPNkeys[i].uniqueIndex, RPNkeys[i].saveLastX, RPNkeys[i].newXedit, TRUE);
                 }
+                break;
             }
             i++;
         }
@@ -1946,16 +1949,16 @@ int ProcessHelp(WPARAM key)
 
     for (i = 0; i < MAX_FUNCS; i++)
     {
-        if (key == (WPARAM) currentFuncs[i].index)
+        if (key == (WPARAM) currentFuncs[i].controlID)
         {
             MessageBox(calcMainWindow, currentFuncs[i].keyHelp, currentFuncs[i].keyTitle, MB_OK | MB_ICONQUESTION);
             break;
         }
     }
     i = 0;
-    while (RPNkeys[i].index != RPN_LAST_KEY)
+    while (RPNkeys[i].controlID != RPN_LAST_KEY)
     {
-        if (key == (WPARAM) RPNkeys[i].index)
+        if (key == (WPARAM) RPNkeys[i].controlID)
         {
             MessageBox(calcMainWindow, RPNkeys[i].keyHelp, RPNkeys[i].keyTitle, MB_OK | MB_ICONQUESTION);
             break;
@@ -1975,9 +1978,9 @@ int ProcessKeyHit(WPARAM key)
     if (key >= FN1 && key <= FN40)
         selectFuncs(key);
     else
-        while (RPNkeys[i].index != RPN_LAST_KEY)
+        while (RPNkeys[i].controlID != RPN_LAST_KEY)
         {
-            if (key == (WPARAM) RPNkeys[i].index)
+            if (key == (WPARAM) RPNkeys[i].controlID)
             {
                 if (RPNkeys[i].routine != NULL)
                 {
@@ -3703,7 +3706,7 @@ void ProcessCustomSave(void)
     {
         newIdx = i;
         index = customSave[newIdx].func_idx;
-        saveIdx = Custom_funcs[newIdx].index;
+        saveIdx = Custom_funcs[newIdx].controlID;
         switch(customSave[newIdx].custom_save_idx)
         {
         case(CUSTOM_SAVE_SCI):        // Scientific
@@ -3737,7 +3740,7 @@ void ProcessCustomSave(void)
             Custom_funcs[newIdx].keyHelp  = PROGRAM_ASSIGNED_KEY_STR;
             break;
         }
-        Custom_funcs[newIdx].index = saveIdx;
+        Custom_funcs[newIdx].controlID = saveIdx;
     }
     processFuncs();
 }
@@ -4486,7 +4489,7 @@ WORD GetMouseHelp(WORD xPos, WORD yPos)
     WORD status = 0;
 
     i = 0;
-    while (FunctionBankKeyPos[i].index != RPN_LAST_KEY)
+    while (FunctionBankKeyPos[i].controlID != RPN_LAST_KEY)
     {
         if (xPos >= FunctionBankKeyPos[i].x && xPos <= FunctionBankKeyPos[i].x + FunctionBankKeyPos[i].w)
             if (yPos >= FunctionBankKeyPos[i].y && yPos <= FunctionBankKeyPos[i].y + FunctionBankKeyPos[i].h)
@@ -4502,13 +4505,12 @@ WORD GetMouseHelp(WORD xPos, WORD yPos)
     i = 0;
     if (status == 0)
     {
-        while (RPNkeyPos[i].index != RPN_LAST_KEY)
+        while (RPNkeyPos[i].controlID != RPN_LAST_KEY)
         {
             if (xPos >= RPNkeyPos[i].x && xPos <= RPNkeyPos[i].x + RPNkeyPos[i].w)
                 if (yPos >= RPNkeyPos[i].y && yPos <= RPNkeyPos[i].y + RPNkeyPos[i].h)
                 {
-                    strcpy(helpTitle, RPNkeys[i + 17].keyTitle);       // tbd, dont use 18
-                    // const as offset
+                    strcpy(helpTitle, RPNkeys[i + 17].keyTitle); // +17 gets us past RPN_ENTER where we start using tooltips
                     strcpy(helpMsg, RPNkeys[i + 17].keyHelp);
                     status = 1;
                     break;
@@ -4551,9 +4553,9 @@ void init_key_pos(void)        // for tool tips
     fnButtonH = pt.y - fnButtonY;
 
     i = 0;
-    while (RPNkeyPos[i].index != RPN_LAST_KEY)
+    while (RPNkeyPos[i].controlID != RPN_LAST_KEY)
     {
-        GetWindowRect(GetDlgItem(calcMainWindow, RPNkeyPos[i].index), &rc);
+        GetWindowRect(GetDlgItem(calcMainWindow, RPNkeyPos[i].controlID), &rc);
         pt.x = rc.left;
         pt.y = rc.top;
         ScreenToClient(calcMainWindow, &pt);
@@ -4565,9 +4567,9 @@ void init_key_pos(void)        // for tool tips
     }
 
     i = 0;
-    while (FunctionBankKeyPos[i].index != RPN_LAST_KEY)
+    while (FunctionBankKeyPos[i].controlID != RPN_LAST_KEY)
     {
-        GetWindowRect(GetDlgItem(calcMainWindow, FunctionBankKeyPos[i].index), &rc);
+        GetWindowRect(GetDlgItem(calcMainWindow, FunctionBankKeyPos[i].controlID), &rc);
         pt.x = rc.left;
         pt.y = rc.top;
         ScreenToClient(calcMainWindow, &pt);
@@ -4725,7 +4727,7 @@ void sortPlaybackList(void)
     int i, j;
     uint8_t exchangeMade;
     struct playbackStruct tmpPlayBack;
-    
+
     for (i = 0; i < totalMappedButtonFuncs; i++)
     {
         exchangeMade = FALSE;
@@ -4752,7 +4754,7 @@ void mapButtonFuncs(void)
     j = 0;
     i = 0;
 
-    do // We do a do-while so we include RPN_LAST_KEY (and a single UNI_UNUSED index) in the map.
+    do // We do a do-while so we include RPN_LAST_KEY (and a single UNI_UNUSED controlID) in the map.
     {
         playBackMap[j].saveLastX        = RPNkeys[i].saveLastX;
         playBackMap[j].newXedit         = RPNkeys[i].newXedit;
@@ -4763,7 +4765,7 @@ void mapButtonFuncs(void)
         playBackMap[j].allowRecord      = RPNkeys[i].allowRecord;
         if (j < MAX_FUNCTIONS) j++;
         i++;
-    } while (RPNkeys[i-1].index != RPN_LAST_KEY);     
+    } while (RPNkeys[i-1].controlID != RPN_LAST_KEY);
 
     for (i = 0; i < MAX_FUNCS; i++)
     {
