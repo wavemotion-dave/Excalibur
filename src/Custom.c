@@ -258,7 +258,7 @@ BOOL CALLBACK CustomDefDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM l
         for (i = 0; i < MAX_MACROS; i++)
         {
             sprintf(tmp, "%-6s:\t%s", macro_short_names[i], macroName[i]);
-            SendDlgItemMessage(hDlg, MACRO_LIST, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+            SendDlgItemMessage(hDlg, IDM_MACRO_LIST, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
         }
 
         // Set the standard main font for all of the buttons
@@ -274,8 +274,8 @@ BOOL CALLBACK CustomDefDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM l
     case WM_COMMAND:
         switch(LOWORD(wParam))
         {
-        case(MACRO_LIST):     // click on program list?!?
-            macroItem = SendDlgItemMessage(hDlg, MACRO_LIST, LB_GETCURSEL, 0, 0L);
+        case(IDM_MACRO_LIST):     // click on program list?!?
+            macroItem = SendDlgItemMessage(hDlg, IDM_MACRO_LIST, LB_GETCURSEL, 0, 0L);
             strcpy(tmp, macroName[macroItem]);
             SetDlgItemText(hDlg, IDC_CUSTOM_FUNCNAME, tmp);
             break;
@@ -285,8 +285,7 @@ BOOL CALLBACK CustomDefDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM l
         {
             macroItem = (LRESULT) - 1;
             index = wParam - IDC_CUSTOM_PB1;
-            LoadString(hExcaliburInstance, customPullFuncs[index].keyTitle, tmp, sizeof(tmp) - 1);
-            SetDlgItemText(hDlg, IDC_CUSTOM_FUNCNAME, tmp);
+            SetDlgItemText(hDlg, IDC_CUSTOM_FUNCNAME, customPullFuncs[index].keyTitle);
             SetFocus(hDlg);
         }
         else if (wParam >= IDC_CUSTOM_PB41 && wParam <= IDC_CUSTOM_PB80)
@@ -299,7 +298,7 @@ BOOL CALLBACK CustomDefDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM l
                 strcpy(Custom_funcs[newIdx].desc, macro_short_names[macroItem]);
                 customSave[newIdx].custom_save_idx = CUSTOM_SAVE_MAC;
                 customSave[newIdx].func_idx = (int16_t)macroItem;
-                Custom_funcs[newIdx].keyTitle = 9000 + macroItem;
+                Custom_funcs[newIdx].keyTitle = macroName[macroItem];
             }
             else
             {
