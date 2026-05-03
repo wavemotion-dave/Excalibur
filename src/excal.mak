@@ -49,7 +49,6 @@ CLEAN :
 	-@erase "$(INTDIR)\CompSci.obj"
 	-@erase "$(INTDIR)\Conversion.obj"
 	-@erase "$(INTDIR)\Custom.obj"
-	-@erase "$(INTDIR)\Geometry.obj"
 	-@erase "$(INTDIR)\Constants.obj"
 	-@erase "$(INTDIR)\Programming.obj"
 	-@erase "$(INTDIR)\Scientific.obj"
@@ -117,7 +116,6 @@ LINK32_OBJS= \
 	"$(INTDIR)\CompSci.obj" \
 	"$(INTDIR)\Conversion.obj" \
 	"$(INTDIR)\Custom.obj" \
-	"$(INTDIR)\Geometry.obj" \
 	"$(INTDIR)\Constants.obj" \
 	"$(INTDIR)\Programming.obj" \
 	"$(INTDIR)\Scientific.obj" \
@@ -154,7 +152,6 @@ CLEAN :
 	-@erase "$(INTDIR)\CompSci.obj"
 	-@erase "$(INTDIR)\Conversion.obj"
 	-@erase "$(INTDIR)\Custom.obj"
-	-@erase "$(INTDIR)\Geometry.obj"
 	-@erase "$(INTDIR)\Programming.obj"
 	-@erase "$(INTDIR)\Scientific.obj"
 	-@erase "$(INTDIR)\Statistics.obj"
@@ -224,7 +221,6 @@ LINK32_OBJS= \
 	"$(INTDIR)\CompSci.obj" \
 	"$(INTDIR)\Conversion.obj" \
 	"$(INTDIR)\Custom.obj" \
-	"$(INTDIR)\Geometry.obj" \
 	"$(INTDIR)\Constants.obj" \
 	"$(INTDIR)\Programming.obj" \
 	"$(INTDIR)\Scientific.obj" \
@@ -279,14 +275,6 @@ DEP_CPP_EX_CU=\
 	
 
 "$(INTDIR)\Custom.obj" : $(SOURCE) $(DEP_CPP_EX_CU) "$(INTDIR)"
-
-
-SOURCE=.\Geometry.c
-DEP_CPP_EX_GE=\
-	".\excal.h"\
-	
-
-"$(INTDIR)\Geometry.obj" : $(SOURCE) $(DEP_CPP_EX_GE) "$(INTDIR)"
 
 
 SOURCE=.\Constants.c

@@ -111,10 +111,6 @@ SOURCE=.\Custom.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Geometry.c
-# End Source File
-# Begin Source File
-
 SOURCE=.\Constants.c
 # End Source File
 # Begin Source File
