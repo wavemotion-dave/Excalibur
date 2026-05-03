@@ -2181,8 +2181,7 @@ void ShowStack(void)
         }
         else
         {
-            sprintf(tmpStr, "%03d-%s", currentMacroPlaybackIdx,
-                     playBackMap[playBack[currentMacroPlaybackIdx]].funcText);
+            sprintf(tmpStr, "%03d-%s", currentMacroPlaybackIdx, playBackMap[playBack[currentMacroPlaybackIdx]].funcText);
         }
 
         tmpStr[MAX_STACK_STRLEN] = CNULL;
@@ -4714,11 +4713,36 @@ void RPN_SelectProgII(void)
     SelectNewFunc((struct funcStruct *) &Program2_funcs);
 }
 
+// Good old bubble sort... not the most efficient but this is only done once
+// at startup and the list is small so who cares?  I just want it to be simple and work.
+void sortPlaybackList(void)
+{
+    int i,j;
+    uint8_t exchangeMade;
+    struct playbackStruct tmpPlayBack;
+    
+    for (i = 0; i < totalMappedButtonFuncs; i++)
+    {
+        exchangeMade = FALSE;
+        for (j = 0; j < (totalMappedButtonFuncs - i - 1); j++)
+        {
+            if (playBackMap[j].uniqueIndex > playBackMap[j + 1].uniqueIndex)
+            {
+                // Need to swap...
+                memcpy(&tmpPlayBack, &playBackMap[j], sizeof(tmpPlayBack));
+                memcpy(&playBackMap[j], &playBackMap[j + 1], sizeof(tmpPlayBack));
+                memcpy(&playBackMap[j + 1], &tmpPlayBack, sizeof(tmpPlayBack));
+                exchangeMade = TRUE; // At least one swap was performed
+            }
+        }
+        if (exchangeMade == FALSE)
+            break;          // We are Sorted!
+    }
+}
+
 void mapButtonFuncs(void)
 {
     int i, j;
-    uint8_t exchangeMade;
-    struct playbackStruct tmpPlayBack;
 
     j = 0;
     i = 0;
@@ -4728,11 +4752,11 @@ void mapButtonFuncs(void)
         playBackMap[j].saveLastX = RPNkeys[i].saveLastX;
         playBackMap[j].newXedit = RPNkeys[i].newXedit;
         playBackMap[j].routine = RPNkeys[i].routine;
-        strcpy(playBackMap[j].funcText, RPNkeys[i].keyTitle);
+        playBackMap[j].funcText = RPNkeys[i].keyTitle;
         playBackMap[j].uniqueIndex = RPNkeys[i].uniqueIndex;
         playBackMap[j].useFloatsLongs = RPNkeys[i].useFloatsLongs;
         playBackMap[j].allowRecord = RPNkeys[i].allowRecord;
-        j++;
+        if (j < MAX_FUNCTIONS) j++;
         i++;
     }
 
@@ -4741,11 +4765,11 @@ void mapButtonFuncs(void)
         playBackMap[j].saveLastX = Scientific_funcs[i].saveLastX;
         playBackMap[j].newXedit = Scientific_funcs[i].newXedit;
         playBackMap[j].routine = Scientific_funcs[i].routine;
-        strcpy(playBackMap[j].funcText, Scientific_funcs[i].keyTitle);
+        playBackMap[j].funcText = Scientific_funcs[i].keyTitle;
         playBackMap[j].uniqueIndex = Scientific_funcs[i].uniqueIndex;
         playBackMap[j].useFloatsLongs = Scientific_funcs[i].useFloatsLongs;
         playBackMap[j].allowRecord = Scientific_funcs[i].allowRecord;
-        j++;
+        if (j < MAX_FUNCTIONS) j++;
     }
 
     for (i = 0; i < MAX_FUNCS; i++)
@@ -4753,24 +4777,23 @@ void mapButtonFuncs(void)
         playBackMap[j].saveLastX = Scientific2_funcs[i].saveLastX;
         playBackMap[j].newXedit = Scientific2_funcs[i].newXedit;
         playBackMap[j].routine = Scientific2_funcs[i].routine;
-        strcpy(playBackMap[j].funcText, Scientific2_funcs[i].keyTitle);
+        playBackMap[j].funcText = Scientific2_funcs[i].keyTitle;
         playBackMap[j].uniqueIndex = Scientific2_funcs[i].uniqueIndex;
         playBackMap[j].useFloatsLongs = Scientific2_funcs[i].useFloatsLongs;
         playBackMap[j].allowRecord = Scientific2_funcs[i].allowRecord;
-        j++;
+        if (j < MAX_FUNCTIONS) j++;
     }
-
 
     for (i = 0; i < MAX_FUNCS; i++)
     {
         playBackMap[j].saveLastX = Financial_funcs[i].saveLastX;
         playBackMap[j].newXedit = Financial_funcs[i].newXedit;
         playBackMap[j].routine = Financial_funcs[i].routine;
-        strcpy(playBackMap[j].funcText, Financial_funcs[i].keyTitle);
+        playBackMap[j].funcText = Financial_funcs[i].keyTitle;
         playBackMap[j].uniqueIndex = Financial_funcs[i].uniqueIndex;
         playBackMap[j].useFloatsLongs = Financial_funcs[i].useFloatsLongs;
         playBackMap[j].allowRecord = Financial_funcs[i].allowRecord;
-        j++;
+        if (j < MAX_FUNCTIONS) j++;
     }
 
     for (i = 0; i < MAX_FUNCS; i++)
@@ -4778,11 +4801,11 @@ void mapButtonFuncs(void)
         playBackMap[j].saveLastX = Conversion_funcs[i].saveLastX;
         playBackMap[j].newXedit = Conversion_funcs[i].newXedit;
         playBackMap[j].routine = Conversion_funcs[i].routine;
-        strcpy(playBackMap[j].funcText, Conversion_funcs[i].keyTitle);
+        playBackMap[j].funcText = Conversion_funcs[i].keyTitle;
         playBackMap[j].uniqueIndex = Conversion_funcs[i].uniqueIndex;
         playBackMap[j].useFloatsLongs = Conversion_funcs[i].useFloatsLongs;
         playBackMap[j].allowRecord = Conversion_funcs[i].allowRecord;
-        j++;
+        if (j < MAX_FUNCTIONS) j++;
     }
 
     for (i = 0; i < MAX_FUNCS; i++)
@@ -4790,11 +4813,11 @@ void mapButtonFuncs(void)
         playBackMap[j].saveLastX = Statistics_funcs[i].saveLastX;
         playBackMap[j].newXedit = Statistics_funcs[i].newXedit;
         playBackMap[j].routine = Statistics_funcs[i].routine;
-        strcpy(playBackMap[j].funcText, Statistics_funcs[i].keyTitle);
+        playBackMap[j].funcText = Statistics_funcs[i].keyTitle;
         playBackMap[j].uniqueIndex = Statistics_funcs[i].uniqueIndex;
         playBackMap[j].useFloatsLongs = Statistics_funcs[i].useFloatsLongs;
         playBackMap[j].allowRecord = Statistics_funcs[i].allowRecord;
-        j++;
+        if (j < MAX_FUNCTIONS) j++;
     }
 
     for (i = 0; i < MAX_FUNCS; i++)
@@ -4802,24 +4825,23 @@ void mapButtonFuncs(void)
         playBackMap[j].saveLastX = CompSci_funcs[i].saveLastX;
         playBackMap[j].newXedit = CompSci_funcs[i].newXedit;
         playBackMap[j].routine = CompSci_funcs[i].routine;
-        strcpy(playBackMap[j].funcText, CompSci_funcs[i].keyTitle);
+        playBackMap[j].funcText = CompSci_funcs[i].keyTitle;
         playBackMap[j].uniqueIndex = CompSci_funcs[i].uniqueIndex;
         playBackMap[j].useFloatsLongs = CompSci_funcs[i].useFloatsLongs;
         playBackMap[j].allowRecord = CompSci_funcs[i].allowRecord;
-        j++;
+        if (j < MAX_FUNCTIONS) j++;
     }
-
 
     for (i = 0; i < MAX_FUNCS; i++)
     {
         playBackMap[j].saveLastX = Program1_funcs[i].saveLastX;
         playBackMap[j].newXedit = Program1_funcs[i].newXedit;
         playBackMap[j].routine = Program1_funcs[i].routine;
-        strcpy(playBackMap[j].funcText, Program1_funcs[i].keyTitle);
+        playBackMap[j].funcText = Program1_funcs[i].keyTitle;
         playBackMap[j].uniqueIndex = Program1_funcs[i].uniqueIndex;
         playBackMap[j].useFloatsLongs = Program1_funcs[i].useFloatsLongs;
         playBackMap[j].allowRecord = Program1_funcs[i].allowRecord;
-        j++;
+        if (j < MAX_FUNCTIONS) j++;
     }
 
     for (i = 0; i < MAX_FUNCS; i++)
@@ -4827,39 +4849,22 @@ void mapButtonFuncs(void)
         playBackMap[j].saveLastX = Program2_funcs[i].saveLastX;
         playBackMap[j].newXedit = Program2_funcs[i].newXedit;
         playBackMap[j].routine = Program2_funcs[i].routine;
-        strcpy(playBackMap[j].funcText, Program2_funcs[i].keyTitle);
+        playBackMap[j].funcText =Program2_funcs[i].keyTitle;
         playBackMap[j].uniqueIndex = Program2_funcs[i].uniqueIndex;
         playBackMap[j].useFloatsLongs = Program2_funcs[i].useFloatsLongs;
         playBackMap[j].allowRecord = Program2_funcs[i].allowRecord;
-        totalMappedButtonFuncs++;
+        if (j < MAX_FUNCTIONS) j++;
     }
 
     totalMappedButtonFuncs = j;
-    STO[99] = totalMappedButtonFuncs;
 
-    if (totalMappedButtonFuncs > MAX_FUNCTIONS)
+    if (totalMappedButtonFuncs >= MAX_FUNCTIONS)
     {
         MessageBox(calcMainWindow, "Error - Maximum number of mapped functions exists!", "Excalibur Fatal Error", MB_OK);
     }
-    else  // Bubble sort on unique Index so that we can move buttons around and not have this all break! Bubble sort fast enough - this list is almost sorted anyway...
+    else  // Sort the list based on unique index for fast lookup during recording and playback.
     {
-        for (i = 0; i < totalMappedButtonFuncs; i++)
-        {
-            exchangeMade = FALSE;
-            for (j = 0; j < (totalMappedButtonFuncs - i - 1); j++)
-            {
-                if (playBackMap[j].uniqueIndex > playBackMap[j + 1].uniqueIndex)
-                {
-                    // Need to swap...
-                    memcpy(&tmpPlayBack, &playBackMap[j], sizeof(tmpPlayBack));
-                    memcpy(&playBackMap[j], &playBackMap[j + 1], sizeof(tmpPlayBack));
-                    memcpy(&playBackMap[j + 1], &tmpPlayBack, sizeof(tmpPlayBack));
-                    exchangeMade = TRUE; // At least one swap was performed
-                }
-            }
-            if (exchangeMade == FALSE)
-                break;          // We are Sorted!
-        }
+        sortPlaybackList();
     }
 }
 
@@ -5089,12 +5094,6 @@ void RPN_Playback(void)
                 else
                     UpdateSpareBar("Run...");
             }
-        }
-        else // traceMacroPlayback is TRUE
-        {
-            showTrace = TRUE;
-            ShowStack();
-            showTrace = FALSE;
         }
 
         idx = playBack[currentMacroPlaybackIdx];

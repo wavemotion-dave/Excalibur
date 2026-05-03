@@ -331,7 +331,6 @@ extern void RPN_backspace(void);
 extern void RPN_store(void);
 extern void RPN_recall(void);
 extern void RPN_Ex(void);
-extern void RPN_Playback(void);
 extern void RPN_clearX(void);
 extern void RPN_drop(void);
 extern void RPN_larg(void);
@@ -397,13 +396,13 @@ extern void turnOnNumLock(void);
 
 struct playbackStruct
 {
-    uint16_t uniqueIndex;
-    uint8_t  useFloatsLongs;
-    uint8_t  allowRecord;
-    uint8_t  saveLastX;
-    uint8_t  newXedit;
-    func_t   routine;
-    char     funcText[MAX_MACRO_FUNC_TEXT];
+    uint16_t    uniqueIndex;
+    uint8_t     useFloatsLongs;
+    uint8_t     allowRecord;
+    uint8_t     saveLastX;
+    uint8_t     newXedit;
+    func_t      routine;
+    const char *funcText;
 };
 
 extern struct playbackStruct playBackMap[MAX_FUNCTIONS + 1];
