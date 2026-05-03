@@ -115,9 +115,9 @@ BYTE     keyState[256];
 uint8_t  Xedit = X_NEW;
 char     Xstr[50];
 
-/* ---------------- */
-/* Global registers */
-/* ---------------- */
+// ---------------- 
+// Global registers 
+// ---------------- 
 double X;                           // Main register X
 double Y;                           // Main register Y
 double Z;                           // Main register Z
@@ -369,9 +369,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
     static WORD lastXpos, lastYpos;
     POINT pCursor;
     HDC hdc;
-    RECT rc;                    /* window's screen coordinates      */
-    POINT ptUpperLeft;          /* client coordinate of upper left  */
-    POINT ptLowerRight;         /* client coordinate of lower right */
+    RECT rc;                    // window's screen coordinates      
+    POINT ptUpperLeft;          // client coordinate of upper left  
+    POINT ptLowerRight;         // client coordinate of lower right 
     SIZE lpSize;
     PAINTSTRUCT ps;
     int i;
@@ -1555,17 +1555,17 @@ int Init(void)
         SetWindowPos(calcMainWindow, HWND_NOTOPMOST, main_x, main_y, main_cx, main_cy, flags);
     }
 
-/* -------------------------------------------------------- */
-/* Turn on the num lock automatically for this application. */
-/* -------------------------------------------------------- */
+// -------------------------------------------------------- 
+// Turn on the num lock automatically for this application. 
+// -------------------------------------------------------- 
     if (numLockMode == 1)
     {
         turnOnNumLock();
     }
 
-/* -------------------------------------------------------- */
-/* If we need to remap the +/- and the E keys, do so now... */
-/* -------------------------------------------------------- */
+// -------------------------------------------------------- 
+// If we need to remap the +/- and the E keys, do so now... 
+// -------------------------------------------------------- 
     if (eexMode == 1)
     {
         SetDlgItemText(calcMainWindow, RPN_NEGATE, "CHS");
@@ -2351,9 +2351,9 @@ double StackPop(void)
 }
 
 
-/* ----------------------- */
-/* Basic keypad keypresses */
-/* ----------------------- */
+// ----------------------- 
+// Basic keypad keypresses 
+// ----------------------- 
 void RPN_clearStack(void)
 {
     // Check if we should clear all registers
@@ -2821,7 +2821,7 @@ BOOL CALLBACK fnDIALOG_DisplayModeProc(HWND hDlg, UINT wMessage, WPARAM wParam, 
     case WM_COMMAND:
         switch(wParam)
         {
-        case(108):            /* OK was pressed */
+        case(108):            // OK was pressed 
             if (SendMessage(GetDlgItem(hDlg, 101), BM_GETCHECK, 0, 0L))
             {
                 sci_format = 'g';
@@ -2873,7 +2873,7 @@ BOOL CALLBACK fnDIALOG_DisplayModeProc(HWND hDlg, UINT wMessage, WPARAM wParam, 
 
             EndDialog(hDlg, FALSE);
             return TRUE;
-        case(109):            /* Cancel was pressed */
+        case(109):            // Cancel was pressed 
             EndDialog(hDlg, FALSE);
             return TRUE;
         default:
@@ -3157,9 +3157,9 @@ void RPN_lastX(void)
 
 
 
-/* -------------- */
-/* Misc functions */
-/* -------------- */
+// -------------- 
+// Misc functions 
+// -------------- 
 
 double ToRadians(double t)
 {
@@ -3190,9 +3190,9 @@ double FromRadians(double t)
 }
 
 
-/* ------------------------- */
-/* STOre and ReCaL functions */
-/* ------------------------- */
+// ------------------------- 
+// STOre and ReCaL functions 
+// ------------------------- 
 char stoTmpStr[10];
 BOOL CALLBACK StoNameDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
 {
@@ -3204,11 +3204,11 @@ BOOL CALLBACK StoNameDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
     case WM_COMMAND:
         switch(LOWORD(wParam))
         {
-        case(IDOK):           /* OK - save value! */
-            GetDlgItemText(hDlg, IDC_EDIT1, stoTmpStr, 9);     /* 8 chars plus NULL */
+        case(IDOK):           // OK - save value! 
+            GetDlgItemText(hDlg, IDC_EDIT1, stoTmpStr, 9);     // 8 chars plus NULL 
             EndDialog(hDlg, FALSE);
             return TRUE;
-        case(IDCANCEL):       /* Close/Cancel */
+        case(IDCANCEL):       // Close/Cancel 
             EndDialog(hDlg, FALSE);
             return TRUE;
         default:
@@ -3271,9 +3271,9 @@ void RPN_ExchangeReg(void)
     }
 }
 
-/* ------------------------------------------------------------------------ */
-/*                           SAVE STUFF TO DISK                             */
-/* ------------------------------------------------------------------------ */
+// ------------------------------------------------------------------------ 
+//                           SAVE STUFF TO DISK                             
+// ------------------------------------------------------------------------ 
 int GetMenuType(struct funcStruct *cFunc)
 {
     int retVal = 1;
@@ -3682,7 +3682,7 @@ void ReadFromDisk(void)
         {
             main_x = -1;        // Force auto-resize!
         }
-        if (configVersionSub != CONFIG_VERSION_SUB)       /* If new version but still supported version */
+        if (configVersionSub != CONFIG_VERSION_SUB)       // If new version but still supported version 
         {
             main_x = -1;        // Force auto-resize!
         }
@@ -5195,7 +5195,7 @@ BOOL CALLBACK NotesDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPara
     case WM_COMMAND:
         switch(LOWORD(wParam))
         {
-        case(IDOK):           /* OK - Close and save notes */
+        case(IDOK):           // OK - Close and save notes 
             GetDlgItemText(hDlg, IDC_EDIT1, excaliburNotes, NOTES_SIZE-1);
             excaliburNotes[NOTES_SIZE] = CNULL;
             EndDialog(hDlg, FALSE);
@@ -5397,13 +5397,13 @@ BOOL CALLBACK HelpDialog(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
 
 
 
-/* Handle several math errors caused by passing a negative argument
- * to log or log10(_DOMAIN errors). When this happens, _matherr
- * returns the natural or base-10 logarithm of the absolute value
- * of the argument and suppresses the usual error message. */
+// Handle several math errors caused by passing a negative argument
+// to log or log10(_DOMAIN errors). When this happens, _matherr
+// returns the natural or base-10 logarithm of the absolute value
+// of the argument and suppresses the usual error message.
 int _matherr(struct _exception *except)
 {
-    /* Handle _OVERFLOW and _UNDERFLOW */
+    // Handle _OVERFLOW and _UNDERFLOW 
     if (except->type == _OVERFLOW)
     {
         MessageBox(calcMainWindow, "Excalibur Function Overflow...", "Excalibur Floating Point", MB_OK);
@@ -5435,7 +5435,7 @@ int _matherr(struct _exception *except)
     }
     else
     {
-        return 0;               /* Else use the default actions */
+        return 0;               // Else use the default actions 
     }
 }
 

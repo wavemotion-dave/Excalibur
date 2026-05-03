@@ -38,14 +38,14 @@
 #include <time.h>
 #include "Excal.h"
 
-/* TVM Registers */
+// TVM Registers 
 #define FIN_REG_n      0
 #define FIN_REG_i      1
 #define FIN_REG_PV     2
 #define FIN_REG_PMT    3
 #define FIN_REG_FV     4
 
-/* Markup Registers */
+// Markup Registers 
 #define FIN_REG_MUC    5
 #define FIN_REG_MUP    6
 #define FIN_REG_COST   7
@@ -785,7 +785,7 @@ unsigned long dateSerial360(struct dateStruct dt)
     serial = 0;
     for (i = 1900; i < (dt.year); i++)
     {
-        serial += 360;          /* TBD, check leap years */
+        serial += 360;          // TBD, check leap years 
     }
 
     for (i = 0; i < (dt.month - 1); i++)

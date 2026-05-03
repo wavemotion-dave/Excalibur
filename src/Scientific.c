@@ -571,7 +571,7 @@ void SCI_GCD(void)
         return;
     }
 
-    /* Get smallest non-zero of the 4 */
+    // Get smallest non-zero of the 4 
     try_value = max(l1, l2);
     if (l1 != 0L)
         try_value = min(try_value, l1);
@@ -608,7 +608,7 @@ void SCI_LCM(void)
     l1 = (long) X;
     l2 = (long) Y;
 
-    /* Get biggest of the 4 */
+    // Get biggest of the 4 
     try_value = max(l1, l2);
 
     if (try_value != 0)
@@ -904,7 +904,7 @@ BOOL CALLBACK fnDIALOG_ElementsProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
         case(101):            // double click?!?
             if (HIWORD(wParam) != LBN_DBLCLK)
                 break;
-        case(102):            /* Insert atomic number */
+        case(102):            // Insert atomic number 
             item = SendDlgItemMessage(hDlg, 101, LB_GETCURSEL, 0, 0L);
             if (item == LB_ERR)
             {
@@ -916,7 +916,7 @@ BOOL CALLBACK fnDIALOG_ElementsProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
                 EndDialog(hDlg, FALSE);
             }
             return TRUE;
-        case(103):            /* Insert atomic mass */
+        case(103):            // Insert atomic mass 
             item = SendDlgItemMessage(hDlg, 101, LB_GETCURSEL, 0, 0L);
             if (item == LB_ERR)
             {
@@ -928,7 +928,7 @@ BOOL CALLBACK fnDIALOG_ElementsProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
                 EndDialog(hDlg, FALSE);
             }
             return TRUE;
-        case(104):            /* Cancel */
+        case(104):            // Cancel 
             EndDialog(hDlg, FALSE);
             return TRUE;
         default:
@@ -1175,7 +1175,7 @@ BOOL CALLBACK MetricPrefixDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARA
         case(101):            // double click?!?
             if (HIWORD(wParam) != LBN_DBLCLK)
                 break;
-        case(102):            /* Insert value */
+        case(102):            // Insert value 
             item = SendDlgItemMessage(hDlg, 101, LB_GETCURSEL, 0, 0L);
             if (item == LB_ERR)
             {
@@ -1187,7 +1187,7 @@ BOOL CALLBACK MetricPrefixDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARA
                 EndDialog(hDlg, FALSE);
             }
             return TRUE;
-        case(103):            /* Cancel */
+        case(103):            // Cancel 
             EndDialog(hDlg, FALSE);
             return TRUE;
         default:
@@ -1632,7 +1632,7 @@ BOOL CALLBACK AstroDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPara
         case(101):            // double click?!?
             if (HIWORD(wParam) != LBN_DBLCLK)
                 break;
-        case(102):            /* Insert value */
+        case(102):            // Insert value 
             item = SendDlgItemMessage(hDlg, 101, LB_GETCURSEL, 0, 0L);
             if (item == LB_ERR)
             {
@@ -1644,7 +1644,7 @@ BOOL CALLBACK AstroDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPara
                 EndDialog(hDlg, FALSE);
             }
             return TRUE;
-        case(103):            /* Cancel */
+        case(103):            // Cancel 
             EndDialog(hDlg, FALSE);
             return TRUE;
         default:

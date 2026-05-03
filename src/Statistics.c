@@ -101,9 +101,9 @@ struct funcStruct Statistics_funcs[MAX_FUNCS] = {
     {FN40,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ',   " ",     YES_L,   X_NEW,   NULL,          T_NULL,    H_NULL}
 };
 
-/* ------------- */
-/* STAT functions */
-/* ------------- */
+// ------------- 
+// STAT functions 
+// ------------- 
 void STAT_SdevX(void)
 {
     double temp;

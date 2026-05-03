@@ -236,7 +236,7 @@ BOOL CALLBACK constBankNamesProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
     case WM_COMMAND:
         switch(LOWORD(wParam))
         {
-        case(IDOK):           /* OK - Close */
+        case(IDOK):           // OK - Close 
             GetDlgItemText(hDlg, IDC_EDIT1, constantBankNames[0], 15);
             constantBankNames[0][14] = CNULL;
             GetDlgItemText(hDlg, IDC_EDIT2, constantBankNames[1], 15);
@@ -250,7 +250,7 @@ BOOL CALLBACK constBankNamesProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
             EndDialog(hDlg, FALSE);
             return TRUE;
         
-        case(IDCANCEL):       /* Cancel */
+        case(IDCANCEL):       // Cancel 
             EndDialog(hDlg, FALSE);
             return TRUE;
         
@@ -326,8 +326,8 @@ BOOL CALLBACK fnDIALOG_Constants(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
         case(101):
             if (HIWORD(wParam) != LBN_DBLCLK)
                 break;
-            /* Else fall through!!!! */
-        case(102):            /* Insert constant number */
+            // Else fall through!!!! 
+        case(102):            // Insert constant number 
             item = SendDlgItemMessage(hDlg, 101, LB_GETCURSEL, 0, 0L);
             if (item == (LRESULT) LB_ERR)
             {
@@ -351,7 +351,7 @@ BOOL CALLBACK fnDIALOG_Constants(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
                 EndDialog(hDlg, FALSE);
             }
             return TRUE;
-        case(105):            /* Add New Constant */
+        case(105):            // Add New Constant 
             for (i = 0; i < MAX_CONSTS; i++)
             {
                 if (constants[lastConstBank][i].includeInList == FALSE)
@@ -371,7 +371,7 @@ BOOL CALLBACK fnDIALOG_Constants(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
             }
 
             // NO BREAK!!! Fall through!
-        case(104):            /* Redefine Constant */
+        case(104):            // Redefine Constant 
             if (LOWORD(wParam) == 104)
                 item = SendDlgItemMessage(hDlg, 101, LB_GETCURSEL, 0, 0L);
             if (item == (LRESULT) LB_ERR)
@@ -580,7 +580,7 @@ BOOL CALLBACK fnDIALOG_Constants(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
             SendDlgItemMessage(hDlg, 101, LB_SETCURSEL, lastChosenConst, 0);
             SetFocus(GetDlgItem(hDlg, 101));
             return TRUE;
-        case(107):            /* Redefine Bank Names */
+        case(107):            // Redefine Bank Names 
             DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_CONSTANT_BANK_NAMES", hDlg, constBankNamesProc);
             SetDlgItemText(hDlg, IDC_RADIO1, constantBankNames[0]);
             SetDlgItemText(hDlg, IDC_RADIO2, constantBankNames[1]);
@@ -589,7 +589,7 @@ BOOL CALLBACK fnDIALOG_Constants(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
             SetDlgItemText(hDlg, IDC_RADIO5, constantBankNames[4]);
             return TRUE;
 
-        case(103):            /* Cancel */
+        case(103):            // Cancel 
             EndDialog(hDlg, FALSE);
             return TRUE;
         default:

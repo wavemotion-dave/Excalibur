@@ -136,9 +136,9 @@ static double inverse(double x)
     return (1.0 / x);
 }
 
-/* --------------------- */
-/* Conversion Functioins */
-/* --------------------- */
+// --------------------- 
+// Conversion Functioins 
+// --------------------- 
 void CONV_lb_kg(void)
 {
     if (!(modifiers & MOD_INVERSE))

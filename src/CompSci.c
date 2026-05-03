@@ -37,7 +37,7 @@
 #include <ctype.h>
 #include "Excal.h"
 
-/* Programming externs */
+// Programming externs 
 extern void PROG_hex(void);
 extern void PROG_bin(void);
 extern void PROG_oct(void);
@@ -149,7 +149,7 @@ void MakeRadixStr(PROG_LONG val, char *tmpL)
     }
     else if (progMode == PROG_BIN)
     {
-        if (binMode == 1)       /* Show upper */
+        if (binMode == 1)       // Show upper 
             val = val >> 16;
 
         ltoa(val & (PROG_LONG) 0x0000FFFF, temp4, progMode);
@@ -279,9 +279,9 @@ PROG_LONG StackPopL(void)
 
 
 
-/* ----------------------- */
-/* Programming mode stuff  */
-/* ----------------------- */
+// ----------------------- 
+// Programming mode stuff  
+// ----------------------- 
 void PROG_hex(void)
 {
     progMode = PROG_HEX;
@@ -1080,11 +1080,11 @@ PROG_LONG biggestProgVal(void)
     }
 }
 
-/**
- * Converts a 64-bit unsigned integer to a null-terminated binary string.
- * @param n: The 64-bit integer to convert.
- * @param out_str: A pointer to a char array of at least 65 bytes.
- */
+//
+// * Converts a 64-bit unsigned integer to a null-terminated binary string.
+// * @param n: The 64-bit integer to convert.
+// * @param out_str: A pointer to a char array of at least 65 bytes.
+// 
 void int64_to_binary(uint64_t n, char *out_str, uint8_t bits)
 {
     int i;
@@ -1147,7 +1147,7 @@ BOOL CALLBACK DlgProcIEEE(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam
     case WM_COMMAND:
         switch(LOWORD(wParam))
         {
-        case(105):           /* Enter */
+        case(105):           // Enter 
             GetDlgItemText(hDlg, IDC_EDIT1, tmp, 25);
             
             val_float = (float)atof(tmp);
@@ -1165,7 +1165,7 @@ BOOL CALLBACK DlgProcIEEE(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam
             SetDlgItemText(hDlg, 102, tmp);            
             return TRUE;
 
-        case(IDOK):           /* OK - Close */
+        case(IDOK):           // OK - Close 
             EndDialog(hDlg, FALSE);
             return TRUE;
         default:

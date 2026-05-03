@@ -38,8 +38,8 @@ typedef unsigned __int32    uint32_t;
 typedef unsigned __int16    uint16_t;
 typedef unsigned __int8     uint8_t;
 
-#define PROG_LONG           uint32_t    /* We handle signed and other word sizes in ex_prog.c */
-#define PROG_SIGNEDLONG     int32_t     /* Needed when we convert Signed to float... */
+#define PROG_LONG           uint32_t    // We handle signed and other word sizes in ex_prog.c 
+#define PROG_SIGNEDLONG     int32_t     // Needed when we convert Signed to float... 
 
 #define MAX_FUNCS           40
 
@@ -47,12 +47,15 @@ typedef unsigned __int8     uint8_t;
 
 #define MAX_DIGITS          18
 
-#define X_NEW               01  /* Next keypress pushes stack and starts new edit */
-#define X_EDIT              02  /* Value is under edit and will have the _ at the end */
-#define X_ENTER             03  /* Enter just pressed - next keypress replaces X */
-#define X_NULL              04  /* No change to the X value - it will remain one of those above */
+#define X_NEW               1   // Next keypress pushes stack and starts new edit 
+#define X_EDIT              2   // Value is under edit and will have the _ at the end 
+#define X_ENTER             3   // Enter just pressed - next keypress replaces X 
+#define X_NULL              4   // No change to the X value - it will remain one of those above 
 
-#define MAX_IMPORT_CLIPBOARD_SIZE (1024 * 10)
+#define YES_L               1   // Yes, save the Last X value when executing this function
+#define NO_L                2   // No, do not save the Last X value when executing this function
+
+#define MAX_IMPORT_CLIPBOARD_SIZE (10 * 1024)
 
 // Defines for menu item IDs
 #define   IDM_OPEN                          101
@@ -80,11 +83,6 @@ typedef unsigned __int8     uint8_t;
 
 #define   IDM_MACRO                         3000
 #define   IDM_MACRO_LIST                    3001
-
-// Function prototypes for dialog and subdialog modules
-
-#define YES_L   ((char) 1)
-#define NO_L    ((char) 2)
 
 typedef void (*func_t)(void);
 
@@ -115,37 +113,37 @@ extern struct funcStruct Custom_funcs[];
 extern struct funcStruct MacroFuncs[];
 
 // For record/playback
-#define ALLOWREC     1
-#define NORECORD     0
+#define ALLOWREC    1   // This button can be recorded
+#define NORECORD    0   // This is a meta-button that can't be recorded (e.g. REC or RUN)
 
 // Float or Long...
-#define USES_F  1   // Uses floating point numbers
-#define USES_L  2   // Uses long integer numbers
-#define USES_FL 3   // Can use either floats or longs
+#define USES_F      1   // Uses floating point numbers
+#define USES_L      2   // Uses long integer numbers
+#define USES_FL     3   // Can use either floats or longs
 
-#define NOTES_SIZE 2048
+#define NOTES_SIZE  2048
 
-/* --------------------------- */
-/* Defines for the main dialog */
-/* --------------------------- */
-#define FUNC_BAR_TEXT_SCI_I    "SCIENTIFIC I"
-#define FUNC_BAR_TEXT_SCI2     "SCIENTIFIC II"
-#define FUNC_BAR_TEXT_BUIS     "FINANCIAL"
-#define FUNC_BAR_TEXT_STATS    "STATISTICS"
-#define FUNC_BAR_TEXT_CONV     "CONVERSION"
-#define FUNC_BAR_TEXT_COMPSCI  "COMP-SCI"
-#define FUNC_BAR_TEXT_PROG1    "PROGRAM I"
-#define FUNC_BAR_TEXT_PROG2    "PROGRAM II"
-#define FUNC_BAR_TEXT_CUSTOM   "CUSTOM BANK"
+// --------------------------- 
+// Defines for the main dialog 
+// --------------------------- 
+#define FUNC_BAR_TEXT_SCI_I     "SCIENTIFIC I"
+#define FUNC_BAR_TEXT_SCI2      "SCIENTIFIC II"
+#define FUNC_BAR_TEXT_BUIS      "FINANCIAL"
+#define FUNC_BAR_TEXT_STATS     "STATISTICS"
+#define FUNC_BAR_TEXT_CONV      "CONVERSION"
+#define FUNC_BAR_TEXT_COMPSCI   "COMP-SCI"
+#define FUNC_BAR_TEXT_PROG1     "PROGRAM I"
+#define FUNC_BAR_TEXT_PROG2     "PROGRAM II"
+#define FUNC_BAR_TEXT_CUSTOM    "CUSTOM BANK"
 
 // We have 3 global timers in use...
-#define TIMER_ONE_MINUTE    1
-#define TIMER_SLOW          2
-#define TIMER_FAST          3
+#define TIMER_ONE_MINUTE        1
+#define TIMER_SLOW              2
+#define TIMER_FAST              3
 
-/* ---------- */
-/* PROTOTYPES */
-/* ---------- */
+// ---------- 
+// PROTOTYPES 
+// ---------- 
 #ifdef CPPLUS
 extern "C" void   StackPush(double temp);
 extern "C" double StackPop(void);
@@ -164,16 +162,16 @@ extern double ToRadians(double t);
 
 extern uint8_t Xedit;
 extern char Xstr[50];
-extern double X;                /* Main register X */
-extern double Y;                /* Main register Y */
-extern double Z;                /* Main register Z */
-extern double T;                /* Main Register T */
-extern double A;                /* Extended Stack A */
-extern double B;                /* Extended Stack B */
-extern double C;                /* Extended Stack C */
-extern double D;                /* Extended Stack D */
+extern double X;                // Main register X 
+extern double Y;                // Main register Y 
+extern double Z;                // Main register Z 
+extern double T;                // Main Register T 
+extern double A;                // Extended Stack A 
+extern double B;                // Extended Stack B 
+extern double C;                // Extended Stack C 
+extern double D;                // Extended Stack D 
 
-extern double LASTX;            /* LAST X register */
+extern double LASTX;            // LAST X register 
 
 extern PROG_LONG XL;
 extern PROG_LONG YL;
@@ -230,7 +228,7 @@ extern double fin_reg[FIN_REG_MAX];
 extern uint8_t payMode;
 extern uint8_t dateMode;
 
-/* Programming mode defines */
+// Programming mode defines 
 extern uint8_t  padZeros;
 extern uint32_t wordSize;
 extern uint8_t  wordMode;
