@@ -1680,5 +1680,7 @@ extern uint32_t userTicks;
 #define H_METRIC        "Metric Prefixes and their magnitudes"
 #define T_SPHV          "Sphere Volume"
 #define H_SPHV          "Calculate the volume of a sphere with radius X."
+#define T_MPA_PSI       "Megapascals to PSI"
+#define H_MPA_PSI       "Convert from Megapascals to PSI"
 
 #include "resource.h"

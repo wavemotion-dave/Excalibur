@@ -4750,110 +4750,110 @@ void mapButtonFuncs(void)
 
     while (RPNkeys[i].index != RPN_LAST_KEY)
     {
-        playBackMap[j].saveLastX = RPNkeys[i].saveLastX;
-        playBackMap[j].newXedit = RPNkeys[i].newXedit;
-        playBackMap[j].routine = RPNkeys[i].routine;
-        playBackMap[j].funcText = RPNkeys[i].keyTitle;
-        playBackMap[j].uniqueIndex = RPNkeys[i].uniqueIndex;
-        playBackMap[j].useFloatsLongs = RPNkeys[i].useFloatsLongs;
-        playBackMap[j].allowRecord = RPNkeys[i].allowRecord;
+        playBackMap[j].saveLastX        = RPNkeys[i].saveLastX;
+        playBackMap[j].newXedit         = RPNkeys[i].newXedit;
+        playBackMap[j].routine          = RPNkeys[i].routine;
+        playBackMap[j].funcText         = RPNkeys[i].keyTitle;
+        playBackMap[j].uniqueIndex      = RPNkeys[i].uniqueIndex;
+        playBackMap[j].useFloatsLongs   = RPNkeys[i].useFloatsLongs;
+        playBackMap[j].allowRecord      = RPNkeys[i].allowRecord;
         if (j < MAX_FUNCTIONS) j++;
         i++;
     }
 
     for (i = 0; i < MAX_FUNCS; i++)
     {
-        playBackMap[j].saveLastX = Scientific_funcs[i].saveLastX;
-        playBackMap[j].newXedit = Scientific_funcs[i].newXedit;
-        playBackMap[j].routine = Scientific_funcs[i].routine;
-        playBackMap[j].funcText = Scientific_funcs[i].keyTitle;
-        playBackMap[j].uniqueIndex = Scientific_funcs[i].uniqueIndex;
-        playBackMap[j].useFloatsLongs = Scientific_funcs[i].useFloatsLongs;
-        playBackMap[j].allowRecord = Scientific_funcs[i].allowRecord;
+        playBackMap[j].saveLastX        = Scientific_funcs[i].saveLastX;
+        playBackMap[j].newXedit         = Scientific_funcs[i].newXedit;
+        playBackMap[j].routine          = Scientific_funcs[i].routine;
+        playBackMap[j].funcText         = Scientific_funcs[i].keyTitle;
+        playBackMap[j].uniqueIndex      = Scientific_funcs[i].uniqueIndex;
+        playBackMap[j].useFloatsLongs   = Scientific_funcs[i].useFloatsLongs;
+        playBackMap[j].allowRecord      = Scientific_funcs[i].allowRecord;
         if (j < MAX_FUNCTIONS) j++;
     }
 
     for (i = 0; i < MAX_FUNCS; i++)
     {
-        playBackMap[j].saveLastX = Scientific2_funcs[i].saveLastX;
-        playBackMap[j].newXedit = Scientific2_funcs[i].newXedit;
-        playBackMap[j].routine = Scientific2_funcs[i].routine;
-        playBackMap[j].funcText = Scientific2_funcs[i].keyTitle;
-        playBackMap[j].uniqueIndex = Scientific2_funcs[i].uniqueIndex;
-        playBackMap[j].useFloatsLongs = Scientific2_funcs[i].useFloatsLongs;
-        playBackMap[j].allowRecord = Scientific2_funcs[i].allowRecord;
+        playBackMap[j].saveLastX        = Scientific2_funcs[i].saveLastX;
+        playBackMap[j].newXedit         = Scientific2_funcs[i].newXedit;
+        playBackMap[j].routine          = Scientific2_funcs[i].routine;
+        playBackMap[j].funcText         = Scientific2_funcs[i].keyTitle;
+        playBackMap[j].uniqueIndex      = Scientific2_funcs[i].uniqueIndex;
+        playBackMap[j].useFloatsLongs   = Scientific2_funcs[i].useFloatsLongs;
+        playBackMap[j].allowRecord      = Scientific2_funcs[i].allowRecord;
         if (j < MAX_FUNCTIONS) j++;
     }
 
     for (i = 0; i < MAX_FUNCS; i++)
     {
-        playBackMap[j].saveLastX = Financial_funcs[i].saveLastX;
-        playBackMap[j].newXedit = Financial_funcs[i].newXedit;
-        playBackMap[j].routine = Financial_funcs[i].routine;
-        playBackMap[j].funcText = Financial_funcs[i].keyTitle;
-        playBackMap[j].uniqueIndex = Financial_funcs[i].uniqueIndex;
-        playBackMap[j].useFloatsLongs = Financial_funcs[i].useFloatsLongs;
-        playBackMap[j].allowRecord = Financial_funcs[i].allowRecord;
+        playBackMap[j].saveLastX        = Financial_funcs[i].saveLastX;
+        playBackMap[j].newXedit         = Financial_funcs[i].newXedit;
+        playBackMap[j].routine          = Financial_funcs[i].routine;
+        playBackMap[j].funcText         = Financial_funcs[i].keyTitle;
+        playBackMap[j].uniqueIndex      = Financial_funcs[i].uniqueIndex;
+        playBackMap[j].useFloatsLongs   = Financial_funcs[i].useFloatsLongs;
+        playBackMap[j].allowRecord      = Financial_funcs[i].allowRecord;
         if (j < MAX_FUNCTIONS) j++;
     }
 
     for (i = 0; i < MAX_FUNCS; i++)
     {
-        playBackMap[j].saveLastX = Conversion_funcs[i].saveLastX;
-        playBackMap[j].newXedit = Conversion_funcs[i].newXedit;
-        playBackMap[j].routine = Conversion_funcs[i].routine;
-        playBackMap[j].funcText = Conversion_funcs[i].keyTitle;
-        playBackMap[j].uniqueIndex = Conversion_funcs[i].uniqueIndex;
-        playBackMap[j].useFloatsLongs = Conversion_funcs[i].useFloatsLongs;
-        playBackMap[j].allowRecord = Conversion_funcs[i].allowRecord;
+        playBackMap[j].saveLastX        = Conversion_funcs[i].saveLastX;
+        playBackMap[j].newXedit         = Conversion_funcs[i].newXedit;
+        playBackMap[j].routine          = Conversion_funcs[i].routine;
+        playBackMap[j].funcText         = Conversion_funcs[i].keyTitle;
+        playBackMap[j].uniqueIndex      = Conversion_funcs[i].uniqueIndex;
+        playBackMap[j].useFloatsLongs   = Conversion_funcs[i].useFloatsLongs;
+        playBackMap[j].allowRecord      = Conversion_funcs[i].allowRecord;
         if (j < MAX_FUNCTIONS) j++;
     }
 
     for (i = 0; i < MAX_FUNCS; i++)
     {
-        playBackMap[j].saveLastX = Statistics_funcs[i].saveLastX;
-        playBackMap[j].newXedit = Statistics_funcs[i].newXedit;
-        playBackMap[j].routine = Statistics_funcs[i].routine;
-        playBackMap[j].funcText = Statistics_funcs[i].keyTitle;
-        playBackMap[j].uniqueIndex = Statistics_funcs[i].uniqueIndex;
-        playBackMap[j].useFloatsLongs = Statistics_funcs[i].useFloatsLongs;
-        playBackMap[j].allowRecord = Statistics_funcs[i].allowRecord;
+        playBackMap[j].saveLastX        = Statistics_funcs[i].saveLastX;
+        playBackMap[j].newXedit         = Statistics_funcs[i].newXedit;
+        playBackMap[j].routine          = Statistics_funcs[i].routine;
+        playBackMap[j].funcText         = Statistics_funcs[i].keyTitle;
+        playBackMap[j].uniqueIndex      = Statistics_funcs[i].uniqueIndex;
+        playBackMap[j].useFloatsLongs   = Statistics_funcs[i].useFloatsLongs;
+        playBackMap[j].allowRecord      = Statistics_funcs[i].allowRecord;
         if (j < MAX_FUNCTIONS) j++;
     }
 
     for (i = 0; i < MAX_FUNCS; i++)
     {
-        playBackMap[j].saveLastX = CompSci_funcs[i].saveLastX;
-        playBackMap[j].newXedit = CompSci_funcs[i].newXedit;
-        playBackMap[j].routine = CompSci_funcs[i].routine;
-        playBackMap[j].funcText = CompSci_funcs[i].keyTitle;
-        playBackMap[j].uniqueIndex = CompSci_funcs[i].uniqueIndex;
-        playBackMap[j].useFloatsLongs = CompSci_funcs[i].useFloatsLongs;
-        playBackMap[j].allowRecord = CompSci_funcs[i].allowRecord;
+        playBackMap[j].saveLastX        = CompSci_funcs[i].saveLastX;
+        playBackMap[j].newXedit         = CompSci_funcs[i].newXedit;
+        playBackMap[j].routine          = CompSci_funcs[i].routine;
+        playBackMap[j].funcText         = CompSci_funcs[i].keyTitle;
+        playBackMap[j].uniqueIndex      = CompSci_funcs[i].uniqueIndex;
+        playBackMap[j].useFloatsLongs   = CompSci_funcs[i].useFloatsLongs;
+        playBackMap[j].allowRecord      = CompSci_funcs[i].allowRecord;
         if (j < MAX_FUNCTIONS) j++;
     }
 
     for (i = 0; i < MAX_FUNCS; i++)
     {
-        playBackMap[j].saveLastX = Program1_funcs[i].saveLastX;
-        playBackMap[j].newXedit = Program1_funcs[i].newXedit;
-        playBackMap[j].routine = Program1_funcs[i].routine;
-        playBackMap[j].funcText = Program1_funcs[i].keyTitle;
-        playBackMap[j].uniqueIndex = Program1_funcs[i].uniqueIndex;
-        playBackMap[j].useFloatsLongs = Program1_funcs[i].useFloatsLongs;
-        playBackMap[j].allowRecord = Program1_funcs[i].allowRecord;
+        playBackMap[j].saveLastX        = Program1_funcs[i].saveLastX;
+        playBackMap[j].newXedit         = Program1_funcs[i].newXedit;
+        playBackMap[j].routine          = Program1_funcs[i].routine;
+        playBackMap[j].funcText         = Program1_funcs[i].keyTitle;
+        playBackMap[j].uniqueIndex      = Program1_funcs[i].uniqueIndex;
+        playBackMap[j].useFloatsLongs   = Program1_funcs[i].useFloatsLongs;
+        playBackMap[j].allowRecord      = Program1_funcs[i].allowRecord;
         if (j < MAX_FUNCTIONS) j++;
     }
 
     for (i = 0; i < MAX_FUNCS; i++)
     {
-        playBackMap[j].saveLastX = Program2_funcs[i].saveLastX;
-        playBackMap[j].newXedit = Program2_funcs[i].newXedit;
-        playBackMap[j].routine = Program2_funcs[i].routine;
-        playBackMap[j].funcText =Program2_funcs[i].keyTitle;
-        playBackMap[j].uniqueIndex = Program2_funcs[i].uniqueIndex;
-        playBackMap[j].useFloatsLongs = Program2_funcs[i].useFloatsLongs;
-        playBackMap[j].allowRecord = Program2_funcs[i].allowRecord;
+        playBackMap[j].saveLastX        = Program2_funcs[i].saveLastX;
+        playBackMap[j].newXedit         = Program2_funcs[i].newXedit;
+        playBackMap[j].routine          = Program2_funcs[i].routine;
+        playBackMap[j].funcText         = Program2_funcs[i].keyTitle;
+        playBackMap[j].uniqueIndex      = Program2_funcs[i].uniqueIndex;
+        playBackMap[j].useFloatsLongs   = Program2_funcs[i].useFloatsLongs;
+        playBackMap[j].allowRecord      = Program2_funcs[i].allowRecord;
         if (j < MAX_FUNCTIONS) j++;
     }
 
@@ -4898,7 +4898,10 @@ void SaveProgramStep(uint16_t uniqueIndex)
                 }
             }
             else
+            {
                 MessageBox(calcMainWindow, "Maximum program length has been reached.", "Excalibur Program Error", MB_OK);
+            }
+
             break;
         }
         i++;
@@ -4926,7 +4929,6 @@ void callButtonFunc(void(*routine) (void), char useFloatsLongs, char allowRecord
         LASTY  = Y;
         LASTYL = YL;
     }
-
 
     // Before we call the button function we need to ensure both stacks look right.
     // This will help with Macro programming between stacks!
@@ -5121,12 +5123,11 @@ void RPN_Playback(void)
         }
     }
 
-    SetWindowText(GetDlgItem(calcMainWindow, RPN_PLAYBACK), "Run");
+    SetWindowText(GetDlgItem(calcMainWindow, RPN_PLAYBACK), "Run"); // Reset button text
 
     UpdateSpareBar(" ");
     macroPlayback = FALSE;
 }
-
 
 
 void RPN_SingleStep(void)
@@ -5461,7 +5462,6 @@ void turnOnNumLock(void)
         SetKeyboardState(keyState);
     }
 }
-
 
 void trim(char *str)
 {

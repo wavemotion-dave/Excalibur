@@ -127,8 +127,8 @@ struct funcStruct Conversion_funcs[MAX_FUNCS] = {
                                     
     {FN37,  UNI_NEWLBF,  USES_F,    ALLOWREC,   ' ',    "N»lbf",    YES_L,  X_NEW,      CONV_N_lbf,         T_N_LBF,        H_N_LBF}, 
     {FN38,  UNI_HZTOAF,  USES_F,    ALLOWREC,   ' ',    "Hz»AF",    YES_L,  X_NEW,      CONV_Hz_AF,         T_HZ_AF,        H_HZ_AF},
-    {FN39,  UNI_MPAPSI,  USES_F,    ALLOWREC,   ' ',    "MPa»PSI",  YES_L,  X_NEW,      CONV_MPa_PSI,       T_NULL,         H_NULL}, // TODO: help
-    {FN40,  UNI_METRIC,  USES_F,    ALLOWREC,   ' ',    "Metric",   YES_L,  X_NEW,      SCI_metricPre,      T_NULL,         H_NULL} // TODO: help
+    {FN39,  UNI_MPAPSI,  USES_F,    ALLOWREC,   ' ',    "MPa»PSI",  YES_L,  X_NEW,      CONV_MPa_PSI,       T_MPA_PSI,      H_MPA_PSI},
+    {FN40,  UNI_METRIC,  USES_F,    ALLOWREC,   ' ',    "Metric",   YES_L,  X_NEW,      SCI_metricPre,      T_METRIC,       H_METRIC}
 };
 
 static double inverse(double x)
@@ -142,63 +142,58 @@ static double inverse(double x)
 void CONV_lb_kg(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush (StackPop () * inverse (2.204622622));
+        StackPush(StackPop() * inverse(2.204622622));
     else
-        StackPush (StackPop () * 2.204622622);
+        StackPush(StackPop() * 2.204622622);
 }
-
 
 void CONV_F_C(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush ((StackPop () - 32.0) * inverse (1.8));
+        StackPush((StackPop() - 32.0) * inverse(1.8));
     else
-        StackPush ((StackPop () * 1.8) + 32.0);
+        StackPush((StackPop() * 1.8) + 32.0);
 }
-
 
 void CONV_In_Cm(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush (StackPop () * 2.54);
+        StackPush(StackPop() * 2.54);
     else
-        StackPush (StackPop () / 2.54);
+        StackPush(StackPop() / 2.54);
 }
-
 
 void CONV_Oz_g(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush (StackPop () * 28.3495);
+        StackPush(StackPop() * 28.3495);
     else
-        StackPush (StackPop () * inverse (28.3495));
+        StackPush(StackPop() * inverse(28.3495));
 }
 
 void CONV_gal_l(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush (StackPop () * 3.785332);
+        StackPush(StackPop() * 3.785332);
     else
-        StackPush (StackPop () * inverse (3.785332));
+        StackPush(StackPop() * inverse(3.785332));
 }
 
 void CONV_Ft_Mi(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush (StackPop () * inverse (5280.0));
+        StackPush(StackPop() * inverse(5280.0));
     else
-        StackPush (StackPop () * 5280.0);
+        StackPush(StackPop() * 5280.0);
 }
-
 
 void CONV_J_Cal(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush (StackPop () * 4.18605);
+        StackPush(StackPop() * 4.18605);
     else
-        StackPush (StackPop () * inverse (4.18605));
+        StackPush(StackPop() * inverse(4.18605));
 }
-
 
 void CONV_H_Ms(void)
 {
@@ -211,81 +206,75 @@ void CONV_H_Ms(void)
 
     if (!(modifiers & MOD_INVERSE))
     {
-        op1 = StackPop ();
-        temp2 = modf (op1, &temp);
+        op1 = StackPop();
+        temp2 = modf(op1, &temp);
         mint = temp2 * 60.0F;
-        mint = MakeAccurate (mint);
-        temp2 = modf (mint, &sec);
+        mint = MakeAccurate(mint);
+        temp2 = modf(mint, &sec);
         sec = temp2 * 60.0F;
-        sec = MakeAccurate (sec);
-        mint = floor (mint) / 100.0F;
+        sec = MakeAccurate(sec);
+        mint = floor(mint) / 100.0F;
         sec = sec / 10000.0F;
         temp = temp + mint + sec;
-        StackPush (temp);
+        StackPush(temp);
     }
     else
     {
-        op1 = StackPop ();
-        temp2 = modf ((double) op1, (double *) &temp);
-        temp2 = MakeAccurate (temp2);
+        op1 = StackPop();
+        temp2 = modf((double)op1, (double *)&temp);
+        temp2 = MakeAccurate(temp2);
         temp2 = temp2 * 100.0F;
-        temp2 = MakeAccurate (temp2);
-        mint = (double) floor (temp2);
-        sec = modf (temp2, &temp3);
+        temp2 = MakeAccurate(temp2);
+        mint = (double)floor(temp2);
+        sec = modf(temp2, &temp3);
         sec = sec * 100.0F;
         sec = (sec / 60.0F);
         mint = mint + sec;
         mint = mint / 60.0F;
         temp = temp + mint;
-        StackPush (temp);
+        StackPush(temp);
     }
 }
-
 
 void CONV_Mi_Km(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush (StackPop () * 1.6093472);
+        StackPush(StackPop() * 1.6093472);
     else
-        StackPush (StackPop () * inverse (1.6093472));
+        StackPush(StackPop() * inverse(1.6093472));
 }
-
 
 void CONV_Ft_Fa(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush (StackPop () / 6.0);
+        StackPush(StackPop() / 6.0);
     else
-        StackPush (StackPop () * 6.0);
+        StackPush(StackPop() * 6.0);
 }
-
 
 void CONV_in2_cm2(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush (StackPop () * 6.452);
+        StackPush(StackPop() * 6.452);
     else
-        StackPush (StackPop () * inverse (6.452));
+        StackPush(StackPop() * inverse(6.452));
 }
-
 
 void CONV_in3_cm3(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush (StackPop () * 16.39);
+        StackPush(StackPop() * 16.39);
     else
-        StackPush (StackPop () * inverse (16.39));
+        StackPush(StackPop() * inverse(16.39));
 }
-
 
 void CONV_Deg_Rad(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush (StackPop () * (M_PI / 180.0));
+        StackPush(StackPop() * (M_PI / 180.0));
     else
-        StackPush (StackPop () * (180.0 / M_PI));
+        StackPush(StackPop() * (180.0 / M_PI));
 }
-
 
 void CONV_R_P(void)
 {
@@ -294,115 +283,107 @@ void CONV_R_P(void)
 
     if (!(modifiers & MOD_INVERSE))
     {
-        a = StackPop ();
-        b = StackPop ();
-        r = sqrt ((a * a) + (b * b));
+        a = StackPop();
+        b = StackPop();
+        r = sqrt((a * a) + (b * b));
         if (a != 0.0)
-            theta = atan (b / a);
+            theta = atan(b / a);
         else
             theta = 0.0;
-        StackPush (FromRadians (theta));
-        StackPush (r);
+        StackPush(FromRadians(theta));
+        StackPush(r);
     }
     else
     {
-        r = StackPop ();
-        theta = StackPop ();
-        theta = ToRadians (theta);
-        a = r * cos (theta);
-        b = r * sin (theta);
-        StackPush (b);
-        StackPush (a);
+        r = StackPop();
+        theta = StackPop();
+        theta = ToRadians(theta);
+        a = r * cos(theta);
+        b = r * sin(theta);
+        StackPush(b);
+        StackPush(a);
     }
 }
-
 
 void CONV_flOz_ml(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush (StackPop () * 29.6F);
+        StackPush(StackPop() * 29.6F);
     else
-        StackPush (StackPop () / 29.6F);
+        StackPush(StackPop() / 29.6F);
 }
-
 
 void CONV_Ft_m(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush (StackPop () * 0.3048);
+        StackPush(StackPop() * 0.3048);
     else
-        StackPush (StackPop () * inverse (0.3048));
+        StackPush(StackPop() * inverse(0.3048));
 }
-
 
 void CONV_ft2_m2(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush (StackPop () * inverse (10.76391042));
+        StackPush(StackPop() * inverse(10.76391042));
     else
-        StackPush (StackPop () * 10.76391042);
+        StackPush(StackPop() * 10.76391042);
 }
-
 
 void CONV_ft3_m3(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush (StackPop () * inverse (35.31466672));
+        StackPush(StackPop() * inverse(35.31466672));
     else
-        StackPush (StackPop () * 35.31466672);
+        StackPush(StackPop() * 35.31466672);
 }
-
 
 void CONV_at_psi(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush (StackPop () * (1.0 / 6.804e-2));
+        StackPush(StackPop() * (1.0 / 6.804e-2));
     else
-        StackPush (StackPop () * 6.804e-2);
+        StackPush(StackPop() * 6.804e-2);
 }
-
 
 void CONV_acre_ft2(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush (StackPop () * 43560);
+        StackPush(StackPop() * 43560);
     else
-        StackPush (StackPop () / 43560);
+        StackPush(StackPop() / 43560);
 }
-
 
 void CONV_inverse(void)
 {
     modifiers ^= MOD_INVERSE;
     if (modifiers & MOD_INVERSE)
-        UpdateSpareBar ("INV");
+        UpdateSpareBar("INV");
     else
-        UpdateSpareBar (" ");
+        UpdateSpareBar(" ");
 }
-
 
 void CONV_gal_cm3(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush (StackPop () * 3785.0);
+        StackPush(StackPop() * 3785.0);
     else
-        StackPush (StackPop () * inverse (3785.0));
+        StackPush(StackPop() * inverse(3785.0));
 }
 
 void CONV_pin_l(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush (StackPop () * inverse (2.113));
+        StackPush(StackPop() * inverse(2.113));
     else
-        StackPush (StackPop () * 2.113);
+        StackPush(StackPop() * 2.113);
 }
 
 void CONV_Igal_l(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush (StackPop () * 4.5458051988);
+        StackPush(StackPop() * 4.5458051988);
     else
-        StackPush (StackPop () * inverse (4.5458051988));
+        StackPush(StackPop() * inverse(4.5458051988));
 }
 
 void CONV_F_K(void)
@@ -411,126 +392,124 @@ void CONV_F_K(void)
 
     if (!(modifiers & MOD_INVERSE))
     {
-        tmp = (StackPop () - 32.0) * inverse (1.8);
-        StackPush (tmp + 273.15);
+        tmp = (StackPop() - 32.0) * inverse(1.8);
+        StackPush(tmp + 273.15);
     }
     else
     {
-        tmp = (((StackPop () - 273.15) * 1.8) + 32.0);
-        StackPush (tmp);
+        tmp = (((StackPop() - 273.15) * 1.8) + 32.0);
+        StackPush(tmp);
     }
 }
 
 void CONV_In_mm(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush (StackPop () * 25.4);
+        StackPush(StackPop() * 25.4);
     else
-        StackPush (StackPop () / 25.4);
+        StackPush(StackPop() / 25.4);
 }
 
 void CONV_Ft_Km(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush (StackPop () * 0.0003048);
+        StackPush(StackPop() * 0.0003048);
     else
-        StackPush (StackPop () * inverse (0.0003048));
+        StackPush(StackPop() * inverse(0.0003048));
 }
 
 void CONV_ah_col(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush (StackPop () * 3600.0);
+        StackPush(StackPop() * 3600.0);
     else
-        StackPush (StackPop () * inverse (3600.0));
+        StackPush(StackPop() * inverse(3600.0));
 }
 
 void CONV_ah_far(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush (StackPop () * 0.037307);
+        StackPush(StackPop() * 0.037307);
     else
-        StackPush (StackPop () * inverse (0.037307));
+        StackPush(StackPop() * inverse(0.037307));
 }
-
 
 void CONV_kmh_mps(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush (StackPop () * inverse (3.6));
+        StackPush(StackPop() * inverse(3.6));
     else
-        StackPush (StackPop () * 3.6);
+        StackPush(StackPop() * 3.6);
 }
 
 void CONV_knot_mph(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush (StackPop () * inverse (0.8690));
+        StackPush(StackPop() * inverse(0.8690));
     else
-        StackPush (StackPop () * 0.8690);
+        StackPush(StackPop() * 0.8690);
 }
 
 void CONV_hp_kw(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush (StackPop () * 0.7457);
+        StackPush(StackPop() * 0.7457);
     else
-        StackPush (StackPop () * inverse (0.7457));
+        StackPush(StackPop() * inverse(0.7457));
 }
-
 
 void CONV_Mil_mm(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush ((StackPop () / 1000.0) * 25.4);
+        StackPush((StackPop() / 1000.0) * 25.4);
     else
-        StackPush ((StackPop () / 25.4) * 1000.0);
+        StackPush((StackPop() / 25.4) * 1000.0);
 }
 
 void CONV_ShortTons_lbs(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush (StackPop () * 2000.0);
+        StackPush(StackPop() * 2000.0);
     else
-        StackPush (StackPop () / 2000.0);
+        StackPush(StackPop() / 2000.0);
 }
 
 void CONV_LongTons_lbs(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush (StackPop () * 2240.0);
+        StackPush(StackPop() * 2240.0);
     else
-        StackPush (StackPop () / 2240.0);
+        StackPush(StackPop() / 2240.0);
 }
 
 void CONV_MetricTons_lbs(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush (StackPop () * 2205.0);
+        StackPush(StackPop() * 2205.0);
     else
-        StackPush (StackPop () / 2205.0);
+        StackPush(StackPop() / 2205.0);
 }
 
 void CONV_N_lbf(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush (StackPop () * 0.224809);
+        StackPush(StackPop() * 0.224809);
     else
-        StackPush (StackPop () / 0.224809);
+        StackPush(StackPop() / 0.224809);
 }
 
 void CONV_Hz_AF(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush (StackPop () * (2.0 * M_PI));
+        StackPush(StackPop() * (2.0 * M_PI));
     else
-        StackPush (StackPop () / (2.0 * M_PI));
+        StackPush(StackPop() / (2.0 * M_PI));
 }
 
 void CONV_MPa_PSI(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush (StackPop () * 145.038);
+        StackPush(StackPop() * 145.038);
     else
-        StackPush (StackPop () / 145.038);
+        StackPush(StackPop() / 145.038);
 }
