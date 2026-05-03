@@ -115,9 +115,9 @@ BYTE     keyState[256];
 uint8_t  Xedit = X_NEW;
 char     Xstr[50];
 
-// ---------------- 
-// Global registers 
-// ---------------- 
+// ----------------
+// Global registers
+// ----------------
 double X;                           // Main register X
 double Y;                           // Main register Y
 double Z;                           // Main register Z
@@ -369,9 +369,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
     static WORD lastXpos, lastYpos;
     POINT pCursor;
     HDC hdc;
-    RECT rc;                    // window's screen coordinates      
-    POINT ptUpperLeft;          // client coordinate of upper left  
-    POINT ptLowerRight;         // client coordinate of lower right 
+    RECT rc;                    // window's screen coordinates
+    POINT ptUpperLeft;          // client coordinate of upper left
+    POINT ptLowerRight;         // client coordinate of lower right
     SIZE lpSize;
     PAINTSTRUCT ps;
     int i;
@@ -1555,17 +1555,17 @@ int Init(void)
         SetWindowPos(calcMainWindow, HWND_NOTOPMOST, main_x, main_y, main_cx, main_cy, flags);
     }
 
-// -------------------------------------------------------- 
-// Turn on the num lock automatically for this application. 
-// -------------------------------------------------------- 
+// --------------------------------------------------------
+// Turn on the num lock automatically for this application.
+// --------------------------------------------------------
     if (numLockMode == 1)
     {
         turnOnNumLock();
     }
 
-// -------------------------------------------------------- 
-// If we need to remap the +/- and the E keys, do so now... 
-// -------------------------------------------------------- 
+// --------------------------------------------------------
+// If we need to remap the +/- and the E keys, do so now...
+// --------------------------------------------------------
     if (eexMode == 1)
     {
         SetDlgItemText(calcMainWindow, RPN_NEGATE, "CHS");
@@ -2351,9 +2351,9 @@ double StackPop(void)
 }
 
 
-// ----------------------- 
-// Basic keypad keypresses 
-// ----------------------- 
+// -----------------------
+// Basic keypad keypresses
+// -----------------------
 void RPN_clearStack(void)
 {
     // Check if we should clear all registers
@@ -2821,7 +2821,7 @@ BOOL CALLBACK fnDIALOG_DisplayModeProc(HWND hDlg, UINT wMessage, WPARAM wParam, 
     case WM_COMMAND:
         switch(wParam)
         {
-        case(108):            // OK was pressed 
+        case(108):            // OK was pressed
             if (SendMessage(GetDlgItem(hDlg, 101), BM_GETCHECK, 0, 0L))
             {
                 sci_format = 'g';
@@ -2873,7 +2873,7 @@ BOOL CALLBACK fnDIALOG_DisplayModeProc(HWND hDlg, UINT wMessage, WPARAM wParam, 
 
             EndDialog(hDlg, FALSE);
             return TRUE;
-        case(109):            // Cancel was pressed 
+        case(109):            // Cancel was pressed
             EndDialog(hDlg, FALSE);
             return TRUE;
         default:
@@ -3157,9 +3157,9 @@ void RPN_lastX(void)
 
 
 
-// -------------- 
-// Misc functions 
-// -------------- 
+// --------------
+// Misc functions
+// --------------
 
 double ToRadians(double t)
 {
@@ -3190,9 +3190,9 @@ double FromRadians(double t)
 }
 
 
-// ------------------------- 
-// STOre and ReCaL functions 
-// ------------------------- 
+// -------------------------
+// STOre and ReCaL functions
+// -------------------------
 char stoTmpStr[10];
 BOOL CALLBACK StoNameDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
 {
@@ -3204,11 +3204,11 @@ BOOL CALLBACK StoNameDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
     case WM_COMMAND:
         switch(LOWORD(wParam))
         {
-        case(IDOK):           // OK - save value! 
-            GetDlgItemText(hDlg, IDC_EDIT1, stoTmpStr, 9);     // 8 chars plus NULL 
+        case(IDOK):           // OK - save value!
+            GetDlgItemText(hDlg, IDC_EDIT1, stoTmpStr, 9);     // 8 chars plus NULL
             EndDialog(hDlg, FALSE);
             return TRUE;
-        case(IDCANCEL):       // Close/Cancel 
+        case(IDCANCEL):       // Close/Cancel
             EndDialog(hDlg, FALSE);
             return TRUE;
         default:
@@ -3271,9 +3271,9 @@ void RPN_ExchangeReg(void)
     }
 }
 
-// ------------------------------------------------------------------------ 
-//                           SAVE STUFF TO DISK                             
-// ------------------------------------------------------------------------ 
+// ------------------------------------------------------------------------
+//                           SAVE STUFF TO DISK
+// ------------------------------------------------------------------------
 int GetMenuType(struct funcStruct *cFunc)
 {
     int retVal = 1;
@@ -3682,7 +3682,7 @@ void ReadFromDisk(void)
         {
             main_x = -1;        // Force auto-resize!
         }
-        if (configVersionSub != CONFIG_VERSION_SUB)       // If new version but still supported version 
+        if (configVersionSub != CONFIG_VERSION_SUB)       // If new version but still supported version
         {
             main_x = -1;        // Force auto-resize!
         }
@@ -4990,8 +4990,10 @@ void callButtonFunc_fast(void(*routine) (void), char useFloatsLongs, uint16_t un
         LASTYL = YL;
     }
 
+    // -----------------------------------------------------------------------------
     // Before we call the button function we need to ensure both stacks look right.
     // This will help with Macro programming between stacks!
+    // -----------------------------------------------------------------------------
     if (useFloatsLongs == USES_L && progMode == PROG_NORMAL)
     {
         progMode = PROG_DEC;
@@ -5007,7 +5009,7 @@ void callButtonFunc_fast(void(*routine) (void), char useFloatsLongs, uint16_t un
         ShowStatus();
     }
 
-    routine();                 // This calls the actual button routine to perform things like SIN, COS, CLX, etc
+    routine();  // This calls the actual button routine to perform things like SIN, COS, CLX, etc
 
     lastUniqueIndex = uniqueIndex;
 
@@ -5034,11 +5036,17 @@ void RPN_Record(void)
     ShowStatus();
 }
 
-
+// -------------------------------------------------------------------------------
+// This is the core driver for when we playback a macro. We loop through the
+// recorded macro steps and call the appropriate button functions. We also check
+// for user input and allow the user to stop the macro at any time by pressing
+// the Escape key. The macro playback loop is optimized to push through the
+// recorded keystrokes as fast as possible. On a typical i5 computer from
+// around 2018, this will run about 1 million 'Excalibur Instructions' per second.
+// -------------------------------------------------------------------------------
 void RPN_Playback(void)
 {
     int idx;
-    int flashRunning = 499;
     int flashRunningDsp = 0;
     MSG msg;
     DWORD initialTimer = 0;
@@ -5195,7 +5203,7 @@ BOOL CALLBACK NotesDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPara
     case WM_COMMAND:
         switch(LOWORD(wParam))
         {
-        case(IDOK):           // OK - Close and save notes 
+        case(IDOK):           // OK - Close and save notes
             GetDlgItemText(hDlg, IDC_EDIT1, excaliburNotes, NOTES_SIZE-1);
             excaliburNotes[NOTES_SIZE] = CNULL;
             EndDialog(hDlg, FALSE);
@@ -5317,17 +5325,16 @@ void RPN_endConst(void)
                         "Key L      Last X Register               Key E      Exponent\n"\
                         "Key X      Exchange X and Y              Key S      Store Register\n"\
                         "Key +      Add X and Y registers         Key R      Recall Register\n"\
-                        "Key -      Subtract Y from X             Key A      Recall R1 Register\n"\
-                        "Key *      Multiply X and Y              Key B      Recall R2 Register\n"\
-                        "Key /      Divide Y into X               Key M      Display Mode\n"\
-                        "ENTER      Enter number to Stack         Key H      Help Key\n"\
-                        "Key N      Change Sign (Negate)          Key F      Last Function Bank\n"\
+                        "Key -      Subtract X from Y             Key M      Display Mode\n"\
+                        "Key *      Multiply X and Y              Key H      Help Key\n"\
+                        "Key /      Divide X into Y               Key F      Last Function Bank\n"\
+                        "ENTER      Enter number to Stack         Key N      Change Sign (Negate)\n"\
                         "\n"\
                         "DP         Decimal Point. Press twice for fraction.\n"\
                         "BKSP       Erases last character, otherwise clears X.\n"\
                         "F1-F10     First column of the currently selected function bank.\n"\
                         "SHIFT  FN  Second column of the currently selected function bank.\n"\
-                        "CTL    FN  Second column of the currently selected function bank.\n"\
+                        "CTRL   FN  Second column of the currently selected function bank.\n"\
                         "CTLSFT FN  Fourth column of the currently selected function bank.\n"\
                         "CTRL 0-9   Quick selection of the number of decimal places to show.\n"\
                         "CTRL S     Brings up the Settings Dialog.\n"\
@@ -5403,7 +5410,7 @@ BOOL CALLBACK HelpDialog(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
 // of the argument and suppresses the usual error message.
 int _matherr(struct _exception *except)
 {
-    // Handle _OVERFLOW and _UNDERFLOW 
+    // Handle _OVERFLOW and _UNDERFLOW
     if (except->type == _OVERFLOW)
     {
         MessageBox(calcMainWindow, "Excalibur Function Overflow...", "Excalibur Floating Point", MB_OK);
@@ -5435,7 +5442,7 @@ int _matherr(struct _exception *except)
     }
     else
     {
-        return 0;               // Else use the default actions 
+        return 0;               // Else use the default actions
     }
 }
 
