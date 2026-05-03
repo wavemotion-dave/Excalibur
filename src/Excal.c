@@ -614,6 +614,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
                             if ((toolTipCounter++) >= 2)
                             {
                                 if (GetFocus() == calcMainWindow)
+                                {
                                     if (GetMouseHelp((WORD) pCursor.x, (WORD) pCursor.y) == 1)
                                     {
                                         hdc = GetDC(toolTipWnd);
@@ -626,6 +627,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
                                             ShowWindow(toolTipWnd, SW_SHOWNOACTIVATE);
                                         }
                                     }
+                                }
                             }
                         }
                         else
@@ -4714,8 +4716,10 @@ void RPN_SelectProgII(void)
     SelectNewFunc((struct funcStruct *) &Program2_funcs);
 }
 
+// -----------------------------------------------------------------------------
 // Good old bubble sort... not the most efficient but this is only done once at
-// startup and the list is small so who cares?  I just want it to be simple and work.
+// startup and the list is small and nearly sorted so this will be plenty fast.
+// -----------------------------------------------------------------------------
 void sortPlaybackList(void)
 {
     int i, j;
@@ -4748,7 +4752,7 @@ void mapButtonFuncs(void)
     j = 0;
     i = 0;
 
-    while (RPNkeys[i].index != RPN_LAST_KEY)
+    do // We do a do-while so we include RPN_LAST_KEY (and a single UNI_UNUSED index) in the map.
     {
         playBackMap[j].saveLastX        = RPNkeys[i].saveLastX;
         playBackMap[j].newXedit         = RPNkeys[i].newXedit;
@@ -4759,7 +4763,7 @@ void mapButtonFuncs(void)
         playBackMap[j].allowRecord      = RPNkeys[i].allowRecord;
         if (j < MAX_FUNCTIONS) j++;
         i++;
-    }
+    } while (RPNkeys[i-1].index != RPN_LAST_KEY);     
 
     for (i = 0; i < MAX_FUNCS; i++)
     {
@@ -4811,14 +4815,17 @@ void mapButtonFuncs(void)
 
     for (i = 0; i < MAX_FUNCS; i++)
     {
-        playBackMap[j].saveLastX        = Statistics_funcs[i].saveLastX;
-        playBackMap[j].newXedit         = Statistics_funcs[i].newXedit;
-        playBackMap[j].routine          = Statistics_funcs[i].routine;
-        playBackMap[j].funcText         = Statistics_funcs[i].keyTitle;
-        playBackMap[j].uniqueIndex      = Statistics_funcs[i].uniqueIndex;
-        playBackMap[j].useFloatsLongs   = Statistics_funcs[i].useFloatsLongs;
-        playBackMap[j].allowRecord      = Statistics_funcs[i].allowRecord;
-        if (j < MAX_FUNCTIONS) j++;
+        if (Statistics_funcs[i].uniqueIndex != UNI_UNUSED)
+        {
+            playBackMap[j].saveLastX        = Statistics_funcs[i].saveLastX;
+            playBackMap[j].newXedit         = Statistics_funcs[i].newXedit;
+            playBackMap[j].routine          = Statistics_funcs[i].routine;
+            playBackMap[j].funcText         = Statistics_funcs[i].keyTitle;
+            playBackMap[j].uniqueIndex      = Statistics_funcs[i].uniqueIndex;
+            playBackMap[j].useFloatsLongs   = Statistics_funcs[i].useFloatsLongs;
+            playBackMap[j].allowRecord      = Statistics_funcs[i].allowRecord;
+            if (j < MAX_FUNCTIONS) j++;
+        }
     }
 
     for (i = 0; i < MAX_FUNCS; i++)
