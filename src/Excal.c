@@ -1762,7 +1762,7 @@ struct funcStruct RPNkeys[] = {
     {RPN_SCI,       UNI_SCI,    USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectSci,      "Select Scientific I",  "Selects the Scientific I Layout"},
     {RPN_SCI2,      UNI_SCI2,   USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectSci2,     "Select Scientific II", "Selects the Scientific II Layout"},
     {RPN_COMPSCI,   UNI_COMPSCI,USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectCompSci,  "Select Comp Sci",      "Selects the Computer Science Layout"},
-    {RPN_FIN,       UNI_BUSI,   USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectFin,      "Select Financial",     "Selects the Financial Layout"},
+    {RPN_FIN,       UNI_FIN,    USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectFin,      "Select Financial",     "Selects the Financial Layout"},
     {RPN_CONV,      UNI_CONV,   USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectConv,     "Select Conversion",    "Selects the Conversion Layout"},
     {RPN_STAT,      UNI_STAT,   USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectStat,     "Select Statistics",    "Selects the Statistical Layout"},
     {RPN_PROGI,     UNI_PROG1,  USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectProgI,    "Select Program I",     "Selects Program Bank I"},
