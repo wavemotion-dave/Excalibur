@@ -189,7 +189,7 @@ void DoMacroSaveRecall(void);
 struct funcStruct *currentFuncs = (struct funcStruct *) &Scientific_funcs;
 struct funcStruct *lastFuncs = (struct funcStruct *) &Scientific_funcs;
 
-uint32_t fastTimer = 0; // Ticks at roughly 300ms intervals
+uint32_t slowTimer = 0; // Ticks at roughly 300ms intervals
 
 #define MIN_WINDOW_WIDTH    5
 #define MIN_WINDOW_HEIGHT   5
@@ -566,12 +566,14 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
         if ((pCursor.x >= 0 && pCursor.x <= ptLowerRight.x) && (pCursor.y >= 0 && pCursor.y <= ptLowerRight.y))
         {
             if (GetFocus() == calcMainWindow)
+            {
                 if (GetMouseHelp((WORD) pCursor.x, (WORD) pCursor.y) == 1)
                 {
                     ShowWindow(toolTipWnd, SW_HIDE);
                     toolTipCounter = 0;
                     MessageBox(calcMainWindow, helpMsg, helpTitle, MB_OK | MB_ICONQUESTION);
                 }
+            }
         }
         return FALSE;
         break;
@@ -587,56 +589,56 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 
         if (wParam == TIMER_SLOW)        // 300 ms timer
         {
-            fastTimer++;
+            slowTimer++;
 
             if (macroPlayback == FALSE)  // Don't bother if we are in the middle of macro playback
             {
-                GetCursorPos(&pCursor);
-                xPos = (WORD) pCursor.x;
-                yPos = (WORD) pCursor.y;
-                ScreenToClient(hwnd, &pCursor);
-
-                GetWindowRect(hwnd, &rc);
-                ptUpperLeft.x = rc.left;
-                ptUpperLeft.y = rc.top;
-                ptLowerRight.x = rc.right;
-                ptLowerRight.y = rc.bottom;
-                ScreenToClient(hwnd, &ptUpperLeft);
-                ScreenToClient(hwnd, &ptLowerRight);
-
-                if ((pCursor.x >= 0 && pCursor.x <= ptLowerRight.x) && (pCursor.y >= 0 && pCursor.y <= ptLowerRight.y))
+                if ((toolTipsOn == 1) && (traceMacroPlayback == FALSE))
                 {
-                    if (!IsWindowVisible(toolTipWnd))
+                    GetCursorPos(&pCursor);
+                    xPos = (WORD) pCursor.x;
+                    yPos = (WORD) pCursor.y;
+                    ScreenToClient(hwnd, &pCursor);
+
+                    GetWindowRect(hwnd, &rc);
+                    ptUpperLeft.x = rc.left;
+                    ptUpperLeft.y = rc.top;
+                    ptLowerRight.x = rc.right;
+                    ptLowerRight.y = rc.bottom;
+                    ScreenToClient(hwnd, &ptUpperLeft);
+                    ScreenToClient(hwnd, &ptLowerRight);
+
+                    if ((pCursor.x >= 0 && pCursor.x <= ptLowerRight.x) && (pCursor.y >= 0 && pCursor.y <= ptLowerRight.y))
                     {
-                        if (xPos == lastXpos && yPos == lastYpos)
+                        if (!IsWindowVisible(toolTipWnd))
                         {
-                            if ((toolTipCounter++) >= 2)
+                            if (xPos == lastXpos && yPos == lastYpos)
                             {
-                                if (GetFocus() == calcMainWindow)
+                                if ((toolTipCounter++) >= 2)
                                 {
-                                    if (GetMouseHelp((WORD) pCursor.x, (WORD) pCursor.y) == 1)
+                                    if (GetFocus() == calcMainWindow)
                                     {
-                                        hdc = GetDC(toolTipWnd);
-                                        SelectObject(hdc, GetStockObject(ANSI_VAR_FONT));
-                                        dw = GetTextExtentPoint32(hdc, helpTitle, strlen(helpTitle), &lpSize);
-                                        ReleaseDC(toolTipWnd, hdc);
-                                        MoveWindow(toolTipWnd, xPos - 1, yPos + 19, lpSize.cx + 10, lpSize.cy + 4, TRUE);
-                                        if ((toolTipsOn == 1) && (traceMacroPlayback == FALSE) && (macroPlayback == FALSE))
+                                        if (GetMouseHelp((WORD) pCursor.x, (WORD) pCursor.y) == 1)
                                         {
+                                            hdc = GetDC(toolTipWnd);
+                                            SelectObject(hdc, GetStockObject(ANSI_VAR_FONT));
+                                            dw = GetTextExtentPoint32(hdc, helpTitle, strlen(helpTitle), &lpSize);
+                                            ReleaseDC(toolTipWnd, hdc);
+                                            MoveWindow(toolTipWnd, xPos - 1, yPos + 19, lpSize.cx + 10, lpSize.cy + 4, TRUE);
                                             ShowWindow(toolTipWnd, SW_SHOWNOACTIVATE);
                                         }
                                     }
                                 }
                             }
-                        }
-                        else
-                        {
-                            toolTipCounter = 0;
+                            else
+                            {
+                                toolTipCounter = 0;
+                            }
                         }
                     }
+                    lastXpos = xPos;
+                    lastYpos = yPos;
                 }
-                lastXpos = xPos;
-                lastYpos = yPos;
             }
         }
 
@@ -5106,9 +5108,9 @@ void RPN_Playback(void)
 
         if (traceMacroPlayback == FALSE)
         {
-            if (fastTimer != initialTimer)
+            if (slowTimer != initialTimer)
             {
-                initialTimer = fastTimer;
+                initialTimer = slowTimer;
                 if ((++flashRunningDsp % 2) == 0)
                     UpdateSpareBar(" ");
                 else
