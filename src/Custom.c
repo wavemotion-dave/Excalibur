@@ -316,14 +316,14 @@ BOOL CALLBACK CustomDefDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM l
             {
             case(IDC_CUSTOM_OK):      // OK
                 EndDialog(hDlg, FALSE);
-                processFuncs();
+                processBank();
                 SaveToDisk();
                 break;
 
             case(IDC_CUSTOM_CANCEL):  // Cancel
                 EndDialog(hDlg, FALSE);
                 memcpy(Custom_funcs, Custom_funcsTmp, sizeof(Custom_funcs));
-                processFuncs();
+                processBank();
                 SaveToDisk();
                 break;
 
@@ -380,7 +380,7 @@ BOOL CALLBACK CustomDefDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM l
     case WM_DESTROY:
     case WM_CLOSE:
         EndDialog(hDlg, FALSE);
-        processFuncs();
+        processBank();
         break;
     }
     return FALSE;

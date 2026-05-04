@@ -121,7 +121,7 @@ extern struct funcStruct MacroFuncs[];
 #define USES_L      2   // Uses long integer numbers
 #define USES_FL     3   // Can use either floats or longs
 
-#define NOTES_SIZE  2048
+#define NOTES_SIZE  4096
 
 // --------------------------- 
 // Defines for the main dialog 
@@ -242,7 +242,7 @@ extern uint32_t wordSizeMask;
 
 extern uint8_t numberDisplayMode;
 
-extern void SelectNewFunc(struct funcStruct *funcs);
+extern void SelectNewBank(struct funcStruct *funcs);
 extern int ClipboardCopySelection(HWND hWnd, uint8_t copytype);
 extern void SetUpFonts(HWND hWnd);
 extern void NotImp(void);
@@ -255,7 +255,7 @@ extern void UpdateTimeBar(void);
 extern void ShowFunctionBar(char *msg);
 extern double MakeAccurate(double val);
 extern int selectFuncs(WPARAM key);
-extern int processFuncs(void);
+extern int processBank(void);
 extern int ProcessDirectKeyHit(WPARAM key);
 extern int ProcessHelp(WPARAM key);
 extern int ProcessKeyHit(WPARAM key);
@@ -468,13 +468,14 @@ extern uint8_t traceMacroPlayback;
 extern uint16_t progDelayValue;
 
 extern void blinkXDisplay(void);
+extern void blinkStack(void);
 extern void endRunningMacro(void);
 extern void UpdateDebugRegs(void);
 extern void UpdateDebugProgram(int resetProgramList);
 extern void RPN_Playback(void);
 
 extern LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
-extern LRESULT CALLBACK helpWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+extern LRESULT CALLBACK tooltipWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 extern int CreateToolTipWindow(HWND hwnd, HINSTANCE hInstance);
 extern int CreateDebugWindow(HWND hwnd, HINSTANCE hInstance);
 extern void RPN_SingleStep(void);

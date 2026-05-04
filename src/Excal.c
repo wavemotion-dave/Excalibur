@@ -321,7 +321,7 @@ int CreateToolTipWindow(HWND hwnd, HINSTANCE hInstance)
     WNDCLASS     wndclass;
 
      wndclass.style         = CS_HREDRAW | CS_VREDRAW;
-     wndclass.lpfnWndProc   = helpWndProc;
+     wndclass.lpfnWndProc   = tooltipWndProc;
      wndclass.cbClsExtra    = 0;
      wndclass.cbWndExtra    = 0;
      wndclass.hInstance     = hInstance;
@@ -363,10 +363,10 @@ int CreateToolTipWindow(HWND hwnd, HINSTANCE hInstance)
 // ---------------------------------------------------------------------------------------
 LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
+    static WORD lastXpos, lastYpos;
     RECT rcWindow;
     DWORD dw;
     WORD xPos, yPos;
-    static WORD lastXpos, lastYpos;
     POINT pCursor;
     HDC hdc;
     RECT rc;                    // window's screen coordinates
@@ -445,11 +445,15 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
                 break;
             case IDM_COPYXTOCLIPBOARD:
                 {
-                    ClipboardCopySelection(hwnd, COPY_X_TO_CLIPBOARD);
+                    blinkXDisplay();
+                    Sleep(100);
+                    ClipboardCopySelection(hwnd, COPY_X_TO_CLIPBOARD);                    
                 }
                 break;
             case IDM_COPYALLTOCLIPBOARD:
                 {
+                    blinkStack();
+                    Sleep(100);
                     ClipboardCopySelection(hwnd, COPY_ALL_TO_CLIPBOARD);
                 }
                 break;
@@ -464,31 +468,31 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
                 }
                 break;
             case IDM_SCIENTIFIC:
-                SelectNewFunc((struct funcStruct *) &Scientific_funcs);
+                SelectNewBank((struct funcStruct *) &Scientific_funcs);
                 break;
             case IDM_FINANCIAL:
-                SelectNewFunc((struct funcStruct *) &Financial_funcs);
+                SelectNewBank((struct funcStruct *) &Financial_funcs);
                 break;
             case IDM_CONVERSION:
-                SelectNewFunc((struct funcStruct *) &Conversion_funcs);
+                SelectNewBank((struct funcStruct *) &Conversion_funcs);
                 break;
             case IDM_COMPSCI:
-                SelectNewFunc((struct funcStruct *) &CompSci_funcs);
+                SelectNewBank((struct funcStruct *) &CompSci_funcs);
                 break;
             case IDM_CUSTOM:
-                SelectNewFunc((struct funcStruct *) &Custom_funcs);
+                SelectNewBank((struct funcStruct *) &Custom_funcs);
                 break;
             case IDM_STATS:
-                SelectNewFunc((struct funcStruct *) &Statistics_funcs);
+                SelectNewBank((struct funcStruct *) &Statistics_funcs);
                 break;
             case IDM_SCIENTIFIC2:
-                SelectNewFunc((struct funcStruct *) &Scientific2_funcs);
+                SelectNewBank((struct funcStruct *) &Scientific2_funcs);
                 break;
             case IDM_PROGI:
-                SelectNewFunc((struct funcStruct *) &Program1_funcs);
+                SelectNewBank((struct funcStruct *) &Program1_funcs);
                 break;
             case IDM_PROGII:
-                SelectNewFunc((struct funcStruct *) &Program2_funcs);
+                SelectNewBank((struct funcStruct *) &Program2_funcs);
                 break;
             case IDM_DEFINECUSTOM:
                 cust_define();
@@ -721,6 +725,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
             if (GetKeyState(VK_CONTROL) < 0)
             {
                 ClipboardCopySelection(hwnd, COPY_ALL_TO_CLIPBOARD);
+                blinkStack();
             }
             break;
 
@@ -951,8 +956,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 }
 
 
-void SelectNewFunc(struct funcStruct *funcs)
+void SelectNewBank(struct funcStruct *funcs)
 {
+    // ------------------------------------------------------------------------------------------------
+    // If we are switching out of CompSci mode or Program mode we need to convert longs back to floats
+    // and reset the display since those modes use the stack differently than the other modes.
+    // ------------------------------------------------------------------------------------------------
     if (currentFuncs == (struct funcStruct *) &CompSci_funcs || progMode != PROG_NORMAL)
     {
         if ( (funcs != (struct funcStruct *) &Program1_funcs) && (funcs != (struct funcStruct *) &Program2_funcs) )
@@ -963,6 +972,10 @@ void SelectNewFunc(struct funcStruct *funcs)
             ShowStatus();
         }
     }
+
+    // ---------------------------------------------------------------------------------
+    // Set all menu items to unchecked - we will pick the right one further below.
+    // ---------------------------------------------------------------------------------
     CheckMenuItem(hMainMenu, IDM_SCIENTIFIC,    MF_UNCHECKED);
     CheckMenuItem(hMainMenu, IDM_COMPSCI,       MF_UNCHECKED);
     CheckMenuItem(hMainMenu, IDM_FINANCIAL,     MF_UNCHECKED);
@@ -973,6 +986,9 @@ void SelectNewFunc(struct funcStruct *funcs)
     CheckMenuItem(hMainMenu, IDM_SCIENTIFIC2,   MF_UNCHECKED);
     CheckMenuItem(hMainMenu, IDM_PROGI,         MF_UNCHECKED);
 
+    // -----------------------------------------------------------------------------------------
+    // Set all radio buttons associated with banking to unchecked. We pick the right one below.
+    // -----------------------------------------------------------------------------------------
     SendMessage(GetDlgItem(calcMainWindow, RPN_SCI),     BM_SETCHECK, (WORD) 0, (DWORD) 0L);
     SendMessage(GetDlgItem(calcMainWindow, RPN_STAT),    BM_SETCHECK, (WORD) 0, (DWORD) 0L);
     SendMessage(GetDlgItem(calcMainWindow, RPN_FIN),     BM_SETCHECK, (WORD) 0, (DWORD) 0L);
@@ -983,13 +999,17 @@ void SelectNewFunc(struct funcStruct *funcs)
     SendMessage(GetDlgItem(calcMainWindow, RPN_PROGII),  BM_SETCHECK, (WORD) 0, (DWORD) 0L);
     SendMessage(GetDlgItem(calcMainWindow, RPN_CUST),    BM_SETCHECK, (WORD) 0, (DWORD) 0L);
 
+    // -------------------------------------------------------------------------------------------------
+    // Now determine which of the banks we are switching into... set the radio button and check the
+    // menu item for the bank we are switching into and show the appropriate function bar for that bank.
+    // -------------------------------------------------------------------------------------------------
     if (funcs == (struct funcStruct *) &Scientific_funcs)
     {
         CheckMenuItem(hMainMenu, IDM_SCIENTIFIC, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, RPN_SCI), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_SCI_I);
     }
-    if (funcs == (struct funcStruct *) &CompSci_funcs)
+    else if (funcs == (struct funcStruct *) &CompSci_funcs)
     {
         CheckMenuItem(hMainMenu, IDM_COMPSCI, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, RPN_COMPSCI), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
@@ -999,55 +1019,56 @@ void SelectNewFunc(struct funcStruct *funcs)
         ShowStack();
         ShowStatus();
     }
-    if (funcs == (struct funcStruct *) &Financial_funcs)
+    else if (funcs == (struct funcStruct *) &Financial_funcs)
     {
         CheckMenuItem(hMainMenu, IDM_FINANCIAL, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, RPN_FIN), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_BUIS);
     }
-    if (funcs == (struct funcStruct *) &Conversion_funcs)
+    else if (funcs == (struct funcStruct *) &Conversion_funcs)
     {
         CheckMenuItem(hMainMenu, IDM_CONVERSION, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, RPN_CONV), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_CONV);
     }
-    if (funcs == (struct funcStruct *) &Custom_funcs)
+    else if (funcs == (struct funcStruct *) &Custom_funcs)
     {
         CheckMenuItem(hMainMenu, IDM_CUSTOM, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, RPN_CUST), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_CUSTOM);
     }
-    if (funcs == (struct funcStruct *) &Statistics_funcs)
+    else if (funcs == (struct funcStruct *) &Statistics_funcs)
     {
         CheckMenuItem(hMainMenu, IDM_STATS, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, RPN_STAT), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_STATS);
     }
-    if (funcs == (struct funcStruct *) &Scientific2_funcs)
+    else if (funcs == (struct funcStruct *) &Scientific2_funcs)
     {
         CheckMenuItem(hMainMenu, IDM_SCIENTIFIC2, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, RPN_SCI2), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_SCI2);
     }
-    if (funcs == (struct funcStruct *) &Program1_funcs)
+    else if (funcs == (struct funcStruct *) &Program1_funcs)
     {
         CheckMenuItem(hMainMenu, IDM_PROGI, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, RPN_PROGI), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_PROG1);
     }
-    if (funcs == (struct funcStruct *) &Program2_funcs)
+    else if (funcs == (struct funcStruct *) &Program2_funcs)
     {
         CheckMenuItem(hMainMenu, IDM_PROGII, MF_CHECKED);
         SendMessage(GetDlgItem(calcMainWindow, RPN_PROGII), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         ShowFunctionBar(FUNC_BAR_TEXT_PROG2);
     }
+
     lastFuncs = currentFuncs;
     currentFuncs = (struct funcStruct *) funcs;
-    processFuncs();
+    processBank();
 }
 
 
-LRESULT CALLBACK helpWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK tooltipWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
      HDC         hdc;
      PAINTSTRUCT ps;
@@ -1106,6 +1127,7 @@ int ClipboardCopySelection(HWND hwnd, uint8_t copytype)
         ShowStack();
         return(0);
     }
+
     if (copytype == COPY_X_FROM_CLIPBOARD)          //  Copy to X register!!!
     {
         OpenClipboard(hwnd);
@@ -1163,6 +1185,7 @@ int ClipboardCopySelection(HWND hwnd, uint8_t copytype)
         ShowStack();
         return(0);
     }
+
     if (copytype == COPY_ALL_TO_CLIPBOARD)          // Copy All to clipboard
     {
         tptr = GlobalAlloc(GHND, (DWORD) 128L);
@@ -1209,6 +1232,7 @@ int ClipboardCopySelection(HWND hwnd, uint8_t copytype)
         ShowStack();
         return(0);
     }
+    
     if (copytype == COPY_MACRO_TO_CLIPBOARD)          // Copy current macro to clipboard
     {
         tptr = GlobalAlloc(GHND, (DWORD) MAX_IMPORT_CLIPBOARD_SIZE);
@@ -1538,7 +1562,7 @@ int Init(void)
 
     mapButtonFuncs();
     ShowStack();
-    processFuncs();
+    processBank();
     ShowStatus();
 
     if (main_x == -1)
@@ -1878,7 +1902,7 @@ int selectFuncs(WPARAM key)
     return(0);
 }
 
-int processFuncs()
+int processBank()
 {
     int i;
 
@@ -3744,7 +3768,7 @@ void ProcessCustomSave(void)
         }
         Custom_funcs[newIdx].controlID = saveIdx;
     }
-    processFuncs();
+    processBank();
 }
 
 BOOL CALLBACK fnDIALOG_MACRONAME(HWND, UINT, WPARAM, LPARAM);
@@ -4677,47 +4701,47 @@ void RPN_edit(void)
 
 void RPN_SelectSci(void)
 {
-    SelectNewFunc((struct funcStruct *) &Scientific_funcs);
+    SelectNewBank((struct funcStruct *) &Scientific_funcs);
 }
 
 void RPN_SelectSci2(void)
 {
-    SelectNewFunc((struct funcStruct *) &Scientific2_funcs);
+    SelectNewBank((struct funcStruct *) &Scientific2_funcs);
 }
 
 void RPN_SelectStat(void)
 {
-    SelectNewFunc((struct funcStruct *) &Statistics_funcs);
+    SelectNewBank((struct funcStruct *) &Statistics_funcs);
 }
 
 void RPN_SelectFin(void)
 {
-    SelectNewFunc((struct funcStruct *) &Financial_funcs);
+    SelectNewBank((struct funcStruct *) &Financial_funcs);
 }
 
 void RPN_SelectConv(void)
 {
-    SelectNewFunc((struct funcStruct *) &Conversion_funcs);
+    SelectNewBank((struct funcStruct *) &Conversion_funcs);
 }
 
 void RPN_SelectCompSci(void)
 {
-    SelectNewFunc((struct funcStruct *) &CompSci_funcs);
+    SelectNewBank((struct funcStruct *) &CompSci_funcs);
 }
 
 void RPN_SelectCustom(void)
 {
-    SelectNewFunc((struct funcStruct *) &Custom_funcs);
+    SelectNewBank((struct funcStruct *) &Custom_funcs);
 }
 
 void RPN_SelectProgI(void)
 {
-    SelectNewFunc((struct funcStruct *) &Program1_funcs);
+    SelectNewBank((struct funcStruct *) &Program1_funcs);
 }
 
 void RPN_SelectProgII(void)
 {
-    SelectNewFunc((struct funcStruct *) &Program2_funcs);
+    SelectNewBank((struct funcStruct *) &Program2_funcs);
 }
 
 // -----------------------------------------------------------------------------
@@ -5051,7 +5075,7 @@ void RPN_Playback(void)
     int idx;
     int flashRunningDsp = 0;
     MSG msg;
-    DWORD initialTimer = 0;
+    DWORD lastSlowTimer = 0;
 
     if (recModeON == 1)         // Always turn off rec mode before playback!
     {
@@ -5108,10 +5132,10 @@ void RPN_Playback(void)
 
         if (traceMacroPlayback == FALSE)
         {
-            if (slowTimer != initialTimer)
+            if (slowTimer != lastSlowTimer)
             {
-                initialTimer = slowTimer;
-                if ((++flashRunningDsp % 2) == 0)
+                lastSlowTimer = slowTimer;
+                if (++flashRunningDsp & 1)
                     UpdateSpareBar(" ");
                 else
                     UpdateSpareBar("Run...");
@@ -5202,6 +5226,7 @@ BOOL CALLBACK NotesDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPara
     case WM_INITDIALOG:
         SetDlgItemText(hDlg, IDC_EDIT1, excaliburNotes);
         return TRUE;
+
     case WM_COMMAND:
         switch(LOWORD(wParam))
         {
@@ -5259,9 +5284,34 @@ void blinkXDisplay(void)
     if (!macroPlayback)
     {
         GetDlgItemText(calcMainWindow, RPN_STACK_X, tmpStr, MAX_STACK_STRLEN);
-        SetDlgItemText(calcMainWindow, RPN_STACK_X, "                      ");
+        SetDlgItemText(calcMainWindow, RPN_STACK_X, " ");
         Sleep(200);
         GetDlgItemText(calcMainWindow, RPN_STACK_X, tmpStr, MAX_STACK_STRLEN);
+    }
+}
+
+void blinkStack(void)
+{
+    char tmp1[MAX_STACK_STRLEN+1];
+    char tmp2[MAX_STACK_STRLEN+1];
+    char tmp3[MAX_STACK_STRLEN+1];
+    char tmp4[MAX_STACK_STRLEN+1];
+    
+    if (!macroPlayback)
+    {
+        GetDlgItemText(calcMainWindow, RPN_STACK_X, tmp1, MAX_STACK_STRLEN);
+        GetDlgItemText(calcMainWindow, RPN_STACK_Y, tmp2, MAX_STACK_STRLEN);
+        GetDlgItemText(calcMainWindow, RPN_STACK_Z, tmp3, MAX_STACK_STRLEN);
+        GetDlgItemText(calcMainWindow, RPN_STACK_T, tmp4, MAX_STACK_STRLEN);
+        SetDlgItemText(calcMainWindow, RPN_STACK_X, " ");
+        SetDlgItemText(calcMainWindow, RPN_STACK_Y, " ");
+        SetDlgItemText(calcMainWindow, RPN_STACK_Z, " ");
+        SetDlgItemText(calcMainWindow, RPN_STACK_T, " ");
+        Sleep(200);
+        GetDlgItemText(calcMainWindow, RPN_STACK_X, tmp1, MAX_STACK_STRLEN);
+        GetDlgItemText(calcMainWindow, RPN_STACK_Y, tmp2, MAX_STACK_STRLEN);
+        GetDlgItemText(calcMainWindow, RPN_STACK_Z, tmp3, MAX_STACK_STRLEN);
+        GetDlgItemText(calcMainWindow, RPN_STACK_T, tmp4, MAX_STACK_STRLEN);
     }
 }
 
