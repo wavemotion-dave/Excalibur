@@ -43,6 +43,8 @@
 
 #define WINDOW_TITLE "Excalibur 32-bit"
 
+#define VERSION_STR "v3.XX-01"
+
 #define ABOUT_MSG "Excalibur for Windows 32-bit\n"                      \
                   "Version 3.XX-01  -  May 04, 2026\n\n"                \
                   "Copyright 1994-2026 David Bernazzani\n\n"            \
@@ -588,7 +590,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
         {
             if (GetFocus() == hwnd)
                 inFocusTime++;
-            UpdateTimeBar();
         }
 
         if (wParam == TIMER_SLOW)        // 300 ms timer
@@ -1555,7 +1556,7 @@ int Init(void)
 {
     UINT flags;
 
-    UpdateTimeBar();
+    UpdateVersionBar();
     UpdateSpareBar("    ");
     ShowFunctionBar(FUNC_BAR_TEXT_SCI_I);
     ReadFromDisk();
@@ -1679,36 +1680,9 @@ void UpdateSpareBar(char *msg)
     SetDlgItemText(calcMainWindow, SPARE_BAR, msg);
 }
 
-void UpdateTimeBar()
+void UpdateVersionBar()
 {
-    int temp_hour, temp_min;
-
-    _strtime(tmpStr);
-    tmpStr[5] = CNULL;
-    tmpStr[2] = CNULL;
-    temp_hour = atoi(tmpStr);
-    temp_min = atoi(&tmpStr[3]);
-
-    if (showTime24HourFormat == TRUE)
-    {
-        sprintf(tmpStr, "%2d:%02d ", temp_hour, temp_min);
-    }
-    else
-    {
-        if (temp_hour < 12)
-        {
-            if (temp_hour == 0)
-                temp_hour = 12; //12AM!!
-            sprintf(tmpStr, "%2d:%02d AM", temp_hour, temp_min);
-        }
-        else if (temp_hour == 12)
-            sprintf(tmpStr, "%2d:%02d PM", temp_hour, temp_min);
-        else
-            sprintf(tmpStr, "%2d:%02d PM", temp_hour - 12, temp_min);
-    }
-
-    if (userTimer == 0)         // Only if we don't have stopwatch!
-        SetDlgItemText(calcMainWindow, TIME_BAR, tmpStr);
+    SetDlgItemText(calcMainWindow, TIME_BAR, VERSION_STR);
 }
 
 void ShowFunctionBar(char *msg)

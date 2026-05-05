@@ -251,7 +251,7 @@ extern void LongsToFloats(void);
 extern int Init(void);
 extern void ShowStatus(void);
 extern void UpdateSpareBar(char *msg);
-extern void UpdateTimeBar(void);
+extern void UpdateVersionBar(void);
 extern void ShowFunctionBar(char *msg);
 extern double MakeAccurate(double val);
 extern int selectFuncs(WPARAM key);

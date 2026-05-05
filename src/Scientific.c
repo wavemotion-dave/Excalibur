@@ -1236,7 +1236,7 @@ void SCI_TimerClear(void)
 {
     userTicks = 0;
     userTimer = 0;
-    UpdateTimeBar();
+    UpdateVersionBar();
 }
 
 void SCI_TimerPush(void)
