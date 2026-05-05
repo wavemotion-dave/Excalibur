@@ -1143,7 +1143,7 @@ int ClipboardCopySelection(HWND hwnd, uint8_t copytype)
         {
             if (numberDisplayMode == NONINTERNATIONAL)
             {
-                if (tmp2[i] != '.') // Stip decimal points out....
+                if (tmp2[i] != '.') // Strip decimal points out....
                 {
                     tmp3[j] = tmp2[i];
                     j++;
@@ -1151,7 +1151,7 @@ int ClipboardCopySelection(HWND hwnd, uint8_t copytype)
             }
             else
             {
-                if (tmp2[i] != ',') // Otherwise, Stip commas out...
+                if (tmp2[i] != ',') // Otherwise, Strip commas out...
                 {
                     tmp3[j] = tmp2[i];
                     j++;
