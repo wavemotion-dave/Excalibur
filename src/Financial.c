@@ -116,33 +116,33 @@ extern void FIN_Depr(void);
 
 struct funcStruct Financial_funcs[MAX_FUNCS] = {
     {FN1,   UNI_TAX,    USES_F,     ALLOWREC,   ' ',    "TAX",      YES_L,  X_NEW,      FIN_tax,           T_TAX,      H_TAX},
-    {FN2,   UNI_PERC,   USES_F,     ALLOWREC,   ' ',    " % ",      YES_L,  X_NEW,      FIN_percent,       T_PERC,     H_PERC},
+    {FN2,   UNI_PERC,   USES_F,     ALLOWREC,   ' ',    "%",        YES_L,  X_NEW,      FIN_percent,       T_PERC,     H_PERC},
     {FN3,   UNI_PERCC,  USES_F,     ALLOWREC,   ' ',    "%CHG",     YES_L,  X_NEW,      FIN_percentChg,    T_PERCC,    H_PERCC},
     {FN4,   UNI_PERCT,  USES_F,     ALLOWREC,   ' ',    "%TOT",     YES_L,  X_NEW,      FIN_percentTot,    T_PERCT,    H_PERCT},
     {FN5,   UNI_CLRF,   USES_F,     ALLOWREC,   ' ',    "CLRF",     YES_L,  X_NEW,      FIN_clearReg,      T_CLRF,     H_CLRF},
     {FN6,   UNI_STO,    USES_FL,    ALLOWREC,   ' ',    "STO",      NO_L,   X_NULL,     RPN_store,         T_STOFN,    H_STOFN},
     {FN7,   UNI_RCL,    USES_FL,    ALLOWREC,   ' ',    "RCL",      NO_L,   X_NULL,     RPN_recall,        T_RCLFN,    H_RCLFN},
-    {FN8,   UNI_FINN,   USES_F,     ALLOWREC,   ' ',    "n",        YES_L,  X_NEW,      FIN_n,             T_FINN,     H_FINN},
-    {FN9,   UNI_INTR,   USES_F,     ALLOWREC,   ' ',    "i%",       YES_L,  X_NEW,      FIN_i,             T_INTR,     H_INTR},
-    {FN10,  UNI_FINPV,  USES_F,     ALLOWREC,   ' ',    "PV",       YES_L,  X_NEW,      FIN_pv,            T_FINPV,    H_FINPV},
-    {FN11,  UNI_FINPMT, USES_F,     ALLOWREC,   ' ',    "PMT",      YES_L,  X_NEW,      FIN_pmt,           T_FINPMT,   H_FINPMT},
-    {FN12,  UNI_FINFV,  USES_F,     ALLOWREC,   ' ',    "FV",       YES_L,  X_NEW,      FIN_fv,            T_FINFV,    H_FINFV},
-    {FN13,  UNI_AMORT,  USES_F,     ALLOWREC,   ' ',    "Amort",    YES_L,  X_NEW,      FIN_amort,         T_AMORT,    H_AMORT},
-    {FN14,  UNI_CF0,    USES_F,     ALLOWREC,   ' ',    "CF0",      YES_L,  X_NEW,      FIN_cashFlow0,     T_CF0,      H_CF0},
-    {FN15,  UNI_CFJ,    USES_F,     ALLOWREC,   ' ',    "CFj",      YES_L,  X_NEW,      FIN_cashFlowj,     T_CFJ,      H_CFJ},
-    {FN16,  UNI_CFNJ,   USES_F,     ALLOWREC,   ' ',    "CFNj",     YES_L,  X_NEW,      FIN_cashFlowNj,    T_CFNJ,     H_CFNJ},
-    {FN17,  UNI_NPV,    USES_F,     ALLOWREC,   ' ',    "NPV",      YES_L,  X_NEW,      FIN_NPV,           T_NPV,      H_NPV},
-    {FN18,  UNI_IIR,    USES_F,     ALLOWREC,   ' ',    "IRR",      YES_L,  X_NEW,      FIN_IRR,           T_IRR,      H_IRR},
-    {FN19,  UNI_BOND,   USES_F,     ALLOWREC,   ' ',    "BOND",     YES_L,  X_NEW,      FIN_bond,          T_BOND,     H_BOND},
-    {FN20,  UNI_YTM,    USES_F,     ALLOWREC,   ' ',    "YTM",      YES_L,  X_NEW,      FIN_ytm,           T_YTM,      H_YTM},
-    {FN21,  UNI_DATE,   USES_F,     ALLOWREC,   ' ',    "DATE",     YES_L,  X_NEW,      FIN_date,          T_DATE,     H_DATE},
-    {FN22,  UNI_DAYS,   USES_F,     ALLOWREC,   ' ',    "DAYS",     YES_L,  X_NEW,      FIN_days,          T_DAYS,     H_DAYS},
-    {FN23,  UNI_TODAY,  USES_F,     ALLOWREC,   ' ',    "Today",    YES_L,  X_NEW,      FIN_today,         T_TODAY,    H_TODAY},
-    {FN24,  UNI_DEPR,   USES_F,     ALLOWREC,   ' ',    "DEPR",     YES_L,  X_NEW,      FIN_Depr,          T_DEPR,     H_DEPR},
-    {FN25,  UNI_DIV12,  USES_F,     ALLOWREC,   ' ',    "12÷",      YES_L,  X_NEW,      FIN_12div,         T_DIV12,    H_DIV12},
-    {FN26,  UNI_MUL12,  USES_F,     ALLOWREC,   ' ',    "12×",      YES_L,  X_NEW,      FIN_12mult,        T_MUL12,    H_MUL12},
-    {FN27,  UNI_DIV100, USES_F,     ALLOWREC,   ' ',    "100÷",     YES_L,  X_NEW,      FIN_100div,        T_DIV100,   H_DIV100},
-    {FN28,  UNI_MUL100, USES_F,     ALLOWREC,   ' ',    "100×",     YES_L,  X_NEW,      FIN_100mult,       T_MUL100,   H_MUL100},
+    {FN8,   UNI_FINFV,  USES_F,     ALLOWREC,   ' ',    "FV",       YES_L,  X_NEW,      FIN_fv,            T_FINFV,    H_FINFV},
+    {FN9,   UNI_FINN,   USES_F,     ALLOWREC,   ' ',    "n",        YES_L,  X_NEW,      FIN_n,             T_FINN,     H_FINN},
+    {FN10,  UNI_INTR,   USES_F,     ALLOWREC,   ' ',    "i%",       YES_L,  X_NEW,      FIN_i,             T_INTR,     H_INTR},
+    {FN11,  UNI_FINPV,  USES_F,     ALLOWREC,   ' ',    "PV",       YES_L,  X_NEW,      FIN_pv,            T_FINPV,    H_FINPV},
+    {FN12,  UNI_FINPMT, USES_F,     ALLOWREC,   ' ',    "PMT",      YES_L,  X_NEW,      FIN_pmt,           T_FINPMT,   H_FINPMT},
+    {FN13,  UNI_MUL12,  USES_F,     ALLOWREC,   ' ',    "12×",      YES_L,  X_NEW,      FIN_12mult,        T_MUL12,    H_MUL12},
+    {FN14,  UNI_DIV12,  USES_F,     ALLOWREC,   ' ',    "12÷",      YES_L,  X_NEW,      FIN_12div,         T_DIV12,    H_DIV12},
+    {FN15,  UNI_MUL100, USES_F,     ALLOWREC,   ' ',    "100×",     YES_L,  X_NEW,      FIN_100mult,       T_MUL100,   H_MUL100},
+    {FN16,  UNI_DIV100, USES_F,     ALLOWREC,   ' ',    "100÷",     YES_L,  X_NEW,      FIN_100div,        T_DIV100,   H_DIV100},
+    {FN17,  UNI_AMORT,  USES_F,     ALLOWREC,   ' ',    "Amort",    YES_L,  X_NEW,      FIN_amort,         T_AMORT,    H_AMORT},
+    {FN18,  UNI_CF0,    USES_F,     ALLOWREC,   ' ',    "CF0",      YES_L,  X_NEW,      FIN_cashFlow0,     T_CF0,      H_CF0},
+    {FN19,  UNI_CFJ,    USES_F,     ALLOWREC,   ' ',    "CFj",      YES_L,  X_NEW,      FIN_cashFlowj,     T_CFJ,      H_CFJ},
+    {FN20,  UNI_CFNJ,   USES_F,     ALLOWREC,   ' ',    "CFNj",     YES_L,  X_NEW,      FIN_cashFlowNj,    T_CFNJ,     H_CFNJ},
+    {FN21,  UNI_NPV,    USES_F,     ALLOWREC,   ' ',    "NPV",      YES_L,  X_NEW,      FIN_NPV,           T_NPV,      H_NPV},
+    {FN22,  UNI_IIR,    USES_F,     ALLOWREC,   ' ',    "IRR",      YES_L,  X_NEW,      FIN_IRR,           T_IRR,      H_IRR},
+    {FN23,  UNI_BOND,   USES_F,     ALLOWREC,   ' ',    "BOND",     YES_L,  X_NEW,      FIN_bond,          T_BOND,     H_BOND},
+    {FN24,  UNI_YTM,    USES_F,     ALLOWREC,   ' ',    "YTM",      YES_L,  X_NEW,      FIN_ytm,           T_YTM,      H_YTM},
+    {FN25,  UNI_DATE,   USES_F,     ALLOWREC,   ' ',    "DATE",     YES_L,  X_NEW,      FIN_date,          T_DATE,     H_DATE},
+    {FN26,  UNI_DAYS,   USES_F,     ALLOWREC,   ' ',    "DAYS",     YES_L,  X_NEW,      FIN_days,          T_DAYS,     H_DAYS},
+    {FN27,  UNI_TODAY,  USES_F,     ALLOWREC,   ' ',    "Today",    YES_L,  X_NEW,      FIN_today,         T_TODAY,    H_TODAY},
+    {FN28,  UNI_DEPR,   USES_F,     ALLOWREC,   ' ',    "DEPR",     YES_L,  X_NEW,      FIN_Depr,          T_DEPR,     H_DEPR},
     {FN29,  UNI_MUC,    USES_F,     ALLOWREC,   ' ',    "MU%C",     YES_L,  X_NEW,      FIN_muc,           T_MUC,      H_MUC},
     {FN30,  UNI_MUP,    USES_F,     ALLOWREC,   ' ',    "MU%P",     YES_L,  X_NEW,      FIN_mup,           T_MUP,      H_MUP},
     {FN31,  UNI_COST,   USES_F,     ALLOWREC,   ' ',    "COST",     YES_L,  X_NEW,      FIN_cost,          T_COST,     H_COST},
@@ -240,12 +240,12 @@ void FIN_fv(void)
 
     if (fin_reg[FIN_REG_i] == 0.0)
     {
-        RPN_error("FV: Interest cannot be zero.\nUse the STOF key to store values into the financial registers.");
+        RPN_error("FV: Interest cannot be zero.\nUse the STO key to store values into the financial registers.");
     }
     else if (fin_reg[FIN_REG_n] <= 0.0)
     {
         RPN_error
-            ("FV: Number of Periods(n) must be greater than 0\nUse the STOF key to store values into the financial registers.");
+            ("FV: Number of Periods(n) must be greater than 0\nUse the STO key to store values into the financial registers.");
     }
     else
     {
@@ -279,12 +279,12 @@ void FIN_pv(void)
 
     if (fin_reg[FIN_REG_i] == 0.0)
     {
-        RPN_error("PV: Interest cannot be zero.\nUse the STOF key to store values into the financial registers.");
+        RPN_error("PV: Interest cannot be zero.\nUse the STO key to store values into the financial registers.");
     }
     else if (fin_reg[FIN_REG_n] <= 0.0)
     {
         RPN_error
-            ("PV: Number of Periods(n) must be greater than 0.\nUse the STOF key to store values into the financial registers.");
+            ("PV: Number of Periods(n) must be greater than 0.\nUse the STO key to store values into the financial registers.");
     }
     else
     {
@@ -333,13 +333,13 @@ BOOL CALLBACK fnDIALOG_AmortProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
 
         if (fin_reg[FIN_REG_i] <= 0.0)
         {
-            RPN_error("AMORT:  Interest must be positive.\nUse the STOF key to store values into the financial registers.");
+            RPN_error("AMORT:  Interest must be positive.\nUse the STO key to store values into the financial registers.");
             EndDialog(hDlg, FALSE);
             return TRUE;
         }
         else if (fin_reg[FIN_REG_n] <= 0.0)
         {
-            RPN_error("AMORT: Number of Periods(n) must be greater than 0.\nUse the STOF key to store values into the financial registers.");
+            RPN_error("AMORT: Number of Periods(n) must be greater than 0.\nUse the STO key to store values into the financial registers.");
             EndDialog(hDlg, FALSE);
             return TRUE;
         }
@@ -464,12 +464,12 @@ void FIN_pmt(void)
 
     if (fin_reg[FIN_REG_i] == 0.0)
     {
-        RPN_error("PMT: Interest cannot be zero.\nUse the STOF key to store values into the financial registers.");
+        RPN_error("PMT: Interest cannot be zero.\nUse the STO key to store values into the financial registers.");
     }
     else if (fin_reg[FIN_REG_n] <= 0.0)
     {
         RPN_error
-            ("PMT: Number of Periods(n) must be greater than 0.\nUse the STOF key to store values into the financial registers.");
+            ("PMT: Number of Periods(n) must be greater than 0.\nUse the STO key to store values into the financial registers.");
     }
     else
     {
@@ -508,7 +508,7 @@ void FIN_n(void)
 
     if (fin_reg[FIN_REG_i] == 0.0)
     {
-        RPN_error("n: Interest cannot be zero.\nUse the STOF key to store values into the financial registers.");
+        RPN_error("n: Interest cannot be zero.\nUse the STO key to store values into the financial registers.");
         return;
     }
     found = FALSE;
@@ -574,7 +574,7 @@ void FIN_i(void)
     if (fin_reg[FIN_REG_n] < 1.0)
     {
         RPN_error
-            ("i%: Number of periods(n) must be greater than or equal to 1.0\nUse the STOF key to store values into the financial registers.");
+            ("i%: Number of periods(n) must be greater than or equal to 1.0\nUse the STO key to store values into the financial registers.");
         return;
     }
     found = FALSE;
@@ -945,7 +945,7 @@ void FIN_muc(void)
 
     if (fin_reg[FIN_REG_COST] <= 0.00)
         RPN_error
-            ("Markup Cost:  Cost must be greater than 0.00\nUse the STOF key to store values into the financial registers.");
+            ("Markup Cost:  Cost must be greater than 0.00\nUse the STO key to store values into the financial registers.");
     else
     {
         muc = (fin_reg[FIN_REG_PRICE] - fin_reg[FIN_REG_COST]) / fin_reg[FIN_REG_COST];
@@ -975,7 +975,7 @@ void FIN_mup(void)
 
     if (fin_reg[FIN_REG_PRICE] <= 0.0)
         RPN_error
-            ("Markup Percent:  Price must be greater than 0.00\nUse the STOF key to store values into the financial registers.");
+            ("Markup Percent:  Price must be greater than 0.00\nUse the STO key to store values into the financial registers.");
     else
     {
         muc = (fin_reg[FIN_REG_PRICE] - fin_reg[FIN_REG_COST]) / fin_reg[FIN_REG_PRICE];

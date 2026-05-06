@@ -38,8 +38,8 @@ typedef unsigned __int32    uint32_t;
 typedef unsigned __int16    uint16_t;
 typedef unsigned __int8     uint8_t;
 
-#define PROG_LONG           uint32_t    // We handle signed and other word sizes in ex_prog.c 
-#define PROG_SIGNEDLONG     int32_t     // Needed when we convert Signed to float... 
+#define PROG_LONG           uint32_t    // We handle signed and other word sizes in ex_prog.c
+#define PROG_SIGNEDLONG     int32_t     // Needed when we convert Signed to float...
 
 #define MAX_FUNCS           40
 
@@ -47,15 +47,15 @@ typedef unsigned __int8     uint8_t;
 
 #define MAX_DIGITS          18
 
-#define X_NEW               1   // Next keypress pushes stack and starts new edit 
-#define X_EDIT              2   // Value is under edit and will have the _ at the end 
-#define X_ENTER             3   // Enter just pressed - next keypress replaces X 
-#define X_NULL              4   // No change to the X value - it will remain one of those above 
+#define X_NEW               1   // Next keypress pushes stack and starts new edit
+#define X_EDIT              2   // Value is under edit and will have the _ at the end
+#define X_ENTER             3   // Enter just pressed - next keypress replaces X
+#define X_NULL              4   // No change to the X value - it will remain one of those above
 
 #define YES_L               1   // Yes, save the Last X value when executing this function
 #define NO_L                2   // No, do not save the Last X value when executing this function
 
-#define MAX_IMPORT_CLIPBOARD_SIZE (10 * 1024)
+#define MAX_IMPORT_CLIPBOARD_SIZE       (10 * 1024)
 
 // Defines for menu item IDs
 #define   IDM_OPEN                          101
@@ -123,9 +123,9 @@ extern struct funcStruct MacroFuncs[];
 
 #define NOTES_SIZE  4096
 
-// --------------------------- 
-// Defines for the main dialog 
-// --------------------------- 
+// ---------------------------
+// Defines for the main dialog
+// ---------------------------
 #define FUNC_BAR_TEXT_SCI_I     "SCIENTIFIC I"
 #define FUNC_BAR_TEXT_SCI2      "SCIENTIFIC II"
 #define FUNC_BAR_TEXT_BUIS      "FINANCIAL"
@@ -141,9 +141,9 @@ extern struct funcStruct MacroFuncs[];
 #define TIMER_SLOW              2
 #define TIMER_FAST              3
 
-// ---------- 
-// PROTOTYPES 
-// ---------- 
+// ----------
+// PROTOTYPES
+// ----------
 #ifdef CPPLUS
 extern "C" void   StackPush(double temp);
 extern "C" double StackPop(void);
@@ -162,33 +162,33 @@ extern double ToRadians(double t);
 
 extern uint8_t Xedit;
 extern char Xstr[50];
-extern double X;                // Main register X 
-extern double Y;                // Main register Y 
-extern double Z;                // Main register Z 
-extern double T;                // Main Register T 
-extern double A;                // Extended Stack A 
-extern double B;                // Extended Stack B 
-extern double C;                // Extended Stack C 
-extern double D;                // Extended Stack D 
+extern double X;                // Main register X
+extern double Y;                // Main register Y
+extern double Z;                // Main register Z
+extern double T;                // Main Register T
+extern double A;                // Extended Stack A
+extern double B;                // Extended Stack B
+extern double C;                // Extended Stack C
+extern double D;                // Extended Stack D
 
-extern double LASTX;            // LAST X register 
+extern double LASTX;            // LAST X register
 
-extern PROG_LONG XL;
-extern PROG_LONG YL;
-extern PROG_LONG ZL;
-extern PROG_LONG TL;
-extern PROG_LONG AL;
-extern PROG_LONG BL;
-extern PROG_LONG CL;
-extern PROG_LONG DL;
-extern PROG_LONG LASTXL;
+extern PROG_LONG XL;            // Main X register in Comp-Sci mode
+extern PROG_LONG YL;            // Main Y register in Comp-Sci mode
+extern PROG_LONG ZL;            // Main Z register in Comp-Sci mode
+extern PROG_LONG TL;            // Main T register in Comp-Sci mode
+extern PROG_LONG AL;            // Extended A register in Comp-Sci mode
+extern PROG_LONG BL;            // Extended B register in Comp-Sci mode
+extern PROG_LONG CL;            // Extended C register in Comp-Sci mode
+extern PROG_LONG DL;            // Extended D register in Comp-Sci mode
+extern PROG_LONG LASTXL;        // Last X register in Comp-Sci mode
 
 extern uint32_t indirectRegister;
 
 extern int32_t main_x;
 extern int32_t main_y;
 
-extern double taxConstant;
+extern double  taxConstant;
 extern uint8_t commaMode;
 extern uint8_t eexMode;
 extern uint8_t numLockMode;
@@ -228,7 +228,7 @@ extern double fin_reg[FIN_REG_MAX];
 extern uint8_t payMode;
 extern uint8_t dateMode;
 
-// Programming mode defines 
+// Programming mode defines
 extern uint8_t  padZeros;
 extern uint32_t wordSize;
 extern uint8_t  wordMode;
@@ -338,6 +338,7 @@ extern void RPN_Notes(void);
 extern void RPN_Copy(void);
 extern void RPN_Paste(void);
 extern void RPN_inverse(void);
+extern void SCI_sqrt(void);
 
 #define CUSTOM_SAVE_SCI       1
 #define CUSTOM_SAVE_SCI2      2
@@ -455,7 +456,6 @@ extern uint8_t depreciationType;
 
 #define MAX_STO 100
 extern double STO[MAX_STO];
-extern char STOlabels[MAX_STO][9];
 
 extern uint8_t macroPlayback;
 extern int16_t currentMacroPlaybackIdx;
@@ -626,11 +626,15 @@ enum UniqueButtonIndexTag
     UNI_PERCC,
     UNI_PERCT,
     UNI_CLRF,
+    UNI_FINFV,
     UNI_FINN,
     UNI_INTR,
     UNI_FINPV,
     UNI_FINPMT,
-    UNI_FINFV,
+    UNI_MUL12,
+    UNI_DIV12,
+    UNI_MUL100,
+    UNI_DIV100,
     UNI_AMORT,
     UNI_CF0,
     UNI_CFJ,
@@ -643,10 +647,6 @@ enum UniqueButtonIndexTag
     UNI_DAYS,
     UNI_TODAY,
     UNI_DEPR,
-    UNI_DIV12,
-    UNI_MUL12,
-    UNI_DIV100,
-    UNI_MUL100,
     UNI_MUC,
     UNI_MUP,
     UNI_COST,
@@ -659,7 +659,6 @@ enum UniqueButtonIndexTag
     UNI_CURR,
     UNI_EFF,
     UNI_INFL,
-
     UNI_CINV,
     UNI_LBKG,
     UNI_OZGR,
@@ -909,6 +908,7 @@ extern uint32_t userTicks;
 #define RPN_EXREG                       140
 #define RPN_COPY                        141
 #define RPN_PASTE                       142
+#define RPN_SQRT                        143
 
 #define RPN_SCI                         200
 #define RPN_SCI2                        201
@@ -927,7 +927,7 @@ extern uint32_t userTicks;
 #define SPARE_BAR                       304
 #define ANGLE_BAR                       305
 #define PROG_BAR                        306
-#define RPN_CARRY                       307 //TODO: CARRY_BAR?
+#define RPN_CARRY                       307
 
 #define RPN_STACK                       400
 #define RPN_X_LABEL                     401
@@ -1199,14 +1199,14 @@ extern uint32_t userTicks;
 #define T_PERCC         "Percent Change"
 #define H_PERCC         "Calculates percent change from Y to X."
 #define T_CLRF          "Clear Financial"
-#define H_CLRF          "Clears all of the financial registers. This includes {n} {i} {PV} {PMT} {FV} {COST} {PRICE} {MARKUP%%C} {COST%%P} {CF0} {CFj}"
+#define H_CLRF          "Clears all of the financial registers. This includes {n} {i} {PV} {PMT} {FV} {COST} {PRICE} {MARKUP%C} {COST%P} {CF0} {CFj}"
 #define T_STOFN         "Store Financial"
 #define H_STOFN         "Stores the current X number to one of the financial registers. After pressing this key, select the financial register to store the value (for example {n} or {PV}). You should see the display blink to let you know the value was stored."
 #define T_RCLFN         "Recall Financial"
 #define H_RCLFN         "Recalls a previously stored financial number to the X register. After pressing this key, select the financial register to retrieve the value from (for example {n} or {PV})."
 #define T_FINN          "Number of Payments"
 #define H_FINN          "Calculates the number of payments required based on entries in the financial registers."
-#define T_INTR          "Interest %%"
+#define T_INTR          "Interest %"
 #define H_INTR          "Calculates the APR interest based on entries in the financial registers."
 #define T_FINPV         "Present Value"
 #define H_FINPV         "Computes the present value of money based on entries in the financial registers."
@@ -1237,7 +1237,7 @@ extern uint32_t userTicks;
 #define T_CPLXMUL       "Complex Multiplication"
 #define H_CPLXMUL       "Multiplies complex pair X,Y with Z,T"
 #define T_PERCT         "Percent Total"
-#define H_PERCT         "Computes the %% portion that X is of Y"
+#define H_PERCT         "Computes the % portion that X is of Y"
 #define T_DATE          "Date From Days"
 #define H_DATE          "Computes the date the number of days in X from a given date in Y.  The result date is stored in X and the day of the week is stored in Y (1=MON..7=SUN)."
 #define T_DAYS          "Days Between Dates"
@@ -1260,14 +1260,14 @@ extern uint32_t userTicks;
 #define H_NPV           "Computes the Net Present Value of a series of cash flows."
 #define T_IRR           "Internal Rate of Return"
 #define H_IRR           "Computes the Internal Rate of Return of a series of cash flows."
-#define T_MUC           "Markup as a %% Cost"
+#define T_MUC           "Markup as a % Cost"
 #define H_MUC           "Calculates markup as a percentage of cost. Must store {COST} and {PRICE} first."
-#define T_MUP           "Markup as a %% Price"
+#define T_MUP           "Markup as a % Price"
 #define H_MUP           "Calculates markup a percentage of price. Must store {COST} and {PRICE} first."
 #define T_COST          "Cost"
-#define H_COST          "Calculates Cost based on {PRICE} and {MARKUP%%C}. If {MARKUP%%C} is 0.0 then it is calculated using {MARKUP%%P} instead."
+#define H_COST          "Calculates Cost based on {PRICE} and {MARKUP%C}. If {MARKUP%C} is 0.0 then it is calculated using {MARKUP%P} instead."
 #define T_PRICE         "Price"
-#define H_PRICE         "Calculates Price  based on {COST} and {MARKUP%%C}. If {MARKUP%%C} is 0.0 then it is calculated using {MARKUP%%P} instead."
+#define H_PRICE         "Calculates Price  based on {COST} and {MARKUP%C}. If {MARKUP%C} is 0.0 then it is calculated using {MARKUP%P} instead."
 #define H_FA_CE         "Degrees Fahrenheit to Celsius"
 #define T_FA_CE         "Degrees Fahrenheit to Celsius"
 #define H_IN_CM         "Inches to Centimeters"

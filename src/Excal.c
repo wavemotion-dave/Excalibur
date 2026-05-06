@@ -54,7 +54,7 @@
                   "if you want to donate to support the effort.\n\n"    \
                   "https://github.com/wavemotion-dave/Excalibur"
 
-#define CONFIG_VERSION_MAIN     0xF002      // If this changes, we wipe EVERYTHING
+#define CONFIG_VERSION_MAIN     0xF004      // If this changes, we wipe EVERYTHING
 #define CONFIG_VERSION_SUB      0xF001      // If this changes, we reset x,y window position and reset constant tables (currency, physics constants, etc)
 
 #define END_OF_PROGRAM_STR          "<End Of Program>"
@@ -154,6 +154,7 @@ uint8_t  eexMode = 1;               // 0=EEX, 1=E
 uint8_t  numLockMode = 1;           // Turn on NumLock when program starts?
 uint8_t  toolTipsOn = 1;            // Enable tooltips?
 uint8_t  extendedStack = 0;         // Standard Stack is 4 deep. Extended is 8 deep.
+uint8_t  footPrint = 0;             // Classic layout by default
 uint8_t  popFillZero = 0;           // T register fills with zero?
 int32_t  lastChosenConst = 0;       // Last chosen constant
 int32_t  lastConstBank = 0;         // Last chosen constant bank
@@ -166,7 +167,6 @@ uint16_t lastUniqueIndex = 0;       // Index of the last function that was calle
 
 // Various storage arrays for RPN use
 double STO[MAX_STO];                // Storage registers R0-R99
-char STOlabels[MAX_STO][9];         // Labels associated with the R0-R99 registers
 double SUM[SUM_MAX];                // Statistics registers for the Financial bank
 char excaliburNotes[NOTES_SIZE];    // A small scratchpad for the user to jot down some info
 
@@ -259,9 +259,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     RegisterClassEx(&wndclass);
 
     PreInit();
+    ReadFromDisk(); // We need to know the footprint... so we need to read the config before we create the window.
 
     // This is the main Excalibur dialog window!
-    calcMainWindow = CreateDialog(hInstance, "EXCALIBUR", 0, NULL);
+    if (footPrint == 1)
+        calcMainWindow = CreateDialog(hInstance, "DIALOG_4BANGER", 0, NULL);
+    else
+        calcMainWindow = CreateDialog(hInstance, "DIALOG_EXCALIBUR", 0, NULL);
 
     hMainMenu = GetMenu(calcMainWindow);
 
@@ -1753,11 +1757,12 @@ struct funcStruct RPNkeys[] = {
     {RPN_EDIT,      UNI_EDIT,   USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_edit,           "Edit X Register",      "Used to place the X register back in edit mode if it is not already."},
     {RPN_CONST,     UNI_CONST,  USES_F,  NORECORD, ' ', "", YES_L,  X_NEW,      RPN_const,          "Constants",            "Recall or Store Constants to one of five banks."},
     {RPN_NOTES,     UNI_NOTES,  USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_Notes,          "Excalibur Notepad",    "Allows some simple notes to be stored/saved."},
-    {RPN_INV,       UNI_INVX,   USES_FL, ALLOWREC, ' ', "", YES_L,  X_NEW,      RPN_inverse,        "Inverse X",            "Computes the inverse of X"},
+    {RPN_INV,       UNI_INVX,   USES_FL, ALLOWREC, 'i', "", YES_L,  X_NEW,      RPN_inverse,        "Inverse X",            "Computes the inverse of X"},
     {RPN_REC,       UNI_REC,    USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_Record,         "Record Mode On/Off",   "When ON - Records button presses for playback."},
     {RPN_EXREG,     UNI_EXREG,  USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_ExchangeReg,    "Exchange X with Reg",  "Exchange X with one of the Registers (next digit/dp selects R0-R19)"},
     {RPN_COPY,      UNI_COPY,   USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_Copy,           "Copy X Register",      "Copy X register to the clipboard"},
     {RPN_PASTE,     UNI_PASTE,  USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_Paste,          "Paste X Register",     "Paste X register from the clipboard"},
+    {RPN_SQRT,      UNI_SQRT,   USES_FL, ALLOWREC, ' ', "", YES_L,  X_NEW,      SCI_sqrt,           "Square Root",          "Computes the Square Root of the value in X"},
 
     {RPN_SCI,       UNI_SCI,    USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectSci,      "Select Scientific I",  "Selects the Scientific I Layout"},
     {RPN_SCI2,      UNI_SCI2,   USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectSci2,     "Select Scientific II", "Selects the Scientific II Layout"},
@@ -1782,7 +1787,7 @@ struct keyPosStruct
 };
 
 // -------------------------------------------------------------------------------------------------------
-// We don't bother with tooltips on any of the basic RPN keyps up through RPN_ENTER so this table starts
+// We don't bother with tooltips on any of the basic RPN keys up through RPN_ENTER so this table starts
 // with the Exchange of X/Y key and goes through the rest of the RPN keys and then the function bank keys.
 // -------------------------------------------------------------------------------------------------------
 struct keyPosStruct RPNkeyPos[] = {
@@ -1810,6 +1815,7 @@ struct keyPosStruct RPNkeyPos[] = {
     {RPN_EXREG      ,0,     0},
     {RPN_COPY       ,0,     0},
     {RPN_PASTE      ,0,     0},
+    {RPN_SQRT       ,0,     0},
     {RPN_LAST_KEY,   0,     0}
 };
 
@@ -1898,7 +1904,7 @@ int ProcessDirectKeyHit(WPARAM key)
 
     keyStroke = LOBYTE(key);
 
-    if (numberDisplayMode == NONINTERNATIONAL && keyStroke == ',')      // Allow comma as DP seperator on keyboard...
+    if (numberDisplayMode == NONINTERNATIONAL && keyStroke == ',')      // Allow comma as DP separator on keyboard...
         keyStroke = '.';
 
     found = 0;
@@ -3508,6 +3514,7 @@ void SaveToDisk(void)
         fwrite(&inFocusTime,        sizeof(inFocusTime),        1, outfile);
         fwrite(customSave,          sizeof(customSave),         1, outfile);
         fwrite(&extendedStack,      sizeof(extendedStack),      1, outfile);
+        fwrite(&footPrint,          sizeof(footPrint),          1, outfile);        
         fwrite(&popFillZero,        sizeof(popFillZero),        1, outfile);
         fwrite(&rightAlignStack,    sizeof(rightAlignStack),    1, outfile);
         fwrite(&showXMinimized,     sizeof(showXMinimized),     1, outfile);
@@ -3532,7 +3539,6 @@ void SaveToDisk(void)
         fwrite(&lastConstBank,      sizeof(lastConstBank),      1, outfile);
         fwrite(&excaliburNotes,     sizeof(excaliburNotes),     1, outfile);
         fwrite(&lastChosenMacro,    sizeof(lastChosenMacro),    1, outfile);
-        fwrite(&STOlabels,          sizeof(STOlabels),          1, outfile);
         fwrite(&progDelayValue,     sizeof(int),                1, outfile);
         fwrite(&indirectRegister,   sizeof(indirectRegister),   1, outfile);
 
@@ -3631,6 +3637,7 @@ void ReadFromDisk(void)
         fread(&inFocusTime,        sizeof(inFocusTime),        1, infile);
         fread(customSave,          sizeof(customSave),         1, infile);
         fread(&extendedStack,      sizeof(extendedStack),      1, infile);
+        fread(&footPrint,          sizeof(footPrint),          1, infile);
         fread(&popFillZero,        sizeof(popFillZero),        1, infile);
         fread(&rightAlignStack,    sizeof(rightAlignStack),    1, infile);
         fread(&showXMinimized,     sizeof(showXMinimized),     1, infile);
@@ -3664,7 +3671,6 @@ void ReadFromDisk(void)
         fread(&lastConstBank,      sizeof(lastConstBank),      1, infile);
         fread(excaliburNotes,      sizeof(excaliburNotes),     1, infile);
         fread(&lastChosenMacro,    sizeof(lastChosenMacro),    1, infile);
-        fread(&STOlabels,          sizeof(STOlabels),          1, infile);
         fread(&progDelayValue,     sizeof(int),                1, infile);
         fread(&indirectRegister,   sizeof(indirectRegister),   1, infile);
 
@@ -4290,6 +4296,11 @@ BOOL CALLBACK fnDIALOG_SettingsProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
         sprintf(tmpStr, "%d", progDelayValue);
         SetDlgItemText(hDlg, 123, tmpStr);
 
+        if (footPrint == 1) // 4-Banger mode
+            SendMessage (GetDlgItem (hDlg, 119), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
+        else
+            SendMessage (GetDlgItem (hDlg, 118), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
+
         if (extendedStack)
             SendMessage(GetDlgItem(hDlg, 125), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         else
@@ -4357,6 +4368,29 @@ BOOL CALLBACK fnDIALOG_SettingsProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
                 popFillZero = 1;
             else
                 popFillZero = 0;
+
+            bs = SendMessage (GetDlgItem (hDlg, 118), BM_GETCHECK, (WORD) 0, (DWORD) 0L);
+            if (bs != 0L)
+            {
+                if (footPrint != 0)
+                {
+                    MessageBox (hDlg,
+                                "Changing the footprint size requires you to close and restart Excalibur for the new setting to take place.",
+                                "Excalibur Footprint Change", MB_OK);
+                }
+                footPrint = 0;
+            }
+            bs = SendMessage (GetDlgItem (hDlg, 119), BM_GETCHECK, (WORD) 0, (DWORD) 0L);
+            if (bs != 0L)
+            {
+                if (footPrint != 1)
+                {
+                    MessageBox (hDlg,
+                                "Changing the footprint size requires you to close and restart Excalibur for the new setting to take place.",
+                                "Excalibur Footprint Change", MB_OK);
+                }
+                footPrint = 1;
+            }
 
             bs = SendMessage(GetDlgItem(hDlg, 104), BM_GETCHECK, (WORD) 0, (DWORD) 0L);
             if (bs != 0L)
@@ -4488,18 +4522,21 @@ WORD GetMouseHelp(WORD xPos, WORD yPos)
     int i;
     WORD status = 0;
 
-    i = 0;
-    while (FunctionBankKeyPos[i].controlID != RPN_LAST_KEY)
+    if (footPrint == 0)
     {
-        if (xPos >= FunctionBankKeyPos[i].x && xPos <= FunctionBankKeyPos[i].x + FunctionBankKeyPos[i].w)
-            if (yPos >= FunctionBankKeyPos[i].y && yPos <= FunctionBankKeyPos[i].y + FunctionBankKeyPos[i].h)
-            {
-                strcpy(helpTitle, currentFuncs[i].keyTitle);
-                strcpy(helpMsg, currentFuncs[i].keyHelp);
-                status = 1;
-                break;
-            }
-        i++;
+        i = 0;
+        while (FunctionBankKeyPos[i].controlID != RPN_LAST_KEY)
+        {
+            if (xPos >= FunctionBankKeyPos[i].x && xPos <= FunctionBankKeyPos[i].x + FunctionBankKeyPos[i].w)
+                if (yPos >= FunctionBankKeyPos[i].y && yPos <= FunctionBankKeyPos[i].y + FunctionBankKeyPos[i].h)
+                {
+                    strcpy(helpTitle, currentFuncs[i].keyTitle);
+                    strcpy(helpMsg, currentFuncs[i].keyHelp);
+                    status = 1;
+                    break;
+                }
+            i++;
+        }
     }
 
     i = 0;
@@ -5063,7 +5100,7 @@ void RPN_Playback(void)
     macroPlayback = TRUE;
 
     GetAsyncKeyState(VK_ESCAPE);        // Get one reading at least!
-    SetFocus(calcMainWindow);           // For long macros this will "release" the Play key depresion...
+    SetFocus(calcMainWindow);           // For long macros this will "release" the Play key depression...
 
     if (IsWindowVisible(toolTipWnd))    // Macro running... hide tool tip window if it was visible.
     {
@@ -5342,7 +5379,7 @@ void RPN_digit9(void)
 
 void RPN_endConst(void)
 {
-    // Simply so that constant numbers can lift stack appopriately.
+    // Simply so that constant numbers can lift stack appropriately.
 }
 
 
