@@ -263,9 +263,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
     // This is the main Excalibur dialog window!
     if (footPrint == 1)
+    {
         calcMainWindow = CreateDialog(hInstance, "DIALOG_4BANGER", 0, NULL);
+        progMode = PROG_NORMAL;
+        lastConstBank = 0;
+    }
     else
+    {
         calcMainWindow = CreateDialog(hInstance, "DIALOG_EXCALIBUR", 0, NULL);
+    }
 
     hMainMenu = GetMenu(calcMainWindow);
 
@@ -451,15 +457,11 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
                 break;
             case IDM_COPYXTOCLIPBOARD:
                 {
-                    blinkXDisplay();
-                    Sleep(100);
                     ClipboardCopySelection(hwnd, COPY_X_TO_CLIPBOARD);                    
                 }
                 break;
             case IDM_COPYALLTOCLIPBOARD:
                 {
-                    blinkStack();
-                    Sleep(100);
                     ClipboardCopySelection(hwnd, COPY_ALL_TO_CLIPBOARD);
                 }
                 break;
@@ -1563,7 +1565,6 @@ int Init(void)
     UpdateVersionBar();
     UpdateSpareBar("    ");
     ShowFunctionBar(FUNC_BAR_TEXT_SCI_I);
-    ReadFromDisk();
 
     mapButtonFuncs();
     ShowStack();
@@ -1763,6 +1764,7 @@ struct funcStruct RPNkeys[] = {
     {RPN_COPY,      UNI_COPY,   USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_Copy,           "Copy X Register",      "Copy X register to the clipboard"},
     {RPN_PASTE,     UNI_PASTE,  USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_Paste,          "Paste X Register",     "Paste X register from the clipboard"},
     {RPN_SQRT,      UNI_SQRT,   USES_FL, ALLOWREC, ' ', "", YES_L,  X_NEW,      SCI_sqrt,           "Square Root",          "Computes the Square Root of the value in X"},
+    {RPN_PI,        UNI_PI,     USES_FL, ALLOWREC, ' ', "", YES_L,  X_NEW,      SCI_pi,             "Pi",                   "Computes the value of Pi"},
 
     {RPN_SCI,       UNI_SCI,    USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectSci,      "Select Scientific I",  "Selects the Scientific I Layout"},
     {RPN_SCI2,      UNI_SCI2,   USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectSci2,     "Select Scientific II", "Selects the Scientific II Layout"},
@@ -1816,6 +1818,7 @@ struct keyPosStruct RPNkeyPos[] = {
     {RPN_COPY       ,0,     0},
     {RPN_PASTE      ,0,     0},
     {RPN_SQRT       ,0,     0},
+    {RPN_PI         ,0,     0},
     {RPN_LAST_KEY,   0,     0}
 };
 
@@ -2362,6 +2365,9 @@ double StackPop(void)
 // -----------------------
 void RPN_clearStack(void)
 {
+    int i;
+    MSG msg;
+
     // Check if we should clear all registers
     if (rpnStoreRecall & 0x03)
     {
@@ -2382,7 +2388,21 @@ void RPN_clearStack(void)
 
             GetDlgItemText(calcMainWindow, RPN_STACK_X, savedStr, MAX_STACK_STRLEN);
             SetDlgItemText(calcMainWindow, RPN_STACK_X, "  ...MEMORY CLEAR...  ");
-            Sleep(500);
+            for (i=0; i<5; i++)
+            {
+                while (PeekMessage(&msg, calcMainWindow, 0, 0, PM_REMOVE))
+                {
+                    if (msg.message == WM_QUIT) // Always check for quit!
+                    {
+                        endRunningMacro();
+                        PostQuitMessage(0);
+                        return;
+                    }
+                    TranslateMessage(&msg);
+                    DispatchMessage(&msg);
+                }
+                Sleep(100);
+            }
             GetDlgItemText(calcMainWindow, RPN_STACK_X, savedStr, MAX_STACK_STRLEN);
         }
 

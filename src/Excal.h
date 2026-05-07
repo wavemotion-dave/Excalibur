@@ -339,6 +339,7 @@ extern void RPN_Copy(void);
 extern void RPN_Paste(void);
 extern void RPN_inverse(void);
 extern void SCI_sqrt(void);
+extern void SCI_pi(void);
 
 #define CUSTOM_SAVE_SCI       1
 #define CUSTOM_SAVE_SCI2      2
@@ -909,6 +910,7 @@ extern uint32_t userTicks;
 #define RPN_COPY                        141
 #define RPN_PASTE                       142
 #define RPN_SQRT                        143
+#define RPN_PI                          144
 
 #define RPN_SCI                         200
 #define RPN_SCI2                        201
