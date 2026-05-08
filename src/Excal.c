@@ -1885,7 +1885,7 @@ int selectFuncs(WPARAM key)
     return(0);
 }
 
-int processBank()
+int processBank(void)
 {
     int i;
 
