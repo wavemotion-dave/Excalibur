@@ -369,6 +369,29 @@ int CreateToolTipWindow(HWND hwnd, HINSTANCE hInstance)
     return 0;
 }
 
+
+void sleep_and_peek(int timeMs)
+{
+    int i;
+    MSG msg;
+
+    for (i=0; i<(timeMs/50); i++)
+    {
+        while (PeekMessage(&msg, calcMainWindow, 0, 0, PM_REMOVE))
+        {
+            if (msg.message == WM_QUIT) // Always check for quit!
+            {
+                endRunningMacro();
+                PostQuitMessage(0);
+                return;
+            }
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+        Sleep(50);
+    }
+}
+
 // ---------------------------------------------------------------------------------------
 // This is our top-level Excalibur window handler... Essentially this handles any
 // top-level functionality such as keyboard presses, global timers, window movement, etc.
@@ -1917,17 +1940,20 @@ int ProcessDirectKeyHit(WPARAM key)
     found = 0;
     for (i = 0; i < MAX_FUNCS; i++)
     {
-        if (toupper(keyStroke) == toupper(currentFuncs[i].op) && keyStroke != ' ')
+        if (footPrint == 0)
         {
-            found = 1;
-            if (currentFuncs[i].routine != NULL)
+            if (toupper(keyStroke) == toupper(currentFuncs[i].op) && keyStroke != ' ')
             {
-                callButtonFunc(currentFuncs[i].routine,
-                               currentFuncs[i].useFloatsLongs,
-                               currentFuncs[i].allowRecord,
-                               currentFuncs[i].uniqueIndex, currentFuncs[i].saveLastX, currentFuncs[i].newXedit, TRUE);
+                found = 1;
+                if (currentFuncs[i].routine != NULL)
+                {
+                    callButtonFunc(currentFuncs[i].routine,
+                                currentFuncs[i].useFloatsLongs,
+                                currentFuncs[i].allowRecord,
+                                currentFuncs[i].uniqueIndex, currentFuncs[i].saveLastX, currentFuncs[i].newXedit, TRUE);
+                }
+                break;
             }
-            break;
         }
     }
 
@@ -2369,9 +2395,6 @@ double StackPop(void)
 // -----------------------
 void RPN_clearStack(void)
 {
-    int i;
-    MSG msg;
-
     // Check if we should clear all registers
     if (rpnStoreRecall & 0x03)
     {
@@ -2392,21 +2415,7 @@ void RPN_clearStack(void)
 
             GetDlgItemText(calcMainWindow, RPN_STACK_X, savedStr, MAX_STACK_STRLEN);
             SetDlgItemText(calcMainWindow, RPN_STACK_X, "  ...MEMORY CLEAR...  ");
-            for (i=0; i<5; i++)
-            {
-                while (PeekMessage(&msg, calcMainWindow, 0, 0, PM_REMOVE))
-                {
-                    if (msg.message == WM_QUIT) // Always check for quit!
-                    {
-                        endRunningMacro();
-                        PostQuitMessage(0);
-                        return;
-                    }
-                    TranslateMessage(&msg);
-                    DispatchMessage(&msg);
-                }
-                Sleep(100);
-            }
+            sleep_and_peek(500);
             GetDlgItemText(calcMainWindow, RPN_STACK_X, savedStr, MAX_STACK_STRLEN);
         }
 
@@ -5187,7 +5196,7 @@ void RPN_Playback(void)
 
         if (traceMacroPlayback == TRUE)
         {
-            Sleep(progDelayValue);
+            sleep_and_peek(progDelayValue);
 
             showTrace = TRUE;
             ShowStack();
@@ -5245,7 +5254,7 @@ void RPN_SingleStep(void)
 
     }
 
-    Sleep(progDelayValue);
+    sleep_and_peek(progDelayValue);
     ShowStack();
 
     UpdateSpareBar("    ");
@@ -5320,7 +5329,7 @@ void blinkXDisplay(void)
     {
         GetDlgItemText(calcMainWindow, RPN_STACK_X, tmpStr, MAX_STACK_STRLEN);
         SetDlgItemText(calcMainWindow, RPN_STACK_X, " ");
-        Sleep(200);
+        sleep_and_peek(200);
         GetDlgItemText(calcMainWindow, RPN_STACK_X, tmpStr, MAX_STACK_STRLEN);
     }
 }
@@ -5342,7 +5351,7 @@ void blinkStack(void)
         SetDlgItemText(calcMainWindow, RPN_STACK_Y, " ");
         SetDlgItemText(calcMainWindow, RPN_STACK_Z, " ");
         SetDlgItemText(calcMainWindow, RPN_STACK_T, " ");
-        Sleep(200);
+        sleep_and_peek(200);
         GetDlgItemText(calcMainWindow, RPN_STACK_X, tmp1, MAX_STACK_STRLEN);
         GetDlgItemText(calcMainWindow, RPN_STACK_Y, tmp2, MAX_STACK_STRLEN);
         GetDlgItemText(calcMainWindow, RPN_STACK_Z, tmp3, MAX_STACK_STRLEN);
