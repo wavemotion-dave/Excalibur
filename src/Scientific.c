@@ -53,8 +53,8 @@ extern void SCI_inverse(void);
 extern void SCI_exp(void);
 extern void SCI_ln(void);
 extern void SCI_log(void);
+extern void SCI_pow(void);
 extern void SCI_xfact(void);
-extern void SCI_y_to_x(void);
 extern void SCI_pi(void);
 extern void SCI_sinh(void);
 extern void SCI_cosh(void);
@@ -147,7 +147,7 @@ struct funcStruct Scientific_funcs[MAX_FUNCS] = {
     {FN14,  UNI_LN,         USES_F,     ALLOWREC,   ' ',    "LN",       YES_L,  X_NEW,  SCI_ln,                 T_LN,           H_LN},
     {FN15,  UNI_LOG,        USES_F,     ALLOWREC,   ' ',    "LOG",      YES_L,  X_NEW,  SCI_log,                T_LOG,          H_LOG},
     {FN16,  UNI_FACT,       USES_F,     ALLOWREC,   ' ',    "X!",       YES_L,  X_NEW,  SCI_xfact,              T_FACT,         H_FACT},
-    {FN17,  UNI_POW,        USES_F,     ALLOWREC,   ' ',    "Y^X",      YES_L,  X_NEW,  SCI_y_to_x,             T_POW,          H_POW},
+    {FN17,  UNI_POW,        USES_F,     ALLOWREC,   ' ',    "Y^X",      YES_L,  X_NEW,  SCI_pow,                T_POW,          H_POW},
     {FN18,  UNI_INT,        USES_F,     ALLOWREC,   ' ',    "INT",      YES_L,  X_NEW,  SCI_int,                T_INT,          H_INT},
     {FN19,  UNI_FRACT,      USES_F,     ALLOWREC,   ' ',    "FRAC",     YES_L,  X_NEW,  SCI_frac,               T_FRAC,         H_FRAC},
     {FN20,  UNI_RAND,       USES_F,     ALLOWREC,   ' ',    "RAND",     YES_L,  X_NEW,  SCI_rand,               T_RAND,         H_RAND},
@@ -409,7 +409,7 @@ void SCI_xfact(void)
     }
 }
 
-void SCI_y_to_x(void)
+void SCI_pow(void)
 {
     double xtemp, ytemp;
 
