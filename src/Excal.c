@@ -318,6 +318,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     ShowWindow(calcMainWindow, iCmdShow);           // Now show the window the way it was asked to be displayed...
     CreateToolTipWindow(calcMainWindow, hInstance); // Create the tool-tip window that goes with buttons...
     CreateDebugWindow(calcMainWindow, hInstance);   // Create the debug window for program traceback, register view, etc.
+    SelectNewBank(currentFuncs);                    // Make sure the right bank is selected
 
     // -------------------------------------------------------------------------------
     // This is our main loop that runs forever... processing and dispatching messages
