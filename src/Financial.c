@@ -329,7 +329,8 @@ BOOL CALLBACK fnDIALOG_AmortProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
     switch(wMessage)
     {
     case WM_INITDIALOG:
-        SendMessage(GetDlgItem(hDlg, 101), WM_SETFONT, (WPARAM) hFixedFont, FALSE);
+        SendMessage(GetDlgItem(hDlg, 101), WM_SETFONT, (WPARAM) hFixedFont, FALSE);  // Main Window
+        SendMessage(GetDlgItem(hDlg, 104), WM_SETFONT, (WPARAM) hFixedFont, FALSE);  // Title
 
         if (fin_reg[FIN_REG_i] <= 0.0)
         {
@@ -344,18 +345,23 @@ BOOL CALLBACK fnDIALOG_AmortProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
             return TRUE;
         }
 
-        finTemp1 =
-            (-1.0 * fin_reg[FIN_REG_PV] *
-             pow(1.0 + (fin_reg[FIN_REG_i] / 100.0), fin_reg[FIN_REG_n])) - fin_reg[FIN_REG_FV];
-        finTemp2 =
-            (1.0 +
-             (fin_reg[FIN_REG_i] / 100.0) * payMode) *
-            ((pow(1.0 + (fin_reg[FIN_REG_i] / 100.0), fin_reg[FIN_REG_n]) - 1.0) / (fin_reg[FIN_REG_i] / 100.0));
-        pmt = finTemp1 / finTemp2;
-        pmt = -1.0 * pmt;
+        if (fin_reg[FIN_REG_PMT] != 0.0)
+            pmt = fin_reg[FIN_REG_PMT];
+        else
+        {
+            finTemp1 =
+                (-1.0 * fin_reg[FIN_REG_PV] *
+                 pow(1.0 + (fin_reg[FIN_REG_i] / 100.0), fin_reg[FIN_REG_n])) - fin_reg[FIN_REG_FV];
+            finTemp2 =
+                (1.0 +
+                 (fin_reg[FIN_REG_i] / 100.0) * payMode) *
+                ((pow(1.0 + (fin_reg[FIN_REG_i] / 100.0), fin_reg[FIN_REG_n]) - 1.0) / (fin_reg[FIN_REG_i] / 100.0));
+            pmt = finTemp1 / finTemp2;
+            pmt = -1.0 * pmt;
+        }
 
-        principal = fin_reg[FIN_REG_PV];
-        sprintf(finTmpStr, "%3d  %13.2f  %13.2f  %13.2f  %13.2f", 0, 0.0, 0.0, 0.0, principal);
+        principal = -fin_reg[FIN_REG_PV];
+        sprintf(finTmpStr, "%3d  %11.2f  %11.2f  %11.2f  %11.2f", 0, 0.0, 0.0, 0.0, principal);
         makeInternational(finTmpStr);
         SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) finTmpStr));
         finTemp1 = 0.0;
@@ -363,31 +369,22 @@ BOOL CALLBACK fnDIALOG_AmortProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
         finTemp3 = 0.0;
         for (i = 0; i < (int) ceil(fin_reg[FIN_REG_n]); i++)
         {
-            if (payMode == 0)   // In END mode we calculate normally
-            {
-                interest = principal * (fin_reg[FIN_REG_i] / 100.0);
-                bulk = pmt - interest;
-                principal -= bulk;
-            }
-            else                // In begining mode we need to subtract out payment first!
-            {
-                interest = (principal - pmt) * (fin_reg[FIN_REG_i] / 100.0);
-                bulk = pmt - interest;
-                principal -= bulk;
-            }
+            interest = principal * (fin_reg[FIN_REG_i] / 100.0);
+            bulk = pmt - interest;
+            principal -= bulk;
             if (principal < 0.005)
                 principal = 0.0;
             if (interest < 0.005)
                 interest = 0.0;
 
-            sprintf(finTmpStr, "%3d  %13.2f  %13.2f  %13.2f  %13.2f", i + 1, pmt, bulk, interest, principal);
+            sprintf(finTmpStr, "%3d  %11.2f  %11.2f  %11.2f  %11.2f", i + 1, pmt, bulk, interest, principal);
             makeInternational(finTmpStr);
             SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) finTmpStr));
             finTemp1 += pmt;
             finTemp2 += bulk;
             finTemp3 += interest;
         }
-        sprintf(finTmpStr, "Tot: %13.2f  %13.2f  %13.2f", finTemp1, finTemp2, finTemp3);
+        sprintf(finTmpStr, "Tot: %11.2f  %11.2f  %11.2f", finTemp1, finTemp2, finTemp3);
         makeInternational(finTmpStr);
         SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) finTmpStr));
         return TRUE;

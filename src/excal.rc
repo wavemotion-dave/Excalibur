@@ -511,11 +511,7 @@ FONT 10, "MS Sans Serif"
 BEGIN
     LISTBOX         101,5,12,278,90,WS_VSCROLL
     PUSHBUTTON      "OK",102,157,103,80,14
-    LTEXT           "Pay#",-1,6,2,18,8
-    LTEXT           "Payment",-1,51,2,34,8
-    LTEXT           "Principal",-1,111,2,31,8
-    LTEXT           "Interest",-1,166,2,30,8
-    LTEXT           "Remaining",-1,220,2,36,8
+    LTEXT           "Pay#     Payment     Principal    Interest    Remaining",104,6,2,250,8
     PUSHBUTTON      "Copy To Clipboard",103,61,103,80,14
 END
 
