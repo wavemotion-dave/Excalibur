@@ -243,7 +243,7 @@ extern uint32_t wordSizeMask;
 extern uint8_t numberDisplayMode;
 
 extern void SelectNewBank(struct funcStruct *funcs);
-extern int ClipboardCopySelection(HWND hWnd, uint8_t copytype);
+extern void ClipboardCopySelection(HWND hWnd, uint8_t copytype);
 extern void SetUpFonts(HWND hWnd);
 extern void NotImp(void);
 extern void FloatsToLongs(void);

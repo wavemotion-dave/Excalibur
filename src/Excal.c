@@ -111,6 +111,7 @@ char     helpMsg[256];
 char     tmpStr[256];
 BYTE     keyState[256];
 
+
 // -------------------------------------
 // Buffers for editing the X register
 // -------------------------------------
@@ -267,6 +268,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
         calcMainWindow = CreateDialog(hInstance, "DIALOG_4BANGER", 0, NULL);
         progMode = PROG_NORMAL;
         lastConstBank = 0;
+        currentFuncs = (struct funcStruct *) &Scientific_funcs;
+        lastFuncs = (struct funcStruct *) &Scientific_funcs;
     }
     else
     {
@@ -1125,40 +1128,111 @@ LRESULT CALLBACK tooltipWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
      return DefWindowProc(hwnd, message, wParam, lParam);
 }
 
-
-int ClipboardCopySelection(HWND hwnd, uint8_t copytype)
+void CopyTextToClipboard(HWND hwnd, char *text)
 {
-    HGLOBAL tptr;
+    HGLOBAL hMem;
+    LPSTR lpMem;
+
+    hMem = GlobalAlloc(GHND, (DWORD) (strlen(text) + 1));
+    lpMem = GlobalLock(hMem);
+    lstrcpy(lpMem, text);
+    OpenClipboard(hwnd);
+    EmptyClipboard();
+    GlobalUnlock(hMem);
+    SetClipboardData(CF_TEXT, hMem);
+    CloseClipboard();
+}
+
+void ClipboardCopySelection(HWND hwnd, uint8_t copytype)
+{
     HANDLE hMem;
     LPSTR lpMem;
-    char far *cptr;
     char tmp2[32];
     char tmp3[32];
     int i, j;
     unsigned short chksum = 0x0000;
 
-    if (copytype == COPY_X_TO_CLIPBOARD)          // Copy X to clipboard
+    if (copytype == COPY_X_TO_CLIPBOARD)    // Copy X to clipboard
     {
-        tptr = GlobalAlloc(GHND, (DWORD) 64L);
-        cptr = GlobalLock(tptr);
         GetDlgItemText(calcMainWindow, RPN_STACK_X, tmpStr, MAX_STACK_STRLEN);  // X register
         trim(tmpStr);
         if (progMode == PROG_DEC)
         {
             if (tmpStr[strlen(tmpStr)-1] == 'd') tmpStr[strlen(tmpStr)-1] = 0;
         }
-        lstrcpy(cptr, (LPSTR) tmpStr);
-        OpenClipboard(hwnd);
-        EmptyClipboard();
-        GlobalUnlock(tptr);
-        SetClipboardData(CF_TEXT, tptr);
-        CloseClipboard();
+        CopyTextToClipboard(hwnd, tmpStr);
         Xedit = X_NEW;
         ShowStack();
-        return(0);
     }
+    else if (copytype == COPY_ALL_TO_CLIPBOARD) // Copy All to clipboard
+    {
+        strcpy(clipboardBuffer, "");
+        GetDlgItemText(calcMainWindow, RPN_STACK_T, tmpStr, MAX_STACK_STRLEN);  // T register
+        trim(tmpStr);
+        if (progMode == PROG_DEC)
+        {
+            if (tmpStr[strlen(tmpStr)-1] == 'd') tmpStr[strlen(tmpStr)-1] = 0;
+        }
+        strcat(clipboardBuffer, tmpStr);
+        strcat(clipboardBuffer, "\r\n");
 
-    if (copytype == COPY_X_FROM_CLIPBOARD)          //  Copy to X register!!!
+        GetDlgItemText(calcMainWindow, RPN_STACK_Z, tmpStr, MAX_STACK_STRLEN);  // Z register
+        trim(tmpStr);
+        if (progMode == PROG_DEC)
+        {
+            if (tmpStr[strlen(tmpStr)-1] == 'd') tmpStr[strlen(tmpStr)-1] = 0;
+        }
+        strcat(clipboardBuffer, tmpStr);
+        strcat(clipboardBuffer, "\r\n");
+
+        GetDlgItemText(calcMainWindow, RPN_STACK_Y, tmpStr, MAX_STACK_STRLEN);  // Y register
+        trim(tmpStr);
+        if (progMode == PROG_DEC)
+        {
+            if (tmpStr[strlen(tmpStr)-1] == 'd') tmpStr[strlen(tmpStr)-1] = 0;
+        }
+        strcat(clipboardBuffer, tmpStr);
+        strcat(clipboardBuffer, "\r\n");
+
+        GetDlgItemText(calcMainWindow, RPN_STACK_X, tmpStr, MAX_STACK_STRLEN);  // X register
+        trim(tmpStr);
+        if (progMode == PROG_DEC)
+        {
+            if (tmpStr[strlen(tmpStr)-1] == 'd') tmpStr[strlen(tmpStr)-1] = 0;
+        }
+        strcat(clipboardBuffer, tmpStr);
+        strcat(clipboardBuffer, "\r\n");
+
+        CopyTextToClipboard(hwnd, clipboardBuffer);
+        Xedit = X_NEW;
+        ShowStack();
+    }
+    else if (copytype == COPY_MACRO_TO_CLIPBOARD)   // Copy current macro to clipboard
+    {
+        strcpy(clipboardBuffer, "");
+
+        for (i = 0; i < playBackIdx; i++)
+        {
+            sprintf(tmpStr, "%03d - %s", i + 1, playBackMap[playBack[i]].funcText);
+            strcat(clipboardBuffer, tmpStr);
+            strcat(clipboardBuffer, "\r\n");
+        }
+        sprintf(tmpStr, "%03d - <End Of Program>", i + 1);
+        strcat(clipboardBuffer, tmpStr);
+        strcat(clipboardBuffer, "\r\n");
+        chksum = 0x0000;
+        for (i = 0; i < playBackIdx; i++)
+            chksum += playBack[i];
+        sprintf(tmpStr, "Checksum: %04X", chksum);
+        strcat(clipboardBuffer, "\r\n");
+        strcat(clipboardBuffer, tmpStr);
+        strcat(clipboardBuffer, "\r\n");
+
+        CopyTextToClipboard(hwnd, clipboardBuffer);
+        Xedit = X_NEW;
+        ShowStack();
+    }
+    else if (copytype == COPY_X_FROM_CLIPBOARD)     // Copy from clipboard to X register
     {
         OpenClipboard(hwnd);
         hMem = GetClipboardData(CF_TEXT);
@@ -1213,89 +1287,7 @@ int ClipboardCopySelection(HWND hwnd, uint8_t copytype)
             }
         }
         ShowStack();
-        return(0);
     }
-
-    if (copytype == COPY_ALL_TO_CLIPBOARD)          // Copy All to clipboard
-    {
-        tptr = GlobalAlloc(GHND, (DWORD) 128L);
-        cptr = GlobalLock(tptr);
-        lstrcpy(cptr, "");
-        GetDlgItemText(calcMainWindow, RPN_STACK_T, tmpStr, MAX_STACK_STRLEN);  // T register
-        trim(tmpStr);
-        if (progMode == PROG_DEC)
-        {
-            if (tmpStr[strlen(tmpStr)-1] == 'd') tmpStr[strlen(tmpStr)-1] = 0;
-        }
-        lstrcat(cptr, (LPSTR) tmpStr);
-        lstrcat(cptr, (LPSTR) "\r\n");
-        GetDlgItemText(calcMainWindow, RPN_STACK_Z, tmpStr, MAX_STACK_STRLEN);  // Z register
-        trim(tmpStr);
-        if (progMode == PROG_DEC)
-        {
-            if (tmpStr[strlen(tmpStr)-1] == 'd') tmpStr[strlen(tmpStr)-1] = 0;
-        }
-        lstrcat(cptr, (LPSTR) tmpStr);
-        lstrcat(cptr, (LPSTR) "\r\n");
-        GetDlgItemText(calcMainWindow, RPN_STACK_Y, tmpStr, MAX_STACK_STRLEN);  // Y register
-        trim(tmpStr);
-        if (progMode == PROG_DEC)
-        {
-            if (tmpStr[strlen(tmpStr)-1] == 'd') tmpStr[strlen(tmpStr)-1] = 0;
-        }
-        lstrcat(cptr, (LPSTR) tmpStr);
-        lstrcat(cptr, (LPSTR) "\r\n");
-        GetDlgItemText(calcMainWindow, RPN_STACK_X, tmpStr, MAX_STACK_STRLEN);  // X register
-        trim(tmpStr);
-        if (progMode == PROG_DEC)
-        {
-            if (tmpStr[strlen(tmpStr)-1] == 'd') tmpStr[strlen(tmpStr)-1] = 0;
-        }
-        lstrcat(cptr, (LPSTR) tmpStr);
-        lstrcat(cptr, (LPSTR) "\r\n");
-        OpenClipboard(hwnd);
-        EmptyClipboard();
-        GlobalUnlock(tptr);
-        SetClipboardData(CF_TEXT, tptr);
-        CloseClipboard();
-        Xedit = X_NEW;
-        ShowStack();
-        return(0);
-    }
-    
-    if (copytype == COPY_MACRO_TO_CLIPBOARD)          // Copy current macro to clipboard
-    {
-        tptr = GlobalAlloc(GHND, (DWORD) MAX_IMPORT_CLIPBOARD_SIZE);
-        cptr = GlobalLock(tptr);
-        lstrcpy(cptr, "");
-
-        for (i = 0; i < playBackIdx; i++)
-        {
-            sprintf(tmpStr, "%03d - %s", i + 1, playBackMap[playBack[i]].funcText);
-            lstrcat(cptr, (LPSTR) tmpStr);
-            lstrcat(cptr, (LPSTR) "\r\n");
-        }
-        sprintf(tmpStr, "%03d - <End Of Program>", i + 1);
-        lstrcat(cptr, (LPSTR) tmpStr);
-        lstrcat(cptr, (LPSTR) "\r\n");
-        chksum = 0x0000;
-        for (i = 0; i < playBackIdx; i++)
-            chksum += playBack[i];
-        sprintf(tmpStr, "Checksum: %04X", chksum);
-        lstrcat(cptr, (LPSTR) "\r\n");
-        lstrcat(cptr, (LPSTR) tmpStr);
-        lstrcat(cptr, (LPSTR) "\r\n");
-
-        OpenClipboard(hwnd);
-        EmptyClipboard();
-        GlobalUnlock(tptr);
-        SetClipboardData(CF_TEXT, tptr);
-        CloseClipboard();
-        Xedit = X_NEW;
-        ShowStack();
-        return(0);
-    }
-    return(0);
 }
 
 
@@ -1788,8 +1780,8 @@ struct funcStruct RPNkeys[] = {
     {RPN_PASTE,     UNI_PASTE,  USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_Paste,          "Paste X Register",     "Paste X register from the clipboard"},
     {RPN_SQRT,      UNI_SQRT,   USES_FL, ALLOWREC, ' ', "", YES_L,  X_NEW,      SCI_sqrt,           "Square Root",          "Computes the Square Root of the value in X"},
     {RPN_XY,        UNI_POW,    USES_FL, ALLOWREC, ' ', "", YES_L,  X_NEW,      SCI_pow,            "Raise X to the Y",     "Raises X to the Y power"},
-    {RPN_LN,        UNI_LN,     USES_FL, ALLOWREC, ' ', "", YES_L,  X_NEW,      SCI_log,            "Natural Logarithm",    "Computes the natural logarithm (base e) of X"},
-    {RPN_LOG,       UNI_LOG,    USES_FL, ALLOWREC, ' ', "", YES_L,  X_NEW,      SCI_ln,             "Base 10 Logarithm",    "Raises the base 10 logarithm of X"},
+    {RPN_LN,        UNI_LN,     USES_FL, ALLOWREC, ' ', "", YES_L,  X_NEW,      SCI_ln,             "Natural Logarithm",    "Computes the natural logarithm (base e) of X"},
+    {RPN_LOG,       UNI_LOG,    USES_FL, ALLOWREC, ' ', "", YES_L,  X_NEW,      SCI_log,            "Base 10 Logarithm",    "Raises the base 10 logarithm of X"},
 
     {RPN_SCI,       UNI_SCI,    USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectSci,      "Select Scientific I",  "Selects the Scientific I Layout"},
     {RPN_SCI2,      UNI_SCI2,   USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectSci2,     "Select Scientific II", "Selects the Scientific II Layout"},
@@ -2940,7 +2932,7 @@ void RPN_backspace(void)
             Xstr[strlen(Xstr) - 1] = CNULL;
             X = atof(Xstr);
         }
-        if (strlen(Xstr) == 0)
+        else
         {
             X = 0.0;
         }
@@ -3232,38 +3224,6 @@ double FromRadians(double t)
 // -------------------------
 // STOre and ReCaL functions
 // -------------------------
-char stoTmpStr[10];
-BOOL CALLBACK StoNameDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
-{
-    switch(wMessage)
-    {
-    case WM_INITDIALOG:
-        SetDlgItemText(hDlg, IDC_EDIT1, stoTmpStr);
-        return TRUE;
-    case WM_COMMAND:
-        switch(LOWORD(wParam))
-        {
-        case(IDOK):           // OK - save value!
-            GetDlgItemText(hDlg, IDC_EDIT1, stoTmpStr, 9);     // 8 chars plus NULL
-            EndDialog(hDlg, FALSE);
-            return TRUE;
-        case(IDCANCEL):       // Close/Cancel
-            EndDialog(hDlg, FALSE);
-            return TRUE;
-        default:
-            return FALSE;
-        }
-
-    case WM_SYSCOMMAND:
-        switch(wParam & 0xFFF0)
-        {
-        case SC_CLOSE:
-            EndDialog(hDlg, FALSE);
-            return TRUE;
-        }
-    }
-    return FALSE;
-}
 
 void RPN_store(void)
 {
