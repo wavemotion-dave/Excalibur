@@ -55,7 +55,7 @@ typedef unsigned __int8     uint8_t;
 #define YES_L               1   // Yes, save the Last X value when executing this function
 #define NO_L                2   // No, do not save the Last X value when executing this function
 
-#define MAX_IMPORT_CLIPBOARD_SIZE       (10 * 1024)
+#define MAX_IMPORT_CLIPBOARD_SIZE       (32 * 1024)
 
 // Defines for menu item IDs
 #define   IDM_OPEN                          101

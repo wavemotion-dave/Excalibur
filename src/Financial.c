@@ -361,7 +361,7 @@ BOOL CALLBACK fnDIALOG_AmortProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
         }
 
         principal = -fin_reg[FIN_REG_PV];
-        sprintf(finTmpStr, "%3d  %11.2f  %11.2f  %11.2f  %11.2f", 0, 0.0, 0.0, 0.0, principal);
+        sprintf(finTmpStr, "%3d %11.2f  %11.2f  %11.2f  %11.2f", 0, 0.0, 0.0, 0.0, principal);
         makeInternational(finTmpStr);
         SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) finTmpStr));
         finTemp1 = 0.0;
@@ -377,7 +377,7 @@ BOOL CALLBACK fnDIALOG_AmortProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
             if (interest < 0.005)
                 interest = 0.0;
 
-            sprintf(finTmpStr, "%3d  %11.2f  %11.2f  %11.2f  %11.2f", i + 1, pmt, bulk, interest, principal);
+            sprintf(finTmpStr, "%3d %11.2f  %11.2f  %11.2f  %11.2f", i + 1, pmt, bulk, interest, principal);
             makeInternational(finTmpStr);
             SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) finTmpStr));
             finTemp1 += pmt;
