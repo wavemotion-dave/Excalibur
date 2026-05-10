@@ -160,8 +160,8 @@ extern double FromRadians(double t);
 extern double ToRadians(double t);
 #endif
 
-extern uint8_t Xedit;
-extern char Xstr[50];
+extern uint8_t Xedit;           // One of X_NEW, X_EDIT, X_NULL, etc.
+extern char Xstr[64];           // Global buffer for X editing
 extern double X;                // Main register X
 extern double Y;                // Main register Y
 extern double Z;                // Main register Z
@@ -468,7 +468,7 @@ extern short int MacroStack[MAX_MACRO_STACK];
 extern short int MacroStackIdx;
 extern unsigned int macroFlags;
 extern uint8_t traceMacroPlayback;
-extern uint16_t progDelayValue;
+extern uint16_t traceDelayValueMs;
 
 extern void blinkXDisplay(void);
 extern void blinkStack(void);
@@ -476,6 +476,7 @@ extern void endRunningMacro(void);
 extern void UpdateDebugRegs(void);
 extern void UpdateDebugProgram(int resetProgramList);
 extern void RPN_Playback(void);
+extern void sleep_and_peek(int timeMs);
 
 extern LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
 extern LRESULT CALLBACK tooltipWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);

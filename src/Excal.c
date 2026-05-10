@@ -52,7 +52,7 @@
                   "if you want to donate to support the effort.\n\n"    \
                   "https://github.com/wavemotion-dave/Excalibur"
 
-#define CONFIG_VERSION_MAIN     0xF004      // If this changes, we wipe EVERYTHING
+#define CONFIG_VERSION_MAIN     0xF005      // If this changes, we wipe EVERYTHING
 #define CONFIG_VERSION_SUB      0xF001      // If this changes, we reset x,y window position and reset constant tables (currency, physics constants, etc)
 
 #define END_OF_PROGRAM_STR          "<End Of Program>"
@@ -83,7 +83,7 @@ uint8_t  padZeros = PROG_NOPADZEROS;
 uint8_t  wordMode = PROG_SIGNED;
 uint8_t  numberDisplayMode = INTERNATIONAL;
 
-uint16_t progDelayValue = 1000;
+uint16_t traceDelayValueMs = 1000;
 
 int16_t  totalMappedButtonFuncs = 0;
 uint32_t lastTickCount = 0;
@@ -110,11 +110,11 @@ char     tmpStr[256];
 BYTE     keyState[256];
 
 
-// -------------------------------------
-// Buffers for editing the X register
-// -------------------------------------
-uint8_t  Xedit = X_NEW;
-char     Xstr[50];
+// ----------------------------------------------
+// Buffers and status for editing the X register
+// ----------------------------------------------
+uint8_t  Xedit = X_NEW;             // One of X_NEW, X_EDIT, X_NULL, etc.
+char     Xstr[64];                  // Global buffer for X editing
 
 // ----------------
 // Global registers
@@ -141,12 +141,12 @@ PROG_LONG DL;                       // The extended stack D when in Comp-Sci mod
 PROG_LONG LASTXL;                   // LAST X when in Comp-Sci mode
 PROG_LONG LASTYL;                   // LAST Y when in Comp-Sci mode
 
-// Some statistics registers
+// Some statistics registers for how Excalibur is being utilized
 uint64_t stackPushes = 0;           // Total number of Stack Pushes
 uint64_t stackPops = 0;             // Total number of Stack Pops
 uint32_t inFocusTime = 0;           // Number of minutes Excalibur window in 'focus'
 
-// A number of status registers
+// A number of status registers for various modes and functions
 uint8_t  AngleMode = 0;             // 0=Degrees, 1=Radians, 2=Gradients
 uint8_t  commaMode = 1;             // 0=International, 1=American
 uint8_t  eexMode = 1;               // 0=EEX, 1=E
@@ -169,6 +169,12 @@ double STO[MAX_STO];                // Storage registers R0-R99
 double SUM[SUM_MAX];                // Statistics registers for the Financial bank
 char excaliburNotes[NOTES_SIZE];    // A small scratchpad for the user to jot down some info
 
+// ---------------------------------------------------------------------------------------------
+// This is the mapping from unique index to function for playback and macro recording purposes. 
+// This is used to determine which function to call when playing back a macro or executing a 
+// program line that was recorded with a unique index. It also contains some info about whether
+// the function uses floats or longs, whether it should be allowed to be recorded in macros, etc.
+// ---------------------------------------------------------------------------------------------
 struct playbackStruct playBackMap[MAX_FUNCTIONS + 1];
 
 extern void RPN_digit0(void);
@@ -2208,8 +2214,7 @@ void ShowStack(void)
         SetDlgItemText(calcMainWindow, RPN_STACK_T, tmpStr);
         SetDlgItemText(calcMainWindow, RPN_STACK_Z, " ");
     }
-    else
-    if (showTrace == TRUE)    // Special record mode - show current program step in Z register!
+    else if (showTrace == TRUE)    // Are we showing a trace playback - repurpose Z register area
     {
         if (currentMacroPlaybackIdx == playBackIdx)
         {
@@ -2267,7 +2272,9 @@ void ShowStack(void)
                 SetDlgItemText(calcMainWindow, RPN_STACK_Z, stackStr);
             }
             else
+            {
                 SetDlgItemText(calcMainWindow, RPN_STACK_Z, tmpStr);
+            }
 
             MakeSciFormat(T, tmpStr);
             if (rightAlignStack == 1)
@@ -2276,7 +2283,9 @@ void ShowStack(void)
                 SetDlgItemText(calcMainWindow, RPN_STACK_T, stackStr);
             }
             else
+            {
                 SetDlgItemText(calcMainWindow, RPN_STACK_T, tmpStr);
+            }
         }
     }
     else
@@ -2294,6 +2303,7 @@ void ShowStack(void)
         sprintf(tmpStr, (bExactFont ? "%23s%c%c":"%20s%c%c"), stackStr, Radix(progMode), RadixBIN(progMode));
         SetDlgItemText(calcMainWindow, RPN_STACK_Y, tmpStr);
 
+        // Show Z and T registers provided we haven't repurposed them above...
         if (recModeON == 0 && traceMacroPlayback == FALSE)
         {
             MakeRadixStr(ZL, stackStr);
@@ -3531,7 +3541,7 @@ void SaveToDisk(void)
         fwrite(&lastConstBank,      sizeof(lastConstBank),      1, outfile);
         fwrite(&excaliburNotes,     sizeof(excaliburNotes),     1, outfile);
         fwrite(&lastChosenMacro,    sizeof(lastChosenMacro),    1, outfile);
-        fwrite(&progDelayValue,     sizeof(int),                1, outfile);
+        fwrite(&traceDelayValueMs,  sizeof(traceDelayValueMs),  1, outfile);
         fwrite(&indirectRegister,   sizeof(indirectRegister),   1, outfile);
 
         fwrite(&reserved,           RESERVED_SIZE,              1, outfile);
@@ -3663,7 +3673,7 @@ void ReadFromDisk(void)
         fread(&lastConstBank,      sizeof(lastConstBank),      1, infile);
         fread(excaliburNotes,      sizeof(excaliburNotes),     1, infile);
         fread(&lastChosenMacro,    sizeof(lastChosenMacro),    1, infile);
-        fread(&progDelayValue,     sizeof(int),                1, infile);
+        fread(&traceDelayValueMs,  sizeof(traceDelayValueMs),  1, infile);
         fread(&indirectRegister,   sizeof(indirectRegister),   1, infile);
 
         fread(&reserved,           RESERVED_SIZE,              1, infile);
@@ -4285,7 +4295,7 @@ BOOL CALLBACK fnDIALOG_SettingsProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
         sprintf(tmpStr, "%3.4f", taxConstant);
         SetDlgItemText(hDlg, 103, tmpStr);
 
-        sprintf(tmpStr, "%d", progDelayValue);
+        sprintf(tmpStr, "%d", traceDelayValueMs);
         SetDlgItemText(hDlg, 123, tmpStr);
 
         if (footPrint == 1) // 4-Banger mode
@@ -4347,7 +4357,8 @@ BOOL CALLBACK fnDIALOG_SettingsProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
                 taxConstant = 1.05;
 
             GetDlgItemText(hDlg, 123, tmpStr, 9);
-            progDelayValue = atoi(tmpStr);
+            traceDelayValueMs = atoi(tmpStr);
+            if (traceDelayValueMs < 100) traceDelayValueMs = 100; // Can't really handle much below this anyway
 
             bs = SendMessage(GetDlgItem(hDlg, 125), BM_GETCHECK, (WORD) 0, (DWORD) 0L);
             if (bs != 0L)
@@ -5155,7 +5166,7 @@ void RPN_Playback(void)
 
         if (traceMacroPlayback == TRUE)
         {
-            sleep_and_peek(progDelayValue);
+            sleep_and_peek(traceDelayValueMs);
 
             showTrace = TRUE;
             ShowStack();
@@ -5213,7 +5224,7 @@ void RPN_SingleStep(void)
 
     }
 
-    sleep_and_peek(progDelayValue);
+    sleep_and_peek(traceDelayValueMs);
     ShowStack();
 
     UpdateSpareBar("    ");

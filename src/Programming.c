@@ -37,36 +37,32 @@
 #include <ctype.h>
 #include "Excal.h"
 
+#pragma comment(lib, "winmm.lib")
+
 HWND debugTraceWindow = NULL;
 
-double debugValue = 0.0;
-int dinputDebugInProgress = 0;
+double  debugValue = 0.0;
+uint8_t dinputDebugInProgress = 0;
 
 extern void Macro_RecallN(void);
 extern void Macro_StoreN(void);
-
 extern void Macro_LblH(void);
 extern void Macro_GotoH(void);
 extern void Macro_GsbH(void);
 extern void Macro_Halt(void);
-
 extern void Macro_LblI(void);
 extern void Macro_GotoI(void);
 extern void Macro_GsbI(void);
-
 extern void Macro_LblJ(void);
 extern void Macro_GotoJ(void);
 extern void Macro_GsbJ(void);
-
 extern void Macro_LblK(void);
 extern void Macro_GotoK(void);
 extern void Macro_GsbK(void);
-
-void Macro_StoInd(void);
-void Macro_RclInd(void);
-void Macro_GotoInd(void);
-void Macro_GosubInd(void);
-
+extern void Macro_StoInd(void);
+extern void Macro_RclInd(void);
+extern void Macro_GotoInd(void);
+extern void Macro_GosubInd(void);
 extern void Macro_LblA(void);
 extern void Macro_LblB(void);
 extern void Macro_LblC(void);
@@ -254,6 +250,7 @@ void rpn_goto(uint16_t uniqueIdx)
 
     if (macroPlayback == TRUE)
     {
+        // Find the first instance of the label - that's where we jump...
         for (j = 0; j < playBackIdx; j++)
         {
             if (playBackMap[playBack[j]].uniqueIndex == uniqueIdx)
@@ -272,10 +269,10 @@ void Macro_GotoD(void)  {rpn_goto(UNI_LBLD);}
 void Macro_GotoE(void)  {rpn_goto(UNI_LBLE);}
 void Macro_GotoF(void)  {rpn_goto(UNI_LBLF);}
 void Macro_GotoG(void)  {rpn_goto(UNI_LBLG);}
-void Macro_GotoH(void)  {rpn_goto(UNI_LBLG);}
-void Macro_GotoI(void)  {rpn_goto(UNI_LBLG);}
-void Macro_GotoJ(void)  {rpn_goto(UNI_LBLG);}
-void Macro_GotoK(void)  {rpn_goto(UNI_LBLG);}
+void Macro_GotoH(void)  {rpn_goto(UNI_LBLH);}
+void Macro_GotoI(void)  {rpn_goto(UNI_LBLI);}
+void Macro_GotoJ(void)  {rpn_goto(UNI_LBLJ);}
+void Macro_GotoK(void)  {rpn_goto(UNI_LBLK);}
 
 void RPN_gosub(uint16_t uniqueIdx)
 {
@@ -316,7 +313,7 @@ void Macro_XLessY(void)
         {
             // Do nothing - execute next line!
         }
-        else
+        else // Skip next line
         {
             currentMacroPlaybackIdx++;
         }
@@ -331,7 +328,7 @@ void Macro_XGreaterY(void)
         {
             // Do nothing - execute next line!
         }
-        else
+        else // Skip next line
         {
             currentMacroPlaybackIdx++;
         }
@@ -346,7 +343,7 @@ void Macro_XLEZero(void)
         {
             // Do nothing - execute next line!
         }
-        else
+        else // Skip next line
         {
             currentMacroPlaybackIdx++;
         }
@@ -361,7 +358,7 @@ void Macro_XGTZero(void)
         {
             // Do nothing - execute next line!
         }
-        else
+        else // Skip next line
         {
             currentMacroPlaybackIdx++;
         }
@@ -376,7 +373,7 @@ void Macro_XEY(void)
         {
             // Do nothing - execute next line!
         }
-        else
+        else // Skip next line
         {
             currentMacroPlaybackIdx++;
         }
@@ -392,7 +389,7 @@ void Macro_XNEY(void)
         {
             // Do nothing - execute next line!
         }
-        else
+        else // Skip next line
         {
             currentMacroPlaybackIdx++;
         }
@@ -407,7 +404,7 @@ void Macro_XEZero(void)
         {
             // Do nothing - execute next line!
         }
-        else
+        else // Skip next line
         {
             currentMacroPlaybackIdx++;
         }
@@ -422,7 +419,7 @@ void Macro_XNEZero(void)
         {
             // Do nothing - execute next line!
         }
-        else
+        else // Skip next line
         {
             currentMacroPlaybackIdx++;
         }
@@ -470,7 +467,7 @@ void Macro_TFx(void)
         if (macroFlags & mask)
         {                       // Do nothing if mask set...
         }
-        else
+        else // Skip next line
         {
             currentMacroPlaybackIdx++;
         }
@@ -489,16 +486,15 @@ void Macro_Pause(void)
     if (macroPlayback == TRUE)
     {
         ShowStack();
-        Sleep(progDelayValue);
+        sleep_and_peek(traceDelayValueMs);
     }
 }
 
-#pragma comment(lib, "winmm.lib")
 void Macro_Beep(void)
 {
     // Play the resource asynchronously
 	PlaySound(MAKEINTRESOURCE(IDR_BEEP), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC);
-    Sleep(250);
+    sleep_and_peek(250);
 }
 
 int RegisterToInput = 0;
