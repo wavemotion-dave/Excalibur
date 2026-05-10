@@ -107,7 +107,6 @@ extern void Macro_InpB(void);
 extern void Macro_InpC(void);
 extern void Macro_InpD(void);
 extern void Macro_Trace(void);
-extern void Macro_StopTrace(void);
 extern void Macro_DEL(void);
 extern void Macro_FWD(void);
 extern void Macro_REV(void);
@@ -128,7 +127,7 @@ extern void Macro_LoopK(void);
 extern void Macro_DSZ(void);
 extern void Macro_Sto2i(void);
 extern void Macro_Rcl2i(void);
-
+extern void Macro_Beep(void);
 
 struct funcStruct Program1_funcs[MAX_FUNCS] =
 {
@@ -231,9 +230,9 @@ struct funcStruct Program2_funcs[MAX_FUNCS] =
     {FN36,  UNI_FWD,        USES_FL,    NORECORD,   ' ',    "FWD",      YES_L,      X_NEW,   Macro_FWD,      T_FWD,      H_FWD},
 
     {FN37,  UNI_TRACE,      USES_FL,    NORECORD,   ' ',    "Trace",    YES_L,      X_NEW,   Macro_Trace,    T_TRACE,    H_TRACE},
-    {FN38,  UNI_STRACE,     USES_FL,    NORECORD,   ' ',    "StopTr",   YES_L,      X_NEW,   Macro_StopTrace,T_STRACE,   H_STRACE},
-    {FN39,  UNI_DEBUG,      USES_FL,    NORECORD,   ' ',    "Debug",    YES_L,      X_NEW,   Macro_Debug,    T_DEBUG,    H_DEBUG},
-    {FN40,  UNI_STEP,       USES_FL,    NORECORD,   ' ',    "Step",     YES_L,      X_NULL,  Macro_Step,     T_STEP,     H_STEP}
+    {FN38,  UNI_STEP,       USES_FL,    NORECORD,   ' ',    "Step",     YES_L,      X_NULL,  Macro_Step,     T_STEP,     H_STEP},
+    {FN39,  UNI_BEEP,       USES_FL,    ALLOWREC,   ' ',    "Beep",     YES_L,      X_NEW,   Macro_Beep,     T_BEEP,     H_BEEP},
+    {FN40,  UNI_DEBUG,      USES_FL,    NORECORD,   ' ',    "Debug",    YES_L,      X_NEW,   Macro_Debug,    T_DEBUG,    H_DEBUG}
 };
 
 
@@ -494,6 +493,14 @@ void Macro_Pause(void)
     }
 }
 
+#pragma comment(lib, "winmm.lib")
+void Macro_Beep(void)
+{
+    // Play the resource asynchronously
+	PlaySound(MAKEINTRESOURCE(IDR_BEEP), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC);
+    Sleep(250);
+}
+
 int RegisterToInput = 0;
 BOOL CALLBACK inputRegisterProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
 {
@@ -590,16 +597,18 @@ void Macro_Trace(void)
 {
     if (recModeON == 0)
     {
-        traceMacroPlayback = TRUE;
-        RPN_Playback();
-        traceMacroPlayback = FALSE;
+        if (traceMacroPlayback)
+        {
+            traceMacroPlayback = FALSE;
+            endRunningMacro();
+        }
+        else
+        {
+            traceMacroPlayback = TRUE;
+            RPN_Playback();
+            traceMacroPlayback = FALSE;
+        }
     }
-}
-
-void Macro_StopTrace(void)
-{
-    traceMacroPlayback = FALSE;
-    endRunningMacro();
 }
 
 void Macro_Step(void)

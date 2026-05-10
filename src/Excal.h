@@ -841,9 +841,9 @@ enum UniqueButtonIndexTag
     UNI_DEL,
     UNI_FWD,
     UNI_TRACE,
-    UNI_STRACE,
-    UNI_DEBUG,
     UNI_STEP,
+    UNI_BEEP,
+    UNI_DEBUG,
 
     UNI_ENDCONST,
     UNI_STARTCONST,
@@ -1611,8 +1611,8 @@ extern uint32_t userTicks;
 #define H_STEP          "Single Step Program"
 #define T_DEBUG         "Debug Program"
 #define H_DEBUG         "Enter Program Debug Mode"
-#define T_STRACE        "Stop Trace"
-#define H_STRACE        "Stop currently running Trace."
+#define T_BEEP          "Beep"
+#define H_BEEP          "Emit a single beep tone."
 #define T_LOOPA         "Loop A"
 #define H_LOOPA         "Decrement R0 register, if above zero branch to A."
 #define T_LOOPB         "Loop B"
