@@ -3,7 +3,7 @@ Excalibur RPN Calculator
 
 Designed as an HP-like calculator for Windows.
 Win32-based and will run on any version of Windows from 98 up to Windows 11 and generally runs quite well under Linux wine.
-This is not emulation nor simulatino of any specific HP model - but will feel familiar to anyone that is well travelled in the HP
+This is not emulation nor simulation of any specific HP model - but will feel familiar to anyone that is well travelled in the HP
 calculator ecosystem.
 
 Excalibur is being released in two major versions.
