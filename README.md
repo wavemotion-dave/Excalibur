@@ -23,7 +23,8 @@ that end, the 3.XX series has a stronger focus on core function, not added formu
 I'm sitting at the computer - and I don't want any clutter to get in the way of crunching numbers. 
 
 One thing that hasn't changed with 3.XX is that it's bullet simple to install and run. It's a single executable that will run equally 
-well under any 32-bit version of Windows (I've tested it on Windows 98 up through Windows 11) as well as perfectly fine in Linux wine.
+well under any 32-bit version of Windows (I've tested it on Windows 98 up through Windows 11) as well as perfectly fine in Linux wine 
+(if you want a closer approximation to how it would look under Windows, install the Consolas Normal and Bolt fonts in Linux).
 
 Place the executable virtually anywhere (yes, it will run from an old 360K IBM Floppy if you really wish!) and double click to run.
 
