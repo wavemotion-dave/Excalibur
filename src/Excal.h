@@ -625,10 +625,6 @@ enum UniqueButtonIndexTag
     UNI_CDIV,
     UNI_CMUL,
 
-    UNI_TAX,
-    UNI_PERC,
-    UNI_PERCC,
-    UNI_PERCT,
     UNI_CLRF,
     UNI_FINFV,
     UNI_FINN,
@@ -639,6 +635,10 @@ enum UniqueButtonIndexTag
     UNI_DIV12,
     UNI_MUL100,
     UNI_DIV100,
+    UNI_TAX,
+    UNI_PERC,
+    UNI_PERCC,
+    UNI_PERCT,
     UNI_AMORT,
     UNI_CF0,
     UNI_CFJ,
@@ -1599,13 +1599,13 @@ extern uint32_t userTicks;
 #define T_INPD          "Input R3"
 #define H_INPD          "Prompt user for R3 register value."
 #define T_STOIND        "Store Indirect Register"
-#define H_STOIND        "Stores X value to the Indirect Register"
+#define H_STOIND        "Stores X value to the Indirect Register (i)"
 #define T_GOTOIND       "Goto Indirect"
 #define H_GOTOIND       "Goto label pointed to by the Indirect (i) register (0=A, 1=B, etc)."
 #define T_GSBIND        "Gosub Indirect"
 #define H_GSBIND        "Gosub to the label pointed to by the Indirect (i) register (0=A, 1=B, etc)."
 #define T_RCLIND        "Recall Indirect Register"
-#define H_RCLIND        "Recalls the Indirect register to the X register."
+#define H_RCLIND        "Recalls the Indirect (i) register to the X register."
 #define T_HALT          "Halt Program"
 #define H_HALT          "Halts Program Execution"
 #define T_STEP          "Single Step Program"
@@ -1630,10 +1630,14 @@ extern uint32_t userTicks;
 #define H_LOOPG         "Decrement R6 register, if above zero branch to G."
 #define T_LOOPH         "Loop H"
 #define H_LOOPH         "Decrement R7 register, if above zero branch to H."
+#define T_LOOPI         "Loop I"
+#define H_LOOPI         "Decrement R8 register, if above zero branch to I."
 #define T_LOOPJ         "Loop J"
-#define H_LOOPJ         "Decrement R8 register, if above zero branch to J."
+#define H_LOOPJ         "Decrement R9 register, if above zero branch to J."
+#define T_LOOPK         "Loop K"
+#define H_LOOPK         "Decrement R10 register, if above zero branch to K."
 #define T_DSZ           "Decrement Skip if Zero"
-#define H_DSZ           "Decrement the Index Register and skip next instruction if zero."
+#define H_DSZ           "Decrement the Indirect (i) Register and skip next instruction if zero."
 #define T_TIMERPUSH     "Timer Push"
 #define H_TIMERPUSH     "Pushes current timer value onto the stack."
 #define T_STON_LB       "Short Tons to Lbs"
@@ -1642,16 +1646,12 @@ extern uint32_t userTicks;
 #define H_LTON_LB       "Long Tons to Lbs"
 #define T_MTON_LB       "Metric Tons to Lbs"
 #define H_MTON_LB       "Metric Tons to Lbs"
-#define T_LOOPI         "Loop I"
-#define H_LOOPI         "Decrement R9 register, if above zero branch to I."
-#define H_LOOPK         "Decrement R10 register, if above zero branch to K."
-#define T_LOOPK         "Loop K"
 #define T_CLEARF        "Clear All 32 Flags"
 #define H_CLEARF        "Clear programming flags register to 0x00000000"
 #define T_STO2I         "Store Indirectly"
-#define H_STO2I         "Stores X to the register (R0-R99) pointed to by the Indirect register"
+#define H_STO2I         "Stores X to the register (R0-R99) pointed to by the Indirect (i) register"
 #define T_RCL2I         "Recall Indirectly"
-#define H_RCL2I         "Recalls value from the register (R0-R99) pointed to by the Indirect register"
+#define H_RCL2I         "Recalls value from the register (R0-R99) pointed to by the Indirect (i) register"
 #define T_CSINH         "Complex sinh"
 #define H_CSINH         "Complex sinh (X=Real, Y=Imaginary)"
 #define T_CCOSH         "Complex cosh"

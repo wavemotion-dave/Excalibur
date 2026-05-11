@@ -569,7 +569,6 @@ extern BOOL CALLBACK fnDIALOG_ASCIIProc(HWND hDlg, UINT wMessage, WPARAM wParam,
 
 void PROG_ascii(void)
 {
-
     DLGPROC lpfnDIALOG_ASCIIProc;
 
     lpfnDIALOG_ASCIIProc = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_ASCIIProc, hExcaliburInstance);

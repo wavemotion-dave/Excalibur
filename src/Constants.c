@@ -116,7 +116,7 @@ void RedefineConst(void)
 
 BOOL CALLBACK fnDIALOG_REDEFINECONST(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
 {
-    char tmp[50];
+    char tmp[64];
 
     switch(wMessage)
     {
@@ -286,7 +286,7 @@ void RPN_const(void)
 BOOL CALLBACK fnDIALOG_Constants(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
 {
     int i, j;
-    char tmp[50];
+    char tmp[64];
     LRESULT item;
     static int lbTabStops[2] = { 170, 240 };
 

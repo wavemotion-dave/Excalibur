@@ -44,13 +44,14 @@
 #define VERSION_STR "v3.XX-02"
 
 #define ABOUT_MSG "Excalibur for Windows 32-bit\n"                      \
-                  "Version 3.XX-02  -  May 10, 2026\n\n"                \
+                  "Version 3.XX-02  -  May 11, 2026\n\n"                \
                   "Copyright 1994-2026 David Bernazzani\n\n"            \
                   "Please read the disclaimer and understand the\n"     \
                   "accuracy and precision issues before using.\n\n"     \
                   "Excalibur is freeware - but see the github page\n"   \
                   "if you want to donate to support the effort.\n\n"    \
-                  "https://github.com/wavemotion-dave/Excalibur"
+                  "https://github.com/wavemotion-dave/Excalibur"        \
+                  "\n\nThis version is BETA - Expect and report Bugs!"
 
 #define CONFIG_VERSION_MAIN     0xF005      // If this changes, we wipe EVERYTHING
 #define CONFIG_VERSION_SUB      0xF001      // If this changes, we reset x,y window position and reset constant tables (currency, physics constants, etc)
@@ -1732,7 +1733,7 @@ void RPN_help(void)
 
 double MakeAccurate(double val)
 {
-    unsigned char str[50];
+    unsigned char str[64];
 
     sprintf(str, "%.13g", val);
     val = atof(str);
@@ -2125,7 +2126,7 @@ void PutCommas(char *str)
 
 void MakeEngineeringFormat(double val, char *Fstr)
 {
-    char engStr[50];
+    char engStr[64];
     char *sp;
     int exponent, shiftDP;
 
@@ -2156,8 +2157,8 @@ void MakeEngineeringFormat(double val, char *Fstr)
 
 void MakeSciFormat(double val, char *Fstr)
 {
-    char sciStr[50];
-    char str[50];
+    char sciStr[64];
+    char str[64];
     int i;
 
     val = MakeAccurate(val);
@@ -2197,7 +2198,7 @@ void MakeSciFormat(double val, char *Fstr)
 
 void ShowStack(void)
 {
-    char stackStr[50];
+    char stackStr[64];
 
     if (recModeON == 1)    // Special record mode - show current program step in Z register!
     {
@@ -3784,7 +3785,7 @@ BOOL CALLBACK fnDIALOG_MACRONAME(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
         {
         case(IDOK):           // OK
             GetDlgItemText(hDlg, IDC_EDIT1, macName, 50);
-            macName[50] = '\0';
+            macName[64] = '\0';
             GetDlgItemText(hDlg, IDC_EDIT2, macShortName, 7);
             macShortName[6] = '\0';
             EndDialog(hDlg, FALSE);
@@ -3817,7 +3818,7 @@ BOOL CALLBACK fnDIALOG_MACRONAME(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
 void CopyBufferToCurrentMacro(char *clipboardBuffer)
 {
     int idx;
-    char tmpB[50];
+    char tmpB[64];
     char outputBuffer[200];
     int  tmpBidx;
     int  i;

@@ -73,7 +73,7 @@ char finRegDesc[FIN_REG_MAX][18] = {
 double cashFlow[MAX_CF];
 uint8_t CFn;
 
-char finTmpStr[50];
+char finTmpStr[64];
 
 extern void FIN_tax(void);
 extern void FIN_percent(void);
@@ -115,22 +115,22 @@ extern void FIN_EFF(void);
 extern void FIN_Depr(void);
 
 struct funcStruct Financial_funcs[MAX_FUNCS] = {
-    {FN1,   UNI_TAX,    USES_F,     ALLOWREC,   ' ',    "TAX",      YES_L,  X_NEW,      FIN_tax,           T_TAX,      H_TAX},
-    {FN2,   UNI_PERC,   USES_F,     ALLOWREC,   ' ',    "%",        YES_L,  X_NEW,      FIN_percent,       T_PERC,     H_PERC},
-    {FN3,   UNI_PERCC,  USES_F,     ALLOWREC,   ' ',    "%CHG",     YES_L,  X_NEW,      FIN_percentChg,    T_PERCC,    H_PERCC},
-    {FN4,   UNI_PERCT,  USES_F,     ALLOWREC,   ' ',    "%TOT",     YES_L,  X_NEW,      FIN_percentTot,    T_PERCT,    H_PERCT},
-    {FN5,   UNI_CLRF,   USES_F,     ALLOWREC,   ' ',    "CLRF",     YES_L,  X_NEW,      FIN_clearReg,      T_CLRF,     H_CLRF},
-    {FN6,   UNI_STO,    USES_FL,    ALLOWREC,   ' ',    "STO",      NO_L,   X_NULL,     RPN_store,         T_STOFN,    H_STOFN},
-    {FN7,   UNI_RCL,    USES_FL,    ALLOWREC,   ' ',    "RCL",      NO_L,   X_NULL,     RPN_recall,        T_RCLFN,    H_RCLFN},
-    {FN8,   UNI_FINFV,  USES_F,     ALLOWREC,   ' ',    "FV",       YES_L,  X_NEW,      FIN_fv,            T_FINFV,    H_FINFV},
-    {FN9,   UNI_FINN,   USES_F,     ALLOWREC,   ' ',    "n",        YES_L,  X_NEW,      FIN_n,             T_FINN,     H_FINN},
-    {FN10,  UNI_INTR,   USES_F,     ALLOWREC,   ' ',    "i%",       YES_L,  X_NEW,      FIN_i,             T_INTR,     H_INTR},
-    {FN11,  UNI_FINPV,  USES_F,     ALLOWREC,   ' ',    "PV",       YES_L,  X_NEW,      FIN_pv,            T_FINPV,    H_FINPV},
-    {FN12,  UNI_FINPMT, USES_F,     ALLOWREC,   ' ',    "PMT",      YES_L,  X_NEW,      FIN_pmt,           T_FINPMT,   H_FINPMT},
-    {FN13,  UNI_MUL12,  USES_F,     ALLOWREC,   ' ',    "12×",      YES_L,  X_NEW,      FIN_12mult,        T_MUL12,    H_MUL12},
-    {FN14,  UNI_DIV12,  USES_F,     ALLOWREC,   ' ',    "12÷",      YES_L,  X_NEW,      FIN_12div,         T_DIV12,    H_DIV12},
-    {FN15,  UNI_MUL100, USES_F,     ALLOWREC,   ' ',    "100×",     YES_L,  X_NEW,      FIN_100mult,       T_MUL100,   H_MUL100},
-    {FN16,  UNI_DIV100, USES_F,     ALLOWREC,   ' ',    "100÷",     YES_L,  X_NEW,      FIN_100div,        T_DIV100,   H_DIV100},
+    {FN1,   UNI_CLRF,   USES_F,     ALLOWREC,   ' ',    "CLRF",     YES_L,  X_NEW,      FIN_clearReg,      T_CLRF,     H_CLRF},
+    {FN2,   UNI_STO,    USES_FL,    ALLOWREC,   ' ',    "STO",      NO_L,   X_NULL,     RPN_store,         T_STOFN,    H_STOFN},
+    {FN3,   UNI_RCL,    USES_FL,    ALLOWREC,   ' ',    "RCL",      NO_L,   X_NULL,     RPN_recall,        T_RCLFN,    H_RCLFN},
+    {FN4,   UNI_FINFV,  USES_F,     ALLOWREC,   ' ',    "FV",       YES_L,  X_NEW,      FIN_fv,            T_FINFV,    H_FINFV},
+    {FN5,   UNI_FINN,   USES_F,     ALLOWREC,   ' ',    "n",        YES_L,  X_NEW,      FIN_n,             T_FINN,     H_FINN},
+    {FN6,   UNI_INTR,   USES_F,     ALLOWREC,   ' ',    "i%",       YES_L,  X_NEW,      FIN_i,             T_INTR,     H_INTR},
+    {FN7,   UNI_FINPV,  USES_F,     ALLOWREC,   ' ',    "PV",       YES_L,  X_NEW,      FIN_pv,            T_FINPV,    H_FINPV},
+    {FN8,   UNI_FINPMT, USES_F,     ALLOWREC,   ' ',    "PMT",      YES_L,  X_NEW,      FIN_pmt,           T_FINPMT,   H_FINPMT},
+    {FN9,   UNI_MUL12,  USES_F,     ALLOWREC,   ' ',    "12×",      YES_L,  X_NEW,      FIN_12mult,        T_MUL12,    H_MUL12},
+    {FN10,  UNI_DIV12,  USES_F,     ALLOWREC,   ' ',    "12÷",      YES_L,  X_NEW,      FIN_12div,         T_DIV12,    H_DIV12},
+    {FN11,  UNI_MUL100, USES_F,     ALLOWREC,   ' ',    "100×",     YES_L,  X_NEW,      FIN_100mult,       T_MUL100,   H_MUL100},
+    {FN12,  UNI_DIV100, USES_F,     ALLOWREC,   ' ',    "100÷",     YES_L,  X_NEW,      FIN_100div,        T_DIV100,   H_DIV100},
+    {FN13,  UNI_TAX,    USES_F,     ALLOWREC,   ' ',    "TAX",      YES_L,  X_NEW,      FIN_tax,           T_TAX,      H_TAX},
+    {FN14,  UNI_PERC,   USES_F,     ALLOWREC,   ' ',    "%",        YES_L,  X_NEW,      FIN_percent,       T_PERC,     H_PERC},
+    {FN15,  UNI_PERCC,  USES_F,     ALLOWREC,   ' ',    "%CHG",     YES_L,  X_NEW,      FIN_percentChg,    T_PERCC,    H_PERCC},
+    {FN16,  UNI_PERCT,  USES_F,     ALLOWREC,   ' ',    "%TOT",     YES_L,  X_NEW,      FIN_percentTot,    T_PERCT,    H_PERCT},
     {FN17,  UNI_AMORT,  USES_F,     ALLOWREC,   ' ',    "Amort",    YES_L,  X_NEW,      FIN_amort,         T_AMORT,    H_AMORT},
     {FN18,  UNI_CF0,    USES_F,     ALLOWREC,   ' ',    "CF0",      YES_L,  X_NEW,      FIN_cashFlow0,     T_CF0,      H_CF0},
     {FN19,  UNI_CFJ,    USES_F,     ALLOWREC,   ' ',    "CFj",      YES_L,  X_NEW,      FIN_cashFlowj,     T_CFJ,      H_CFJ},

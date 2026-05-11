@@ -970,7 +970,7 @@ BOOL CALLBACK fnDIALOG_ResistorProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
     static int res_val_mult_band = 0;
     static double res_tolerance  = 0.05;
     static double res_val        = 0.0;
-    char tmp[50];
+    char tmp[64];
     int i;
 
     char color_list[10][4] = {

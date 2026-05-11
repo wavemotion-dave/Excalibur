@@ -571,8 +571,8 @@ BEGIN
     GROUPBOX        "Comma Display",IDC_STATIC,93,54,72,32
     GROUPBOX        "Tool Tips",IDC_STATIC,171,54,72,32
     GROUPBOX        "Stack Options",IDC_STATIC,9,90,78,81
-    LTEXT           "Tax Constant:",IDC_STATIC,172,98,43,8
-    LTEXT           "Pause/Trace Delay (ms):",IDC_STATIC,174,118,40,18
+    LTEXT           "Tax Constant:",IDC_STATIC,172,98,48,8
+    LTEXT           "Pause/Trace Delay (ms):",IDC_STATIC,174,118,48,18
     CONTROL         "Classic",118,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
                     WS_TABSTOP,99,99,56,10
     CONTROL         "4-Banger",119,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,

@@ -37,12 +37,13 @@
 #include <ctype.h>
 #include "Excal.h"
 
-#pragma comment(lib, "winmm.lib")
+#pragma comment(lib, "winmm.lib")   // Needed to playback WAV beep
 
 HWND debugTraceWindow = NULL;
 
 double  debugValue = 0.0;
 uint8_t dinputDebugInProgress = 0;
+uint8_t RegisterToInput = 0;
 
 extern void Macro_RecallN(void);
 extern void Macro_StoreN(void);
@@ -493,11 +494,10 @@ void Macro_Pause(void)
 void Macro_Beep(void)
 {
     // Play the resource asynchronously
-	PlaySound(MAKEINTRESOURCE(IDR_BEEP), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC);
+	PlaySound(MAKEINTRESOURCE(IDR_BEEP), GetModuleHandle(NULL), SND_RESOURCE | SND_SYNC);
     sleep_and_peek(250);
 }
 
-int RegisterToInput = 0;
 BOOL CALLBACK inputRegisterProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
 {
     char tmp[64];
@@ -944,7 +944,7 @@ BOOL CALLBACK debugWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam
             }
             break;
       case WM_CLOSE:
-            Macro_Debug(); // This will toggle the window off...
+            Macro_Debug(); // This will toggle the window to hidden...
             return TRUE;
      }
 
@@ -980,7 +980,7 @@ void Macro_Debug(void)
 
 void UpdateDebugRegs(void)
 {
-    char tmp[50];
+    char tmp[64];
     int i;
 
     SendMessage(GetDlgItem(debugTraceWindow, TRACE_REGS1), WM_SETFONT, (WPARAM) hFixedFont, FALSE);
@@ -1274,113 +1274,6 @@ void Macro_DSZ(void)
                 currentMacroPlaybackIdx++;
             }
         }
-    }
-}
-
-void Macro_StoE(void)
-{
-    if (progMode == PROG_NORMAL)
-        STO[4] = X;
-    else
-    {
-        if (wordMode == PROG_SIGNED)
-            STO[4] = (PROG_SIGNEDLONG) XL;
-        else
-            STO[4] = XL;
-    }
-}
-
-void Macro_RclE(void)
-{
-    if (Xedit == X_ENTER)
-    {
-        if (progMode == PROG_NORMAL)
-            X = STO[4];
-        else
-            XL = maskStackStuff((PROG_LONG) STO[4]);
-    }
-    else
-    {
-        if (progMode == PROG_NORMAL)
-            StackPush(STO[4]);
-        else
-            StackPushL((PROG_LONG) STO[4]);
-    }
-}
-
-void Macro_StoF(void)
-{
-    if (progMode == PROG_NORMAL)
-        STO[5] = X;
-    else
-    {
-        if (wordMode == PROG_SIGNED)
-            STO[5] = (PROG_SIGNEDLONG) XL;
-        else
-            STO[5] = XL;
-    }
-}
-
-void Macro_RclF(void)
-{
-    if (Xedit == X_ENTER)
-    {
-        if (progMode == PROG_NORMAL)
-            X = STO[5];
-        else
-            XL = maskStackStuff((PROG_LONG) STO[5]);
-    }
-    else
-    {
-        if (progMode == PROG_NORMAL)
-            StackPush(STO[5]);
-        else
-            StackPushL((PROG_LONG) STO[5]);
-    }
-}
-
-
-void Macro_StoG(void)
-{
-    if (progMode == PROG_NORMAL)
-        STO[6] = X;
-    else
-    {
-        if (wordMode == PROG_SIGNED)
-            STO[6] = (PROG_SIGNEDLONG) XL;
-        else
-            STO[6] = XL;
-    }
-}
-
-void Macro_RclG(void)
-{
-    if (Xedit == X_ENTER)
-    {
-        if (progMode == PROG_NORMAL)
-            X = STO[6];
-        else
-            XL = maskStackStuff((PROG_LONG) STO[6]);
-    }
-    else
-    {
-        if (progMode == PROG_NORMAL)
-            StackPush(STO[6]);
-        else
-            StackPushL((PROG_LONG) STO[6]);
-    }
-}
-
-void Macro_StoH(void)
-{
-    if (progMode == PROG_NORMAL)
-        STO[7] = X;
-    else
-    {
-        if (wordMode == PROG_SIGNED)
-            STO[7] = (PROG_SIGNEDLONG) XL;
-        else
-            STO[7] = XL;
     }
 }
 
