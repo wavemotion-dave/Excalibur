@@ -544,7 +544,7 @@ BEGIN
                     WS_TABSTOP,16,99,48,11
     CONTROL         "8 Level",125,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,
                     16,110,48,11
-    CONTROL         "RPL Entry",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | 
+    CONTROL         "eRPN",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,16,122,54,10
     CONTROL         "Zero Fill Pop",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,16,133,54,10

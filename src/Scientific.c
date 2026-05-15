@@ -105,7 +105,6 @@ extern void SCI_Astro(void);
 extern void SCI_pyth(void);
 extern void SCI_quad(void);
 extern void SCI_circA(void);
-extern void SCI_SphrV(void);
 
 extern void COMP_plus(void);
 extern void COMP_minus(void);
@@ -124,11 +123,13 @@ extern void COMP_abs(void);
 extern void COMP_CHS(void);
 extern void COMP_norm(void);
 extern void COMP_arg(void);
+extern void COMP_Gamma(void);
 extern void COMP_ToPolar(void);
 extern void COMP_FromPolar(void);
 extern void COMP_hsin(void);
 extern void COMP_hcos(void);
 extern void COMP_htan(void);
+
 
 struct funcStruct Scientific_funcs[MAX_FUNCS] = {
     {FN1,   UNI_SIN,        USES_F,     ALLOWREC,   ' ',    "SIN",      YES_L,  X_NEW,  SCI_sin,                T_SIN,          H_SIN},
@@ -191,7 +192,7 @@ struct funcStruct Scientific2_funcs[MAX_FUNCS] = {
     {FN15,  UNI_QUAD,       USES_F,     ALLOWREC,   ' ',    "Quad",     YES_L,  X_NEW,  SCI_quad,               T_QUAD,         H_QUAD},
     {FN16,  UNI_PYTH,       USES_F,     ALLOWREC,   ' ',    "Pyth",     YES_L,  X_NEW,  SCI_pyth,               T_PYTHAG,       H_PYTHAG},
     {FN17,  UNI_CIRCA,      USES_F,     ALLOWREC,   ' ',    "Circ A",   YES_L,  X_NEW,  SCI_circA,              T_CIRCA,        H_CIRCA},
-    {FN18,  UNI_SPHV,       USES_F,     ALLOWREC,   ' ',    "Sphr V",   YES_L,  X_NEW,  SCI_SphrV,              T_SPHV,         H_SPHV},
+    {FN18,  UNI_GAMMA,      USES_F,     ALLOWREC,   ' ',    "GAMMA",    YES_L,  X_NEW,  COMP_Gamma,             T_GAMMA,        H_GAMMA},
     {FN19,  UNI_TOPOLAR,    USES_F,     ALLOWREC,   ' ',    "»POLR",    YES_L,  X_NEW,  COMP_ToPolar,           T_TOPOLAR,      H_TOPOLAR},
     {FN20,  UNI_FROMPOLAR,  USES_F,     ALLOWREC,   ' ',    "«POLR",    YES_L,  X_NEW,  COMP_FromPolar,         T_FROMPOLAR,    H_FROMPOLAR},
     {FN21,  UNI_CSIN,       USES_F,     ALLOWREC,   ' ',    "cSIN",     YES_L,  X_NEW,  COMP_sin,               T_CPLXSIN,      H_CPLXSIN},

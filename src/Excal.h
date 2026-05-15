@@ -601,7 +601,7 @@ enum UniqueButtonIndexTag
     UNI_QUAD,
     UNI_PYTH,
     UNI_CIRCA,
-    UNI_SPHV,
+    UNI_GAMMA,
     UNI_TOPOLAR,
     UNI_FROMPOLAR,
     UNI_CSIN,
@@ -1672,8 +1672,8 @@ extern uint32_t userTicks;
 #define H_HZ_AF         "Convert from Hertz to Angular Frequency (rad/sec)"
 #define T_METRIC        "Metric Table"
 #define H_METRIC        "Metric Prefixes and their magnitudes"
-#define T_SPHV          "Sphere Volume"
-#define H_SPHV          "Calculate the volume of a sphere with radius X."
+#define T_GAMMA         "Gamma Function"
+#define H_GAMMA         "Calculate the gamma of a Complex number X (or real number if imaginary Y is zero)"
 #define T_MPA_PSI       "Megapascals to PSI"
 #define H_MPA_PSI       "Convert from Megapascals to PSI"
 

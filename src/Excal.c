@@ -91,7 +91,7 @@ uint32_t lastTickCount = 0;
 uint32_t ticksUsed = 0;
 
 uint8_t  ClearStackOnExit = 0;
-uint8_t  RPL_entry = 0;
+uint8_t  eRPN = 0;
 uint8_t  progModecarry = 0;
 uint8_t  rightAlignStack = 0;
 uint8_t  showXMinimized = 0;
@@ -2457,7 +2457,7 @@ void RPN_clearL(void)
 
 void RPN_enter(void)
 {
-    if (RPL_entry)
+    if (eRPN)
     {
         if (Xedit == X_EDIT)
         {
@@ -3521,7 +3521,7 @@ void SaveToDisk(void)
         fwrite(&popFillZero,        sizeof(popFillZero),        1, outfile);
         fwrite(&rightAlignStack,    sizeof(rightAlignStack),    1, outfile);
         fwrite(&showXMinimized,     sizeof(showXMinimized),     1, outfile);
-        fwrite(&RPL_entry,          sizeof(RPL_entry),          1, outfile);
+        fwrite(&eRPN,          sizeof(eRPN),          1, outfile);
         fwrite(&ClearStackOnExit,   sizeof(ClearStackOnExit),   1, outfile);
 
         fwrite(&playBack,           sizeof(playBack),           1, outfile);
@@ -3644,7 +3644,7 @@ void ReadFromDisk(void)
         fread(&popFillZero,        sizeof(popFillZero),        1, infile);
         fread(&rightAlignStack,    sizeof(rightAlignStack),    1, infile);
         fread(&showXMinimized,     sizeof(showXMinimized),     1, infile);
-        fread(&RPL_entry,          sizeof(RPL_entry),          1, infile);
+        fread(&eRPN,          sizeof(eRPN),          1, infile);
         fread(&ClearStackOnExit,   sizeof(ClearStackOnExit),   1, infile);
 
         fread(&playBack,           sizeof(playBack),           1, infile);
@@ -4340,7 +4340,7 @@ BOOL CALLBACK fnDIALOG_SettingsProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
         if (showXMinimized == 1)
             SendMessage(GetDlgItem(hDlg, IDC_CHECK2), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
 
-        if (RPL_entry == 1)
+        if (eRPN == 1)
             SendMessage(GetDlgItem(hDlg, IDC_CHECK3), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
 
         if (ClearStackOnExit == 1)
@@ -4463,9 +4463,9 @@ BOOL CALLBACK fnDIALOG_SettingsProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
 
             bs = SendMessage(GetDlgItem(hDlg, IDC_CHECK3), BM_GETCHECK, (WORD) 0, (DWORD) 0L);
             if (bs != 0L)
-                RPL_entry = 1;
+                eRPN = 1;
             else
-                RPL_entry = 0;
+                eRPN = 0;
 
             bs = SendMessage(GetDlgItem(hDlg, IDC_CHECK4), BM_GETCHECK, (WORD) 0, (DWORD) 0L);
             if (bs != 0L)
