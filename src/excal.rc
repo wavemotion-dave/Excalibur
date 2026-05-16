@@ -544,8 +544,8 @@ BEGIN
                     WS_TABSTOP,16,99,48,11
     CONTROL         "8 Level",125,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,
                     16,110,48,11
-    CONTROL         "eRPN",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,16,122,54,10
+    CONTROL         "eRPN",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    16,122,54,10
     CONTROL         "Zero Fill Pop",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,16,133,54,10
     CONTROL         "Show X Min",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | 
@@ -560,8 +560,8 @@ BEGIN
                     WS_TABSTOP,178,63,33,10
     CONTROL         "OFF",115,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,178,
                     73,31,10
-    EDITTEXT        103,220,96,25,12
-    EDITTEXT        123,220,121,25,12
+    EDITTEXT        103,220,96,32,12
+    EDITTEXT        123,220,121,32,12
     PUSHBUTTON      "Display Modes",113,103,181,54,14
     PUSHBUTTON      "Cancel",102,173,181,52,14
     GROUPBOX        "Angle Mode",IDC_STATIC,9,7,78,42
@@ -572,7 +572,7 @@ BEGIN
     GROUPBOX        "Tool Tips",IDC_STATIC,171,54,72,32
     GROUPBOX        "Stack Options",IDC_STATIC,9,90,78,81
     LTEXT           "Tax Constant:",IDC_STATIC,172,98,48,8
-    LTEXT           "Pause/Trace Delay (ms):",IDC_STATIC,174,118,48,18
+    LTEXT           "Pause/Trace Delay (ms):",IDC_STATIC,172,118,48,18
     CONTROL         "Classic",118,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
                     WS_TABSTOP,99,99,56,10
     CONTROL         "4-Banger",119,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,

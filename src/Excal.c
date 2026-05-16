@@ -41,10 +41,10 @@
 
 #define WINDOW_TITLE "Excalibur 32-bit"
 
-#define VERSION_STR "v3.XX-02"
+#define VERSION_STR "v3.XX-03"
 
 #define ABOUT_MSG "Excalibur for Windows 32-bit\n"                      \
-                  "Version 3.XX-02  -  May 11, 2026\n\n"                \
+                  "Version 3.XX-03  -  May 16, 2026\n\n"                \
                   "Copyright 1994-2026 David Bernazzani\n\n"            \
                   "Please read the disclaimer and understand the\n"     \
                   "accuracy and precision issues before using.\n\n"     \
@@ -1763,8 +1763,8 @@ struct funcStruct RPNkeys[] = {
     {RPN_EXCH_X_Y,  UNI_XCH,    USES_FL, ALLOWREC, 'x', "", NO_L,   X_NEW,      RPN_exchange_x_y,   "Exchange X and Y",     "Exchanges the contents of the X and Y registers"},
     {RPN_NEGATE,    UNI_CHS,    USES_FL, ALLOWREC, 'n', "", NO_L,   X_NULL,     RPN_negate_x,       "Change Sign",          "Used to change the sign of X"},
     {RPN_E,         UNI_E,      USES_FL, ALLOWREC, 'e', "", NO_L,   X_NULL,     RPN_Ex,             "Exponent",             "Used to produce an exponential number(e.g. 3.45e+12)"},
-    {RPN_STO,       UNI_STO,    USES_FL, ALLOWREC, 's', "", NO_L,   X_NULL,     RPN_store,          "Store Register",       "Used to store X to one of the registers (next digit/dp selects R0-R19)"},
-    {RPN_RCL,       UNI_RCL,    USES_FL, ALLOWREC, 'r', "", NO_L,   X_NULL,     RPN_recall,         "Recall Register",      "Used to recall one of registers to X (next digit/dp selects R0-R19)"},
+    {RPN_STO,       UNI_STO,    USES_FL, ALLOWREC, 's', "", NO_L,   X_NULL,     RPN_store,          "Store Register",       "Used to store X to one of the registers (next digit/dp selects R0-R19). Register Arithmetic is also supported."},
+    {RPN_RCL,       UNI_RCL,    USES_FL, ALLOWREC, 'r', "", NO_L,   X_NULL,     RPN_recall,         "Recall Register",      "Used to recall one of registers to X (next digit/dp selects R0-R19). Register Arithmetic is also supported."},
     {RPN_R_UP,      UNI_RUP,    USES_FL, ALLOWREC, 38,  "", NO_L,   X_NEW,      RPN_rotateStackUp,  "Rotate Stack Up",      "Rotates the contents of the stack up"},
     {RPN_R_DN,      UNI_RDN,    USES_FL, ALLOWREC, 40,  "", NO_L,   X_NEW,      RPN_rotateStackDn,  "Rotate Stack Down",    "Rotates the contents of the stack down"},
     {RPN_LASTX,     UNI_LSTX,   USES_FL, ALLOWREC, 'l', "", NO_L,   X_NEW,      RPN_lastX,          "Last X",               "Retrieves the last value of X before the last operation occurred"},
