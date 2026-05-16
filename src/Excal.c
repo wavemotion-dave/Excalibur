@@ -41,10 +41,10 @@
 
 #define WINDOW_TITLE "Excalibur 32-bit"
 
-#define VERSION_STR "v3.XX-02"
+#define VERSION_STR "v3.XX-03"
 
 #define ABOUT_MSG "Excalibur for Windows 32-bit\n"                      \
-                  "Version 3.XX-02  -  May 11, 2026\n\n"                \
+                  "Version 3.XX-03  -  May 16, 2026\n\n"                \
                   "Copyright 1994-2026 David Bernazzani\n\n"            \
                   "Please read the disclaimer and understand the\n"     \
                   "accuracy and precision issues before using.\n\n"     \
