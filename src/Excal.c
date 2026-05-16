@@ -2573,7 +2573,10 @@ void RPN_digit(WPARAM key)
 {
     double tmp1, tmp2, tmp3;
 
-    // Handle Store and Recall of Registers
+    // ---------------------------------------------------------
+    // Handle Store and Recall of Registers. This also handles
+    // the possibility of Store and Recall Arithmetic.
+    // ---------------------------------------------------------
     if (rpnStoreRecall)
     {
         uint8_t reg = (key - RPN_DIGIT_0) + (rpnStoreRecall & REG_DP ? 10:0);
@@ -2582,6 +2585,7 @@ void RPN_digit(WPARAM key)
         {
             if (Xedit == X_EDIT) Xedit = X_NEW;
 
+            // See if we are doing any sort of STO Arithmetic...
             if (rpnStoreRecall & REG_PLUS)
             {
                 STO[reg] += X;
@@ -2607,37 +2611,39 @@ void RPN_digit(WPARAM key)
         }
         else if (rpnStoreRecall & REG_RECALL)
         {
-            if (Xedit == X_EDIT)
-            {
-                RPN_enter();
-            }
-            else if (Xedit == X_NEW)
-            {
-                if (progMode != PROG_NORMAL)
-                    StackPushL(0L);
-                else
-                    StackPush(0.0);
-            }
-            else Xedit = X_NEW;
-
+            // See if we are doing any sort of RCL Arithmetic...
+            // In this case the stack does NOT lift.
             if (rpnStoreRecall & REG_PLUS)
             {
-                X += STO[reg];
+                X = X + STO[reg];
             }
             else if (rpnStoreRecall & REG_MINUS)
             {
-                X -= STO[reg];
+                X = X - STO[reg];
             }
             else if (rpnStoreRecall & REG_MULTIPLY)
             {
-                X *= STO[reg];
+                X = X * STO[reg];
             }
             else if (rpnStoreRecall & REG_DIVIDE)
             {
-                if (STO[reg] != 0.0) X /= STO[reg];
+                if (STO[reg] != 0.0) X = X / STO[reg];
             }
-            else
+            else // Normal RCL will lift the stack
             {
+                if (Xedit == X_EDIT)
+                {
+                    RPN_enter();
+                }
+                else if (Xedit == X_NEW)
+                {
+                    if (progMode != PROG_NORMAL)
+                        StackPushL(0L);
+                    else
+                        StackPush(0.0);
+                }
+                else Xedit = X_NEW;
+
                 X = STO[reg];
             }
         }
@@ -2677,10 +2683,10 @@ void RPN_digit(WPARAM key)
     }
     else if (Xedit == X_EDIT)
     {
-        if (allowDigitBasedOnMaxStringSize(Xstr, (char) ('0' + (key - 101))))
+        if (allowDigitBasedOnMaxStringSize(Xstr, (char) ('0' + (key - RPN_DIGIT_0))))
         {
             int len = strlen(Xstr);
-            Xstr[len] = '0' + (key - 101);
+            Xstr[len] = '0' + (key - RPN_DIGIT_0);
             Xstr[len+1] = CNULL;
         }
     }
@@ -2984,6 +2990,8 @@ void RPN_multiply(void)
 {
     PROG_LONG xl, yl;
 
+    Xedit = X_NEW;
+
     if (rpnStoreRecall & 0x03)
     {
         rpnStoreRecall &= 0x0F;
@@ -2992,7 +3000,6 @@ void RPN_multiply(void)
         return;
     }
 
-    Xedit = X_NEW;
     if (progMode == PROG_NORMAL)
         StackPush(StackPop() * StackPop());
     else
@@ -3009,6 +3016,8 @@ void RPN_divide(void)
     PROG_LONG xl, yl;
     PROG_SIGNEDLONG sxl, syl;
 
+    Xedit = X_NEW;
+
     if (rpnStoreRecall & 0x03)
     {
         rpnStoreRecall &= 0x0F;
@@ -3017,14 +3026,12 @@ void RPN_divide(void)
         return;
     }
 
-
     if (X == 0.0)
     {
         RPN_error("Divide By Zero");
     }
     else
     {
-        Xedit = X_NEW;
         if (progMode == PROG_NORMAL)
         {
             x = StackPop();
@@ -3054,6 +3061,8 @@ void RPN_minus(void)
     double x, y;
     PROG_LONG xl, yl;
 
+    Xedit = X_NEW;
+
     if (rpnStoreRecall & 0x03)
     {
         rpnStoreRecall &= 0x0F;
@@ -3062,7 +3071,6 @@ void RPN_minus(void)
         return;
     }
 
-    Xedit = X_NEW;
     if (progMode == PROG_NORMAL)
     {
         x = StackPop();
