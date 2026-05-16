@@ -38,8 +38,8 @@ typedef unsigned __int32    uint32_t;
 typedef unsigned __int16    uint16_t;
 typedef unsigned __int8     uint8_t;
 
-#define PROG_LONG           uint32_t    // We handle signed and other word sizes in ex_prog.c
-#define PROG_SIGNEDLONG     int32_t     // Needed when we convert Signed to float...
+#define PROG_LONG           uint64_t    // We handle signed and other word sizes in ex_prog.c
+#define PROG_SIGNEDLONG     int64_t     // Needed when we convert Signed to float...
 
 #define MAX_FUNCS           40
 
@@ -160,6 +160,11 @@ extern double FromRadians(double t);
 extern double ToRadians(double t);
 #endif
 
+extern uint64_t strtou64(const char *nptr, char **endptr, int base);
+extern int64_t  strtoi64(const char *nptr, char **endptr, int base);
+extern uint64_t rotl64(uint64_t value, int shift);
+extern uint64_t rotr64(uint64_t value, int shift);
+
 extern uint8_t Xedit;           // One of X_NEW, X_EDIT, X_NULL, etc.
 extern char Xstr[64];           // Global buffer for X editing
 extern double X;                // Main register X
@@ -203,7 +208,7 @@ extern HFONT hNumberFont;
 extern HFONT hFixedFont;
 
 extern uint8_t progMode;
-#define PROG_NORMAL     0       // For normal floating-point handling
+#define PROG_FLOAT      0       // For normal floating-point handling
 #define PROG_DEC        10      // Comp-Sci DEC mode
 #define PROG_HEX        16      // Comp-Sci HEX mode
 #define PROG_BIN        2       // Comp-Sci BIN mode
@@ -232,13 +237,18 @@ extern uint8_t dateMode;
 extern uint8_t  padZeros;
 extern uint32_t wordSize;
 extern uint8_t  wordMode;
-extern uint32_t wordSizeMask;
+extern uint64_t wordSizeMask;
+extern uint8_t  hexSpacing;
 
 #define PROG_UNSIGNED   1
 #define PROG_SIGNED     0
 
 #define PROG_PADZEROS   1
 #define PROG_NOPADZEROS 0
+
+#define HEX_SPACE_NONE  0
+#define HEX_SPACE_2     1
+#define HEX_SPACE_4     2
 
 extern uint8_t numberDisplayMode;
 
@@ -275,6 +285,9 @@ extern PROG_LONG StackPopL(void);
 extern PROG_LONG MakeProgStr(char *str);
 extern PROG_LONG maskStackStuff(PROG_LONG lng);
 extern void PROG_dec(void);
+extern void PROG_hex(void);
+extern void PROG_oct(void);
+extern void PROG_bin(void);
 extern void cust_define(void);
 extern void RPN_clearStack(void);
 extern void RPN_clearL(void);
@@ -1116,19 +1129,19 @@ extern uint32_t userTicks;
 #define T_NULL          "Unused"
 #define H_NULL          "Nothing implemented for this key"
 #define T_SIN           "Sine"
-#define H_SIN           "Computes the Sine of X. Set trig (deg, rad, gra) mode in File/Settings."
+#define H_SIN           "Computes the Sine of X. Set angle mode (deg, rad, gra) in File/Settings."
 #define T_COS           "Cosine"
-#define H_COS           "Computes the Cosine of X. Set trig (deg, rad, gra) mode in File/Settings."
+#define H_COS           "Computes the Cosine of X. Set angle mode (deg, rad, gra) in File/Settings."
 #define T_TAN           "Tangent"
-#define H_TAN           "Computes the Tangent of X. Set trig (deg, rad, gra) mode in File/Settings."
+#define H_TAN           "Computes the Tangent of X. Set angle mode (deg, rad, gra) in File/Settings."
 #define T_HYP           "Hyperbolic"
 #define H_HYP           "Used in conjunction with SIN, COS and TAN, produces the Hyperbolic functions."
 #define T_ASIN          "ArcSine"
-#define H_ASIN          "Computes the arc sine of X. Set trig (deg, rad, gra) mode in File/Settings."
+#define H_ASIN          "Computes the arc sine of X. Set angle mode (deg, rad, gra) in File/Settings."
 #define T_ACOS          "ArcCosine"
-#define H_ACOS          "Computes the arc cosine of X. Set trig (deg, rad, gra) mode in File/Settings."
+#define H_ACOS          "Computes the arc cosine of X. Set angle mode (deg, rad, gra) in File/Settings."
 #define T_ATAN          "ArcTangent"
-#define H_ATAN          "Computes the arc tangent of X. Set trig (deg, rad, gra) mode in File/Settings."
+#define H_ATAN          "Computes the arc tangent of X. Set angle mode (deg, rad, gra) in File/Settings."
 #define T_ABS           "Absolute Value"
 #define H_ABS           "Computes the absolute value of X"
 #define T_XX            "X Squared"

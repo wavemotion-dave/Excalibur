@@ -677,14 +677,14 @@ void Macro_StoreN(void)
 
 void Macro_StoInd(void)
 {
-    if (progMode == PROG_NORMAL)
+    if (progMode == PROG_FLOAT)
         indirectRegister = (unsigned long) X;
     else
     {
         if (wordMode == PROG_SIGNED)
-            indirectRegister = (PROG_SIGNEDLONG) XL;
+            indirectRegister = (long) XL;
         else
-            indirectRegister = XL;
+            indirectRegister = (unsigned long) XL;
     }
 }
 
@@ -692,14 +692,14 @@ void Macro_RclInd(void)
 {
     if (Xedit == X_ENTER)
     {
-        if (progMode == PROG_NORMAL)
+        if (progMode == PROG_FLOAT)
             X = indirectRegister;
         else
             XL = maskStackStuff((PROG_LONG) indirectRegister);
     }
     else
     {
-        if (progMode == PROG_NORMAL)
+        if (progMode == PROG_FLOAT)
             StackPush(indirectRegister);
         else
             StackPushL((PROG_LONG) indirectRegister);

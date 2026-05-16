@@ -125,6 +125,47 @@ struct funcStruct CompSci_funcs[MAX_FUNCS] = {
 };
 
 
+void PutHexSpaces(char *str)
+{
+    int i;
+    int group;
+    int count;
+    int out_len;
+    char tmp2[80];
+    int len;
+
+    if (hexSpacing == HEX_SPACE_NONE)
+        return;
+
+    if (hexSpacing == HEX_SPACE_4)
+        group = 4;
+    else
+        group = 2;
+
+    len = (int) strlen(str);
+    out_len = 0;
+    count = 0;
+
+    for (i = len - 1; i >= 0; i--)
+    {
+        if (count == group)
+        {
+            tmp2[out_len++] = ' ';
+            count = 0;
+        }
+        tmp2[out_len++] = str[i];
+        count++;
+    }
+
+    if ((out_len > 0) && (tmp2[out_len - 1] == ' '))
+        out_len--;
+
+    for (i = 0; i < out_len; i++)
+        str[i] = tmp2[out_len - i - 1];
+
+    str[out_len] = CNULL;
+}
+
 void MakeRadixStr(PROG_LONG val, char *tmpL)
 {
     char temp[60];
@@ -138,23 +179,29 @@ void MakeRadixStr(PROG_LONG val, char *tmpL)
         if (padZeros == 1)
         {
             if (wordSize == 8)
-                sprintf(tmpL, "%02lX", val);
+                sprintf(tmpL, "%02I64X", val);
             else if (wordSize == 16)
-                sprintf(tmpL, "%04lX", val);
+                sprintf(tmpL, "%04I64X", val);
+            else if (wordSize == 32)
+                sprintf(tmpL, "%08I64X", val);
             else
-                sprintf(tmpL, "%08lX", val);
+                sprintf(tmpL, "%016I64X", val);
         }
         else
-            sprintf(tmpL, "%lX", val);
+        {
+            sprintf(tmpL, "%I64X", val);
+        }
+        PutHexSpaces(tmpL);
     }
     else if (progMode == PROG_BIN)
     {
         if (binMode == 1)       // Show upper 
             val = val >> 16;
 
-        ltoa(val & (PROG_LONG) 0x0000FFFF, temp4, progMode);
+        _i64toa(val & (PROG_LONG) 0x0000FFFF, temp4, progMode);
         if (padZeros == 1)
         {
+            temp[17] = CNULL; //TODO: For now, only 32-bit bin
             if (wordSize == 8)
                 sprintf(temp, "%08s", temp4);
             else
@@ -197,20 +244,25 @@ void MakeRadixStr(PROG_LONG val, char *tmpL)
     else if (progMode == PROG_DEC)
     {
         if (wordMode == PROG_SIGNED)
-            ltoa(val, tmpL, progMode);
+			sprintf(tmpL, "%I64d", val);
         else
-            ultoa(val, tmpL, progMode);
-        PutCommas(tmpL);
+			sprintf(tmpL, "%I64u", val);
+        if (strlen(tmpL) < 18) // Above this we can't fit commas
+        {
+            PutCommas(tmpL);
+        }
     }
     else
-        ltoa(val, tmpL, progMode);     // Lonely OCTal
+    {
+        _i64toa(val, tmpL, progMode);     // Lonely OCTal
+    }
 }
 
 
 PROG_LONG MakeProgStr(char *str)
 {
     char *tmpPtr;
-    return(strtoul(str, &tmpPtr, progMode));
+    return(strtoi64(str, &tmpPtr, progMode));
 }
 
 PROG_LONG maskStackStuff(PROG_LONG lng)
@@ -523,11 +575,10 @@ void PROG_rol(void)
     PROG_LONG r;
     PROG_LONG mask;
 
-    mask = 0x00000001L << (wordSize);
+    r = StackPopL();                    // Get the value to be rotated from our stack.
+    mask = (r & (1 << (wordSize - 1))) >> (wordSize - 1);   // Get the bit that will be rotated around to the LSBit.
+    r = (r << 1) | mask;                // Shift left and OR in the bit that was rotated around to the LSBit.
 
-    r = (PROG_LONG) _lrotl(StackPopL(), 1);
-    if (r & mask)
-        r |= 0x00000001L;       // Shift in appropriate bit
     StackPushL(r);
 }
 
@@ -536,17 +587,10 @@ void PROG_ror(void)
     PROG_LONG r;
     PROG_LONG mask;
 
-    r = (PROG_LONG) _lrotr(StackPopL(), 1);
-    mask = 0x00000001L << (wordSize - 1);
+    r = StackPopL();                    // Get the value to be rotated from our stack.
+    mask = (r & 1) << (wordSize - 1);   // Get the bit that will be rotated around to the MSBit.
+    r = (r >> 1) | mask;                // Shift right and OR in the bit that was rotated around to the MSBit.
 
-    if (r & 0x80000000L)
-    {
-        r |= mask;
-    }
-    else
-    {
-        r &= (PROG_LONG) ~ mask;        // If we didn't rotate a 1 around, always zero the MSBit.
-    }
     StackPushL(r);
 }
 
@@ -801,7 +845,7 @@ void PROG_NumBits(void)
 
     cnt = 0;
     Val = StackPopL();
-    for (shiftVal = 0; shiftVal < (PROG_LONG) wordSize; shiftVal++)     // tbd-word size
+    for (shiftVal = 0; shiftVal < (PROG_LONG) wordSize; shiftVal++)
     {
         mask = 1L << shiftVal;
         cmp = Val & mask;;
@@ -900,58 +944,95 @@ BOOL CALLBACK fnDIALOG_WordSizeProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
     {
     case WM_INITDIALOG:
         if (padZeros == 0)
-            SendMessage(GetDlgItem(hDlg, 110), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
-        else
-            SendMessage(GetDlgItem(hDlg, 111), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
-
-        if (wordSize == 8)
-            SendMessage(GetDlgItem(hDlg, 104), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
-        else if (wordSize == 16)
-            SendMessage(GetDlgItem(hDlg, 105), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
-        else
-            SendMessage(GetDlgItem(hDlg, 106), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
-
-        if (wordMode == PROG_SIGNED)
             SendMessage(GetDlgItem(hDlg, 107), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         else
             SendMessage(GetDlgItem(hDlg, 108), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
 
+        if (wordSize == 8)
+            SendMessage(GetDlgItem(hDlg, 101), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
+        else if (wordSize == 16)
+            SendMessage(GetDlgItem(hDlg, 102), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
+        else if (wordSize == 32)
+            SendMessage(GetDlgItem(hDlg, 103), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
+        else
+            SendMessage(GetDlgItem(hDlg, 104), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
+
+        if (wordMode == PROG_SIGNED)
+            SendMessage(GetDlgItem(hDlg, 105), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
+        else
+            SendMessage(GetDlgItem(hDlg, 106), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
+
+        if (hexSpacing == HEX_SPACE_NONE)
+            SendMessage(GetDlgItem(hDlg, 111), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
+        else if (hexSpacing == HEX_SPACE_2)
+            SendMessage(GetDlgItem(hDlg, 112), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
+        else
+            SendMessage(GetDlgItem(hDlg, 113), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
+
         return TRUE;
+
     case WM_COMMAND:
         switch(wParam)
         {
         case(IDOK):           // OK
-            bs = SendMessage(GetDlgItem(hDlg, 110), BM_GETCHECK, (WORD) 0, (DWORD) 0L);
+            bs = SendMessage(GetDlgItem(hDlg, 107), BM_GETCHECK, (WORD) 0, (DWORD) 0L);
             if (bs != 0L)
                 padZeros = 0;
             else
                 padZeros = 1;
 
-            bs = SendMessage(GetDlgItem(hDlg, 107), BM_GETCHECK, (WORD) 0, (DWORD) 0L);
+            bs = SendMessage(GetDlgItem(hDlg, 105), BM_GETCHECK, (WORD) 0, (DWORD) 0L);
             if (bs != 0L)
                 wordMode = PROG_SIGNED;
             else
                 wordMode = PROG_UNSIGNED;
 
-            bs = SendMessage(GetDlgItem(hDlg, 104), BM_GETCHECK, (WORD) 0, (DWORD) 0L);
+            bs = SendMessage(GetDlgItem(hDlg, 101), BM_GETCHECK, (WORD) 0, (DWORD) 0L);
             if (bs != 0L)
             {
                 wordSize = 8;
                 wordSizeMask = 0x000000FFL;
             }
-            bs = SendMessage(GetDlgItem(hDlg, 105), BM_GETCHECK, (WORD) 0, (DWORD) 0L);
+
+            bs = SendMessage(GetDlgItem(hDlg, 102), BM_GETCHECK, (WORD) 0, (DWORD) 0L);
             if (bs != 0L)
             {
                 wordSize = 16;
                 wordSizeMask = 0x0000FFFFL;
             }
 
-            bs = SendMessage(GetDlgItem(hDlg, 106), BM_GETCHECK, (WORD) 0, (DWORD) 0L);
+            bs = SendMessage(GetDlgItem(hDlg, 103), BM_GETCHECK, (WORD) 0, (DWORD) 0L);
             if (bs != 0L)
             {
                 wordSize = 32;
                 wordSizeMask = 0xFFFFFFFFL;
             }
+
+            bs = SendMessage(GetDlgItem(hDlg, 104), BM_GETCHECK, (WORD) 0, (DWORD) 0L);
+            if (bs != 0L)
+            {
+                wordSize = 64;
+                wordSizeMask = (uint64_t) 0xFFFFFFFFFFFFFFFF;
+            }
+
+            bs = SendMessage(GetDlgItem(hDlg, 111), BM_GETCHECK, (WORD) 0, (DWORD) 0L);
+            if (bs != 0L)
+            {
+                hexSpacing = HEX_SPACE_NONE;
+            }
+
+            bs = SendMessage(GetDlgItem(hDlg, 112), BM_GETCHECK, (WORD) 0, (DWORD) 0L);
+            if (bs != 0L)
+            {
+                hexSpacing = HEX_SPACE_2;
+            }
+
+            bs = SendMessage(GetDlgItem(hDlg, 113), BM_GETCHECK, (WORD) 0, (DWORD) 0L);
+            if (bs != 0L)
+            {
+                hexSpacing = HEX_SPACE_4;
+            }
+
             EndDialog(hDlg, FALSE);
             ShowStatus();
 
@@ -990,7 +1071,7 @@ void PROG_Mirror(void)
 
     newVal = (PROG_LONG) 0L;
     xTmp = StackPopL();
-    for (shiftVal = 0; shiftVal < (PROG_LONG) wordSize; shiftVal++)     // tbd-word size
+    for (shiftVal = 0; shiftVal < (PROG_LONG) wordSize; shiftVal++)
     {
         mask1 = 1L << shiftVal;
         mask2 = 1L << (wordSize - shiftVal - 1);
@@ -1008,8 +1089,10 @@ void PROG_MinW(void)
             StackPushL((PROG_LONG) 0x80);
         else if (wordSize == 16)
             StackPushL((PROG_LONG) 0x8000);
-        else
+        else if (wordSize == 32)
             StackPushL((PROG_LONG) 0x80000000);
+        else
+            StackPushL((PROG_LONG) 0x8000000000000000);
     }
     else
     {
@@ -1025,8 +1108,10 @@ void PROG_MaxW(void)
             StackPushL((PROG_LONG) 0x7F);
         else if (wordSize == 16)
             StackPushL((PROG_LONG) 0x7FFF);
-        else
+        else if (wordSize == 32)
             StackPushL((PROG_LONG) 0x7FFFFFFF);
+        else
+            StackPushL((PROG_LONG) 0x7FFFFFFFFFFFFFFF);
     }
     else
     {
@@ -1034,8 +1119,10 @@ void PROG_MaxW(void)
             StackPushL((PROG_LONG) 0xFF);
         else if (wordSize == 16)
             StackPushL((PROG_LONG) 0xFFFF);
-        else
+        else if (wordSize == 32)
             StackPushL((PROG_LONG) 0xFFFFFFFF);
+        else
+            StackPushL((PROG_LONG) 0xFFFFFFFFFFFFFFFF);
     }
 }
 
@@ -1048,8 +1135,10 @@ PROG_LONG smallestProgVal(void)
             return((PROG_LONG) 0x80);
         else if (wordSize == 16)
             return((PROG_LONG) 0x8000);
-        else
+        else if (wordSize == 32)
             return((PROG_LONG) 0x80000000);
+        else 
+            return((PROG_LONG) 0x8000000000000000);
     }
     else
     {
@@ -1065,8 +1154,10 @@ PROG_LONG biggestProgVal(void)
             return((PROG_LONG) 0x7F);
         else if (wordSize == 16)
             return((PROG_LONG) 0x7FFF);
-        else
+        else  if (wordSize == 32)
             return((PROG_LONG) 0x7FFFFFFF);
+        else
+            return((PROG_LONG) 0x7FFFFFFFFFFFFFFF);
     }
     else
     {
@@ -1074,8 +1165,10 @@ PROG_LONG biggestProgVal(void)
             return((PROG_LONG) 0xFF);
         else if (wordSize == 16)
             return((PROG_LONG) 0xFFFF);
-        else
+        else if (wordSize == 32)
             return((PROG_LONG) 0xFFFFFFFF);
+        else
+            return((PROG_LONG) 0xFFFFFFFFFFFFFFFF);
     }
 }
 

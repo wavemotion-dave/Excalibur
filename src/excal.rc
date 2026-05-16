@@ -606,30 +606,39 @@ BEGIN
                     WS_TABSTOP
 END
 
-DIALOG_WORDSIZE DIALOG DISCARDABLE  115, 25, 221, 87
+DIALOG_WORDSIZE DIALOG DISCARDABLE  65, 25, 292, 88
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Word Size Options"
 FONT 10, "MS Sans Serif"
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,52,66,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,118,66,50,14
-    CONTROL         "8-Bit",104,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
+    DEFPUSHBUTTON   "OK",IDOK,90,67,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,156,67,50,14
+    GROUPBOX        "Word Size",IDC_STATIC,9,7,66,56
+    CONTROL         "8-Bit",101,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
                     WS_TABSTOP,21,17,48,11
-    CONTROL         "16-Bit",105,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,21,
-                    30,48,11
-    CONTROL         "32-Bit",106,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,21,
-                    43,48,11
-    GROUPBOX        "Word Size",IDC_STATIC,9,7,66,51
-    CONTROL         "Signed",107,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
+    CONTROL         "16-Bit",102,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,21,
+                    28,48,11
+    CONTROL         "32-Bit",103,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,21,
+                    39,48,11
+    CONTROL         "64-Bit",104,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,21,
+                    50,48,11
+    GROUPBOX        "Decimal Mode",IDC_STATIC,79,7,66,56
+    CONTROL         "Signed",105,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
                     WS_TABSTOP,91,20,48,11
-    CONTROL         "Unsigned",108,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,
+    CONTROL         "Unsigned",106,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,
                     91,33,48,11
-    GROUPBOX        "Decimal Mode",IDC_STATIC,79,7,66,51
-    CONTROL         "Don't Pad",110,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
-                    WS_TABSTOP,161,21,48,11
-    CONTROL         "Pad Zeros",111,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,
-                    161,34,48,11
-    GROUPBOX        "Pad Zeros",IDC_STATIC,149,7,66,51
+    GROUPBOX        "Pad Zeros",IDC_STATIC,220,7,66,56
+    CONTROL         "Don't Pad",107,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
+                    WS_TABSTOP,228,21,48,11
+    CONTROL         "Pad Zeros",108,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,
+                    228,34,48,11
+    GROUPBOX        "Hex Spacing",IDC_STATIC,149,7,66,56
+    CONTROL         "None",111,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
+                    WS_TABSTOP,159,21,48,11
+    CONTROL         "2",112,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,159,34,
+                    48,11
+    CONTROL         "4",113,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,159,47,
+                    48,11
 END
 
 DIALOG_MACRO_SAVE DIALOG DISCARDABLE  0, 65526, 434, 210
@@ -970,9 +979,9 @@ BEGIN
     "DIALOG_WORDSIZE", DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 214
+        RIGHTMARGIN, 286
         TOPMARGIN, 7
-        BOTTOMMARGIN, 80
+        BOTTOMMARGIN, 81
     END
 
     "DIALOG_MACRO_SAVE", DIALOG
