@@ -1211,8 +1211,8 @@ BOOL CALLBACK DlgProcIEEE(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam
     char tmp3[32];
     float  val_float = 0.0;
     double val_double = 0.0;
-    uint32_t val32 = 0;
-    uint64_t val64 = 0;
+    static uint32_t ieee_val32 = 0;
+    static uint64_t ieee_val64 = 0;
     HDC hdc;
     SIZE lpSize;
     RECT rect;
@@ -1223,7 +1223,11 @@ BOOL CALLBACK DlgProcIEEE(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam
         SendMessage(GetDlgItem(hDlg, 101), WM_SETFONT, (WPARAM) hFixedFont, FALSE);
         SendMessage(GetDlgItem(hDlg, 102), WM_SETFONT, (WPARAM) hFixedFont, FALSE);
         
+        ieee_val32 = 0;
+        ieee_val64 = 0;
         hdc = GetDC(hDlg);
+        sprintf(tmp2, "%f", lastFloat);
+        SetDlgItemText(hDlg, IDC_EDIT1, tmp2);
         SelectObject(hdc, hFixedFont);
         (void)GetTextExtentPoint32(hdc, "[0] [00000000000] [00000000000000000000000000000000000000000000000000000]", 73, &lpSize);
         ReleaseDC(hDlg, hdc);
@@ -1232,29 +1236,39 @@ BOOL CALLBACK DlgProcIEEE(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam
             int height = rect.bottom - rect.top;
             MoveWindow(hDlg, main_x+100, main_y+50, lpSize.cx + 40, height, TRUE);
         }        
-        SetDlgItemText(hDlg, 101, "32-bit:  Enter Number Above - Click Enter");
-        SetDlgItemText(hDlg, 102, "64-bit:  Enter Number Above - Click Enter");
+        SetDlgItemText(hDlg, 101, "32-bit:  Enter Number Above - Click Convert");
+        SetDlgItemText(hDlg, 102, "64-bit:  Enter Number Above - Click Convert");
         return TRUE;
         
     case WM_COMMAND:
         switch(LOWORD(wParam))
         {
-        case(105):           // Enter 
+        case(105):           // Convert 
             GetDlgItemText(hDlg, IDC_EDIT1, tmp, 25);
             
             val_float = (float)atof(tmp);
             val_double = (double)atof(tmp);
             
-            memcpy(&val32, &val_float, 4);
-            int64_to_binary(val32, tmp2, 32);
-            sprintf(tmp, "32-bit:  0x%08X\n%s", (uint32_t)val32, tmp2);
+            memcpy(&ieee_val32, &val_float, 4);
+            int64_to_binary(ieee_val32, tmp2, 32);
+            sprintf(tmp, "32-bit:  0x%08X\n%s", (uint32_t)ieee_val32, tmp2);
             SetDlgItemText(hDlg, 101, tmp);
             
-            memcpy(&val64, &val_double, 8);
-            int64_to_binary(val64, tmp2, 64);
-            sprintf(tmp3, "0x%016I64X", (uint64_t)val64);
+            memcpy(&ieee_val64, &val_double, 8);
+            int64_to_binary(ieee_val64, tmp2, 64);
+            sprintf(tmp3, "0x%016I64X", (uint64_t)ieee_val64);
             sprintf(tmp, "64-bit:  %s\n%s", tmp3, tmp2);
             SetDlgItemText(hDlg, 102, tmp);            
+            return TRUE;
+
+        case(106):           // Push 4-byte
+            StackPushL(ieee_val32);
+            EndDialog(hDlg, FALSE);
+            return TRUE;
+
+        case(107):           // Push 8-byte
+            StackPushL(ieee_val64);
+            EndDialog(hDlg, FALSE);
             return TRUE;
 
         case(IDOK):           // OK - Close 

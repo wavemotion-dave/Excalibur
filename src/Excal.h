@@ -121,7 +121,7 @@ extern struct funcStruct MacroFuncs[];
 #define USES_L      2   // Uses long integer numbers
 #define USES_FL     3   // Can use either floats or longs
 
-#define NOTES_SIZE  4096
+#define NOTES_SIZE  8196
 
 // ---------------------------
 // Defines for the main dialog
@@ -177,6 +177,7 @@ extern double C;                // Extended Stack C
 extern double D;                // Extended Stack D
 
 extern double LASTX;            // LAST X register
+extern double lastFloat;        // Last floating value in X
 
 extern PROG_LONG XL;            // Main X register in Comp-Sci mode
 extern PROG_LONG YL;            // Main Y register in Comp-Sci mode
@@ -197,6 +198,7 @@ extern double  taxConstant;
 extern uint8_t commaMode;
 extern uint8_t eexMode;
 extern uint8_t numLockMode;
+extern uint8_t lastProgMode;
 
 extern HINSTANCE hExcaliburInstance;
 extern HWND calcMainWindow;
@@ -405,8 +407,8 @@ extern void turnOnNumLock(void);
 #define MAX_STACK_STRLEN    29
 
 #define MAX_FUNCTIONS       400     // Total Excalibur function keys across all banks
-#define MAX_REC_PLAYBACK    256     // Maximum number of program steps per program
-#define MAX_MACROS          64      // Maximum number of total programs (each getting the max steps)
+#define MAX_REC_PLAYBACK    400     // Maximum number of program steps per program
+#define MAX_MACROS          40      // Maximum number of total programs (each getting the max steps)
 #define MAX_MACRO_FUNC_TEXT 30      // Maximum macro text that can be assigned to any key
 
 struct playbackStruct

@@ -54,7 +54,7 @@
                   "https://github.com/wavemotion-dave/Excalibur"      \
                   "\n\nThis version is BETA - Expect and report Bugs!"
 
-#define CONFIG_VERSION_MAIN 0xF007 // If this changes, we wipe EVERYTHING
+#define CONFIG_VERSION_MAIN 0xF009 // If this changes, we wipe EVERYTHING
 #define CONFIG_VERSION_SUB 0xF001  // If this changes, we reset x,y window position and reset constant tables (currency, physics constants, etc)
 
 #define END_OF_PROGRAM_STR "<End Of Program>"
@@ -76,7 +76,6 @@ uint8_t bExactFont = TRUE;
 int16_t MacroStack[MAX_MACRO_STACK];
 int16_t MacroStackIdx = 0;
 uint32_t macroFlags = 0x00000000;
-
 uint8_t rpnStoreRecall = 0x00;
 
 uint32_t wordSize = 32;
@@ -85,7 +84,7 @@ uint8_t padZeros = PROG_NOPADZEROS;
 uint8_t wordMode = PROG_SIGNED;
 uint8_t hexSpacing = HEX_SPACE_NONE;
 uint8_t numberDisplayMode = INTERNATIONAL;
-
+uint8_t lastProgMode = PROG_FLOAT;
 uint16_t traceDelayValueMs = 1000;
 
 int16_t totalMappedButtonFuncs = 0;
@@ -101,6 +100,9 @@ uint8_t traceMacroPlayback = FALSE;
 int32_t lastChosenMacro = 0;
 uint8_t showTime24HourFormat = FALSE;
 uint8_t alwaysOnTop = 0;
+uint8_t reservedOpt1 = 0;
+uint8_t reservedOpt2 = 0;
+uint8_t reservedOpt3 = 0;
 
 char macroName[MAX_MACROS][MAX_MACRO_FUNC_TEXT];
 char macro_short_names[MAX_MACROS][7];
@@ -131,6 +133,7 @@ double C;     // Extended Stack C
 double D;     // Extended Stack D
 double LASTX; // LAST X register
 double LASTY; // LAST Y register
+double lastFloat = 0.0;
 
 PROG_LONG XL;     // The main register X when in Comp-Sci mode
 PROG_LONG YL;     // The main register Y when in Comp-Sci mode
@@ -1462,6 +1465,7 @@ void UpdateSpareBar_StoreRecall(void)
 // --------------------------------------------------------
 void FloatsToLongs(void)
 {
+    lastFloat = X;
     if (X <= (float)0xFFFFFFFF)
         XL = (PROG_LONG)X;
     else
@@ -1679,8 +1683,10 @@ void ShowStatus(void)
             strcat(tmpStr, "8  ");
         else if (wordSize == 16)
             strcat(tmpStr, "16 ");
-        else
+        else if (wordSize == 32)
             strcat(tmpStr, "32 ");
+        else
+            strcat(tmpStr, "64 ");
 
         if (progMode == PROG_BIN)
         {
@@ -3488,97 +3494,102 @@ void SaveToDisk(void)
 
     if (outfile)
     {
-        fwrite(&configVersionMain, sizeof(configVersionMain), 1, outfile);
-        fwrite(&configVersionSub, sizeof(configVersionSub), 1, outfile);
+        fwrite(&configVersionMain,  sizeof(configVersionMain),  1, outfile);
+        fwrite(&configVersionSub,   sizeof(configVersionSub),   1, outfile);
 
-        fwrite(&main_x, sizeof(main_x), 1, outfile);
-        fwrite(&main_y, sizeof(main_y), 1, outfile);
-        fwrite(&main_cx, sizeof(main_cx), 1, outfile);
-        fwrite(&main_cy, sizeof(main_cy), 1, outfile);
+        fwrite(&main_x,             sizeof(main_x),             1, outfile);
+        fwrite(&main_y,             sizeof(main_y),             1, outfile);
+        fwrite(&main_cx,            sizeof(main_cx),            1, outfile);
+        fwrite(&main_cy,            sizeof(main_cy),            1, outfile);
 
-        fwrite(&menuCurrentFuncs, sizeof(menuCurrentFuncs), 1, outfile);
-        fwrite(&menuLastFuncs, sizeof(menuLastFuncs), 1, outfile);
-        fwrite(&progMode, sizeof(progMode), 1, outfile);
-        fwrite(&alwaysOnTop, sizeof(alwaysOnTop), 1, outfile);
-        fwrite(&decimal_places, sizeof(decimal_places), 1, outfile);
-        fwrite(&sci_format, sizeof(sci_format), 1, outfile);
-        fwrite(&numberDisplayMode, sizeof(numberDisplayMode), 1, outfile);
-        fwrite(&padZeros, sizeof(padZeros), 1, outfile);
-        fwrite(&wordSize, sizeof(wordSize), 1, outfile);
-        fwrite(&wordMode, sizeof(wordMode), 1, outfile);
-        fwrite(&hexSpacing, sizeof(hexSpacing), 1, outfile);        
-        fwrite(&wordSizeMask, sizeof(wordSizeMask), 1, outfile);
+        fwrite(&menuCurrentFuncs,   sizeof(menuCurrentFuncs),   1, outfile);
+        fwrite(&menuLastFuncs,      sizeof(menuLastFuncs),      1, outfile);
+        fwrite(&progMode,           sizeof(progMode),           1, outfile);
+        fwrite(&alwaysOnTop,        sizeof(alwaysOnTop),        1, outfile);
+        fwrite(&decimal_places,     sizeof(decimal_places),     1, outfile);
+        fwrite(&sci_format,         sizeof(sci_format),         1, outfile);
+        fwrite(&numberDisplayMode,  sizeof(numberDisplayMode),  1, outfile);
+        fwrite(&lastProgMode,       sizeof(lastProgMode),       1, outfile);        
+        fwrite(&padZeros,           sizeof(padZeros),           1, outfile);
+        fwrite(&wordSize,           sizeof(wordSize),           1, outfile);
+        fwrite(&wordMode,           sizeof(wordMode),           1, outfile);
+        fwrite(&hexSpacing,         sizeof(hexSpacing),         1, outfile);        
+        fwrite(&wordSizeMask,       sizeof(wordSizeMask),       1, outfile);
 
-        fwrite(&X, sizeof(X), 1, outfile);
-        fwrite(&Y, sizeof(Y), 1, outfile);
-        fwrite(&Z, sizeof(Z), 1, outfile);
-        fwrite(&T, sizeof(T), 1, outfile);
-        fwrite(&LASTX, sizeof(LASTX), 1, outfile);
-        fwrite(&LASTY, sizeof(LASTY), 1, outfile);
+        fwrite(&X,                  sizeof(X),                  1, outfile);
+        fwrite(&Y,                  sizeof(Y),                  1, outfile);
+        fwrite(&Z,                  sizeof(Z),                  1, outfile);
+        fwrite(&T,                  sizeof(T),                  1, outfile);
+        fwrite(&LASTX,              sizeof(LASTX),              1, outfile);
+        fwrite(&LASTY,              sizeof(LASTY),              1, outfile);
+        fwrite(&lastFloat,          sizeof(lastFloat),          1, outfile);        
 
-        fwrite(&XL, sizeof(XL), 1, outfile);
-        fwrite(&YL, sizeof(YL), 1, outfile);
-        fwrite(&ZL, sizeof(ZL), 1, outfile);
-        fwrite(&TL, sizeof(TL), 1, outfile);
-        fwrite(&LASTXL, sizeof(LASTXL), 1, outfile);
-        fwrite(&LASTYL, sizeof(LASTYL), 1, outfile);
+        fwrite(&XL,                 sizeof(XL),                 1, outfile);
+        fwrite(&YL,                 sizeof(YL),                 1, outfile);
+        fwrite(&ZL,                 sizeof(ZL),                 1, outfile);
+        fwrite(&TL,                 sizeof(TL),                 1, outfile);
+        fwrite(&LASTXL,             sizeof(LASTXL),             1, outfile);
+        fwrite(&LASTYL,             sizeof(LASTYL),             1, outfile);
 
-        fwrite(&A, sizeof(A), 1, outfile);
-        fwrite(&B, sizeof(B), 1, outfile);
-        fwrite(&C, sizeof(C), 1, outfile);
-        fwrite(&D, sizeof(D), 1, outfile);
-        fwrite(&AL, sizeof(AL), 1, outfile);
-        fwrite(&BL, sizeof(BL), 1, outfile);
-        fwrite(&CL, sizeof(CL), 1, outfile);
-        fwrite(&DL, sizeof(DL), 1, outfile);
+        fwrite(&A,                  sizeof(A),                  1, outfile);
+        fwrite(&B,                  sizeof(B),                  1, outfile);
+        fwrite(&C,                  sizeof(C),                  1, outfile);
+        fwrite(&D,                  sizeof(D),                  1, outfile);
+        fwrite(&AL,                 sizeof(AL),                 1, outfile);
+        fwrite(&BL,                 sizeof(BL),                 1, outfile);
+        fwrite(&CL,                 sizeof(CL),                 1, outfile);
+        fwrite(&DL,                 sizeof(DL),                 1, outfile);
 
-        fwrite(&STO, sizeof(STO), 1, outfile);
-        fwrite(&SUM, sizeof(SUM), 1, outfile);
-        fwrite(&fin_reg, sizeof(fin_reg), 1, outfile);
-        fwrite(&cashFlow, sizeof(cashFlow), 1, outfile);
-        fwrite(&CFn, sizeof(CFn), 1, outfile);
+        fwrite(&STO,                sizeof(STO),                1, outfile);
+        fwrite(&SUM,                sizeof(SUM),                1, outfile);
+        fwrite(&fin_reg,            sizeof(fin_reg),            1, outfile);
+        fwrite(&cashFlow,           sizeof(cashFlow),           1, outfile);
+        fwrite(&CFn,                sizeof(CFn),                1, outfile);
 
-        fwrite(&AngleMode, sizeof(AngleMode), 1, outfile);
-        fwrite(&taxConstant, sizeof(taxConstant), 1, outfile);
-        fwrite(&commaMode, sizeof(commaMode), 1, outfile);
-        fwrite(&eexMode, sizeof(eexMode), 1, outfile);
-        fwrite(&numLockMode, sizeof(numLockMode), 1, outfile);
-        fwrite(&toolTipsOn, sizeof(toolTipsOn), 1, outfile);
-        fwrite(&payMode, sizeof(payMode), 1, outfile);
-        fwrite(&dateMode, sizeof(dateMode), 1, outfile);
-        fwrite(&depreciationType, sizeof(depreciationType), 1, outfile);
-        fwrite(&stackPushes, sizeof(stackPushes), 1, outfile);
-        fwrite(&stackPops, sizeof(stackPops), 1, outfile);
-        fwrite(&inFocusTime, sizeof(inFocusTime), 1, outfile);
-        fwrite(customSave, sizeof(customSave), 1, outfile);
-        fwrite(&extendedStack, sizeof(extendedStack), 1, outfile);
-        fwrite(&footPrint, sizeof(footPrint), 1, outfile);
-        fwrite(&popFillZero, sizeof(popFillZero), 1, outfile);
-        fwrite(&rightAlignStack, sizeof(rightAlignStack), 1, outfile);
-        fwrite(&showXMinimized, sizeof(showXMinimized), 1, outfile);
-        fwrite(&eRPN, sizeof(eRPN), 1, outfile);
-        fwrite(&ClearStackOnExit, sizeof(ClearStackOnExit), 1, outfile);
+        fwrite(&AngleMode,          sizeof(AngleMode),          1, outfile);
+        fwrite(&taxConstant,        sizeof(taxConstant),        1, outfile);
+        fwrite(&commaMode,          sizeof(commaMode),          1, outfile);
+        fwrite(&eexMode,            sizeof(eexMode),            1, outfile);
+        fwrite(&numLockMode,        sizeof(numLockMode),        1, outfile);
+        fwrite(&toolTipsOn,         sizeof(toolTipsOn),         1, outfile);
+        fwrite(&payMode,            sizeof(payMode),            1, outfile);
+        fwrite(&dateMode,           sizeof(dateMode),           1, outfile);
+        fwrite(&depreciationType,   sizeof(depreciationType),   1, outfile);
+        fwrite(&stackPushes,        sizeof(stackPushes),        1, outfile);
+        fwrite(&stackPops,          sizeof(stackPops),          1, outfile);
+        fwrite(&inFocusTime,        sizeof(inFocusTime),        1, outfile);
+        fwrite(customSave,          sizeof(customSave),         1, outfile);
+        fwrite(&extendedStack,      sizeof(extendedStack),      1, outfile);
+        fwrite(&footPrint,          sizeof(footPrint),          1, outfile);
+        fwrite(&popFillZero,        sizeof(popFillZero),        1, outfile);
+        fwrite(&rightAlignStack,    sizeof(rightAlignStack),    1, outfile);
+        fwrite(&showXMinimized,     sizeof(showXMinimized),     1, outfile);
+        fwrite(&eRPN,               sizeof(eRPN),               1, outfile);
+        fwrite(&ClearStackOnExit,   sizeof(ClearStackOnExit),   1, outfile);
+        fwrite(&reservedOpt1,       sizeof(reservedOpt1),       1, outfile);
+        fwrite(&reservedOpt2,       sizeof(reservedOpt2),       1, outfile);
+        fwrite(&reservedOpt3,       sizeof(reservedOpt3),       1, outfile);
 
-        fwrite(&playBack, sizeof(playBack), 1, outfile);
-        fwrite(&playBackSave, sizeof(playBackSave), 1, outfile);
-        fwrite(&playBackIdx, sizeof(playBackIdx), 1, outfile);
-        fwrite(&playBackIdxSave, sizeof(playBackIdxSave), 1, outfile);
-        fwrite(&macroName, sizeof(macroName), 1, outfile);
-        fwrite(&macro_short_names, sizeof(macro_short_names), 1, outfile);
+        fwrite(&playBack,           sizeof(playBack),           1, outfile);
+        fwrite(&playBackSave,       sizeof(playBackSave),       1, outfile);
+        fwrite(&playBackIdx,        sizeof(playBackIdx),        1, outfile);
+        fwrite(&playBackIdxSave,    sizeof(playBackIdxSave),    1, outfile);
+        fwrite(&macroName,          sizeof(macroName),          1, outfile);
+        fwrite(&macro_short_names,  sizeof(macro_short_names),  1, outfile);
 
-        fwrite(&currency1index, sizeof(currency1index), 1, outfile);
-        fwrite(&currency2index, sizeof(currency2index), 1, outfile);
+        fwrite(&currency1index,     sizeof(currency1index),     1, outfile);
+        fwrite(&currency2index,     sizeof(currency2index),     1, outfile);
 
-        fwrite(&constants, sizeof(constants), 1, outfile);
-        fwrite(&constantBankNames, sizeof(constantBankNames), 1, outfile);
-        fwrite(&CurrencyConv, sizeof(CurrencyConv), 1, outfile);
+        fwrite(&constants,          sizeof(constants),          1, outfile);
+        fwrite(&constantBankNames,  sizeof(constantBankNames),  1, outfile);
+        fwrite(&CurrencyConv,       sizeof(CurrencyConv),       1, outfile);
 
-        fwrite(&lastChosenConst, sizeof(lastChosenConst), 1, outfile);
-        fwrite(&lastConstBank, sizeof(lastConstBank), 1, outfile);
-        fwrite(&excaliburNotes, sizeof(excaliburNotes), 1, outfile);
-        fwrite(&lastChosenMacro, sizeof(lastChosenMacro), 1, outfile);
-        fwrite(&traceDelayValueMs, sizeof(traceDelayValueMs), 1, outfile);
-        fwrite(&indirectRegister, sizeof(indirectRegister), 1, outfile);
+        fwrite(&lastChosenConst,    sizeof(lastChosenConst),    1, outfile);
+        fwrite(&lastConstBank,      sizeof(lastConstBank),      1, outfile);
+        fwrite(&excaliburNotes,     sizeof(excaliburNotes),     1, outfile);
+        fwrite(&lastChosenMacro,    sizeof(lastChosenMacro),    1, outfile);
+        fwrite(&traceDelayValueMs,  sizeof(traceDelayValueMs),  1, outfile);
+        fwrite(&indirectRegister,   sizeof(indirectRegister),   1, outfile);
 
         fwrite(&reserved, RESERVED_SIZE, 1, outfile);
 
@@ -3600,8 +3611,8 @@ void ReadFromDisk(void)
     infile = fopen(GetConfigurationDirectory(), "rb");
     if (infile != NULL)
     {
-        fread(&configVersionMain, sizeof(configVersionMain), 1, infile);
-        fread(&configVersionSub, sizeof(configVersionSub), 1, infile);
+        fread(&configVersionMain,   sizeof(configVersionMain),  1, infile);
+        fread(&configVersionSub,    sizeof(configVersionSub),   1, infile);
 
         // --------------------------------------------------------------
         // If main version has changed, we wipe config with defaults...
@@ -3615,83 +3626,88 @@ void ReadFromDisk(void)
             return;
         }
 
-        fread(&main_x, sizeof(main_x), 1, infile);
-        fread(&main_y, sizeof(main_y), 1, infile);
-        fread(&main_cx, sizeof(main_cx), 1, infile);
-        fread(&main_cy, sizeof(main_cy), 1, infile);
+        fread(&main_x,             sizeof(main_x),             1, infile);
+        fread(&main_y,             sizeof(main_y),             1, infile);
+        fread(&main_cx,            sizeof(main_cx),            1, infile);
+        fread(&main_cy,            sizeof(main_cy),            1, infile);
 
-        fread(&menuCurrentFuncs, sizeof(menuCurrentFuncs), 1, infile);
-        fread(&menuLastFuncs, sizeof(menuLastFuncs), 1, infile);
-        fread(&progMode, sizeof(progMode), 1, infile);
-        fread(&alwaysOnTop, sizeof(alwaysOnTop), 1, infile);
-        fread(&decimal_places, sizeof(decimal_places), 1, infile);
-        fread(&sci_format, sizeof(sci_format), 1, infile);
-        fread(&numberDisplayMode, sizeof(numberDisplayMode), 1, infile);
-        fread(&padZeros, sizeof(padZeros), 1, infile);
-        fread(&wordSize, sizeof(wordSize), 1, infile);
-        fread(&wordMode, sizeof(wordMode), 1, infile);
-        fread(&hexSpacing, sizeof(hexSpacing), 1, infile);        
-        fread(&wordSizeMask, sizeof(wordSizeMask), 1, infile);
+        fread(&menuCurrentFuncs,   sizeof(menuCurrentFuncs),   1, infile);
+        fread(&menuLastFuncs,      sizeof(menuLastFuncs),      1, infile);
+        fread(&progMode,           sizeof(progMode),           1, infile);
+        fread(&alwaysOnTop,        sizeof(alwaysOnTop),        1, infile);
+        fread(&decimal_places,     sizeof(decimal_places),     1, infile);
+        fread(&sci_format,         sizeof(sci_format),         1, infile);
+        fread(&numberDisplayMode,  sizeof(numberDisplayMode),  1, infile);
+        fread(&lastProgMode,       sizeof(lastProgMode),       1, infile);
+        fread(&padZeros,           sizeof(padZeros),           1, infile);
+        fread(&wordSize,           sizeof(wordSize),           1, infile);
+        fread(&wordMode,           sizeof(wordMode),           1, infile);
+        fread(&hexSpacing,         sizeof(hexSpacing),         1, infile);        
+        fread(&wordSizeMask,       sizeof(wordSizeMask),       1, infile);
 
-        fread(&X, sizeof(X), 1, infile);
-        fread(&Y, sizeof(Y), 1, infile);
-        fread(&Z, sizeof(Z), 1, infile);
-        fread(&T, sizeof(T), 1, infile);
-        fread(&LASTX, sizeof(LASTX), 1, infile);
-        fread(&LASTY, sizeof(LASTY), 1, infile);
+        fread(&X,                  sizeof(X),                  1, infile);
+        fread(&Y,                  sizeof(Y),                  1, infile);
+        fread(&Z,                  sizeof(Z),                  1, infile);
+        fread(&T,                  sizeof(T),                  1, infile);
+        fread(&LASTX,              sizeof(LASTX),              1, infile);
+        fread(&LASTY,              sizeof(LASTY),              1, infile);
+        fread(&lastFloat,          sizeof(lastFloat),          1, infile);        
 
-        fread(&XL, sizeof(XL), 1, infile);
-        fread(&YL, sizeof(YL), 1, infile);
-        fread(&ZL, sizeof(ZL), 1, infile);
-        fread(&TL, sizeof(TL), 1, infile);
-        fread(&LASTXL, sizeof(LASTXL), 1, infile);
-        fread(&LASTYL, sizeof(LASTYL), 1, infile);
+        fread(&XL,                 sizeof(XL),                 1, infile);
+        fread(&YL,                 sizeof(YL),                 1, infile);
+        fread(&ZL,                 sizeof(ZL),                 1, infile);
+        fread(&TL,                 sizeof(TL),                 1, infile);
+        fread(&LASTXL,             sizeof(LASTXL),             1, infile);
+        fread(&LASTYL,             sizeof(LASTYL),             1, infile);
 
-        fread(&A, sizeof(A), 1, infile);
-        fread(&B, sizeof(B), 1, infile);
-        fread(&C, sizeof(C), 1, infile);
-        fread(&D, sizeof(D), 1, infile);
-        fread(&AL, sizeof(AL), 1, infile);
-        fread(&BL, sizeof(BL), 1, infile);
-        fread(&CL, sizeof(CL), 1, infile);
-        fread(&DL, sizeof(DL), 1, infile);
+        fread(&A,                  sizeof(A),                  1, infile);
+        fread(&B,                  sizeof(B),                  1, infile);
+        fread(&C,                  sizeof(C),                  1, infile);
+        fread(&D,                  sizeof(D),                  1, infile);
+        fread(&AL,                 sizeof(AL),                 1, infile);
+        fread(&BL,                 sizeof(BL),                 1, infile);
+        fread(&CL,                 sizeof(CL),                 1, infile);
+        fread(&DL,                 sizeof(DL),                 1, infile);
 
-        fread(&STO, sizeof(STO), 1, infile);
-        fread(&SUM, sizeof(SUM), 1, infile);
-        fread(&fin_reg, sizeof(fin_reg), 1, infile);
-        fread(&cashFlow, sizeof(cashFlow), 1, infile);
-        fread(&CFn, sizeof(CFn), 1, infile);
+        fread(&STO,                sizeof(STO),                1, infile);
+        fread(&SUM,                sizeof(SUM),                1, infile);
+        fread(&fin_reg,            sizeof(fin_reg),            1, infile);
+        fread(&cashFlow,           sizeof(cashFlow),           1, infile);
+        fread(&CFn,                sizeof(CFn),                1, infile);
 
-        fread(&AngleMode, sizeof(AngleMode), 1, infile);
-        fread(&taxConstant, sizeof(taxConstant), 1, infile);
-        fread(&commaMode, sizeof(commaMode), 1, infile);
-        fread(&eexMode, sizeof(eexMode), 1, infile);
-        fread(&numLockMode, sizeof(numLockMode), 1, infile);
-        fread(&toolTipsOn, sizeof(toolTipsOn), 1, infile);
-        fread(&payMode, sizeof(payMode), 1, infile);
-        fread(&dateMode, sizeof(dateMode), 1, infile);
-        fread(&depreciationType, sizeof(depreciationType), 1, infile);
-        fread(&stackPushes, sizeof(stackPushes), 1, infile);
-        fread(&stackPops, sizeof(stackPops), 1, infile);
-        fread(&inFocusTime, sizeof(inFocusTime), 1, infile);
-        fread(customSave, sizeof(customSave), 1, infile);
-        fread(&extendedStack, sizeof(extendedStack), 1, infile);
-        fread(&footPrint, sizeof(footPrint), 1, infile);
-        fread(&popFillZero, sizeof(popFillZero), 1, infile);
-        fread(&rightAlignStack, sizeof(rightAlignStack), 1, infile);
-        fread(&showXMinimized, sizeof(showXMinimized), 1, infile);
-        fread(&eRPN, sizeof(eRPN), 1, infile);
-        fread(&ClearStackOnExit, sizeof(ClearStackOnExit), 1, infile);
+        fread(&AngleMode,          sizeof(AngleMode),          1, infile);
+        fread(&taxConstant,        sizeof(taxConstant),        1, infile);
+        fread(&commaMode,          sizeof(commaMode),          1, infile);
+        fread(&eexMode,            sizeof(eexMode),            1, infile);
+        fread(&numLockMode,        sizeof(numLockMode),        1, infile);
+        fread(&toolTipsOn,         sizeof(toolTipsOn),         1, infile);
+        fread(&payMode,            sizeof(payMode),            1, infile);
+        fread(&dateMode,           sizeof(dateMode),           1, infile);
+        fread(&depreciationType,   sizeof(depreciationType),   1, infile);
+        fread(&stackPushes,        sizeof(stackPushes),        1, infile);
+        fread(&stackPops,          sizeof(stackPops),          1, infile);
+        fread(&inFocusTime,        sizeof(inFocusTime),        1, infile);
+        fread(customSave,          sizeof(customSave),         1, infile);
+        fread(&extendedStack,      sizeof(extendedStack),      1, infile);
+        fread(&footPrint,          sizeof(footPrint),          1, infile);
+        fread(&popFillZero,        sizeof(popFillZero),        1, infile);
+        fread(&rightAlignStack,    sizeof(rightAlignStack),    1, infile);
+        fread(&showXMinimized,     sizeof(showXMinimized),     1, infile);
+        fread(&eRPN,               sizeof(eRPN),               1, infile);
+        fread(&ClearStackOnExit,   sizeof(ClearStackOnExit),   1, infile);
+        fread(&reservedOpt1,       sizeof(reservedOpt1),       1, infile);
+        fread(&reservedOpt2,       sizeof(reservedOpt2),       1, infile);
+        fread(&reservedOpt3,       sizeof(reservedOpt3),       1, infile);
 
-        fread(&playBack, sizeof(playBack), 1, infile);
-        fread(&playBackSave, sizeof(playBackSave), 1, infile);
-        fread(&playBackIdx, sizeof(playBackIdx), 1, infile);
-        fread(&playBackIdxSave, sizeof(playBackIdxSave), 1, infile);
-        fread(&macroName, sizeof(macroName), 1, infile);
-        fread(&macro_short_names, sizeof(macro_short_names), 1, infile);
+        fread(&playBack,           sizeof(playBack),           1, infile);
+        fread(&playBackSave,       sizeof(playBackSave),       1, infile);
+        fread(&playBackIdx,        sizeof(playBackIdx),        1, infile);
+        fread(&playBackIdxSave,    sizeof(playBackIdxSave),    1, infile);
+        fread(&macroName,          sizeof(macroName),          1, infile);
+        fread(&macro_short_names,  sizeof(macro_short_names),  1, infile);
 
-        fread(&currency1index, sizeof(currency1index), 1, infile);
-        fread(&currency2index, sizeof(currency2index), 1, infile);
+        fread(&currency1index,     sizeof(currency1index),     1, infile);
+        fread(&currency2index,     sizeof(currency2index),     1, infile);
 
         if (configVersionSub != CONFIG_VERSION_SUB) // Skip these if sub-ver changed
         {
@@ -3701,17 +3717,17 @@ void ReadFromDisk(void)
         }
         else
         {
-            fread(&constants, sizeof(constants), 1, infile);
+            fread(&constants,       sizeof(constants),           1, infile);
             fread(&constantBankNames, sizeof(constantBankNames), 1, infile);
-            fread(&CurrencyConv, sizeof(CurrencyConv), 1, infile);
+            fread(&CurrencyConv,    sizeof(CurrencyConv),        1, infile);
         }
 
-        fread(&lastChosenConst, sizeof(lastChosenConst), 1, infile);
-        fread(&lastConstBank, sizeof(lastConstBank), 1, infile);
-        fread(excaliburNotes, sizeof(excaliburNotes), 1, infile);
-        fread(&lastChosenMacro, sizeof(lastChosenMacro), 1, infile);
-        fread(&traceDelayValueMs, sizeof(traceDelayValueMs), 1, infile);
-        fread(&indirectRegister, sizeof(indirectRegister), 1, infile);
+        fread(&lastChosenConst,     sizeof(lastChosenConst),     1, infile);
+        fread(&lastConstBank,       sizeof(lastConstBank),       1, infile);
+        fread(excaliburNotes,       sizeof(excaliburNotes),      1, infile);
+        fread(&lastChosenMacro,     sizeof(lastChosenMacro),     1, infile);
+        fread(&traceDelayValueMs,   sizeof(traceDelayValueMs),   1, infile);
+        fread(&indirectRegister,    sizeof(indirectRegister),    1, infile);
 
         fread(&reserved, RESERVED_SIZE, 1, infile);
 

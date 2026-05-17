@@ -123,30 +123,6 @@ void Cust_MacroPlayback37(void) { CustMacroPlayback(36); }
 void Cust_MacroPlayback38(void) { CustMacroPlayback(37); }
 void Cust_MacroPlayback39(void) { CustMacroPlayback(38); }
 void Cust_MacroPlayback40(void) { CustMacroPlayback(39); }
-void Cust_MacroPlayback41(void) { CustMacroPlayback(40); }
-void Cust_MacroPlayback42(void) { CustMacroPlayback(41); }
-void Cust_MacroPlayback43(void) { CustMacroPlayback(42); }
-void Cust_MacroPlayback44(void) { CustMacroPlayback(43); }
-void Cust_MacroPlayback45(void) { CustMacroPlayback(44); }
-void Cust_MacroPlayback46(void) { CustMacroPlayback(45); }
-void Cust_MacroPlayback47(void) { CustMacroPlayback(46); }
-void Cust_MacroPlayback48(void) { CustMacroPlayback(47); }
-void Cust_MacroPlayback49(void) { CustMacroPlayback(48); }
-void Cust_MacroPlayback50(void) { CustMacroPlayback(49); }
-void Cust_MacroPlayback51(void) { CustMacroPlayback(50); }
-void Cust_MacroPlayback52(void) { CustMacroPlayback(51); }
-void Cust_MacroPlayback53(void) { CustMacroPlayback(52); }
-void Cust_MacroPlayback54(void) { CustMacroPlayback(53); }
-void Cust_MacroPlayback55(void) { CustMacroPlayback(54); }
-void Cust_MacroPlayback56(void) { CustMacroPlayback(55); }
-void Cust_MacroPlayback57(void) { CustMacroPlayback(56); }
-void Cust_MacroPlayback58(void) { CustMacroPlayback(57); }
-void Cust_MacroPlayback59(void) { CustMacroPlayback(58); }
-void Cust_MacroPlayback60(void) { CustMacroPlayback(59); }
-void Cust_MacroPlayback61(void) { CustMacroPlayback(60); }
-void Cust_MacroPlayback62(void) { CustMacroPlayback(61); }
-void Cust_MacroPlayback63(void) { CustMacroPlayback(62); }
-void Cust_MacroPlayback64(void) { CustMacroPlayback(63); }
 
 
 struct funcStruct MacroFuncs[MAX_MACROS] = {
@@ -190,30 +166,6 @@ struct funcStruct MacroFuncs[MAX_MACROS] = {
     {FN1,  UNI_UNUSED, USES_F, ALLOWREC, ' ', " ", NO_L, X_NULL,  Cust_MacroPlayback38,    T_NULL,  H_NULL},
     {FN1,  UNI_UNUSED, USES_F, ALLOWREC, ' ', " ", NO_L, X_NULL,  Cust_MacroPlayback39,    T_NULL,  H_NULL},
     {FN1,  UNI_UNUSED, USES_F, ALLOWREC, ' ', " ", NO_L, X_NULL,  Cust_MacroPlayback40,    T_NULL,  H_NULL},
-    {FN1,  UNI_UNUSED, USES_F, ALLOWREC, ' ', " ", NO_L, X_NULL,  Cust_MacroPlayback41,    T_NULL,  H_NULL},
-    {FN1,  UNI_UNUSED, USES_F, ALLOWREC, ' ', " ", NO_L, X_NULL,  Cust_MacroPlayback42,    T_NULL,  H_NULL},
-    {FN1,  UNI_UNUSED, USES_F, ALLOWREC, ' ', " ", NO_L, X_NULL,  Cust_MacroPlayback43,    T_NULL,  H_NULL},
-    {FN1,  UNI_UNUSED, USES_F, ALLOWREC, ' ', " ", NO_L, X_NULL,  Cust_MacroPlayback44,    T_NULL,  H_NULL},
-    {FN1,  UNI_UNUSED, USES_F, ALLOWREC, ' ', " ", NO_L, X_NULL,  Cust_MacroPlayback45,    T_NULL,  H_NULL},
-    {FN1,  UNI_UNUSED, USES_F, ALLOWREC, ' ', " ", NO_L, X_NULL,  Cust_MacroPlayback46,    T_NULL,  H_NULL},
-    {FN1,  UNI_UNUSED, USES_F, ALLOWREC, ' ', " ", NO_L, X_NULL,  Cust_MacroPlayback47,    T_NULL,  H_NULL},
-    {FN1,  UNI_UNUSED, USES_F, ALLOWREC, ' ', " ", NO_L, X_NULL,  Cust_MacroPlayback48,    T_NULL,  H_NULL},
-    {FN1,  UNI_UNUSED, USES_F, ALLOWREC, ' ', " ", NO_L, X_NULL,  Cust_MacroPlayback49,    T_NULL,  H_NULL},
-    {FN1,  UNI_UNUSED, USES_F, ALLOWREC, ' ', " ", NO_L, X_NULL,  Cust_MacroPlayback50,    T_NULL,  H_NULL},
-    {FN1,  UNI_UNUSED, USES_F, ALLOWREC, ' ', " ", NO_L, X_NULL,  Cust_MacroPlayback51,    T_NULL,  H_NULL},
-    {FN1,  UNI_UNUSED, USES_F, ALLOWREC, ' ', " ", NO_L, X_NULL,  Cust_MacroPlayback52,    T_NULL,  H_NULL},
-    {FN1,  UNI_UNUSED, USES_F, ALLOWREC, ' ', " ", NO_L, X_NULL,  Cust_MacroPlayback53,    T_NULL,  H_NULL},
-    {FN1,  UNI_UNUSED, USES_F, ALLOWREC, ' ', " ", NO_L, X_NULL,  Cust_MacroPlayback54,    T_NULL,  H_NULL},
-    {FN1,  UNI_UNUSED, USES_F, ALLOWREC, ' ', " ", NO_L, X_NULL,  Cust_MacroPlayback55,    T_NULL,  H_NULL},
-    {FN1,  UNI_UNUSED, USES_F, ALLOWREC, ' ', " ", NO_L, X_NULL,  Cust_MacroPlayback56,    T_NULL,  H_NULL},
-    {FN1,  UNI_UNUSED, USES_F, ALLOWREC, ' ', " ", NO_L, X_NULL,  Cust_MacroPlayback57,    T_NULL,  H_NULL},
-    {FN1,  UNI_UNUSED, USES_F, ALLOWREC, ' ', " ", NO_L, X_NULL,  Cust_MacroPlayback58,    T_NULL,  H_NULL},
-    {FN1,  UNI_UNUSED, USES_F, ALLOWREC, ' ', " ", NO_L, X_NULL,  Cust_MacroPlayback59,    T_NULL,  H_NULL},
-    {FN1,  UNI_UNUSED, USES_F, ALLOWREC, ' ', " ", NO_L, X_NULL,  Cust_MacroPlayback60,    T_NULL,  H_NULL},
-    {FN1,  UNI_UNUSED, USES_F, ALLOWREC, ' ', " ", NO_L, X_NULL,  Cust_MacroPlayback61,    T_NULL,  H_NULL},
-    {FN1,  UNI_UNUSED, USES_F, ALLOWREC, ' ', " ", NO_L, X_NULL,  Cust_MacroPlayback62,    T_NULL,  H_NULL},
-    {FN1,  UNI_UNUSED, USES_F, ALLOWREC, ' ', " ", NO_L, X_NULL,  Cust_MacroPlayback63,    T_NULL,  H_NULL},
-    {FN1,  UNI_UNUSED, USES_F, ALLOWREC, ' ', " ", NO_L, X_NULL,  Cust_MacroPlayback64,    T_NULL,  H_NULL},
 };
 
 
