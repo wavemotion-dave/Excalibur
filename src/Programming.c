@@ -478,7 +478,7 @@ void Macro_TFx(void)
 void Macro_ClearF(void)
 {
     macroFlags = 0x00000000;
-    blinkXDisplay();
+    blinkXDisplay(0);
 }
 
 
@@ -494,7 +494,7 @@ void Macro_Pause(void)
 void Macro_Beep(void)
 {
     // Play the resource asynchronously
-	PlaySound(MAKEINTRESOURCE(IDR_BEEP), GetModuleHandle(NULL), SND_RESOURCE | SND_SYNC);
+    PlaySound(MAKEINTRESOURCE(IDR_BEEP), GetModuleHandle(NULL), SND_RESOURCE | SND_SYNC);
     sleep_and_peek(250);
 }
 

@@ -485,8 +485,8 @@ extern unsigned int macroFlags;
 extern uint8_t traceMacroPlayback;
 extern uint16_t traceDelayValueMs;
 
-extern void blinkXDisplay(void);
-extern void blinkStack(void);
+extern void blinkXDisplay(uint8_t no_peek);
+extern void blinkStack(uint8_t no_peek);
 extern void endRunningMacro(void);
 extern void UpdateDebugRegs(void);
 extern void UpdateDebugProgram(int resetProgramList);

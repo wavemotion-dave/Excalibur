@@ -244,9 +244,9 @@ void MakeRadixStr(PROG_LONG val, char *tmpL)
     else if (progMode == PROG_DEC)
     {
         if (wordMode == PROG_SIGNED)
-			sprintf(tmpL, "%I64d", val);
+            sprintf(tmpL, "%I64d", val);
         else
-			sprintf(tmpL, "%I64u", val);
+            sprintf(tmpL, "%I64u", val);
         if (strlen(tmpL) < 18) // Above this we can't fit commas
         {
             PutCommas(tmpL);
@@ -1177,7 +1177,7 @@ PROG_LONG biggestProgVal(void)
 // * @param n: The 64-bit integer to convert.
 // * @param out_str: A pointer to a char array of at least 65 bytes.
 // 
-void int64_to_binary(uint64_t n, char *out_str, uint8_t bits)
+void int64_to_binary_str(uint64_t n, char *out_str, uint8_t bits)
 {
     int i;
     int idx=0;
@@ -1250,12 +1250,12 @@ BOOL CALLBACK DlgProcIEEE(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam
             val_double = (double)atof(tmp);
             
             memcpy(&ieee_val32, &val_float, 4);
-            int64_to_binary(ieee_val32, tmp2, 32);
+            int64_to_binary_str(ieee_val32, tmp2, 32);
             sprintf(tmp, "32-bit:  0x%08X\n%s", (uint32_t)ieee_val32, tmp2);
             SetDlgItemText(hDlg, 101, tmp);
             
             memcpy(&ieee_val64, &val_double, 8);
-            int64_to_binary(ieee_val64, tmp2, 64);
+            int64_to_binary_str(ieee_val64, tmp2, 64);
             sprintf(tmp3, "0x%016I64X", (uint64_t)ieee_val64);
             sprintf(tmp, "64-bit:  %s\n%s", tmp3, tmp2);
             SetDlgItemText(hDlg, 102, tmp);            

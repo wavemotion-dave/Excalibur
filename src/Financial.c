@@ -234,7 +234,7 @@ void FIN_fv(void)
     {
         fin_reg[FIN_REG_FV] = X;
         Xedit = X_NEW;
-        blinkXDisplay();
+        blinkXDisplay(0);
         return;
     }
 
@@ -273,7 +273,7 @@ void FIN_pv(void)
     {
         fin_reg[FIN_REG_PV] = X;
         Xedit = X_NEW;
-        blinkXDisplay();
+        blinkXDisplay(0);
         return;
     }
 
@@ -455,7 +455,7 @@ void FIN_pmt(void)
     {
         fin_reg[FIN_REG_PMT] = X;
         Xedit = X_NEW;
-        blinkXDisplay();
+        blinkXDisplay(0);
         return;
     }
 
@@ -499,7 +499,7 @@ void FIN_n(void)
     {
         fin_reg[FIN_REG_n] = X;
         Xedit = X_NEW;
-        blinkXDisplay();
+        blinkXDisplay(0);
         return;
     }
 
@@ -564,7 +564,7 @@ void FIN_i(void)
     {
         fin_reg[FIN_REG_i] = X;
         Xedit = X_NEW;
-        blinkXDisplay();
+        blinkXDisplay(0);
         return;
     }
 
@@ -640,7 +640,7 @@ void FIN_cashFlow0(void)
     CFn = 0;
     fin_reg[FIN_REG_n] = 0.0;
     cashFlow[CFn] = X;
-    blinkXDisplay();
+    blinkXDisplay(0);
 }
 
 void FIN_cashFlowj(void)
@@ -654,7 +654,7 @@ void FIN_cashFlowj(void)
         CFn++;
         fin_reg[FIN_REG_n] = CFn;
         cashFlow[CFn] = X;
-        blinkXDisplay();
+        blinkXDisplay(0);
     }
 }
 
@@ -662,7 +662,7 @@ void FIN_cashFlowNj(void)
 {
     int loop, finalLoop;
 
-    blinkXDisplay();
+    blinkXDisplay(0);
 
     finalLoop = (int) X - 1;
     if (finalLoop < 0)
@@ -936,7 +936,7 @@ void FIN_muc(void)
     {
         fin_reg[FIN_REG_MUC] = X;
         Xedit = X_NEW;
-        blinkXDisplay();
+        blinkXDisplay(0);
         return;
     }
 
@@ -966,7 +966,7 @@ void FIN_mup(void)
     {
         fin_reg[FIN_REG_MUP] = X;
         Xedit = X_NEW;
-        blinkXDisplay();
+        blinkXDisplay(0);
         return;
     }
 
@@ -996,7 +996,7 @@ void FIN_cost(void)
     {
         fin_reg[FIN_REG_COST] = X;
         Xedit = X_NEW;
-        blinkXDisplay();
+        blinkXDisplay(0);
         return;
     }
 
@@ -1022,7 +1022,7 @@ void FIN_price(void)
     {
         fin_reg[FIN_REG_PRICE] = X;
         Xedit = X_NEW;
-        blinkXDisplay();
+        blinkXDisplay(0);
         return;
     }
 

@@ -45,7 +45,7 @@
 #define VERSION_STR "v3.XX-03"
 
 #define ABOUT_MSG "Excalibur for Windows 32-bit\n"                    \
-                  "Version 3.XX-03  -  May 16, 2026\n\n"              \
+                  "Version 3.XX-03  -  May 17, 2026\n\n"              \
                   "Copyright 1994-2026 David Bernazzani\n\n"          \
                   "Please read the disclaimer and understand the\n"   \
                   "accuracy and precision issues before using.\n\n"   \
@@ -748,15 +748,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
         case ('V'): // Paste
             if (GetKeyState(VK_CONTROL) < 0)
             {
-                ClipboardCopySelection(hwnd, COPY_X_FROM_CLIPBOARD);
+                ClipboardCopySelection(calcMainWindow, COPY_X_FROM_CLIPBOARD);
+                blinkXDisplay(1);
             }
             break;
 
         case ('C'): // Copy
             if (GetKeyState(VK_CONTROL) < 0)
             {
-                ClipboardCopySelection(hwnd, COPY_X_TO_CLIPBOARD);
-                blinkXDisplay();
+                ClipboardCopySelection(calcMainWindow, COPY_X_TO_CLIPBOARD);
+                blinkXDisplay(1);
             }
             break;
 
@@ -764,7 +765,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
             if (GetKeyState(VK_CONTROL) < 0)
             {
                 ClipboardCopySelection(hwnd, COPY_ALL_TO_CLIPBOARD);
-                blinkStack();
+                blinkStack(1);
             }
             break;
 
@@ -2631,7 +2632,7 @@ void RPN_digit(WPARAM key)
                 STO[reg] = X;
             }
 
-            blinkXDisplay();
+            blinkXDisplay(0);
         }
         else if (rpnStoreRecall & REG_RECALL)
         {
@@ -5323,13 +5324,13 @@ void RPN_Notes(void)
 void RPN_Copy(void)
 {
     ClipboardCopySelection(calcMainWindow, COPY_X_TO_CLIPBOARD);
-    blinkXDisplay();
+    blinkXDisplay(0);
 }
 
 void RPN_Paste(void)
 {
     ClipboardCopySelection(calcMainWindow, COPY_X_FROM_CLIPBOARD);
-    blinkXDisplay();
+    blinkXDisplay(0);
 }
 
 void RPN_inverse(void)
@@ -5344,18 +5345,30 @@ void RPN_inverse(void)
     }
 }
 
-void blinkXDisplay(void)
+void blinkXDisplay(uint8_t no_peek)
 {
     if (!macroPlayback)
     {
+        HWND hControl;
         GetDlgItemText(calcMainWindow, RPN_STACK_X, tmpStr, MAX_STACK_STRLEN);
         SetDlgItemText(calcMainWindow, RPN_STACK_X, " ");
-        sleep_and_peek(200);
+
+        hControl = GetDlgItem(calcMainWindow, RPN_STACK_X);
+        InvalidateRect(hControl, NULL, TRUE);
+        UpdateWindow(hControl);
+
+        if (no_peek) Sleep(250);
+        else sleep_and_peek(250);
         GetDlgItemText(calcMainWindow, RPN_STACK_X, tmpStr, MAX_STACK_STRLEN);
+        
+        hControl = GetDlgItem(calcMainWindow, RPN_STACK_X);
+        InvalidateRect(hControl, NULL, TRUE);
+        UpdateWindow(hControl);
+        Sleep(10);
     }
 }
 
-void blinkStack(void)
+void blinkStack(uint8_t no_peek)
 {
     char tmp1[MAX_STACK_STRLEN + 1];
     char tmp2[MAX_STACK_STRLEN + 1];
@@ -5364,6 +5377,7 @@ void blinkStack(void)
 
     if (!macroPlayback)
     {
+        HWND hControl;
         GetDlgItemText(calcMainWindow, RPN_STACK_X, tmp1, MAX_STACK_STRLEN);
         GetDlgItemText(calcMainWindow, RPN_STACK_Y, tmp2, MAX_STACK_STRLEN);
         GetDlgItemText(calcMainWindow, RPN_STACK_Z, tmp3, MAX_STACK_STRLEN);
@@ -5372,11 +5386,22 @@ void blinkStack(void)
         SetDlgItemText(calcMainWindow, RPN_STACK_Y, " ");
         SetDlgItemText(calcMainWindow, RPN_STACK_Z, " ");
         SetDlgItemText(calcMainWindow, RPN_STACK_T, " ");
-        sleep_and_peek(200);
+        
+        hControl = GetDlgItem(calcMainWindow, RPN_STACK);
+        InvalidateRect(hControl, NULL, TRUE);
+        UpdateWindow(hControl);
+        
+        if (no_peek) Sleep(250);
+        else sleep_and_peek(250);
         GetDlgItemText(calcMainWindow, RPN_STACK_X, tmp1, MAX_STACK_STRLEN);
         GetDlgItemText(calcMainWindow, RPN_STACK_Y, tmp2, MAX_STACK_STRLEN);
         GetDlgItemText(calcMainWindow, RPN_STACK_Z, tmp3, MAX_STACK_STRLEN);
         GetDlgItemText(calcMainWindow, RPN_STACK_T, tmp4, MAX_STACK_STRLEN);
+
+        hControl = GetDlgItem(calcMainWindow, RPN_STACK);
+        InvalidateRect(hControl, NULL, TRUE);
+        UpdateWindow(hControl);
+        Sleep(10);
     }
 }
 
