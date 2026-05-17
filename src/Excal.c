@@ -80,8 +80,8 @@ uint8_t rpnStoreRecall = 0x00;
 
 uint32_t wordSize = 32;
 uint64_t wordSizeMask = (uint64_t) 0xFFFFFFFFL;
-uint8_t padZeros = PROG_NOPADZEROS;
-uint8_t wordMode = PROG_SIGNED;
+uint8_t padZeros = COMPSCI_NOPADZEROS;
+uint8_t wordMode = COMPSCI_SIGNED;
 uint8_t hexSpacing = HEX_SPACE_NONE;
 uint8_t numberDisplayMode = INTERNATIONAL;
 uint8_t lastProgMode = PROG_FLOAT;
@@ -1526,7 +1526,7 @@ void FloatsToLongs(void)
 // --------------------------------------------------------
 void LongsToFloats(void)
 {
-    if (wordMode == PROG_SIGNED)
+    if (wordMode == COMPSCI_SIGNED)
     {
         X = (double)(PROG_SIGNEDLONG)XL;
         Y = (double)(PROG_SIGNEDLONG)YL;
@@ -1675,7 +1675,7 @@ void ShowStatus(void)
 
     if (progMode != PROG_FLOAT)
     {
-        if (wordMode == PROG_SIGNED)
+        if (wordMode == COMPSCI_SIGNED)
             sprintf(tmpStr, "S");
         else
             sprintf(tmpStr, "U");
@@ -3064,7 +3064,7 @@ void RPN_divide(void)
         }
         else
         {
-            if (wordMode == PROG_SIGNED)
+            if (wordMode == COMPSCI_SIGNED)
             {
                 sxl = (PROG_SIGNEDLONG)StackPopL();
                 syl = (PROG_SIGNEDLONG)StackPopL();

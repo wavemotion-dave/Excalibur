@@ -242,15 +242,15 @@ extern uint8_t  wordMode;
 extern uint64_t wordSizeMask;
 extern uint8_t  hexSpacing;
 
-#define PROG_UNSIGNED   1
-#define PROG_SIGNED     0
+#define COMPSCI_SIGNED      0
+#define COMPSCI_UNSIGNED    1
 
-#define PROG_PADZEROS   1
-#define PROG_NOPADZEROS 0
+#define COMPSCI_NOPADZEROS  0
+#define COMPSCI_PADZEROS    1
 
-#define HEX_SPACE_NONE  0
-#define HEX_SPACE_2     1
-#define HEX_SPACE_4     2
+#define HEX_SPACE_NONE      0
+#define HEX_SPACE_2         1
+#define HEX_SPACE_4         2
 
 extern uint8_t numberDisplayMode;
 

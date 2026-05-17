@@ -681,7 +681,7 @@ void Macro_StoInd(void)
         indirectRegister = (unsigned long) X;
     else
     {
-        if (wordMode == PROG_SIGNED)
+        if (wordMode == COMPSCI_SIGNED)
             indirectRegister = (long) XL;
         else
             indirectRegister = (unsigned long) XL;

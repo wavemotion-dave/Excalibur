@@ -243,7 +243,7 @@ void MakeRadixStr(PROG_LONG val, char *tmpL)
     }
     else if (progMode == PROG_DEC)
     {
-        if (wordMode == PROG_SIGNED)
+        if (wordMode == COMPSCI_SIGNED)
             sprintf(tmpL, "%I64d", val);
         else
             sprintf(tmpL, "%I64u", val);
@@ -275,7 +275,7 @@ PROG_LONG maskStackStuff(PROG_LONG lng)
 
     if ((progMode == PROG_DEC) && (lng & mask))
     {
-        if (wordMode == PROG_SIGNED)
+        if (wordMode == COMPSCI_SIGNED)
             lng |= ~wordSizeMask;
     }
     return(lng);
@@ -816,7 +816,7 @@ void PROG_ASR(void)
 
     val = StackPopL();
 
-    if (wordMode == PROG_SIGNED)
+    if (wordMode == COMPSCI_SIGNED)
     {
         if (val & mask)
         {
@@ -954,19 +954,19 @@ BOOL CALLBACK fnDIALOG_WordSizeProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
             SendMessage(GetDlgItem(hDlg, 102), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         else if (wordSize == 32)
             SendMessage(GetDlgItem(hDlg, 103), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
-        else
+        else // wordSize is 64
             SendMessage(GetDlgItem(hDlg, 104), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
 
-        if (wordMode == PROG_SIGNED)
+        if (wordMode == COMPSCI_SIGNED)
             SendMessage(GetDlgItem(hDlg, 105), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
-        else
+        else // COMPSCI_UNSIGNED
             SendMessage(GetDlgItem(hDlg, 106), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
 
         if (hexSpacing == HEX_SPACE_NONE)
             SendMessage(GetDlgItem(hDlg, 111), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
         else if (hexSpacing == HEX_SPACE_2)
             SendMessage(GetDlgItem(hDlg, 112), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
-        else
+        else // HEX_SPACE_4
             SendMessage(GetDlgItem(hDlg, 113), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
 
         return TRUE;
@@ -983,9 +983,9 @@ BOOL CALLBACK fnDIALOG_WordSizeProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
 
             bs = SendMessage(GetDlgItem(hDlg, 105), BM_GETCHECK, (WORD) 0, (DWORD) 0L);
             if (bs != 0L)
-                wordMode = PROG_SIGNED;
+                wordMode = COMPSCI_SIGNED;
             else
-                wordMode = PROG_UNSIGNED;
+                wordMode = COMPSCI_UNSIGNED;
 
             bs = SendMessage(GetDlgItem(hDlg, 101), BM_GETCHECK, (WORD) 0, (DWORD) 0L);
             if (bs != 0L)
@@ -1083,7 +1083,7 @@ void PROG_Mirror(void)
 
 void PROG_MinW(void)
 {
-    if (wordMode == PROG_SIGNED)
+    if (wordMode == COMPSCI_SIGNED)
     {
         if (wordSize == 8)
             StackPushL((PROG_LONG) 0x80);
@@ -1102,7 +1102,7 @@ void PROG_MinW(void)
 
 void PROG_MaxW(void)
 {
-    if (wordMode == PROG_SIGNED)
+    if (wordMode == COMPSCI_SIGNED)
     {
         if (wordSize == 8)
             StackPushL((PROG_LONG) 0x7F);
@@ -1129,7 +1129,7 @@ void PROG_MaxW(void)
 
 PROG_LONG smallestProgVal(void)
 {
-    if (wordMode == PROG_SIGNED)
+    if (wordMode == COMPSCI_SIGNED)
     {
         if (wordSize == 8)
             return((PROG_LONG) 0x80);
@@ -1148,7 +1148,7 @@ PROG_LONG smallestProgVal(void)
 
 PROG_LONG biggestProgVal(void)
 {
-    if (wordMode == PROG_SIGNED)
+    if (wordMode == COMPSCI_SIGNED)
     {
         if (wordSize == 8)
             return((PROG_LONG) 0x7F);
