@@ -346,7 +346,9 @@ BOOL CALLBACK fnDIALOG_AmortProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
         }
 
         if (fin_reg[FIN_REG_PMT] != 0.0)
+        {
             pmt = fin_reg[FIN_REG_PMT];
+        }
         else
         {
             finTemp1 =
@@ -357,10 +359,11 @@ BOOL CALLBACK fnDIALOG_AmortProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
                  (fin_reg[FIN_REG_i] / 100.0) * payMode) *
                 ((pow(1.0 + (fin_reg[FIN_REG_i] / 100.0), fin_reg[FIN_REG_n]) - 1.0) / (fin_reg[FIN_REG_i] / 100.0));
             pmt = finTemp1 / finTemp2;
-            pmt = -1.0 * pmt;
+            //pmt = -1.0 * pmt;
         }
+        pmt = -pmt;
 
-        principal = -fin_reg[FIN_REG_PV];
+        principal = fin_reg[FIN_REG_PV];
         sprintf(finTmpStr, "%3d %11.2f  %11.2f  %11.2f  %11.2f", 0, 0.0, 0.0, 0.0, principal);
         makeInternational(finTmpStr);
         SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) finTmpStr));
@@ -388,6 +391,7 @@ BOOL CALLBACK fnDIALOG_AmortProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
         makeInternational(finTmpStr);
         SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) finTmpStr));
         return TRUE;
+        
     case WM_COMMAND:
         switch(wParam)
         {
