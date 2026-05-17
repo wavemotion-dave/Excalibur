@@ -78,7 +78,7 @@ extern void SCI_LCM(void);
 extern void SCI_MinR(void);
 extern void SCI_MaxR(void);
 extern void SCI_RoundYX(void);
-extern void SCI_prime(void);
+extern void SCI_primes(void);
 extern void SCI_elements(void);
 extern void SCI_resist(void);
 extern void SCI_metricPre(void);
@@ -164,7 +164,7 @@ struct funcStruct Scientific_funcs[MAX_FUNCS] = {
     {FN30,  UNI_LCM,        USES_F,     ALLOWREC,   ' ',    "LCM",      YES_L,  X_NEW,  SCI_LCM,                T_LCM,          H_LCM},
     {FN31,  UNI_MINR,       USES_F,     ALLOWREC,   ' ',    "MinR",     YES_L,  X_NEW,  SCI_MinR,               T_MINR,         H_MINR},
     {FN32,  UNI_MAXR,       USES_F,     ALLOWREC,   ' ',    "MaxR",     YES_L,  X_NEW,  SCI_MaxR,               T_MAXR,         H_MAXR},
-    {FN33,  UNI_PRIME,      USES_F,     NORECORD,   ' ',    "Prime#",   YES_L,  X_NEW,  SCI_prime,              T_PRIME,        H_PRIME},
+    {FN33,  UNI_PRIME,      USES_F,     NORECORD,   ' ',    "Primes",   YES_L,  X_NEW,  SCI_primes,              T_PRIME,        H_PRIME},
     {FN34,  UNI_METRIC,     USES_F,     ALLOWREC,   ' ',    "Metric",   YES_L,  X_NEW,  SCI_metricPre,          T_METRIC,       H_METRIC},
     {FN35,  UNI_ELEMENT,    USES_F,     NORECORD,   ' ',    "Elmnts",   YES_L,  X_NEW,  SCI_elements,           T_ELEMENT,      H_ELEMENT},
     {FN36,  UNI_ASTRO,      USES_F,     NORECORD,   ' ',    "Astro",    YES_L,  X_NEW,  SCI_Astro,              T_ASTRO,        H_ASTRO},
@@ -665,7 +665,7 @@ void SCI_RoundYX(void)
 }
 
 extern BOOL CALLBACK fnDIALOG_PrimesProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
-void SCI_prime(void)
+void SCI_primes(void)
 {
     DLGPROC lpfnDIALOG_PrimesProc;
 
@@ -767,8 +767,8 @@ void SCI_elements(void)
 
 struct elementTableStruct
 {
-    char name[20];
-    int number;
+    char name[19];
+    uint8_t number;
     double weight;
 };
 struct elementTableStruct elementTable[] = {
@@ -800,7 +800,7 @@ struct elementTableStruct elementTable[] = {
     {"Einsteinium(Es)",    99,      254.0},
     {"Erbium(Er)",         68,      167.26},
     {"Europium(Eu)",       63,      151.96},
-    {"Fermium(Fm)",        100,      257.0},
+    {"Fermium(Fm)",        100,     257.0},
     {"Flourine(F) ",       9,       18.998403},
     {"Francium(Fr)",       87,      223},
     {"Gadolinium(Gd)",     64,      157.25},
@@ -950,7 +950,6 @@ BOOL CALLBACK fnDIALOG_ElementsProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
 extern BOOL CALLBACK fnDIALOG_ResistorProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
 void SCI_resist(void)
 {
-
     DLGPROC lpfnDIALOG_ResistorProc;
 
     lpfnDIALOG_ResistorProc = (DLGPROC) MakeProcInstance((FARPROC) fnDIALOG_ResistorProc, hExcaliburInstance);
@@ -1130,11 +1129,12 @@ void SCI_metricPre(void)
 
 struct MetricPrefixStruct
 {
-    char name[60];
+    char name[56];
     double value;
 };
+
 struct MetricPrefixStruct MetricPrefixTable[] = {
-    {"Peta    1.0e15    1,000,000,000,000,000(quadrillion)  ",  1.0e15},
+    {"Peta    1.0e15    1,000,000,000,000,000(quadrillion)",    1.0e15},
     {"Tera    1.0e12    1,000,000,000,000(trillion)     ",      1.0e12},
     {"Giga    1.0e9     1,000,000,000(billion)      ",          1.0e9},
     {"Mega    1.0e6     1,000,000(million)      ",              1.0e6},
@@ -1148,7 +1148,7 @@ struct MetricPrefixStruct MetricPrefixTable[] = {
     {"Nano    1.0e-9    0.000000001(billionth)    ",            1.0e-9},
     {"Pico    1.0e-12   0.000000000001(trillionth)   ",         1.0e-12},
     {"Femto   1.0e-15   0.000000000000001(quadrillionth)",      1.0e-15},
-    {"None                                                  ",  0.00}
+    {"None                                                ",    0.00}
 };
 
 BOOL CALLBACK MetricPrefixDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
@@ -1205,7 +1205,6 @@ BOOL CALLBACK MetricPrefixDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARA
     }
     return FALSE;
 }
-
 
 void SCI_LogBase2(void)
 {
@@ -1385,182 +1384,182 @@ void SCI_ProjectileHeight(void)       // in meters
 
 struct AstroPrefixStruct
 {
-    char name[60];
+    char name[36];
     double value;
 };
 struct AstroPrefixStruct astroTableMercury[] = {
-    {"Semimajor Axis(AU)", 0.3871},
-    {"Semimajor Axis(km)", 5.79e7},
+    {"Semimajor Axis(AU)",               0.3871},
+    {"Semimajor Axis(km)",               5.79e7},
     {"Sidereal  Period(tropical years)", 0.2508},
-    {"Sidereal  Period(days)", 87.97},
-    {"Synodic   Period(days)", 115.88},
-    {"Mean Orbital Speed(km/s)", 47.9},
-    {"Orbital Eccentricity", 0.206},
-    {"Inclination to Ecliptic", 7.00},
-    {"Equatorial Diameter(km)", 4878.0},
-    {"Mass(kg)", 3.3e23},
-    {"Mean Density(g/cm^3)", 5.42},
-    {"Rotation Period(days)", 58.646},
-    {"Surface Gravity(1=Earth)", 0.38},
-    {"Albedo", 0.106},
-    {"Escape Velocity(km/s)", 4.3},
+    {"Sidereal  Period(days)",           87.97},
+    {"Synodic   Period(days)",           115.88},
+    {"Mean Orbital Speed(km/s)",         47.9},
+    {"Orbital Eccentricity",             0.206},
+    {"Inclination to Ecliptic",          7.00},
+    {"Equatorial Diameter(km)",          4878.0},
+    {"Mass(kg)",                         3.3e23},
+    {"Mean Density(g/cm^3)",             5.42},
+    {"Rotation Period(days)",            58.646},
+    {"Surface Gravity(1=Earth)",         0.38},
+    {"Albedo",                           0.106},
+    {"Escape Velocity(km/s)",            4.3},
     {"***", -1.0F}
 };
 struct AstroPrefixStruct astroTableVenus[] = {
-    {"Semimajor Axis(AU)", 0.7233},
-    {"Semimajor Axis(km)", 108.2e6},
+    {"Semimajor Axis(AU)",               0.7233},
+    {"Semimajor Axis(km)",               108.2e6},
     {"Sidereal  Period(tropical years)", 0.6152},
-    {"Sidereal  Period(days)", 224.70},
-    {"Synodic   Period(days)", 583.96},
-    {"Mean Orbital Speed(km/s)", 35.0},
-    {"Orbital Eccentricity", 0.007},
-    {"Inclination to Ecliptic", 3.39},
-    {"Equatorial Diameter(km)", 12104.0},
-    {"Mass(kg)", 4.87e24},
-    {"Mean Density(g/cm^3)", 5.24},
-    {"Rotation Period(days)", -243.0},
-    {"Surface Gravity(1=Earth)", 0.91},
-    {"Albedo", 0.65},
-    {"Escape Velocity(km/s)", 10.4},
+    {"Sidereal  Period(days)",           224.70},
+    {"Synodic   Period(days)",           583.96},
+    {"Mean Orbital Speed(km/s)",         35.0},
+    {"Orbital Eccentricity",             0.007},
+    {"Inclination to Ecliptic",          3.39},
+    {"Equatorial Diameter(km)",          12104.0},
+    {"Mass(kg)",                         4.87e24},
+    {"Mean Density(g/cm^3)",             5.24},
+    {"Rotation Period(days)",            -243.0},
+    {"Surface Gravity(1=Earth)",         0.91},
+    {"Albedo",                           0.65},
+    {"Escape Velocity(km/s)",            10.4},
     {"***", -1.0F}
 };
 struct AstroPrefixStruct astroTableEarth[] = {
-    {"Semimajor Axis(AU)", 1.00},
-    {"Semimajor Axis(km)", 149.6e6},
+    {"Semimajor Axis(AU)",               1.00},
+    {"Semimajor Axis(km)",               149.6e6},
     {"Sidereal  Period(tropical years)", 1.00},
-    {"Sidereal  Period(days)", 365.26},
-    {"Mean Orbital Speed(km/s)", 29.8},
-    {"Orbital Eccentricity", 0.017},
-    {"Inclination to Ecliptic", 0.0},
-    {"Equatorial Diameter(km)", 12756.0},
-    {"Mass(kg)", 5.976e24},
-    {"Mean Density(g/cm^3)", 5.50},
-    {"Rotation Period(days)", 0.997},
-    {"Surface Gravity(1=Earth)", 1.00},
-    {"Albedo", 0.39},
-    {"Escape Velocity(km/s)", 11.2},
+    {"Sidereal  Period(days)",           365.26},
+    {"Mean Orbital Speed(km/s)",         29.8},
+    {"Orbital Eccentricity",             0.017},
+    {"Inclination to Ecliptic",          0.0},
+    {"Equatorial Diameter(km)",          12756.0},
+    {"Mass(kg)",                         5.976e24},
+    {"Mean Density(g/cm^3)",             5.50},
+    {"Rotation Period(days)",            0.997},
+    {"Surface Gravity(1=Earth)",         1.00},
+    {"Albedo",                           0.39},
+    {"Escape Velocity(km/s)",            11.2},
     {"***", -1.0F}
 };
 struct AstroPrefixStruct astroTableMars[] = {
-    {"Semimajor Axis(AU)", 1.5237},
-    {"Semimajor Axis(km)", 227.9e6},
+    {"Semimajor Axis(AU)",               1.5237},
+    {"Semimajor Axis(km)",               227.9e6},
     {"Sidereal  Period(tropical years)", 1.8809},
-    {"Sidereal  Period(days)", 686.98},
-    {"Synodic   Period(days)", 779.94},
-    {"Mean Orbital Speed(km/s)", 24.1},
-    {"Orbital Eccentricity", 0.093},
-    {"Inclination to Ecliptic", 1.85},
-    {"Equatorial Diameter(km)", 6794.0},
-    {"Mass(kg)", 6.42e23},
-    {"Mean Density(g/cm^3)", 3.94},
-    {"Rotation Period(days)", 1.026},
-    {"Surface Gravity(1=Earth)", 0.38},
-    {"Albedo", 0.15},
-    {"Escape Velocity(km/s)", 5.0},
+    {"Sidereal  Period(days)",           686.98},
+    {"Synodic   Period(days)",           779.94},
+    {"Mean Orbital Speed(km/s)",         24.1},
+    {"Orbital Eccentricity",             0.093},
+    {"Inclination to Ecliptic",          1.85},
+    {"Equatorial Diameter(km)",          6794.0},
+    {"Mass(kg)",                         6.42e23},
+    {"Mean Density(g/cm^3)",             3.94},
+    {"Rotation Period(days)",            1.026},
+    {"Surface Gravity(1=Earth)",         0.38},
+    {"Albedo",                           0.15},
+    {"Escape Velocity(km/s)",            5.0},
     {"***", -1.0F}
 };
 struct AstroPrefixStruct astroTableJupiter[] = {
-    {"Semimajor Axis(AU)", 5.2028},
-    {"Semimajor Axis(km)", 778e6},
+    {"Semimajor Axis(AU)",               5.2028},
+    {"Semimajor Axis(km)",               778e6},
     {"Sidereal  Period(tropical years)", 11.86},
-    {"Sidereal  Period(days)", 11.86 * 365.26},
-    {"Synodic   Period(days)", 399},
-    {"Mean Orbital Speed(km/s)", 13.1},
-    {"Orbital Eccentricity", 0.048},
-    {"Inclination to Ecliptic", 1.30},
-    {"Equatorial Diameter(km)", 142800.0},
-    {"Mass(kg)", 1.90e27},
-    {"Mean Density(g/cm^3)", 1.3},
-    {"Rotation Period(days)", 0.41},
-    {"Surface Gravity(1=Earth)", 2.53},
-    {"Albedo", 0.52},
-    {"Escape Velocity(km/s)", 60.0},
+    {"Sidereal  Period(days)",           11.86 * 365.26},
+    {"Synodic   Period(days)",           399},
+    {"Mean Orbital Speed(km/s)",         13.1},
+    {"Orbital Eccentricity",             0.048},
+    {"Inclination to Ecliptic",          1.30},
+    {"Equatorial Diameter(km)",          142800.0},
+    {"Mass(kg)",                         1.90e27},
+    {"Mean Density(g/cm^3)",             1.3},
+    {"Rotation Period(days)",            0.41},
+    {"Surface Gravity(1=Earth)",         2.53},
+    {"Albedo",                           0.52},
+    {"Escape Velocity(km/s)",            60.0},
     {"***", -1.0F}
 };
 struct AstroPrefixStruct astroTableSaturn[] = {
-    {"Semimajor Axis(AU)", 9.529},
-    {"Semimajor Axis(km)", 1426e6},
+    {"Semimajor Axis(AU)",               9.529},
+    {"Semimajor Axis(km)",               1426e6},
     {"Sidereal  Period(tropical years)", 29.41},
-    {"Sidereal  Period(days)", 29.41 * 365.26},
-    {"Synodic   Period(days)", 378.0},
-    {"Mean Orbital Speed(km/s)", 9.6},
-    {"Orbital Eccentricity", 0.056},
-    {"Inclination to Ecliptic", 2.49},
-    {"Equatorial Diameter(km)", 120000.0},
-    {"Mass(kg)", 5.69e26},
-    {"Mean Density(g/cm^3)", 0.7},
-    {"Rotation Period(days)", 0.43},
-    {"Surface Gravity(1=Earth)", 1.07},
-    {"Albedo", 0.76},
-    {"Escape Velocity(km/s)", 36.0},
+    {"Sidereal  Period(days)",           29.41 * 365.26},
+    {"Synodic   Period(days)",           378.0},
+    {"Mean Orbital Speed(km/s)",         9.6},
+    {"Orbital Eccentricity",             0.056},
+    {"Inclination to Ecliptic",          2.49},
+    {"Equatorial Diameter(km)",          120000.0},
+    {"Mass(kg)",                         5.69e26},
+    {"Mean Density(g/cm^3)",             0.7},
+    {"Rotation Period(days)",            0.43},
+    {"Surface Gravity(1=Earth)",         1.07},
+    {"Albedo",                           0.76},
+    {"Escape Velocity(km/s)",            36.0},
     {"***", -1.0F}
 };
 struct AstroPrefixStruct astroTableUranus[] = {
-    {"Semimajor Axis(AU)", 19.192},
-    {"Semimajor Axis(km)", 2871e6},
+    {"Semimajor Axis(AU)",               19.192},
+    {"Semimajor Axis(km)",               2871e6},
     {"Sidereal  Period(tropical years)", 84.04},
-    {"Sidereal  Period(days)", 84.04 * 365.26},
-    {"Synodic   Period(days)", 370.0},
-    {"Mean Orbital Speed(km/s)", 6.8},
-    {"Orbital Eccentricity", 0.046},
-    {"Inclination to Ecliptic", 0.77},
-    {"Equatorial Diameter(km)", 51120.0},
-    {"Mass(kg)", 8.70e25},
-    {"Mean Density(g/cm^3)", 1.3},
-    {"Rotation Period(days)", -0.65},
-    {"Surface Gravity(1=Earth)", 0.92},
-    {"Albedo", 0.51},
-    {"Escape Velocity(km/s)", 21.0},
+    {"Sidereal  Period(days)",           84.04 * 365.26},
+    {"Synodic   Period(days)",           370.0},
+    {"Mean Orbital Speed(km/s)",         6.8},
+    {"Orbital Eccentricity",             0.046},
+    {"Inclination to Ecliptic",          0.77},
+    {"Equatorial Diameter(km)",          51120.0},
+    {"Mass(kg)",                         8.70e25},
+    {"Mean Density(g/cm^3)",             1.3},
+    {"Rotation Period(days)",            -0.65},
+    {"Surface Gravity(1=Earth)",         0.92},
+    {"Albedo",                           0.51},
+    {"Escape Velocity(km/s)",            21.0},
     {"***", -1.0F}
 };
 struct AstroPrefixStruct astroTableNeptune[] = {
-    {"Semimajor Axis(AU)", 30.061},
-    {"Semimajor Axis(km)", 4497e6},
+    {"Semimajor Axis(AU)",               30.061},
+    {"Semimajor Axis(km)",               4497e6},
     {"Sidereal  Period(tropical years)", 164.79},
-    {"Sidereal  Period(days)", 164.79 * 365.26},
-    {"Synodic   Period(days)", 367.0},
-    {"Mean Orbital Speed(km/s)", 5.4},
-    {"Orbital Eccentricity", 0.010},
-    {"Inclination to Ecliptic", 1.77},
-    {"Equatorial Diameter(km)", 49528.0},
-    {"Mass(kg)", 1.03e26},
-    {"Mean Density(g/cm^3)", 1.7},
-    {"Rotation Period(days)", 0.67},
-    {"Surface Gravity(1=Earth)", 1.12},
-    {"Albedo", 0.35},
-    {"Escape Velocity(km/s)", 24.0},
+    {"Sidereal  Period(days)",           164.79 * 365.26},
+    {"Synodic   Period(days)",           367.0},
+    {"Mean Orbital Speed(km/s)",         5.4},
+    {"Orbital Eccentricity",             0.010},
+    {"Inclination to Ecliptic",          1.77},
+    {"Equatorial Diameter(km)",          49528.0},
+    {"Mass(kg)",                         1.03e26},
+    {"Mean Density(g/cm^3)",             1.7},
+    {"Rotation Period(days)",            0.67},
+    {"Surface Gravity(1=Earth)",         1.12},
+    {"Albedo",                           0.35},
+    {"Escape Velocity(km/s)",            24.0},
     {"***", -1.0F}
 };
 struct AstroPrefixStruct astroTablePluto[] = {
-    {"Semimajor Axis(AU)", 39.529},
-    {"Semimajor Axis(km)", 5914e6},
+    {"Semimajor Axis(AU)",               39.529},
+    {"Semimajor Axis(km)",               5914e6},
     {"Sidereal  Period(tropical years)", 248.6},
-    {"Sidereal  Period(days)", 248.6 * 365.26},
-    {"Synodic   Period(days)", 367},
-    {"Mean Orbital Speed(km/s)", 4.7},
-    {"Orbital Eccentricity", 0.248},
-    {"Inclination to Ecliptic", 17.15},
-    {"Equatorial Diameter(km)", 2290.0},
-    {"Mass(kg)", 1.0e22},
-    {"Mean Density(g/cm^3)", 2.0},
-    {"Rotation Period(days)", 6.387},
-    {"Surface Gravity(1=Earth)", 0.06},
-    {"Albedo", 0.40},
-    {"Escape Velocity(km/s)", 1.0},
+    {"Sidereal  Period(days)",           248.6 * 365.26},
+    {"Synodic   Period(days)",           367},
+    {"Mean Orbital Speed(km/s)",         4.7},
+    {"Orbital Eccentricity",             0.248},
+    {"Inclination to Ecliptic",          17.15},
+    {"Equatorial Diameter(km)",          2290.0},
+    {"Mass(kg)",                         1.0e22},
+    {"Mean Density(g/cm^3)",             2.0},
+    {"Rotation Period(days)",            6.387},
+    {"Surface Gravity(1=Earth)",         0.06},
+    {"Albedo",                           0.40},
+    {"Escape Velocity(km/s)",            1.0},
     {"***", -1.0F}
 };
 struct AstroPrefixStruct astroTableMisc[] = {
-    {"Moon Distance from Earth(km)", 384400.0},
-    {"Moon Sidereal Period(days)", 27.322},
-    {"Moon Orbital Eccentricity", 0.055},
-    {"Moon Diameter(km)", 3476.0},
-    {"Solar Radius(m)", 6.960e8},
-    {"Solar Mass(kg)", 1.989e30},
-    {"Solar Luminosity(W)", 3.90e26},
-    {"Light Year(m)", 9.460e15},
-    {"Light Year(AU)", 63240.0},
-    {"Parsec(m)", 3.086e16},
-    {"Astronomical Unit(m)", 1.496e11},
+    {"Moon Distance from Earth(km)",     384400.0},
+    {"Moon Sidereal Period(days)",       27.322},
+    {"Moon Orbital Eccentricity",        0.055},
+    {"Moon Diameter(km)",                3476.0},
+    {"Solar Radius(m)",                  6.960e8},
+    {"Solar Mass(kg)",                   1.989e30},
+    {"Solar Luminosity(W)",              3.90e26},
+    {"Light Year(m)",                    9.460e15},
+    {"Light Year(AU)",                   63240.0},
+    {"Parsec(m)",                        3.086e16},
+    {"Astronomical Unit(m)",             1.496e11},
     {"***", -1.0F}
 };
 
@@ -1706,12 +1705,4 @@ void SCI_circA(void)
     double temp;
     temp = StackPop();
     StackPush((temp * temp) * M_PI);
-}
-
-void SCI_SphrV(void)
-{
-    double r;
-
-    r = StackPop();
-    StackPush((4.0F / 3.0F) * M_PI * (r * r * r));
 }
