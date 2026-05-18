@@ -204,10 +204,19 @@ void FIN_percentTot(void)
 void FIN_clearReg(void)
 {
     int i;
+    char savedStr[64];
+
     for (i = 0; i < FIN_REG_MAX; i++)
+    {
         fin_reg[i] = 0.0;
+    }
     CFn = 0;
     memset(cashFlow, 0x00, sizeof(cashFlow));
+
+    GetDlgItemText(calcMainWindow, RPN_STACK_X, savedStr, MAX_STACK_STRLEN);
+    SetDlgItemText(calcMainWindow, RPN_STACK_X, "  ...FINANCIAL CLEAR...  ");
+    sleep_and_peek(500);
+    GetDlgItemText(calcMainWindow, RPN_STACK_X, savedStr, MAX_STACK_STRLEN);
 }
 
 void FIN_12div(void)
@@ -223,6 +232,7 @@ void FIN_12mult(void)
 void FIN_fv(void)
 {
     double fintemp1, fintemp2;
+    double i, powTerm, annuityFactor;
 
     if (rpnStoreRecall & REG_RECALL)
     {
@@ -238,22 +248,22 @@ void FIN_fv(void)
         return;
     }
 
-    if (fin_reg[FIN_REG_i] == 0.0)
-    {
-        RPN_error("FV: Interest cannot be zero.\nUse the STO key to store values into the financial registers.");
-    }
-    else if (fin_reg[FIN_REG_n] <= 0.0)
+    if (fin_reg[FIN_REG_n] <= 0.0)
     {
         RPN_error
             ("FV: Number of Periods(n) must be greater than 0\nUse the STO key to store values into the financial registers.");
     }
     else
     {
-        fintemp1 = fin_reg[FIN_REG_PV] * pow(1.0 + (fin_reg[FIN_REG_i] / 100.0), fin_reg[FIN_REG_n]);
-        fintemp2 =
-            fin_reg[FIN_REG_PMT] * (1.0 +
-                                    fin_reg[FIN_REG_i] / 100.0 * payMode) *
-            ((pow(1.0 + (fin_reg[FIN_REG_i] / 100.0), fin_reg[FIN_REG_n]) - 1.0) / (fin_reg[FIN_REG_i] / 100.0));
+        i = fin_reg[FIN_REG_i] / 100.0;
+        powTerm = pow(1.0 + i, fin_reg[FIN_REG_n]);
+        if (fabs(i) < 1.0e-16)
+            annuityFactor = fin_reg[FIN_REG_n];
+        else
+            annuityFactor = (powTerm - 1.0) / i;
+
+        fintemp1 = fin_reg[FIN_REG_PV] * powTerm;
+        fintemp2 = fin_reg[FIN_REG_PMT] * (1.0 + i * payMode) * annuityFactor;
         StackPush((fintemp1 + fintemp2) / -1.0);
         fin_reg[FIN_REG_FV] = X;
     }
@@ -261,7 +271,8 @@ void FIN_fv(void)
 
 void FIN_pv(void)
 {
-    double fintemp1, fintemp2;
+    double fintemp1;
+    double i, powTerm, annuityFactor;
 
     if (rpnStoreRecall & REG_RECALL)
     {
@@ -277,25 +288,22 @@ void FIN_pv(void)
         return;
     }
 
-    if (fin_reg[FIN_REG_i] == 0.0)
-    {
-        RPN_error("PV: Interest cannot be zero.\nUse the STO key to store values into the financial registers.");
-    }
-    else if (fin_reg[FIN_REG_n] <= 0.0)
+    if (fin_reg[FIN_REG_n] <= 0.0)
     {
         RPN_error
             ("PV: Number of Periods(n) must be greater than 0.\nUse the STO key to store values into the financial registers.");
     }
     else
     {
-        fintemp1 = pow(1.0 + (fin_reg[FIN_REG_i] / 100.0), fin_reg[FIN_REG_n]);
-        fintemp2 =
-            -1.0 * fin_reg[FIN_REG_PMT] * (1.0 +
-                                           fin_reg[FIN_REG_i] / 100.0 *
-                                           payMode) *
-            ((pow(1.0 + (fin_reg[FIN_REG_i] / 100.0), fin_reg[FIN_REG_n]) -
-              1.0) / (fin_reg[FIN_REG_i] / 100.0)) - fin_reg[FIN_REG_FV];
-        StackPush(fintemp2 / fintemp1);
+        i = fin_reg[FIN_REG_i] / 100.0;
+        powTerm = pow(1.0 + i, fin_reg[FIN_REG_n]);
+        if (fabs(i) < 1.0e-16)
+            annuityFactor = fin_reg[FIN_REG_n];
+        else
+            annuityFactor = (powTerm - 1.0) / i;
+
+        fintemp1 = -1.0 * fin_reg[FIN_REG_PMT] * (1.0 + i * payMode) * annuityFactor - fin_reg[FIN_REG_FV];
+        StackPush(fintemp1 / powTerm);
         fin_reg[FIN_REG_PV] = X;
     }
 }
@@ -341,6 +349,12 @@ BOOL CALLBACK fnDIALOG_AmortProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
         else if (fin_reg[FIN_REG_n] <= 0.0)
         {
             RPN_error("AMORT: Number of Periods(n) must be greater than 0.\nUse the STO key to store values into the financial registers.");
+            EndDialog(hDlg, FALSE);
+            return TRUE;
+        }
+        else if (fin_reg[FIN_REG_n] > 1024)
+        {
+            RPN_error("AMORT: Number of Periods(n) must be less than 1024.\nUse the STO key to store values into the financial registers.");
             EndDialog(hDlg, FALSE);
             return TRUE;
         }
@@ -474,24 +488,54 @@ void FIN_pmt(void)
     }
     else
     {
-        fintemp1 =
-            (-1.0 * fin_reg[FIN_REG_PV] *
-             pow(1.0 + (fin_reg[FIN_REG_i] / 100.0), fin_reg[FIN_REG_n])) - fin_reg[FIN_REG_FV];
-        fintemp2 =
-            (1.0 +
-             (fin_reg[FIN_REG_i] / 100.0) * payMode) *
-            ((pow(1.0 + (fin_reg[FIN_REG_i] / 100.0), fin_reg[FIN_REG_n]) - 1.0) / (fin_reg[FIN_REG_i] / 100.0));
-        StackPush(fintemp1 / fintemp2);
+        double i;
+        double annuityFactor;
+        double powTerm;
+
+        i = fin_reg[FIN_REG_i] / 100.0;
+        powTerm = pow(1.0 + i, fin_reg[FIN_REG_n]);
+        fintemp1 = (-1.0 * fin_reg[FIN_REG_PV] * powTerm) - fin_reg[FIN_REG_FV];
+        if (fabs(i) < 1.0e-16)
+        {
+            annuityFactor = fin_reg[FIN_REG_n];
+        }
+        else
+        {
+            annuityFactor = (1.0 + i * payMode) * ((powTerm - 1.0) / i);
+        }
+        StackPush(fintemp1 / annuityFactor);
         fin_reg[FIN_REG_PMT] = X;
     }
 }
 
 
+static double FIN_n_equation(double n)
+{
+    double i;
+    double pv_term;
+    double pmt_term;
+    double factor;
+
+    i = fin_reg[FIN_REG_i] / 100.0;
+    pv_term = fin_reg[FIN_REG_PV] * pow(1.0 + i, n);
+    if (fabs(i) < 1.0e-16)
+    {
+        pmt_term = fin_reg[FIN_REG_PMT] * n;
+    }
+    else
+    {
+        factor = (pow(1.0 + i, n) - 1.0) / i;
+        pmt_term = fin_reg[FIN_REG_PMT] * (1.0 + i * payMode) * factor;
+    }
+    return pv_term + pmt_term + fin_reg[FIN_REG_FV];
+}
+
 void FIN_n(void)
 {
-    double n, fintemp1, fintemp2, fintemp3;
-    int newSign, oldSign;
+    double lo, hi, mid;
+    double f_lo, f_hi, f_mid;
     int found;
+    int iter;
 
     if (rpnStoreRecall & REG_RECALL)
     {
@@ -512,51 +556,87 @@ void FIN_n(void)
         RPN_error("n: Interest cannot be zero.\nUse the STO key to store values into the financial registers.");
         return;
     }
+
     found = FALSE;
-    n = 0.1;
-    fintemp1 = fin_reg[FIN_REG_PV] * pow(1.0 + (fin_reg[FIN_REG_i] / 100.0), n);
-    fintemp2 =
-        fin_reg[FIN_REG_PMT] * (1.0 +
-                                fin_reg[FIN_REG_i] / 100.0 * payMode) *
-        ((pow(1.0 + (fin_reg[FIN_REG_i] / 100.0), n) - 1.0) / (fin_reg[FIN_REG_i] / 100.0));
-    fintemp3 = fintemp1 + fintemp2 + fin_reg[FIN_REG_FV];
-    if (fintemp3 < 0.0)
-        oldSign = -1;
-    else
-        oldSign = 1;
-
-    for (n = 0.1; n < 1000.0; n += 0.1)
+    lo = 0.0;
+    f_lo = FIN_n_equation(lo);
+    if (fabs(f_lo) < 1.0e-12)
     {
-        fintemp1 = fin_reg[FIN_REG_PV] * pow(1.0 + (fin_reg[FIN_REG_i] / 100.0), n);
-        fintemp2 =
-            fin_reg[FIN_REG_PMT] * (1.0 +
-                                    fin_reg[FIN_REG_i] / 100.0 * payMode) *
-            ((pow(1.0 + (fin_reg[FIN_REG_i] / 100.0), n) - 1.0) / (fin_reg[FIN_REG_i] / 100.0));
-        fintemp3 = fintemp1 + fintemp2 + fin_reg[FIN_REG_FV];
-        if (fintemp3 < 0.0)
-            newSign = -1;
-        else
-            newSign = 1;
+        StackPush(0.0);
+        fin_reg[FIN_REG_n] = X;
+        return;
+    }
 
-        if (newSign != oldSign)
+    hi = 0.01;
+    f_hi = FIN_n_equation(hi);
+    while ((f_hi > 0.0) == (f_lo > 0.0) && hi < 10000.0)
+    {
+        hi *= 2.0;
+        f_hi = FIN_n_equation(hi);
+    }
+
+    if (fabs(f_hi) < 1.0e-12)
+    {
+        StackPush(hi);
+        fin_reg[FIN_REG_n] = X;
+        return;
+    }
+
+    if ((f_hi > 0.0) != (f_lo > 0.0))
+    {
+        for (iter = 0; iter < 100; iter++)
         {
-            found = TRUE;
-            StackPush(n);
-            fin_reg[FIN_REG_n] = X;
-            break;
+            mid = 0.5 * (lo + hi);
+            f_mid = FIN_n_equation(mid);
+            if (fabs(f_mid) < 1.0e-12 || (hi - lo) < 1.0e-12)
+            {
+                StackPush(mid);
+                fin_reg[FIN_REG_n] = X;
+                found = TRUE;
+                break;
+            }
+            if ((f_mid > 0.0) == (f_lo > 0.0))
+            {
+                lo = mid;
+                f_lo = f_mid;
+            }
+            else
+            {
+                hi = mid;
+                f_hi = f_mid;
+            }
         }
     }
+
     if (!found)
         RPN_error("A solution could not be found...");
 }
 
+static double FIN_i_equation(double i)
+{
+    double pv_term;
+    double pmt_term;
+    double factor;
+
+    pv_term = fin_reg[FIN_REG_PV] * pow(1.0 + i, fin_reg[FIN_REG_n]);
+    if (fabs(i) < 1.0e-16)
+    {
+        pmt_term = fin_reg[FIN_REG_PMT] * fin_reg[FIN_REG_n];
+    }
+    else
+    {
+        factor = (pow(1.0 + i, fin_reg[FIN_REG_n]) - 1.0) / i;
+        pmt_term = fin_reg[FIN_REG_PMT] * (1.0 + i * payMode) * factor;
+    }
+    return pv_term + pmt_term + fin_reg[FIN_REG_FV];
+}
+
 void FIN_i(void)
 {
-    double i, fintemp1, fintemp2, fintemp3;
-    int newSign, oldSign;
-    double closei;
+    double lo, hi, mid;
+    double f_lo, f_hi, f_mid;
     int found;
-    char tmpBuff[16];
+    int iter;
 
     if (rpnStoreRecall & REG_RECALL)
     {
@@ -578,63 +658,58 @@ void FIN_i(void)
             ("i%: Number of periods(n) must be greater than or equal to 1.0\nUse the STO key to store values into the financial registers.");
         return;
     }
+
     found = FALSE;
-    i = 0.00001;
-    fintemp1 = fin_reg[FIN_REG_PV] * pow(1.0 + i, fin_reg[FIN_REG_n]);
-    fintemp2 = fin_reg[FIN_REG_PMT] * (1.0 + i / 100.0 * payMode) * ((pow(1.0 + i, fin_reg[FIN_REG_n]) - 1.0) / i);
-    fintemp3 = fintemp1 + fintemp2 + fin_reg[FIN_REG_FV];
-    if (fintemp3 < 0.0)
-        oldSign = -1;
-    else
-        oldSign = 1;
-
-    for (i = 0.00001; i < 1.0; i += 0.00001)
+    lo = 0.0;
+    f_lo = FIN_i_equation(lo);
+    if (fabs(f_lo) < 1.0e-12)
     {
-        fintemp1 = fin_reg[FIN_REG_PV] * pow(1.0 + i, fin_reg[FIN_REG_n]);
-        fintemp2 = fin_reg[FIN_REG_PMT] * (1.0 + i / 100.0 * payMode) * ((pow(1.0 + i, fin_reg[FIN_REG_n]) - 1.0) / i);
-        fintemp3 = fintemp1 + fintemp2 + fin_reg[FIN_REG_FV];
-        if (fintemp3 < 0.0)
-            newSign = -1;
-        else
-            newSign = 1;
+        StackPush(0.0);
+        fin_reg[FIN_REG_i] = X;
+        return;
+    }
 
-        if (newSign != oldSign)
+    hi = 0.001;
+    f_hi = FIN_i_equation(hi);
+    while ((f_hi > 0.0) == (f_lo > 0.0) && hi < 100.0)
+    {
+        hi *= 2.0;
+        f_hi = FIN_i_equation(hi);
+    }
+
+    if (fabs(f_hi) < 1.0e-12)
+    {
+        StackPush(hi * 100.0);
+        fin_reg[FIN_REG_i] = X;
+        return;
+    }
+
+    if ((f_hi > 0.0) != (f_lo > 0.0))
+    {
+        for (iter = 0; iter < 100; iter++)
         {
-            closei = i - 0.00001;
-            i = closei;
-            fintemp1 = fin_reg[FIN_REG_PV] * pow(1.0 + i, fin_reg[FIN_REG_n]);
-            fintemp2 =
-                fin_reg[FIN_REG_PMT] * (1.0 + i / 100.0 * payMode) * ((pow(1.0 + i, fin_reg[FIN_REG_n]) - 1.0) / i);
-            fintemp3 = fintemp1 + fintemp2 + fin_reg[FIN_REG_FV];
-            if (fintemp3 < 0.0)
-                oldSign = -1;
-            else
-                oldSign = 1;
-
-            for (i = closei; i <= closei + 0.000015; i += 0.0000001)
+            mid = 0.5 * (lo + hi);
+            f_mid = FIN_i_equation(mid);
+            if (fabs(f_mid) < 1.0e-12 || (hi - lo) < 1.0e-12)
             {
-                fintemp1 = fin_reg[FIN_REG_PV] * pow(1.0 + i, fin_reg[FIN_REG_n]);
-                fintemp2 =
-                    fin_reg[FIN_REG_PMT] * (1.0 +
-                                            fin_reg[FIN_REG_i] / 100.0 *
-                                            payMode) * ((pow(1.0 + i, fin_reg[FIN_REG_n]) - 1.0) / i);
-                fintemp3 = fintemp1 + fintemp2 + fin_reg[FIN_REG_FV];
-                if (fintemp3 < 0.0)
-                    newSign = -1;
-                else
-                    newSign = 1;
-                if (newSign != oldSign)
-                {
-                    found = TRUE;
-                    sprintf(tmpBuff, "%.4f", i * 100.0F);
-                    StackPush(atof(tmpBuff));
-                    fin_reg[FIN_REG_i] = X;
-                    break;
-                }
+                StackPush(mid * 100.0);
+                fin_reg[FIN_REG_i] = X;
+                found = TRUE;
+                break;
             }
-            break;
+            if ((f_mid > 0.0) == (f_lo > 0.0))
+            {
+                lo = mid;
+                f_lo = f_mid;
+            }
+            else
+            {
+                hi = mid;
+                f_hi = f_mid;
+            }
         }
     }
+
     if (!found)
         RPN_error("A solution could not be found...");
 }
