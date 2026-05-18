@@ -123,10 +123,10 @@ struct funcStruct Financial_funcs[MAX_FUNCS] = {
     {FN6,   UNI_INTR,   USES_F,     ALLOWREC,   ' ',    "i%",       YES_L,  X_NEW,      FIN_i,             T_INTR,     H_INTR},
     {FN7,   UNI_FINPV,  USES_F,     ALLOWREC,   ' ',    "PV",       YES_L,  X_NEW,      FIN_pv,            T_FINPV,    H_FINPV},
     {FN8,   UNI_FINPMT, USES_F,     ALLOWREC,   ' ',    "PMT",      YES_L,  X_NEW,      FIN_pmt,           T_FINPMT,   H_FINPMT},
-    {FN9,   UNI_MUL12,  USES_F,     ALLOWREC,   ' ',    "12×",      YES_L,  X_NEW,      FIN_12mult,        T_MUL12,    H_MUL12},
-    {FN10,  UNI_DIV12,  USES_F,     ALLOWREC,   ' ',    "12÷",      YES_L,  X_NEW,      FIN_12div,         T_DIV12,    H_DIV12},
-    {FN11,  UNI_MUL100, USES_F,     ALLOWREC,   ' ',    "100×",     YES_L,  X_NEW,      FIN_100mult,       T_MUL100,   H_MUL100},
-    {FN12,  UNI_DIV100, USES_F,     ALLOWREC,   ' ',    "100÷",     YES_L,  X_NEW,      FIN_100div,        T_DIV100,   H_DIV100},
+    {FN9,   UNI_MUL12,  USES_F,     ALLOWREC,   ' ',    "12ï¿½",      YES_L,  X_NEW,      FIN_12mult,        T_MUL12,    H_MUL12},
+    {FN10,  UNI_DIV12,  USES_F,     ALLOWREC,   ' ',    "12ï¿½",      YES_L,  X_NEW,      FIN_12div,         T_DIV12,    H_DIV12},
+    {FN11,  UNI_MUL100, USES_F,     ALLOWREC,   ' ',    "100ï¿½",     YES_L,  X_NEW,      FIN_100mult,       T_MUL100,   H_MUL100},
+    {FN12,  UNI_DIV100, USES_F,     ALLOWREC,   ' ',    "100ï¿½",     YES_L,  X_NEW,      FIN_100div,        T_DIV100,   H_DIV100},
     {FN13,  UNI_TAX,    USES_F,     ALLOWREC,   ' ',    "TAX",      YES_L,  X_NEW,      FIN_tax,           T_TAX,      H_TAX},
     {FN14,  UNI_PERC,   USES_F,     ALLOWREC,   ' ',    "%",        YES_L,  X_NEW,      FIN_percent,       T_PERC,     H_PERC},
     {FN15,  UNI_PERCC,  USES_F,     ALLOWREC,   ' ',    "%CHG",     YES_L,  X_NEW,      FIN_percentChg,    T_PERCC,    H_PERCC},
@@ -477,11 +477,7 @@ void FIN_pmt(void)
         return;
     }
 
-    if (fin_reg[FIN_REG_i] == 0.0)
-    {
-        RPN_error("PMT: Interest cannot be zero.\nUse the STO key to store values into the financial registers.");
-    }
-    else if (fin_reg[FIN_REG_n] <= 0.0)
+    if (fin_reg[FIN_REG_n] <= 0.0)
     {
         RPN_error
             ("PMT: Number of Periods(n) must be greater than 0.\nUse the STO key to store values into the financial registers.");
@@ -654,8 +650,7 @@ void FIN_i(void)
 
     if (fin_reg[FIN_REG_n] < 1.0)
     {
-        RPN_error
-            ("i%: Number of periods(n) must be greater than or equal to 1.0\nUse the STO key to store values into the financial registers.");
+        RPN_error("i%: Number of periods(n) must be greater than or equal to 1.0\nUse the STO key to store values into the financial registers.");
         return;
     }
 
@@ -711,7 +706,9 @@ void FIN_i(void)
     }
 
     if (!found)
+    {
         RPN_error("A solution could not be found...");
+    }
 }
 
 void FIN_cashFlow0(void)
