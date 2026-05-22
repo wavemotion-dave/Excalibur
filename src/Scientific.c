@@ -290,6 +290,10 @@ void SCI_atan(void)
         StackPush(FromRadians(atan(StackPop())));
 }
 
+// ---------------------------------------------------------
+// The Hyperbolic functions below don't need to deal
+// with degrees/radians since the arguments are not angles.
+// ---------------------------------------------------------
 void SCI_sinh(void)
 {
     StackPush(sinh(StackPop()));
@@ -305,12 +309,15 @@ void SCI_tanh(void)
     StackPush(tanh(StackPop()));
 }
 
+// ----------------------------------------------------------
+// Visual C++ 5.0 doesn't have hyperbolic arc-trig functions.
+// ----------------------------------------------------------
 void SCI_asinh(void)
 {
     double val;
 
     val = StackPop();
-    StackPush(log(fabs(val) + sqrt(val * val + 1)));
+    StackPush(log(val + sqrt((val * val) + 1)));
 }
 
 void SCI_acosh(void)
@@ -318,11 +325,13 @@ void SCI_acosh(void)
     double val;
 
     if (X < 1.0)
+    {
         RPN_error("ACOSH: X Must Be Greater Than or Equal To 1.0");
+    }
     else
     {
         val = StackPop();
-        StackPush(log(val + (sqrt(val - 1) * sqrt(val + 1))));
+        StackPush(log(val + sqrt((val * val) - 1)));
     }
 }
 
@@ -331,7 +340,9 @@ void SCI_atanh(void)
     double val;
 
     if ((X * X) >= 1.0)
+    {
         RPN_error("ATANH: X*X Must Be Less Than 1.0");
+    }
     else
     {
         val = StackPop();
@@ -343,7 +354,6 @@ void SCI_10x(void)
 {
     StackPush(pow(10, StackPop()));
 }
-
 
 void SCI_sqrt(void)
 {
@@ -357,6 +367,7 @@ void SCI_sqrt(void)
         StackPush(sqrt(StackPop()));
     }
 }
+
 void SCI_inverse(void)
 {
     if (X == 0.0)
@@ -368,6 +379,7 @@ void SCI_inverse(void)
         StackPush(1.0 / StackPop());
     }
 }
+
 void SCI_exp(void)
 {
     StackPush(exp(StackPop()));
@@ -410,7 +422,6 @@ void SCI_rand(void)
         X = ((float) randVal / 10000000.0);
     else
         StackPush((float) randVal / 10000000.0);
-
 }
 
 void SCI_pi(void)
@@ -507,12 +518,10 @@ void SCI_Pnr(void)
         StackPush(0.0);
 }
 
-
 void SCI_abs(void)
 {
     StackPush(fabs(StackPop()));
 }
-
 
 void SCI_round(void)
 {
@@ -1127,20 +1136,20 @@ struct MetricPrefixStruct
 
 struct MetricPrefixStruct MetricPrefixTable[] = {
     {"Peta    1.0e15    1,000,000,000,000,000(quadrillion)",    1.0e15},
-    {"Tera    1.0e12    1,000,000,000,000(trillion)     ",      1.0e12},
-    {"Giga    1.0e9     1,000,000,000(billion)      ",          1.0e9},
-    {"Mega    1.0e6     1,000,000(million)      ",              1.0e6},
-    {"Kilo    1.0e3     1,000(thousand)     ",                  1.0e3},
-    {"Hecto   1.0e2     100(hundred)      ",                    1.0e2},
-    {"Deka    1.0e1     10(ten)          ",                     1.0e1},
-    {"Deci    1.0e-1    0.1(tenth)        ",                    1.0e-1},
-    {"Centi   1.0e-2    0.01(hundredth)    ",                   1.0e-2},
-    {"Milli   1.0e-3    0.001(thousandth)   ",                  1.0e-3},
-    {"Micro   1.0e-6    0.000001(millionth)    ",               1.0e-6},
-    {"Nano    1.0e-9    0.000000001(billionth)    ",            1.0e-9},
-    {"Pico    1.0e-12   0.000000000001(trillionth)   ",         1.0e-12},
+    {"Tera    1.0e12    1,000,000,000,000(trillion)",           1.0e12},
+    {"Giga    1.0e9     1,000,000,000(billion)",                1.0e9},
+    {"Mega    1.0e6     1,000,000(million)",                    1.0e6},
+    {"Kilo    1.0e3     1,000(thousand)",                       1.0e3},
+    {"Hecto   1.0e2     100(hundred)",                          1.0e2},
+    {"Deka    1.0e1     10(ten)",                               1.0e1},
+    {"Deci    1.0e-1    0.1(tenth)",                            1.0e-1},
+    {"Centi   1.0e-2    0.01(hundredth)",                       1.0e-2},
+    {"Milli   1.0e-3    0.001(thousandth)",                     1.0e-3},
+    {"Micro   1.0e-6    0.000001(millionth)",                   1.0e-6},
+    {"Nano    1.0e-9    0.000000001(billionth)",                1.0e-9},
+    {"Pico    1.0e-12   0.000000000001(trillionth)",            1.0e-12},
     {"Femto   1.0e-15   0.000000000000001(quadrillionth)",      1.0e-15},
-    {"None                                                ",    0.00}
+    {"None                                              ",      0.00}
 };
 
 BOOL CALLBACK MetricPrefixDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
