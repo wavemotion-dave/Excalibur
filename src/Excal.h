@@ -148,14 +148,14 @@ extern struct funcStruct MacroFuncs[];
 extern "C" void   StackPush(double temp);
 extern "C" double StackPop(void);
 extern "C" void   RPN_error(char *msg);
-extern "C" void   RPN_help(void);
+extern "C" void   RPN_fact(void);
 extern "C" double FromRadians(double t);
 extern "C" double ToRadians(double t);
 #else
 extern void   StackPush(double temp);
 extern double StackPop(void);
 extern void   RPN_error(char *msg);
-extern void   RPN_help(void);
+extern void   RPN_fact(void);
 extern double FromRadians(double t);
 extern double ToRadians(double t);
 #endif
@@ -353,6 +353,7 @@ extern void RPN_Notes(void);
 extern void RPN_Copy(void);
 extern void RPN_Paste(void);
 extern void RPN_inverse(void);
+extern void RPN_pow(void);
 extern void SCI_sqrt(void);
 extern void SCI_ln(void);
 extern void SCI_log(void);
@@ -569,12 +570,12 @@ enum UniqueButtonIndexTag
     UNI_XX,
     UNI_SQRT,
     UNI_INV,
-    UNI_POW10,
+    UNI_POW,
     UNI_EXP,
     UNI_LN,
     UNI_LOG,
     UNI_FACT,
-    UNI_POW,
+    UNI_POW10,
     UNI_INT,
     UNI_FRACT,
     UNI_RAND,
@@ -914,13 +915,13 @@ extern uint32_t userTicks;
 #define RPN_MODE                        126
 #define RPN_BKSP                        127
 #define RPN_CLR_STACK                   128
-#define RPN_HELP                        129
+#define RPN_FACT                        129
 #define RPN_PLAYBACK                    130
 #define RPN_DROP                        131
 #define RPN_LARG                        132
 #define RPN_FRAC                        133
 #define RPN_EDIT                        134
-#define RPN_CONST                       135
+#define RPN_POW                         135
 #define RPN_NOTES                       136
 #define RPN_INV                         137
 #define RPN_REC                         139
@@ -1692,5 +1693,7 @@ extern uint32_t userTicks;
 #define H_GAMMA         "Calculate the gamma of a Complex number X (or real number if imaginary Y is zero)"
 #define T_MPA_PSI       "Megapascals to PSI"
 #define H_MPA_PSI       "Convert from Megapascals to PSI"
+#define T_CONST         "Constants"
+#define H_CONST         "Select from a number of scientific universal constants"
 
 #include "resource.h"

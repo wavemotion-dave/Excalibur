@@ -269,6 +269,7 @@ BOOL CALLBACK constBankNamesProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
 }
 
 
+
 extern BOOL CALLBACK fnDIALOG_Constants(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
 void RPN_const(void)
 {
@@ -300,7 +301,7 @@ BOOL CALLBACK fnDIALOG_Constants(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
         {
             if (constants[lastConstBank][i].includeInList == TRUE)      // Only include those in the list the user wants...
             {
-                sprintf(tmp, "%-25s\t%-14.12g \t%s",
+                sprintf(tmp, "%-25s\t%-14.13g \t%s",
                          constants[lastConstBank][i].name,
                          constants[lastConstBank][i].value, constants[lastConstBank][i].units);
                 makeInternational(tmp);        // To swap commas and DPs if needed
@@ -408,7 +409,7 @@ BOOL CALLBACK fnDIALOG_Constants(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
                     {
                         if (constants[lastConstBank][i].includeInList == TRUE)  // Only include those in the list the user wants...
                         {
-                            sprintf(tmp, "%-25s\t%-14.12g \t%s",
+                            sprintf(tmp, "%-25s\t%-14.13g \t%s",
                                      constants[lastConstBank][i].name,
                                      constants[lastConstBank][i].value, constants[lastConstBank][i].units);
                             makeInternational(tmp);    // To swap commas and DPs if needed
@@ -464,7 +465,7 @@ BOOL CALLBACK fnDIALOG_Constants(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
                     {
                         if (constants[lastConstBank][i].includeInList == TRUE)  // Only include those in the list the user wants...
                         {
-                            sprintf(tmp, "%-25s\t%-14.12g \t%s",
+                            sprintf(tmp, "%-25s\t%-14.13g \t%s",
                                      constants[lastConstBank][i].name,
                                      constants[lastConstBank][i].value, constants[lastConstBank][i].units);
                             makeInternational(tmp);    // To swap commas and DPs if needed
@@ -487,7 +488,7 @@ BOOL CALLBACK fnDIALOG_Constants(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
             {
                 if (constants[lastConstBank][i].includeInList == TRUE)  // Only include those in the list the user wants...
                 {
-                    sprintf(tmp, "%-25s\t%-14.12g \t%s",
+                    sprintf(tmp, "%-25s\t%-14.13g \t%s",
                              constants[lastConstBank][i].name,
                              constants[lastConstBank][i].value, constants[lastConstBank][i].units);
                     makeInternational(tmp);    // To swap commas and DPs if needed
@@ -507,7 +508,7 @@ BOOL CALLBACK fnDIALOG_Constants(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
             {
                 if (constants[lastConstBank][i].includeInList == TRUE)  // Only include those in the list the user wants...
                 {
-                    sprintf(tmp, "%-25s\t%-14.12g \t%s",
+                    sprintf(tmp, "%-25s\t%-14.13g \t%s",
                              constants[lastConstBank][i].name,
                              constants[lastConstBank][i].value, constants[lastConstBank][i].units);
                     makeInternational(tmp);    // To swap commas and DPs if needed
@@ -527,7 +528,7 @@ BOOL CALLBACK fnDIALOG_Constants(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
             {
                 if (constants[lastConstBank][i].includeInList == TRUE)  // Only include those in the list the user wants...
                 {
-                    sprintf(tmp, "%-25s\t%-14.12g \t%s",
+                    sprintf(tmp, "%-25s\t%-14.13g \t%s",
                              constants[lastConstBank][i].name,
                              constants[lastConstBank][i].value, constants[lastConstBank][i].units);
                     makeInternational(tmp);    // To swap commas and DPs if needed
@@ -547,7 +548,7 @@ BOOL CALLBACK fnDIALOG_Constants(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
             {
                 if (constants[lastConstBank][i].includeInList == TRUE)  // Only include those in the list the user wants...
                 {
-                    sprintf(tmp, "%-25s\t%-14.12g \t%s",
+                    sprintf(tmp, "%-25s\t%-14.13g \t%s",
                              constants[lastConstBank][i].name,
                              constants[lastConstBank][i].value, constants[lastConstBank][i].units);
                     makeInternational(tmp);    // To swap commas and DPs if needed
@@ -567,7 +568,7 @@ BOOL CALLBACK fnDIALOG_Constants(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
             {
                 if (constants[lastConstBank][i].includeInList == TRUE)  // Only include those in the list the user wants...
                 {
-                    sprintf(tmp, "%-25s\t%-14.12g \t%s",
+                    sprintf(tmp, "%-25s\t%-14.13g \t%s",
                              constants[lastConstBank][i].name,
                              constants[lastConstBank][i].value, constants[lastConstBank][i].units);
                     makeInternational(tmp);    // To swap commas and DPs if needed

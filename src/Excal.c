@@ -42,10 +42,10 @@
 
 #define WINDOW_TITLE "Excalibur 32-bit"
 
-#define VERSION_STR "v3.XX-03"
+#define VERSION_STR "v3.XX-04"
 
 #define ABOUT_MSG "Excalibur for Windows 32-bit\n"                    \
-                  "Version 3.XX-03  -  May 17, 2026\n\n"              \
+                  "Version 3.XX-04  -  May 22, 2026\n\n"              \
                   "Copyright 1994-2026 David Bernazzani\n\n"          \
                   "Please read the disclaimer and understand the\n"   \
                   "accuracy and precision issues before using.\n\n"   \
@@ -54,7 +54,7 @@
                   "https://github.com/wavemotion-dave/Excalibur"      \
                   "\n\nThis version is BETA - Expect and report Bugs!"
 
-#define CONFIG_VERSION_MAIN 0xF009 // If this changes, we wipe EVERYTHING
+#define CONFIG_VERSION_MAIN 0xF00A // If this changes, we wipe EVERYTHING
 #define CONFIG_VERSION_SUB 0xF001  // If this changes, we reset x,y window position and reset constant tables (currency, physics constants, etc)
 
 #define END_OF_PROGRAM_STR "<End Of Program>"
@@ -166,7 +166,6 @@ int32_t decimal_places = 13;    // Default decimal places
 uint8_t sci_format = 'g';       // Default scientific display format
 uint32_t indirectRegister = 0;  // For programming - (i) register
 uint8_t progMode = PROG_FLOAT;  // Normal floating-point mode
-uint8_t helpMode = 0;           // Used to determine if next key or button hit is for help
 uint16_t lastUniqueIndex = 0;   // Index of the last function that was called (useful in Financial Register handling)
 
 // Various storage arrays for RPN use
@@ -572,14 +571,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
         }
         else
         {
-            if (helpMode == 0)
-            {
-                ProcessKeyHit(wParam);
-            }
-            else
-            {
-                ProcessHelp(wParam);
-            }
+            ProcessKeyHit(wParam);
             SetFocus(calcMainWindow);
         }
         return 0;
@@ -1182,6 +1174,8 @@ void ClipboardCopySelection(HWND hwnd, uint8_t copytype)
             if (tmpStr[strlen(tmpStr) - 1] == 'd')
                 tmpStr[strlen(tmpStr) - 1] = 0;
         }
+        if (tmpStr[strlen(tmpStr) - 1] == '_')
+            tmpStr[strlen(tmpStr) - 1] = 0;
         CopyTextToClipboard(hwnd, tmpStr);
         Xedit = X_NEW;
         ShowStack();
@@ -1461,64 +1455,65 @@ void UpdateSpareBar_StoreRecall(void)
     }
 }
 
+
 // --------------------------------------------------------
 // Used when we switch into one of the 'Comp Sci' modes...
 // --------------------------------------------------------
 void FloatsToLongs(void)
 {
     lastFloat = X;
-    if (X <= (float)0xFFFFFFFF)
-        XL = (PROG_LONG)X;
+    if (X <= (float)(PROG_SIGNEDLONG)wordSizeMask)
+        XL = (PROG_SIGNEDLONG)X;
     else
-        XL = 0xFFFFFFFF;
+        XL = wordSizeMask;
 
-    if (Y <= (float)0xFFFFFFFF)
-        YL = (PROG_LONG)Y;
+    if (Y <= (float)(PROG_SIGNEDLONG)wordSizeMask)
+        YL = (PROG_SIGNEDLONG)Y;
     else
-        YL = 0xFFFFFFFF;
+        YL = wordSizeMask;
 
-    if (Z <= (float)0xFFFFFFFF)
-        ZL = (PROG_LONG)Z;
+    if (Z <= (float)(PROG_SIGNEDLONG)wordSizeMask)
+        ZL = (PROG_SIGNEDLONG)Z;
     else
-        ZL = 0xFFFFFFFF;
+        ZL = wordSizeMask;
 
-    if (T <= (float)0xFFFFFFFF)
-        TL = (PROG_LONG)T;
+    if (T <= (float)(PROG_SIGNEDLONG)wordSizeMask)
+        TL = (PROG_SIGNEDLONG)T;
     else
-        TL = 0xFFFFFFFF;
+        TL = wordSizeMask;
 
     if (extendedStack)
     {
-        if (A <= (float)0xFFFFFFFF)
-            AL = (PROG_LONG)A;
+        if (A <= (float)(PROG_SIGNEDLONG)wordSizeMask)
+            AL = (PROG_SIGNEDLONG)A;
         else
-            AL = 0xFFFFFFFF;
+            AL = wordSizeMask;
 
-        if (B <= (float)0xFFFFFFFF)
-            BL = (PROG_LONG)B;
+        if (B <= (float)(PROG_SIGNEDLONG)wordSizeMask)
+            BL = (PROG_SIGNEDLONG)B;
         else
-            BL = 0xFFFFFFFF;
+            BL = wordSizeMask;
 
-        if (C <= (float)0xFFFFFFFF)
-            CL = (PROG_LONG)C;
+        if (C <= (float)(PROG_SIGNEDLONG)wordSizeMask)
+            CL = (PROG_SIGNEDLONG)C;
         else
-            CL = 0xFFFFFFFF;
+            CL = wordSizeMask;
 
-        if (D <= (float)0xFFFFFFFF)
-            DL = (PROG_LONG)D;
+        if (D <= (float)(PROG_SIGNEDLONG)wordSizeMask)
+            DL = (PROG_SIGNEDLONG)D;
         else
-            DL = 0xFFFFFFFF;
+            DL = wordSizeMask;
     }
 
-    if (LASTX <= (float)0xFFFFFFFF)
-        LASTXL = (PROG_LONG)LASTX;
+    if (LASTX <= (float)(PROG_SIGNEDLONG)wordSizeMask)
+        LASTXL = (PROG_SIGNEDLONG)LASTX;
     else
-        LASTXL = 0xFFFFFFFF;
+        LASTXL = wordSizeMask;
 
-    if (LASTY <= (float)0xFFFFFFFF)
-        LASTYL = (PROG_LONG)LASTY;
+    if (LASTY <= (float)(PROG_SIGNEDLONG)wordSizeMask)
+        LASTYL = (PROG_SIGNEDLONG)LASTY;
     else
-        LASTYL = 0xFFFFFFFF;
+        LASTYL = wordSizeMask;
 }
 
 // --------------------------------------------------------
@@ -1749,13 +1744,48 @@ void RPN_error(char *msg)
     MessageBox(calcMainWindow, msg, "Excalibur Calculation Error", MB_OK | MB_ICONEXCLAMATION);
 }
 
-void RPN_help(void)
+void RPN_fact(void)
 {
-    helpMode ^= 1;
-    if (helpMode == 0)
-        UpdateSpareBar("    ");
+    if (progMode == PROG_FLOAT)
+    {
+        int fact;
+        double temp;
+
+        if (X >= 0.0 && X <= 170.0)
+        {
+            temp = 1.0;
+            for (fact = (int) X; fact > 0; fact--)
+            {
+                temp = (double) temp *(double) fact;
+            }
+            StackPop();
+            StackPush(temp);
+        }
+        else
+        {
+            RPN_error("X! Out Of Range(0-170)");
+        }
+    }
     else
-        UpdateSpareBar("HELP");
+    {
+        PROG_LONG fact;
+        PROG_LONG temp;
+
+        if (XL >= 0 && XL <= 20)
+        {
+            temp = 1;
+            for (fact = XL; fact > 0; fact--)
+            {
+                temp = temp * fact;
+            }
+            StackPopL();
+            StackPushL(temp);
+        }
+        else
+        {
+            RPN_error("X! Out Of Range(0-20 in Comp-Sci mode)");
+        }
+    }
 }
 
 double MakeAccurate(double val)
@@ -1798,13 +1828,13 @@ struct funcStruct RPNkeys[] = {
     {RPN_MODE,      UNI_MODE,   USES_FL, ALLOWREC, 'm', "", NO_L,   X_NEW,      RPN_mode,           "Select Mode",          "Used to select number format mode"},
     {RPN_BKSP,      UNI_BKSP,   USES_FL, ALLOWREC,  8,  "", NO_L,   X_NULL,     RPN_backspace,      "Backspace",            "Used to correct mistakes in number entry"},
     {RPN_CLR_STACK, UNI_CLRSTK, USES_FL, ALLOWREC, 'c', "", YES_L,  X_ENTER,    RPN_clearStack,     "Clear Stack",          "Used to clear the entire stack contents. Press twice to clear all registers as well."},
-    {RPN_HELP,      UNI_HELP,   USES_FL, ALLOWREC, 'h', "", NO_L,   X_NULL,     RPN_help,           "Help",                 "After clicking this key, select another key for individual key help.\nSame as right-click of the mouse on any key."},
+    {RPN_FACT,      UNI_FACT,   USES_FL, ALLOWREC, '!', "", YES_L,  X_NEW,      RPN_fact,           "Factorial X",          "Compute the Factorial of X"},
     {RPN_PLAYBACK,  UNI_PLAY,   USES_FL, NORECORD, 'p', "", NO_L,   X_NEW,      RPN_Playback,       "Run Program",          "Run the the currently loaded program."},
     {RPN_DROP,      UNI_DROP,   USES_FL, ALLOWREC, 'd', "", YES_L,  X_NEW,      RPN_drop,           "Drop Stack",           "Drops the X register and the rest of stack shifts down."},
     {RPN_LARG,      UNI_LARG,   USES_FL, ALLOWREC, ' ', "", NO_L,   X_NEW,      RPN_larg,           "Last Arguments",       "Retrieves the last X and Y pair before last operation."},
     {RPN_FRAC,      UNI_FRAC,   USES_FL, ALLOWREC, ' ', "", NO_L,   X_EDIT,     RPN_frac,           "Fraction Bar",         "Insert Fraction to current X edit"},
     {RPN_EDIT,      UNI_EDIT,   USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_edit,           "Edit X Register",      "Used to place the X register back in edit mode if it is not already."},
-    {RPN_CONST,     UNI_CONST,  USES_F,  NORECORD, ' ', "", YES_L,  X_NEW,      RPN_const,          "Constants",            "Recall or Store Constants to one of five banks."},
+    {RPN_POW,       UNI_POW,    USES_FL, ALLOWREC, '^', "", YES_L,  X_NEW,      RPN_pow,            "Raise to Power",       "Raise X to the power of Y"},
     {RPN_NOTES,     UNI_NOTES,  USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_Notes,          "Excalibur Notepad",    "Allows some simple notes to be stored/saved."},
     {RPN_INV,       UNI_INVX,   USES_FL, ALLOWREC, 'i', "", YES_L,  X_NEW,      RPN_inverse,        "Inverse X",            "Computes the inverse of X"},
     {RPN_REC,       UNI_REC,    USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_Record,         "Record Mode On/Off",   "When ON - Records button presses for playback."},
@@ -1854,13 +1884,13 @@ struct keyPosStruct RPNkeyPos[] = {
     {RPN_MODE       ,0,     0},
     {RPN_BKSP       ,0,     0},
     {RPN_CLR_STACK  ,0,     0},
-    {RPN_HELP       ,0,     0},
+    {RPN_FACT       ,0,     0},
     {RPN_PLAYBACK   ,0,     0},
     {RPN_DROP       ,0,     0},
     {RPN_LARG       ,0,     0},
     {RPN_FRAC       ,0,     0},
     {RPN_EDIT       ,0,     0},
-    {RPN_CONST      ,0,     0},
+    {RPN_POW        ,0,     0},
     {RPN_NOTES      ,0,     0},
     {RPN_INV        ,0,     0},
     {RPN_REC        ,0,     0},
@@ -2028,7 +2058,6 @@ int ProcessHelp(WPARAM key)
         }
         i++;
     }
-    helpMode = 0;
     UpdateSpareBar(" ");
     return (0);
 }
@@ -4498,7 +4527,7 @@ BOOL CALLBACK fnDIALOG_SettingsProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
             if (bs != 0L)
             {
                 eexMode = 0;
-                SetDlgItemText(calcMainWindow, RPN_NEGATE, "+/-");
+                SetDlgItemText(calcMainWindow, RPN_NEGATE, "±");
                 SetDlgItemText(calcMainWindow, RPN_E, "E");
             }
             else
@@ -5346,6 +5375,45 @@ void RPN_inverse(void)
     else
     {
         StackPush(1.0 / StackPop());
+    }
+}
+
+void RPN_pow(void)
+{
+    if (progMode == PROG_FLOAT)
+    {
+        double xtemp, ytemp;
+        xtemp = StackPop();
+        ytemp = StackPop();
+        if (ytemp == 0.0 && xtemp < 0.0)
+            RPN_error("Power:  Y=0 and X < 0");
+        else
+            StackPush(pow(ytemp, xtemp));
+    }
+    else
+    {
+        PROG_LONG i, xtemp64, ytemp64;
+        
+        xtemp64 = StackPopL();
+        ytemp64 = StackPopL();
+        if (ytemp64 == 0 && xtemp64 < 0)
+		{
+            RPN_error("Power:  Y=0 and X < 0");
+		}
+        else if (xtemp64 == 0)
+		{
+			StackPushL(1);
+		}
+		else
+        {
+			PROG_LONG sum = ytemp64;
+            for (i = 0; i < xtemp64-1; i++)
+            {
+                sum = sum * ytemp64;
+            }
+
+            StackPushL(sum);
+        }
     }
 }
 

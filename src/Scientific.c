@@ -104,7 +104,7 @@ extern void SCI_ProjectileHeight(void);    // In meters
 extern void SCI_Astro(void);
 extern void SCI_pyth(void);
 extern void SCI_quad(void);
-extern void SCI_circA(void);
+extern void SCI_const(void);
 
 extern void COMP_plus(void);
 extern void COMP_minus(void);
@@ -143,12 +143,12 @@ struct funcStruct Scientific_funcs[MAX_FUNCS] = {
     {FN9,   UNI_XX,         USES_F,     ALLOWREC,   ' ',    "X²",       YES_L,  X_NEW,  SCI_square,             T_XX,           H_XX},
     {FN10,  UNI_SQRT,       USES_F,     ALLOWREC,   ' ',    "SQRT",     YES_L,  X_NEW,  SCI_sqrt,               T_SQRT,         H_SQRT},
     {FN11,  UNI_INV,        USES_F,     ALLOWREC,   ' ',    "1/X",      YES_L,  X_NEW,  SCI_inverse,            T_INV,          H_INV},
-    {FN12,  UNI_POW10,      USES_F,     ALLOWREC,   ' ',    "10^X",     YES_L,  X_NEW,  SCI_10x,                T_POW10,        H_POW10},
+    {FN12,  UNI_POW,        USES_FL,    ALLOWREC,   ' ',    "Y^X",      YES_L,  X_NEW,  SCI_pow,                T_POW,          H_POW},
     {FN13,  UNI_EXP,        USES_F,     ALLOWREC,   ' ',    "e^X",      YES_L,  X_NEW,  SCI_exp,                T_EXP,          H_EXP},
     {FN14,  UNI_LN,         USES_F,     ALLOWREC,   ' ',    "LN",       YES_L,  X_NEW,  SCI_ln,                 T_LN,           H_LN},
     {FN15,  UNI_LOG,        USES_F,     ALLOWREC,   ' ',    "LOG",      YES_L,  X_NEW,  SCI_log,                T_LOG,          H_LOG},
-    {FN16,  UNI_FACT,       USES_F,     ALLOWREC,   ' ',    "X!",       YES_L,  X_NEW,  SCI_xfact,              T_FACT,         H_FACT},
-    {FN17,  UNI_POW,        USES_F,     ALLOWREC,   ' ',    "Y^X",      YES_L,  X_NEW,  SCI_pow,                T_POW,          H_POW},
+    {FN16,  UNI_FACT,       USES_FL,    ALLOWREC,   ' ',    "X!",       YES_L,  X_NEW,  SCI_xfact,              T_FACT,         H_FACT},
+    {FN17,  UNI_POW10,      USES_F,     ALLOWREC,   ' ',    "10^X",     YES_L,  X_NEW,  SCI_10x,                T_POW10,        H_POW10},
     {FN18,  UNI_INT,        USES_F,     ALLOWREC,   ' ',    "INT",      YES_L,  X_NEW,  SCI_int,                T_INT,          H_INT},
     {FN19,  UNI_FRACT,      USES_F,     ALLOWREC,   ' ',    "FRAC",     YES_L,  X_NEW,  SCI_frac,               T_FRAC,         H_FRAC},
     {FN20,  UNI_RAND,       USES_F,     ALLOWREC,   ' ',    "RAND",     YES_L,  X_NEW,  SCI_rand,               T_RAND,         H_RAND},
@@ -164,7 +164,7 @@ struct funcStruct Scientific_funcs[MAX_FUNCS] = {
     {FN30,  UNI_LCM,        USES_F,     ALLOWREC,   ' ',    "LCM",      YES_L,  X_NEW,  SCI_LCM,                T_LCM,          H_LCM},
     {FN31,  UNI_MINR,       USES_F,     ALLOWREC,   ' ',    "MinR",     YES_L,  X_NEW,  SCI_MinR,               T_MINR,         H_MINR},
     {FN32,  UNI_MAXR,       USES_F,     ALLOWREC,   ' ',    "MaxR",     YES_L,  X_NEW,  SCI_MaxR,               T_MAXR,         H_MAXR},
-    {FN33,  UNI_PRIME,      USES_F,     NORECORD,   ' ',    "Primes",   YES_L,  X_NEW,  SCI_primes,              T_PRIME,        H_PRIME},
+    {FN33,  UNI_CONST,      USES_F,     NORECORD,   ' ',    "Consts",   YES_L,  X_NEW,  SCI_const,              T_CONST,        H_CONST},
     {FN34,  UNI_METRIC,     USES_F,     ALLOWREC,   ' ',    "Metric",   YES_L,  X_NEW,  SCI_metricPre,          T_METRIC,       H_METRIC},
     {FN35,  UNI_ELEMENT,    USES_F,     NORECORD,   ' ',    "Elmnts",   YES_L,  X_NEW,  SCI_elements,           T_ELEMENT,      H_ELEMENT},
     {FN36,  UNI_ASTRO,      USES_F,     NORECORD,   ' ',    "Astro",    YES_L,  X_NEW,  SCI_Astro,              T_ASTRO,        H_ASTRO},
@@ -191,7 +191,7 @@ struct funcStruct Scientific2_funcs[MAX_FUNCS] = {
     {FN14,  UNI_RESIST,     USES_F,     ALLOWREC,   ' ',    "Resist",   YES_L,  X_NEW,  SCI_resist,             T_RESIST,       H_RESIST},    
     {FN15,  UNI_QUAD,       USES_F,     ALLOWREC,   ' ',    "Quad",     YES_L,  X_NEW,  SCI_quad,               T_QUAD,         H_QUAD},
     {FN16,  UNI_PYTH,       USES_F,     ALLOWREC,   ' ',    "Pyth",     YES_L,  X_NEW,  SCI_pyth,               T_PYTHAG,       H_PYTHAG},
-    {FN17,  UNI_CIRCA,      USES_F,     ALLOWREC,   ' ',    "Circ A",   YES_L,  X_NEW,  SCI_circA,              T_CIRCA,        H_CIRCA},
+    {FN17,  UNI_PRIME,      USES_F,     NORECORD,   ' ',    "Primes",   YES_L,  X_NEW,  SCI_primes,             T_PRIME,        H_PRIME},
     {FN18,  UNI_GAMMA,      USES_F,     ALLOWREC,   ' ',    "GAMMA",    YES_L,  X_NEW,  COMP_Gamma,             T_GAMMA,        H_GAMMA},
     {FN19,  UNI_TOPOLAR,    USES_F,     ALLOWREC,   ' ',    "»POLR",    YES_L,  X_NEW,  COMP_ToPolar,           T_TOPOLAR,      H_TOPOLAR},
     {FN20,  UNI_FROMPOLAR,  USES_F,     ALLOWREC,   ' ',    "«POLR",    YES_L,  X_NEW,  COMP_FromPolar,         T_FROMPOLAR,    H_FROMPOLAR},
@@ -391,35 +391,12 @@ void SCI_log(void)
 
 void SCI_xfact(void)
 {
-    int fact;
-    double temp;
-
-    if (X >= 0.0 && X <= 170.0)
-    {
-        temp = 1.0;
-        for (fact = (int) X; fact > 0; fact--)
-        {
-            temp = (double) temp *(double) fact;
-        }
-        StackPop();
-        StackPush(temp);
-    }
-    else
-    {
-        RPN_error("X! Out Of Range(0-170)");
-    }
+    RPN_fact();
 }
 
 void SCI_pow(void)
 {
-    double xtemp, ytemp;
-
-    xtemp = StackPop();
-    ytemp = StackPop();
-    if (ytemp == 0.0 && xtemp < 0.0)
-        RPN_error("Power:  Y=0 and X < 0");
-    else
-        StackPush(pow(ytemp, xtemp));
+    RPN_pow();
 }
 
 void SCI_rand(void)
@@ -1715,9 +1692,7 @@ void SCI_pyth(void)
     StackPush(c);
 }
 
-void SCI_circA(void)
+void SCI_const(void)
 {
-    double temp;
-    temp = StackPop();
-    StackPush((temp * temp) * M_PI);
+    RPN_const();
 }

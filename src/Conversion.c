@@ -131,9 +131,9 @@ struct funcStruct Conversion_funcs[MAX_FUNCS] = {
     {FN40,  UNI_METRIC,  USES_F,    ALLOWREC,   ' ',    "Metric",   YES_L,  X_NEW,      SCI_metricPre,      T_METRIC,       H_METRIC}
 };
 
-// --------------------- 
-// Conversion Functions 
-// --------------------- 
+// -----------------------------------------------------------------
+// Conversion Functions - these handle conversion both to and from.
+// -----------------------------------------------------------------
 void CONV_lb_kg(void)
 {
     if (!(modifiers & MOD_INVERSE))
