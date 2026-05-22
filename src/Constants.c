@@ -54,7 +54,7 @@ void PushConstant(double value)
     //@TODO convert this to a simple UNI_xxx value
     if (recModeON == 1) // If recording, generate key sequence to playback struct
     {
-        sprintf(tmpStr, "%.12g", value);
+        sprintf(tmpStr, "%.13g", value);
         startPos = 0;
         if (tmpStr[0] == '-')
         {
@@ -123,7 +123,7 @@ BOOL CALLBACK fnDIALOG_REDEFINECONST(HWND hDlg, UINT wMessage, WPARAM wParam, LP
     case WM_INITDIALOG:
         SetDlgItemText(hDlg, IDC_EDIT1, constName);
         SetDlgItemText(hDlg, IDC_EDIT2, constUnits);
-        sprintf(tmp, "%.12g", constVal);
+        sprintf(tmp, "%.13g", constVal);
         SetDlgItemText(hDlg, IDC_EDIT3, tmp);
 
         return TRUE;
@@ -140,7 +140,7 @@ BOOL CALLBACK fnDIALOG_REDEFINECONST(HWND hDlg, UINT wMessage, WPARAM wParam, LP
             GetDlgItemText(hDlg, IDC_EDIT3, tmp, 20);
             tmp[20] = '\0';
             constVal = atof(tmp);
-            sprintf(tmp, "%.12g", constVal); // Make the Number the correct # significant digits...
+            sprintf(tmp, "%.13g", constVal); // Make the Number the correct # significant digits...
             constVal = atof(tmp);
             EndDialog(hDlg, FALSE);
             return TRUE;

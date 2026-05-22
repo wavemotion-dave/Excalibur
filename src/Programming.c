@@ -504,7 +504,7 @@ BOOL CALLBACK inputRegisterProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM 
     switch(wMessage)
     {
     case WM_INITDIALOG:
-        MakeSciFormat(STO[RegisterToInput], tmp);
+        FormatNumberForStack(STO[RegisterToInput], tmp);
         SetDlgItemText(hDlg, IDC_EDIT1, tmp);
         SetFocus(GetDlgItem(hDlg, IDC_EDIT1));
         return TRUE;
@@ -810,7 +810,7 @@ BOOL CALLBACK inputDebugValue(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lP
     switch(wMessage)
     {
     case WM_INITDIALOG:
-        MakeSciFormat(debugValue, tmp);
+        FormatNumberForStack(debugValue, tmp);
         SetDlgItemText(hDlg, IDC_EDIT1, tmp);
         SetFocus(GetDlgItem(hDlg, IDC_EDIT1));
         return TRUE;

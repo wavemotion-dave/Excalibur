@@ -274,7 +274,7 @@ extern int ProcessKeyHit(WPARAM key);
 extern char Radix(int progM);
 extern void PutCommas(char *str);
 extern void MakeEngineeringFormat(double val, char *Fstr);
-extern void MakeSciFormat(double val, char *Fstr);
+extern void FormatNumberForStack(double val, char *Fstr);
 extern void ShowStack(void);
 extern void StackPush(double temp);
 extern double StackPop(void);
@@ -381,7 +381,7 @@ extern uint64_t stackPops;
 #define INTERNATIONAL     0
 #define NONINTERNATIONAL  1
 
-#define M_PI              3.14159265359
+#define M_PI              3.14159265358979
 #define CNULL            '\0'
 
 #define REG_STORE         0x01
@@ -1125,7 +1125,8 @@ extern uint32_t userTicks;
 #define IDC_RADIO10                     1010
 #define IDC_RADIO11                     1011
 #define IDC_RADIO12                     1012
-#define IDC_DECIMAL_PLACES              1013
+#define IDC_RADIO13                     1013
+#define IDC_DECIMAL_PLACES              1014
 
 
 #define T_NULL          "Unused"
@@ -1175,7 +1176,7 @@ extern uint32_t userTicks;
 #define T_PERM          "Permutations"
 #define H_PERM          "Y Permutations grouped X at a time."
 #define T_PI            "PI"
-#define H_PI            "Physical constant  3.14159265359"
+#define H_PI            "Physical constant 3.1415926535898"
 #define T_SUMP          "Summation +"
 #define H_SUMP          "Adds the X and Y values to the statistics and summation registers."
 #define T_SUMM          "Summation -"

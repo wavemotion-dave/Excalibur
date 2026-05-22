@@ -162,7 +162,7 @@ uint8_t footPrint = 0;          // Classic layout by default
 uint8_t popFillZero = 0;        // T register fills with zero?
 int32_t lastChosenConst = 0;    // Last chosen constant
 int32_t lastConstBank = 0;      // Last chosen constant bank
-int32_t decimal_places = 12;    // Default decimal places
+int32_t decimal_places = 13;    // Default decimal places
 uint8_t sci_format = 'g';       // Default scientific display format
 uint32_t indirectRegister = 0;  // For programming - (i) register
 uint8_t progMode = PROG_FLOAT;  // Normal floating-point mode
@@ -1762,7 +1762,7 @@ double MakeAccurate(double val)
 {
     unsigned char str[64];
 
-    sprintf(str, "%.13g", val);
+    sprintf(str, "%.14g", val);
     val = atof(str);
     return (val);
 }
@@ -2179,7 +2179,7 @@ void MakeEngineeringFormat(double val, char *Fstr)
     sprintf(sp, "%d", exponent);
 }
 
-void MakeSciFormat(double val, char *Fstr)
+void FormatNumberForStack(double val, char *Fstr)
 {
     char sciStr[64];
     char str[64];
@@ -2204,7 +2204,7 @@ void MakeSciFormat(double val, char *Fstr)
     }
     else
     {
-        strcpy(str, "%- 21.13g");
+        strcpy(str, "%- 21.14g");
     }
     if (sci_format != 'Z') // ENGINEERING FORMAT
     {
@@ -2264,7 +2264,7 @@ void ShowStack(void)
         }
         else
         {
-            MakeSciFormat(X, tmpStr);
+            FormatNumberForStack(X, tmpStr);
         }
 
         if (rightAlignStack == 1)
@@ -2277,7 +2277,7 @@ void ShowStack(void)
             SetDlgItemText(calcMainWindow, RPN_STACK_X, tmpStr);
         }
 
-        MakeSciFormat(Y, tmpStr);
+        FormatNumberForStack(Y, tmpStr);
         if (rightAlignStack == 1)
         {
             sprintf(stackStr, (bExactFont ? "%24s" : "%22s"), tmpStr);
@@ -2290,7 +2290,7 @@ void ShowStack(void)
 
         if (recModeON == 0 && showTrace == FALSE)
         {
-            MakeSciFormat(Z, tmpStr);
+            FormatNumberForStack(Z, tmpStr);
             if (rightAlignStack == 1)
             {
                 sprintf(stackStr, (bExactFont ? "%24s" : "%22s"), tmpStr);
@@ -2301,7 +2301,7 @@ void ShowStack(void)
                 SetDlgItemText(calcMainWindow, RPN_STACK_Z, tmpStr);
             }
 
-            MakeSciFormat(T, tmpStr);
+            FormatNumberForStack(T, tmpStr);
             if (rightAlignStack == 1)
             {
                 sprintf(stackStr, (bExactFont ? "%24s" : "%22s"), tmpStr);
@@ -2758,7 +2758,7 @@ int allowDigitBasedOnMaxStringSize(char *Xstr, char digit)
     char *tmpPtr;
     int i, significantDigits;
 
-    maxDigits = 12;
+    maxDigits = 14;
     significantDigits = 0;
     for (i = 0; i < (int)strlen(Xstr); i++)
     {
@@ -2874,8 +2874,10 @@ BOOL CALLBACK fnDIALOG_DisplayModeProc(HWND hDlg, UINT wMessage, WPARAM wParam, 
             SendMessage(GetDlgItem(hDlg, IDC_RADIO10), BM_SETCHECK, (WORD)1, (DWORD)0L);
         else if (decimal_places == 11)
             SendMessage(GetDlgItem(hDlg, IDC_RADIO11), BM_SETCHECK, (WORD)1, (DWORD)0L);
-        else
+        else if (decimal_places == 12)
             SendMessage(GetDlgItem(hDlg, IDC_RADIO12), BM_SETCHECK, (WORD)1, (DWORD)0L);
+        else
+            SendMessage(GetDlgItem(hDlg, IDC_RADIO13), BM_SETCHECK, (WORD)1, (DWORD)0L);
 
         if (sci_format == 'g')
             SendMessage(GetDlgItem(hDlg, 101), BM_SETCHECK, (WORD)1, (DWORD)0L);
@@ -2936,8 +2938,10 @@ BOOL CALLBACK fnDIALOG_DisplayModeProc(HWND hDlg, UINT wMessage, WPARAM wParam, 
                 decimal_places = 10;
             else if (SendMessage(GetDlgItem(hDlg, IDC_RADIO11), BM_GETCHECK, (WORD)0, (DWORD)0L) != 0)
                 decimal_places = 11;
-            else
+            else if (SendMessage(GetDlgItem(hDlg, IDC_RADIO12), BM_GETCHECK, (WORD)0, (DWORD)0L) != 0)
                 decimal_places = 12;
+            else
+                decimal_places = 13;
 
             if (SendMessage(GetDlgItem(hDlg, IDC_CHECK1), BM_GETCHECK, (WORD)0, (DWORD)0L))
                 rightAlignStack = 1;

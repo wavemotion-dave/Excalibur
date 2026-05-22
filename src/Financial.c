@@ -461,7 +461,7 @@ void FIN_100mult(void)
 
 void FIN_pmt(void)
 {
-    double fintemp1, fintemp2;
+    double fintemp1;
 
     if (rpnStoreRecall & REG_RECALL)
     {
