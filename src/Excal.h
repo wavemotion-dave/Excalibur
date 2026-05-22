@@ -933,9 +933,8 @@ extern uint32_t userTicks;
 #define RPN_COPY                        141
 #define RPN_PASTE                       142
 #define RPN_SQRT                        143
-#define RPN_XY                          144
-#define RPN_LN                          145
-#define RPN_LOG                         146
+#define RPN_LN                          144
+#define RPN_LOG                         145
 
 #define RPN_SCI                         200
 #define RPN_SCI2                        201

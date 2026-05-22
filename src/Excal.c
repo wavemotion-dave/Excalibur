@@ -1834,7 +1834,7 @@ struct funcStruct RPNkeys[] = {
     {RPN_LARG,      UNI_LARG,   USES_FL, ALLOWREC, ' ', "", NO_L,   X_NEW,      RPN_larg,           "Last Arguments",       "Retrieves the last X and Y pair before last operation."},
     {RPN_FRAC,      UNI_FRAC,   USES_FL, ALLOWREC, ' ', "", NO_L,   X_EDIT,     RPN_frac,           "Fraction Bar",         "Insert Fraction to current X edit"},
     {RPN_EDIT,      UNI_EDIT,   USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_edit,           "Edit X Register",      "Used to place the X register back in edit mode if it is not already."},
-    {RPN_POW,       UNI_POW,    USES_FL, ALLOWREC, '^', "", YES_L,  X_NEW,      RPN_pow,            "Raise to Power",       "Raise X to the power of Y"},
+    {RPN_POW,       UNI_POW,    USES_FL, ALLOWREC, '^', "", YES_L,  X_NEW,      RPN_pow,            "Raise to Power",       "Raise Y to the power of X"},
     {RPN_NOTES,     UNI_NOTES,  USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_Notes,          "Excalibur Notepad",    "Allows some simple notes to be stored/saved."},
     {RPN_INV,       UNI_INVX,   USES_FL, ALLOWREC, 'i', "", YES_L,  X_NEW,      RPN_inverse,        "Inverse X",            "Computes the inverse of X"},
     {RPN_REC,       UNI_REC,    USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_Record,         "Record Mode On/Off",   "When ON - Records button presses for playback."},
@@ -1842,7 +1842,6 @@ struct funcStruct RPNkeys[] = {
     {RPN_COPY,      UNI_COPY,   USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_Copy,           "Copy X Register",      "Copy X register to the clipboard"},
     {RPN_PASTE,     UNI_PASTE,  USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_Paste,          "Paste X Register",     "Paste X register from the clipboard"},
     {RPN_SQRT,      UNI_SQRT,   USES_FL, ALLOWREC, ' ', "", YES_L,  X_NEW,      SCI_sqrt,           "Square Root",          "Computes the Square Root of the value in X"},
-    {RPN_XY,        UNI_POW,    USES_FL, ALLOWREC, ' ', "", YES_L,  X_NEW,      SCI_pow,            "Raise X to the Y",     "Raises X to the Y power"},
     {RPN_LN,        UNI_LN,     USES_FL, ALLOWREC, ' ', "", YES_L,  X_NEW,      SCI_ln,             "Natural Logarithm",    "Computes the natural logarithm (base e) of X"},
     {RPN_LOG,       UNI_LOG,    USES_FL, ALLOWREC, ' ', "", YES_L,  X_NEW,      SCI_log,            "Base 10 Logarithm",    "Raises the base 10 logarithm of X"},
 
@@ -1898,7 +1897,6 @@ struct keyPosStruct RPNkeyPos[] = {
     {RPN_COPY       ,0,     0},
     {RPN_PASTE      ,0,     0},
     {RPN_SQRT       ,0,     0},
-    {RPN_XY         ,0,     0},
     {RPN_LN         ,0,     0},
     {RPN_LOG        ,0,     0},
     {RPN_LAST_KEY,   0,     0}
