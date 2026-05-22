@@ -169,26 +169,48 @@ BOOL CALLBACK fnDIALOG_REDEFINECONST(HWND hDlg, UINT wMessage, WPARAM wParam, LP
 struct constTableStruct constantsUsed[MAX_CONSTS];
 struct constTableStruct constants[MAX_CONST_BANKS][MAX_CONSTS] = 
 {
+    
     // Bank 1
     {
-        {TRUE,  "Pi",                       "",             M_PI},
-        {TRUE,  "Speed Of Light",           "m/s",          299792458.0},
-        {TRUE,  "Acceleration Gravity",     "m/s²",         9.80665},
-        {TRUE,  "Plank's Constant",         "Js",           6.626E-34},
-        {TRUE,  "Avogadro's Number",        "mol",          6.022045E+23},
-        {TRUE,  "Electron Charge",          "col",          1.6021892E-19},
-        {TRUE,  "Atomic Mass Unit",         "kg",           1.6606E-27},
-        {TRUE,  "Electron Mass",            "kg",           9.109534E-31},
-        {TRUE,  "Proton Mass",              "kg",           1.6722E-27},
-        {TRUE,  "Electron-Proton Ratio",    "",             1836.1},
-        {TRUE,  "Ideal Gas Volume @ STP",   "l/mol",        22.4136},
-        {TRUE,  "Bohr Radius",              "m",            5.292E-11},
-        {TRUE,  "Electron Volt",            "J",            1.602E-19},
-        {TRUE,  "Boltzman Constant",        "JK-1",         1.380622e-23},
-        {TRUE,  "Faraday's Constant",       "col",          9.65E4},
-        {TRUE,  "Unit Atomic Energy",       "MeV",          931.34},
-        {TRUE,  "Universal Answer",         "",             42.0},
-        {FALSE, "None",                     "",             0.00}  // end of list...
+        {TRUE,  "Acceleration Gravity",         "m/s²",          9.80665},
+        {TRUE,  "Atomic Mass Unit",             "kg",            1.6606E-27},
+        {TRUE,  "Astronomical Unit",            "m",             1.495978707E11},
+        {TRUE,  "Avogadro's Number",            "mol",           6.022045E+23},
+        {TRUE,  "Bohr Radius",                  "m",             5.292E-11},
+        {TRUE,  "Boltzman Constant",            "JK-1",          1.380622E-23},
+        {TRUE,  "Coulomb Constant",             "N m²/C²",       8.9875517923E9},
+        {TRUE,  "Earth Mass",                   "kg",            5.97219E24},
+        {TRUE,  "Earth Radius",                 "m",             6.371E6},
+        {TRUE,  "Electron Charge",              "col",           1.6021892E-19},
+        {TRUE,  "Electron Mass",                "kg",            9.109534E-31},
+        {TRUE,  "Electron-Proton Ratio",        "",              1836.1},
+        {TRUE,  "Electron Volt",                "J",             1.602E-19},
+        {TRUE,  "Euler-Mascheroni Constant",    "",              0.5772156649015329},
+        {TRUE,  "Euler's Number",               "",              2.718281828459045},
+        {TRUE,  "Faraday's Constant",           "col",           9.65E4},
+        {TRUE,  "Fine-Structure Constant",      "",              7.2973525693E-3},
+        {TRUE,  "Golden Ratio",                 "",              1.618033988749895},
+        {TRUE,  "Gravitational Constant",       "m³/kg·s²",      6.67430E-11},
+        {TRUE,  "Ideal Gas Volume @ STP",       "l/mol",         22.4136},
+        {TRUE,  "Light-Year",                   "m",             9.460730472E15},
+        {TRUE,  "ln(2)",                        "",              0.6931471805599453},
+        {TRUE,  "Parsec",                       "m",             3.085677581E16},
+        {TRUE,  "Pi",                           "",              M_PI},
+        {TRUE,  "Plank's Constant",             "Js",            6.626E-34},
+        {TRUE,  "Proton Mass",                  "kg",            1.6722E-27},
+        {TRUE,  "Reduced Planck Constant",      "J s",           1.054571817E-34},
+        {TRUE,  "Rydberg Constant",             "m^-1",          1.0973731568508E7},
+        {TRUE,  "Sqrt 2",                       "",              1.4142135623730951},
+        {TRUE,  "Sqrt 3",                       "",              1.7320508075688772},
+        {TRUE,  "Speed Of Light",               "m/s",           299792458.0},
+        {TRUE,  "Standard Atmosphere",          "Pa",            101325.0},
+        {TRUE,  "Stefan-Boltzmann Constant",    "W/m² K^4",      5.670374419E-8},
+        {TRUE,  "Unit Atomic Energy",           "MeV",           931.34},
+        {TRUE,  "Universal Answer",             "",              42.0},
+        {TRUE,  "Universal Gas Constant",       "J/mol K",       8.314462618},
+        {TRUE,  "Vacuum Permittivity",          "F/m",           8.8541878128E-12},
+        {TRUE,  "Vacuum Permeability",          "N/A²",          1.2566370614E-6},
+        {FALSE, "None",                         "",              0.00}  // end of list...
     },
      
     // Bank 2 
@@ -267,7 +289,6 @@ BOOL CALLBACK constBankNamesProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
     }
     return FALSE;
 }
-
 
 
 extern BOOL CALLBACK fnDIALOG_Constants(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
