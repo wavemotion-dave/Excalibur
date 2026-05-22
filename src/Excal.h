@@ -123,6 +123,10 @@ extern struct funcStruct MacroFuncs[];
 
 #define NOTES_SIZE  8196
 
+#define UINT64_MAX (uint64_t)0xFFFFFFFFFFFFFFFF
+#define INT64_MAX (int64_t)0x7FFFFFFFFFFFFFFF
+#define INT64_MIN (int64_t)0x8000000000000000
+
 // ---------------------------
 // Defines for the main dialog
 // ---------------------------

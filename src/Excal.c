@@ -1462,55 +1462,55 @@ void UpdateSpareBar_StoreRecall(void)
 void FloatsToLongs(void)
 {
     lastFloat = X;
-    if (X <= (float)(PROG_SIGNEDLONG)wordSizeMask)
+    if (X <= (float)INT64_MAX)
         XL = (PROG_SIGNEDLONG)X;
     else
         XL = wordSizeMask;
 
-    if (Y <= (float)(PROG_SIGNEDLONG)wordSizeMask)
+    if (Y <= (float)INT64_MAX)
         YL = (PROG_SIGNEDLONG)Y;
     else
         YL = wordSizeMask;
 
-    if (Z <= (float)(PROG_SIGNEDLONG)wordSizeMask)
+    if (Z <= (float)INT64_MAX)
         ZL = (PROG_SIGNEDLONG)Z;
     else
         ZL = wordSizeMask;
 
-    if (T <= (float)(PROG_SIGNEDLONG)wordSizeMask)
+    if (T <= (float)INT64_MAX)
         TL = (PROG_SIGNEDLONG)T;
     else
         TL = wordSizeMask;
 
     if (extendedStack)
     {
-        if (A <= (float)(PROG_SIGNEDLONG)wordSizeMask)
+        if (A <= (float)INT64_MAX)
             AL = (PROG_SIGNEDLONG)A;
         else
             AL = wordSizeMask;
 
-        if (B <= (float)(PROG_SIGNEDLONG)wordSizeMask)
+        if (B <= (float)INT64_MAX)
             BL = (PROG_SIGNEDLONG)B;
         else
             BL = wordSizeMask;
 
-        if (C <= (float)(PROG_SIGNEDLONG)wordSizeMask)
+        if (C <= (float)INT64_MAX)
             CL = (PROG_SIGNEDLONG)C;
         else
             CL = wordSizeMask;
 
-        if (D <= (float)(PROG_SIGNEDLONG)wordSizeMask)
+        if (D <= (float)INT64_MAX)
             DL = (PROG_SIGNEDLONG)D;
         else
             DL = wordSizeMask;
     }
 
-    if (LASTX <= (float)(PROG_SIGNEDLONG)wordSizeMask)
+    if (LASTX <= (float)INT64_MAX)
         LASTXL = (PROG_SIGNEDLONG)LASTX;
     else
         LASTXL = wordSizeMask;
 
-    if (LASTY <= (float)(PROG_SIGNEDLONG)wordSizeMask)
+    if (LASTY <= (float)INT64_MAX)
         LASTYL = (PROG_SIGNEDLONG)LASTY;
     else
         LASTYL = wordSizeMask;
@@ -5533,13 +5533,14 @@ void RPN_endConst(void)
 }
 
 #define EXCAL_HELP_STR "TAB        Clear X                       Key UP     Rotate Stack Up\n"      \
-                       "Key C      Clear Stack                   Key DN     Rotate Stack Down\n"    \
+                       "Key C      Clear Stack (twice=all)       Key DN     Rotate Stack Down\n"    \
                        "Key L      Last X Register               Key E      Exponent\n"             \
                        "Key X      Exchange X and Y              Key S      Store Register\n"       \
                        "Key +      Add X and Y registers         Key R      Recall Register\n"      \
                        "Key -      Subtract X from Y             Key M      Display Mode\n"         \
                        "Key *      Multiply X and Y              Key H      Help Key\n"             \
                        "Key /      Divide X into Y               Key F      Last Function Bank\n"   \
+                       "Key !      Factorial of X                Key ^      Raise Y to X power\n"   \
                        "ENTER      Enter number to Stack         Key N      Change Sign (Negate)\n" \
                        "\n"                                                                         \
                        "DP         Decimal Point. Press twice for fraction.\n"                      \
@@ -5587,9 +5588,9 @@ BOOL CALLBACK HelpDialog(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
 
         hdc = GetDC(hDlg);
         SelectObject(hdc, hFixedFont);
-        dw = GetTextExtentPoint32(hdc, "WWWWW88888OOOOOXXXXXWWWWW88888OOOOOXXXXXWWWWW88888OOOOOXXXXXOOOOOXXXXX", 70, &lpSize);
+        dw = GetTextExtentPoint32(hdc, "WWWWW88888OOOOOXXXXXWWWWW88888OOOOOXXXXXWWWWW88888OOOOOXXXXXOOOOOXXXXXXX", 72, &lpSize);
         ReleaseDC(hDlg, hdc);
-        MoveWindow(hDlg, main_x + 100, main_y + 5, lpSize.cx + 50, (lpSize.cy * 29) + 12, TRUE);
+        MoveWindow(hDlg, main_x + 100, main_y + 5, lpSize.cx + 60, (lpSize.cy * 29) + 12, TRUE);
 
         return TRUE;
 
@@ -5723,10 +5724,6 @@ void trim(char *str)
         memmove(str, start, end - start + 2);
     }
 }
-
-#define UINT64_MAX (uint64_t)0xFFFFFFFFFFFFFFFF
-#define INT64_MAX (int64_t)0x7FFFFFFFFFFFFFFF
-#define INT64_MIN (int64_t)0x8000000000000000
 
 #define INT64_MAX_PRE_DIV (INT64_MAX / 10)
 #define UINT64_MAX_PRE_DIV (UINT64_MAX / 10)
