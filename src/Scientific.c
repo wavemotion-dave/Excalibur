@@ -310,7 +310,7 @@ void SCI_asinh(void)
     double val;
 
     val = StackPop();
-    StackPush(log(val + sqrt(val * val + 1)));
+    StackPush(log(fabs(val) + sqrt(val * val + 1)));
 }
 
 void SCI_acosh(void)
@@ -322,7 +322,7 @@ void SCI_acosh(void)
     else
     {
         val = StackPop();
-        StackPush(log(val + sqrt(val * val - 1)));
+        StackPush(log(val + (sqrt(val - 1) * sqrt(val + 1))));
     }
 }
 
@@ -330,12 +330,12 @@ void SCI_atanh(void)
 {
     double val;
 
-    if (X * X >= 1.0)
+    if ((X * X) >= 1.0)
         RPN_error("ATANH: X*X Must Be Less Than 1.0");
     else
     {
         val = StackPop();
-        StackPush(0.5 * log((1 + val) / (1 - val)));
+        StackPush(0.5 * (log(1 + val) - log(1 - val)));
     }
 }
 

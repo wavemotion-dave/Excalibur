@@ -131,18 +131,13 @@ struct funcStruct Conversion_funcs[MAX_FUNCS] = {
     {FN40,  UNI_METRIC,  USES_F,    ALLOWREC,   ' ',    "Metric",   YES_L,  X_NEW,      SCI_metricPre,      T_METRIC,       H_METRIC}
 };
 
-static double inverse(double x)
-{
-    return (1.0 / x);
-}
-
 // --------------------- 
-// Conversion Functioins 
+// Conversion Functions 
 // --------------------- 
 void CONV_lb_kg(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush(StackPop() * inverse(2.204622622));
+        StackPush(StackPop() / 2.204622622);
     else
         StackPush(StackPop() * 2.204622622);
 }
@@ -150,7 +145,7 @@ void CONV_lb_kg(void)
 void CONV_F_C(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush((StackPop() - 32.0) * inverse(1.8));
+        StackPush((StackPop() - 32.0) / 1.8);
     else
         StackPush((StackPop() * 1.8) + 32.0);
 }
@@ -168,7 +163,7 @@ void CONV_Oz_g(void)
     if (!(modifiers & MOD_INVERSE))
         StackPush(StackPop() * 28.3495);
     else
-        StackPush(StackPop() * inverse(28.3495));
+        StackPush(StackPop() / 28.3495);
 }
 
 void CONV_gal_l(void)
@@ -176,13 +171,13 @@ void CONV_gal_l(void)
     if (!(modifiers & MOD_INVERSE))
         StackPush(StackPop() * 3.785332);
     else
-        StackPush(StackPop() * inverse(3.785332));
+        StackPush(StackPop() / 3.785332);
 }
 
 void CONV_Ft_Mi(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush(StackPop() * inverse(5280.0));
+        StackPush(StackPop() / 5280.0);
     else
         StackPush(StackPop() * 5280.0);
 }
@@ -192,7 +187,7 @@ void CONV_J_Cal(void)
     if (!(modifiers & MOD_INVERSE))
         StackPush(StackPop() * 4.18605);
     else
-        StackPush(StackPop() * inverse(4.18605));
+        StackPush(StackPop() / 4.18605);
 }
 
 void CONV_H_Ms(void)
@@ -241,7 +236,7 @@ void CONV_Mi_Km(void)
     if (!(modifiers & MOD_INVERSE))
         StackPush(StackPop() * 1.6093472);
     else
-        StackPush(StackPop() * inverse(1.6093472));
+        StackPush(StackPop() / 1.6093472);
 }
 
 void CONV_Ft_Fa(void)
@@ -257,7 +252,7 @@ void CONV_in2_cm2(void)
     if (!(modifiers & MOD_INVERSE))
         StackPush(StackPop() * 6.452);
     else
-        StackPush(StackPop() * inverse(6.452));
+        StackPush(StackPop() / 6.452);
 }
 
 void CONV_in3_cm3(void)
@@ -265,7 +260,7 @@ void CONV_in3_cm3(void)
     if (!(modifiers & MOD_INVERSE))
         StackPush(StackPop() * 16.39);
     else
-        StackPush(StackPop() * inverse(16.39));
+        StackPush(StackPop() / 16.39);
 }
 
 void CONV_Deg_Rad(void)
@@ -318,13 +313,13 @@ void CONV_Ft_m(void)
     if (!(modifiers & MOD_INVERSE))
         StackPush(StackPop() * 0.3048);
     else
-        StackPush(StackPop() * inverse(0.3048));
+        StackPush(StackPop() / 0.3048);
 }
 
 void CONV_ft2_m2(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush(StackPop() * inverse(10.76391042));
+        StackPush(StackPop() / 10.76391042);
     else
         StackPush(StackPop() * 10.76391042);
 }
@@ -332,7 +327,7 @@ void CONV_ft2_m2(void)
 void CONV_ft3_m3(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush(StackPop() * inverse(35.31466672));
+        StackPush(StackPop() / 35.31466672);
     else
         StackPush(StackPop() * 35.31466672);
 }
@@ -367,13 +362,13 @@ void CONV_gal_cm3(void)
     if (!(modifiers & MOD_INVERSE))
         StackPush(StackPop() * 3785.0);
     else
-        StackPush(StackPop() * inverse(3785.0));
+        StackPush(StackPop() / 3785.0);
 }
 
 void CONV_pin_l(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush(StackPop() * inverse(2.113));
+        StackPush(StackPop() / 2.113);
     else
         StackPush(StackPop() * 2.113);
 }
@@ -383,7 +378,7 @@ void CONV_Igal_l(void)
     if (!(modifiers & MOD_INVERSE))
         StackPush(StackPop() * 4.5458051988);
     else
-        StackPush(StackPop() * inverse(4.5458051988));
+        StackPush(StackPop() / 4.5458051988);
 }
 
 void CONV_F_K(void)
@@ -392,7 +387,7 @@ void CONV_F_K(void)
 
     if (!(modifiers & MOD_INVERSE))
     {
-        tmp = (StackPop() - 32.0) * inverse(1.8);
+        tmp = (StackPop() - 32.0) / 1.8;
         StackPush(tmp + 273.15);
     }
     else
@@ -415,7 +410,7 @@ void CONV_Ft_Km(void)
     if (!(modifiers & MOD_INVERSE))
         StackPush(StackPop() * 0.0003048);
     else
-        StackPush(StackPop() * inverse(0.0003048));
+        StackPush(StackPop() / 0.0003048);
 }
 
 void CONV_ah_col(void)
@@ -423,7 +418,7 @@ void CONV_ah_col(void)
     if (!(modifiers & MOD_INVERSE))
         StackPush(StackPop() * 3600.0);
     else
-        StackPush(StackPop() * inverse(3600.0));
+        StackPush(StackPop() / 3600.0);
 }
 
 void CONV_ah_far(void)
@@ -431,13 +426,13 @@ void CONV_ah_far(void)
     if (!(modifiers & MOD_INVERSE))
         StackPush(StackPop() * 0.037307);
     else
-        StackPush(StackPop() * inverse(0.037307));
+        StackPush(StackPop() / 0.037307);
 }
 
 void CONV_kmh_mps(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush(StackPop() * inverse(3.6));
+        StackPush(StackPop() / 3.6);
     else
         StackPush(StackPop() * 3.6);
 }
@@ -445,7 +440,7 @@ void CONV_kmh_mps(void)
 void CONV_knot_mph(void)
 {
     if (!(modifiers & MOD_INVERSE))
-        StackPush(StackPop() * inverse(0.8690));
+        StackPush(StackPop() / 0.8690);
     else
         StackPush(StackPop() * 0.8690);
 }
@@ -455,7 +450,7 @@ void CONV_hp_kw(void)
     if (!(modifiers & MOD_INVERSE))
         StackPush(StackPop() * 0.7457);
     else
-        StackPush(StackPop() * inverse(0.7457));
+        StackPush(StackPop() / 0.7457);
 }
 
 void CONV_Mil_mm(void)

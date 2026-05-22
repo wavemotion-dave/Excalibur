@@ -36,6 +36,7 @@
 #include <mmsystem.h>
 #include <ctype.h>
 #include <time.h>
+#include <float.h>
 #include "Excal.h"
 
 // TVM Registers 
@@ -123,10 +124,10 @@ struct funcStruct Financial_funcs[MAX_FUNCS] = {
     {FN6,   UNI_INTR,   USES_F,     ALLOWREC,   ' ',    "i%",       YES_L,  X_NEW,      FIN_i,             T_INTR,     H_INTR},
     {FN7,   UNI_FINPV,  USES_F,     ALLOWREC,   ' ',    "PV",       YES_L,  X_NEW,      FIN_pv,            T_FINPV,    H_FINPV},
     {FN8,   UNI_FINPMT, USES_F,     ALLOWREC,   ' ',    "PMT",      YES_L,  X_NEW,      FIN_pmt,           T_FINPMT,   H_FINPMT},
-    {FN9,   UNI_MUL12,  USES_F,     ALLOWREC,   ' ',    "12ï¿½",      YES_L,  X_NEW,      FIN_12mult,        T_MUL12,    H_MUL12},
-    {FN10,  UNI_DIV12,  USES_F,     ALLOWREC,   ' ',    "12ï¿½",      YES_L,  X_NEW,      FIN_12div,         T_DIV12,    H_DIV12},
-    {FN11,  UNI_MUL100, USES_F,     ALLOWREC,   ' ',    "100ï¿½",     YES_L,  X_NEW,      FIN_100mult,       T_MUL100,   H_MUL100},
-    {FN12,  UNI_DIV100, USES_F,     ALLOWREC,   ' ',    "100ï¿½",     YES_L,  X_NEW,      FIN_100div,        T_DIV100,   H_DIV100},
+    {FN9,   UNI_MUL12,  USES_F,     ALLOWREC,   ' ',    "12×",      YES_L,  X_NEW,      FIN_12mult,        T_MUL12,    H_MUL12},
+    {FN10,  UNI_DIV12,  USES_F,     ALLOWREC,   ' ',    "12÷",      YES_L,  X_NEW,      FIN_12div,         T_DIV12,    H_DIV12},
+    {FN11,  UNI_MUL100, USES_F,     ALLOWREC,   ' ',    "100×",     YES_L,  X_NEW,      FIN_100mult,       T_MUL100,   H_MUL100},
+    {FN12,  UNI_DIV100, USES_F,     ALLOWREC,   ' ',    "100÷",     YES_L,  X_NEW,      FIN_100div,        T_DIV100,   H_DIV100},
     {FN13,  UNI_TAX,    USES_F,     ALLOWREC,   ' ',    "TAX",      YES_L,  X_NEW,      FIN_tax,           T_TAX,      H_TAX},
     {FN14,  UNI_PERC,   USES_F,     ALLOWREC,   ' ',    "%",        YES_L,  X_NEW,      FIN_percent,       T_PERC,     H_PERC},
     {FN15,  UNI_PERCC,  USES_F,     ALLOWREC,   ' ',    "%CHG",     YES_L,  X_NEW,      FIN_percentChg,    T_PERCC,    H_PERCC},
@@ -257,7 +258,7 @@ void FIN_fv(void)
     {
         i = fin_reg[FIN_REG_i] / 100.0;
         powTerm = pow(1.0 + i, fin_reg[FIN_REG_n]);
-        if (fabs(i) < 1.0e-16)
+        if (fabs(i) < DBL_EPSILON)
             annuityFactor = fin_reg[FIN_REG_n];
         else
             annuityFactor = (powTerm - 1.0) / i;
@@ -389,11 +390,7 @@ BOOL CALLBACK fnDIALOG_AmortProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
             interest = principal * (fin_reg[FIN_REG_i] / 100.0);
             bulk = pmt - interest;
             principal -= bulk;
-            if (principal < 0.005)
-                principal = 0.0;
-            if (interest < 0.005)
-                interest = 0.0;
-
+            if (fabs(principal) < fabs(fin_reg[FIN_REG_PV]) * DBL_EPSILON * 1000);
             sprintf(finTmpStr, "%3d %11.2f  %11.2f  %11.2f  %11.2f", i + 1, pmt, bulk, interest, principal);
             makeInternational(finTmpStr);
             SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) finTmpStr));
