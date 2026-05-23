@@ -55,7 +55,25 @@ typedef unsigned __int8     uint8_t;
 #define YES_L               1   // Yes, save the Last X value when executing this function
 #define NO_L                2   // No, do not save the Last X value when executing this function
 
+enum StackPosition_t
+{
+    STK_X = 0,
+    STK_Y,
+    STK_Z,
+    STK_T,
+    STK_A,
+    STK_B,
+    STK_C,
+    STK_D,
+    MAX_STACK
+};
+
+extern double STACK[MAX_STACK];     // The main RPN stack (X, Y, Z, T, A, B, C D)
+extern PROG_LONG STACKL[MAX_STACK]; // The main RPN stack in long integer form for Comp-Sci mode (X, Y, Z, T, A, B, C, D)
+
+
 #define MAX_IMPORT_CLIPBOARD_SIZE       (32 * 1024)
+
 
 // Defines for menu item IDs
 #define   IDM_OPEN                          101
@@ -171,27 +189,10 @@ extern uint64_t rotr64(uint64_t value, int shift);
 
 extern uint8_t Xedit;           // One of X_NEW, X_EDIT, X_NULL, etc.
 extern char Xstr[64];           // Global buffer for X editing
-extern double X;                // Main register X
-extern double Y;                // Main register Y
-extern double Z;                // Main register Z
-extern double T;                // Main Register T
-extern double A;                // Extended Stack A
-extern double B;                // Extended Stack B
-extern double C;                // Extended Stack C
-extern double D;                // Extended Stack D
 
 extern double LASTX;            // LAST X register
-extern double lastFloat;        // Last floating value in X
-
-extern PROG_LONG XL;            // Main X register in Comp-Sci mode
-extern PROG_LONG YL;            // Main Y register in Comp-Sci mode
-extern PROG_LONG ZL;            // Main Z register in Comp-Sci mode
-extern PROG_LONG TL;            // Main T register in Comp-Sci mode
-extern PROG_LONG AL;            // Extended A register in Comp-Sci mode
-extern PROG_LONG BL;            // Extended B register in Comp-Sci mode
-extern PROG_LONG CL;            // Extended C register in Comp-Sci mode
-extern PROG_LONG DL;            // Extended D register in Comp-Sci mode
 extern PROG_LONG LASTXL;        // Last X register in Comp-Sci mode
+extern double lastFloat;        // Last floating value in X (saved when switching into Comp-Sci mode)
 
 extern uint32_t indirectRegister;
 
@@ -479,6 +480,7 @@ extern uint8_t depreciationType;
 
 #define MAX_STO 100
 extern double STO[MAX_STO];
+extern PROG_LONG STOL[MAX_STO];
 
 extern uint8_t macroPlayback;
 extern int16_t currentMacroPlaybackIdx;
@@ -503,7 +505,7 @@ extern LRESULT CALLBACK tooltipWndProc(HWND hwnd, UINT message, WPARAM wParam, L
 extern int CreateToolTipWindow(HWND hwnd, HINSTANCE hInstance);
 extern int CreateDebugWindow(HWND hwnd, HINSTANCE hInstance);
 extern void RPN_SingleStep(void);
-extern int PreInit(void);
+extern void MemoryInit(void);
 extern void trim(char *str);
 
 // Add to the end of this list but *NEVER* remove entries or else you will need to update excalibur config file...

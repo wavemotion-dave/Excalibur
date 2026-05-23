@@ -306,11 +306,19 @@ void Macro_GsbJ(void)   {RPN_gosub(UNI_LBLJ);}
 void Macro_GsbK(void)   {RPN_gosub(UNI_LBLK);}
 
 
-void Macro_XLessY(void)
+int PopStackInteger(void)
+{
+    if (progMode == PROG_FLOAT)
+        return (int) StackPop();
+    else
+        return (int) StackPopL();
+}
+
+void CheckMacroCondition(int condition)
 {
     if (macroPlayback == TRUE)
     {
-        if (X <= Y)
+        if (condition)
         {
             // Do nothing - execute next line!
         }
@@ -318,112 +326,104 @@ void Macro_XLessY(void)
         {
             currentMacroPlaybackIdx++;
         }
+    }
+}
+
+void Macro_XLessY(void)
+{
+    if (progMode == PROG_FLOAT)
+    {
+        CheckMacroCondition(STACK[STK_X] <= STACK[STK_Y]);
+    }
+    else
+    {
+        CheckMacroCondition(STACKL[STK_X] <= STACKL[STK_Y]);
     }
 }
 
 void Macro_XGreaterY(void)
 {
-    if (macroPlayback == TRUE)
+    if (progMode == PROG_FLOAT)
     {
-        if (X > Y)
-        {
-            // Do nothing - execute next line!
-        }
-        else // Skip next line
-        {
-            currentMacroPlaybackIdx++;
-        }
+        CheckMacroCondition(STACK[STK_X] > STACK[STK_Y]);
+    }
+    else
+    {
+        CheckMacroCondition(STACKL[STK_X] > STACKL[STK_Y]);
     }
 }
 
 void Macro_XLEZero(void)
 {
-    if (macroPlayback == TRUE)
+    if (progMode == PROG_FLOAT)
     {
-        if (X <= 0.0)
-        {
-            // Do nothing - execute next line!
-        }
-        else // Skip next line
-        {
-            currentMacroPlaybackIdx++;
-        }
+        CheckMacroCondition(STACK[STK_X] <= 0.0);
     }
-}
-
-void Macro_XGTZero(void)
-{
-    if (macroPlayback == TRUE)
+    else
     {
-        if (X > 0.0)
-        {
-            // Do nothing - execute next line!
-        }
-        else // Skip next line
-        {
-            currentMacroPlaybackIdx++;
-        }
+        CheckMacroCondition(STACKL[STK_X] <= 0L);
     }
 }
 
 void Macro_XEY(void)
 {
-    if (macroPlayback == TRUE)
+    if (progMode == PROG_FLOAT)
     {
-        if (X == Y)
-        {
-            // Do nothing - execute next line!
-        }
-        else // Skip next line
-        {
-            currentMacroPlaybackIdx++;
-        }
+        CheckMacroCondition(STACK[STK_X] == STACK[STK_Y]);
     }
+    else
+    {
+        CheckMacroCondition(STACKL[STK_X] == STACKL[STK_Y]);
+    }    
 }
 
 
 void Macro_XNEY(void)
 {
-    if (macroPlayback == TRUE)
+    if (progMode == PROG_FLOAT)
     {
-        if (X != Y)
-        {
-            // Do nothing - execute next line!
-        }
-        else // Skip next line
-        {
-            currentMacroPlaybackIdx++;
-        }
+        CheckMacroCondition(STACK[STK_X] != STACK[STK_Y]);
+    }
+    else
+    {
+        CheckMacroCondition(STACKL[STK_X] != STACKL[STK_Y]);
     }
 }
 
 void Macro_XEZero(void)
 {
-    if (macroPlayback == TRUE)
+    if (progMode == PROG_FLOAT)
     {
-        if (X == 0.0)
-        {
-            // Do nothing - execute next line!
-        }
-        else // Skip next line
-        {
-            currentMacroPlaybackIdx++;
-        }
+        CheckMacroCondition(STACK[STK_X] == 0.0);
+    }
+    else
+    {
+        CheckMacroCondition(STACKL[STK_X] == 0L);
     }
 }
 
 void Macro_XNEZero(void)
 {
-    if (macroPlayback == TRUE)
+    if (progMode == PROG_FLOAT)
     {
-        if (X != 0.0)
-        {
-            // Do nothing - execute next line!
-        }
-        else // Skip next line
-        {
-            currentMacroPlaybackIdx++;
-        }
+        CheckMacroCondition(STACK[STK_X] != 0.0);
+    }
+    else
+    {
+        CheckMacroCondition(STACKL[STK_X] != 0L);
+    }
+}
+
+
+void Macro_XGTZero(void)
+{
+    if (progMode == PROG_FLOAT)
+    {
+        CheckMacroCondition(STACK[STK_X] > 0.0);
+    }
+    else
+    {
+        CheckMacroCondition(STACKL[STK_X] > 0L);
     }
 }
 
@@ -441,46 +441,31 @@ void Macro_Return(void)
 
 void Macro_SFx(void)
 {
-    int iX;
-    unsigned int mask;
-    iX = (int) StackPop();
-    mask = (0x00000001 << iX);
+    int iX = PopStackInteger();
+    unsigned int mask = (0x00000001 << iX);
     macroFlags = macroFlags | mask;
 }
 
 void Macro_CFx(void)
 {
-    int iX;
-    unsigned int mask;
-    iX = (int) StackPop();
-    mask = (0x00000001 << iX);
+    int iX = PopStackInteger();
+    unsigned int mask = (0x00000001 << iX);
     macroFlags = macroFlags & ~mask;
 }
 
 void Macro_TFx(void)
 {
-    int iX;
-    unsigned int mask;
-    if (macroPlayback == TRUE)
-    {
-        iX = (int) StackPop();
-        mask = (0x00000001 << iX);
-        if (macroFlags & mask)
-        {                       // Do nothing if mask set...
-        }
-        else // Skip next line
-        {
-            currentMacroPlaybackIdx++;
-        }
-    }
+    int iX = PopStackInteger();
+    unsigned int mask = (0x00000001 << iX);
+    
+    CheckMacroCondition(macroFlags & mask);
 }
 
 void Macro_ClearF(void)
 {
     macroFlags = 0x00000000;
-    blinkXDisplay(0);
+    blinkXDisplay(FALSE);
 }
-
 
 void Macro_Pause(void)
 {
@@ -493,7 +478,7 @@ void Macro_Pause(void)
 
 void Macro_Beep(void)
 {
-    // Play the resource asynchronously
+    // Play the sound resource...
     PlaySound(MAKEINTRESOURCE(IDR_BEEP), GetModuleHandle(NULL), SND_RESOURCE | SND_SYNC);
     sleep_and_peek(250);
 }
@@ -504,7 +489,10 @@ BOOL CALLBACK inputRegisterProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM 
     switch(wMessage)
     {
     case WM_INITDIALOG:
-        FormatNumberForStack(STO[RegisterToInput], tmp);
+        if (progMode == PROG_FLOAT)
+            FormatNumberForStack(STO[RegisterToInput], tmp);
+        else
+            MakeCompSciStr(STOL[RegisterToInput], tmp);
         SetDlgItemText(hDlg, IDC_EDIT1, tmp);
         SetFocus(GetDlgItem(hDlg, IDC_EDIT1));
         return TRUE;
@@ -514,7 +502,14 @@ BOOL CALLBACK inputRegisterProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM 
         {
         case(IDOK):
             GetDlgItemText(hDlg, IDC_EDIT1, tmp, 64);
-            STO[RegisterToInput] = atof(tmp);
+            if (progMode == PROG_FLOAT)
+            {
+                STO[RegisterToInput] = atof(tmp);
+            }
+            else
+            {
+                STOL[RegisterToInput] = ConvertCompSciStrTo64(tmp);
+            }
             EndDialog(hDlg, FALSE);
             return TRUE;
             break;
@@ -645,14 +640,22 @@ void endRunningMacro(void)
     macroPlayback = FALSE;
 }
 
+
 void Macro_RecallN(void)
 {
     int i;
 
-    i = (int) StackPop();
+    i = PopStackInteger();
     if (i >= 0 && i < MAX_STO)
     {
-        StackPush(STO[i]);
+        if (progMode == PROG_FLOAT)
+        {
+            StackPush(STO[i]);
+        }
+        else
+        {
+            StackPushL(STOL[i]);
+        }
     }
     else
     {
@@ -664,10 +667,13 @@ void Macro_StoreN(void)
 {
     int i;
 
-    i = (int) StackPop();
+    i = PopStackInteger();
     if (i >= 0 && i < MAX_STO)
     {
-        STO[i] = X;
+        if (progMode == PROG_FLOAT)
+            STO[i] = STACK[STK_X];
+        else
+            STOL[i] = STACKL[STK_X];
     }
     else
     {
@@ -678,14 +684,14 @@ void Macro_StoreN(void)
 void Macro_StoInd(void)
 {
     if (progMode == PROG_FLOAT)
-        indirectRegister = (unsigned long) X;
+    {
+        indirectRegister = (uint32_t) STACK[STK_X];
+    }
     else
     {
-        if (wordMode == COMPSCI_SIGNED)
-            indirectRegister = (long) XL;
-        else
-            indirectRegister = (unsigned long) XL;
+        indirectRegister = (uint32_t) STACKL[STK_X];
     }
+    blinkXDisplay(FALSE);
 }
 
 void Macro_RclInd(void)
@@ -693,16 +699,16 @@ void Macro_RclInd(void)
     if (Xedit == X_ENTER)
     {
         if (progMode == PROG_FLOAT)
-            X = indirectRegister;
+            STACK[STK_X] = indirectRegister;
         else
-            XL = MaskStack((PROG_LONG) indirectRegister);
+            STACKL[STK_X] = MaskStack((PROG_LONG) indirectRegister);
     }
     else
     {
         if (progMode == PROG_FLOAT)
             StackPush(indirectRegister);
         else
-            StackPushL((PROG_LONG) indirectRegister);
+            StackPushL(MaskStack((PROG_LONG) indirectRegister));
     }
 }
 
@@ -889,24 +895,24 @@ BOOL CALLBACK debugWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam
                         switch((int)item)
                         {
                             case 0:
-                                debugValue = T;
-                                T = getNewDebugVal();
-                                TL = (PROG_LONG) T;
+                                debugValue = STACK[STK_T];
+                                STACK[STK_T] = getNewDebugVal();
+                                STACKL[STK_T] = (PROG_LONG) STACK[STK_T];
                                 break;
                             case 1:
-                                debugValue = Z;
-                                Z = getNewDebugVal();
-                                ZL = (PROG_LONG) Z;
+                                debugValue = STACK[STK_Z];
+                                STACK[STK_Z] = getNewDebugVal();
+                                STACKL[STK_Z] = (PROG_LONG) STACK[STK_Z];
                                 break;
                             case 2:
-                                debugValue = Y;
-                                Y = getNewDebugVal();
-                                YL = (PROG_LONG) Y;
+                                debugValue = STACK[STK_Y];
+                                STACK[STK_Y] = getNewDebugVal();
+                                STACKL[STK_Y] = (PROG_LONG) STACK[STK_Y];
                                 break;
                             case 3:
-                                debugValue = X;
-                                X = getNewDebugVal();
-                                XL = (PROG_LONG) X;
+                                debugValue = STACK[STK_X];
+                                STACK[STK_X] = getNewDebugVal();
+                                STACKL[STK_X] = (PROG_LONG) STACK[STK_X];
                                 break;
                             case 5:
                                 debugValue = (double) indirectRegister;
@@ -921,8 +927,16 @@ BOOL CALLBACK debugWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam
                     if ((dinputDebugInProgress == 0) && (HIWORD(wParam) == LBN_DBLCLK))
                     {
                         item = SendDlgItemMessage(hwnd, TRACE_REGS2, LB_GETCURSEL, 0, 0L);
-                        debugValue = STO[item];
-                        STO[item] = getNewDebugVal();
+                        if (progMode == PROG_FLOAT)
+                        {
+                            debugValue = STO[item];
+                            STO[item] = getNewDebugVal();
+                        }
+                        else
+                        {
+                            debugValue = (double) (PROG_SIGNEDLONG)STOL[item];
+                            STOL[item] = (PROG_LONG) getNewDebugVal();
+                        }
                         ShowStack();
                         return TRUE;
                     }
@@ -984,6 +998,7 @@ void Macro_Debug(void)
 void UpdateDebugRegs(void)
 {
     char tmp[64];
+    char tmp2[64];
     int i;
 
     SendMessage(GetDlgItem(debugTraceWindow, TRACE_REGS1), WM_SETFONT, (WPARAM) hFixedFont, FALSE);
@@ -994,41 +1009,107 @@ void UpdateDebugRegs(void)
     sprintf(tmp, " Extended Stack");
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
-    sprintf(tmp, " D: %-20.13g", D);
-    makeInternational(tmp);
+    if (progMode == PROG_FLOAT)
+    {
+        sprintf(tmp, " D: %-20.13g", STACK[STK_D]);
+        makeInternational(tmp);
+    }
+    else
+    {
+        MakeCompSciStr(STACKL[STK_D], tmp2);        
+        sprintf(tmp, " D: %-20s", tmp2);
+    }
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
-    sprintf(tmp, " C: %-20.13g", C);
-    makeInternational(tmp);
+    if (progMode == PROG_FLOAT)
+    {
+        sprintf(tmp, " C: %-20.13g", STACK[STK_C]);
+        makeInternational(tmp);
+    }
+    else
+    {
+        MakeCompSciStr(STACKL[STK_C], tmp2);        
+        sprintf(tmp, " C: %-20s", tmp2);
+    }
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
-    sprintf(tmp, " B: %-20.13g", B);
-    makeInternational(tmp);
+    if (progMode == PROG_FLOAT)
+    {
+        sprintf(tmp, " B: %-20.13g", STACK[STK_B]);
+        makeInternational(tmp);
+    }
+    else
+    {
+        MakeCompSciStr(STACKL[STK_B], tmp2);        
+        sprintf(tmp, " B: %-20s", tmp2);
+    }
+
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
-    sprintf(tmp, " A: %-20.13g", A);
-    makeInternational(tmp);
+    if (progMode == PROG_FLOAT)
+    {
+        sprintf(tmp, " A: %-20.13g", STACK[STK_A]);
+        makeInternational(tmp);
+    }
+    else
+    {
+        MakeCompSciStr(STACKL[STK_A], tmp2);        
+        sprintf(tmp, " A: %-20s", tmp2);
+    }
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
     sprintf(tmp, " ");
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+    
     sprintf(tmp, " Main Stack");
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
-    sprintf(tmp, " T: %-20.13g", T);
-    makeInternational(tmp);
+    if (progMode == PROG_FLOAT)
+    {
+        sprintf(tmp, " T: %-20.13g", STACK[STK_T]);
+        makeInternational(tmp);
+    }
+    else
+    {
+        MakeCompSciStr(STACKL[STK_T], tmp2);        
+        sprintf(tmp, " T: %-20s", tmp2);
+    }
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
-    sprintf(tmp, " Z: %-20.13g", Z);
-    makeInternational(tmp);
+    if (progMode == PROG_FLOAT)
+    {
+        sprintf(tmp, " Z: %-20.13g", STACK[STK_Z]);
+        makeInternational(tmp);
+    }
+    else
+    {
+        MakeCompSciStr(STACKL[STK_Z], tmp2);        
+        sprintf(tmp, " Z: %-20s", tmp2);
+    }
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
-    sprintf(tmp, " Y: %-20.13g", Y);
-    makeInternational(tmp);
+    if (progMode == PROG_FLOAT)
+    {
+        sprintf(tmp, " Y: %-20.13g", STACK[STK_Y]);
+        makeInternational(tmp);
+    }
+    else
+    {
+        MakeCompSciStr(STACKL[STK_Y], tmp2);        
+        sprintf(tmp, " Y: %-20s", tmp2);
+    }
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
-    sprintf(tmp, " X: %-20.13g", X);
-    makeInternational(tmp);
+    if (progMode == PROG_FLOAT)
+    {
+        sprintf(tmp, " X: %-20.13g", STACK[STK_X]);
+        makeInternational(tmp);
+    }
+    else
+    {
+        MakeCompSciStr(STACKL[STK_X], tmp2);        
+        sprintf(tmp, " X: %-20s", tmp2);
+    }
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
     sprintf(tmp, " ");
@@ -1098,27 +1179,21 @@ void UpdateDebugRegs(void)
     // Block for local vars... Here we don't want to update the entire 100
     // registers if they haven't changed. So we do a simple checksum and see.
     // ------------------------------------------------------------------------
+    SendDlgItemMessage(debugTraceWindow, TRACE_REGS2, LB_RESETCONTENT, 0, 0);
+
+    for (i = 0; i < MAX_STO; i++)
     {
-        uint32_t debug_register_checksum = 0;
-        uint8_t *ptr = (uint8_t *)STO;
-
-        for (i = 0; i < sizeof(STO); i++)    
+        if (progMode == PROG_FLOAT)
         {
-            debug_register_checksum += *ptr++;
+            sprintf(tmp, " R%02d: %-20.13g", i, STO[i]);
+            makeInternational(tmp);
         }
-
-        if (debug_register_checksum != last_debug_register_checksum)
+        else
         {
-            last_debug_register_checksum = debug_register_checksum;
-            SendDlgItemMessage(debugTraceWindow, TRACE_REGS2, LB_RESETCONTENT, 0, 0);
-
-            for (i = 0; i < MAX_STO; i++)
-            {
-                sprintf(tmp, " R%02d: %-20.13g", i, STO[i]);
-                makeInternational(tmp);
-                SendDlgItemMessage(debugTraceWindow, TRACE_REGS2, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
-            }
+            MakeCompSciStr(STOL[i], tmp2);
+            sprintf(tmp, " R%02d: %-20s", i, tmp2);
         }
+        SendDlgItemMessage(debugTraceWindow, TRACE_REGS2, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
     }
 }
 
@@ -1150,140 +1225,84 @@ void UpdateDebugProgram(int resetProgramList)
     }
 }
 
-void Macro_LoopA(void)
+int DecrementAndLoop(int index, uint16_t uniqueLabel)
 {
     if (macroPlayback == TRUE)
     {
-        STO[0] = (float) ( ((int)STO[0]) -1 );
-        if (STO[0] > 0.0)
+        if (progMode == PROG_FLOAT)
         {
-            Macro_GotoA();
+            STO[index] = (float) ( ((int)STO[index]) -1 );
+            if (STO[index] > 0.0)
+            {
+                rpn_goto(uniqueLabel);
+            }
+        }
+        else
+        {
+            STOL[index] = (PROG_LONG) ( ((int)STOL[index]) -1 );
+            if (STOL[index] > 0L)
+            {
+                rpn_goto(uniqueLabel);
+            }
         }
     }
+    return 0;
+}
+
+void Macro_LoopA(void)
+{
+    DecrementAndLoop(0, UNI_LBLA);
 }
 
 void Macro_LoopB(void)
 {
-    if (macroPlayback == TRUE)
-    {
-        STO[1] = (float) ( ((int)STO[1]) -1 );
-        if (STO[1] > 0.0)
-        {
-            Macro_GotoB();
-        }
-    }
+    DecrementAndLoop(1, UNI_LBLB);
 }
 
 void Macro_LoopC(void)
 {
-    if (macroPlayback == TRUE)
-    {
-        STO[2] = (float) ( ((int)STO[2]) -1 );
-        if (STO[2] > 0.0)
-        {
-            Macro_GotoC();
-        }
-    }
+    DecrementAndLoop(2, UNI_LBLC);
 }
 
 void Macro_LoopD(void)
 {
-    if (macroPlayback == TRUE)
-    {
-        STO[3] = (float) ( ((int)STO[3]) -1 );
-        if (STO[3] > 0.0)
-        {
-            Macro_GotoD();
-        }
-    }
+    DecrementAndLoop(3, UNI_LBLD);
 }
 
 void Macro_LoopE(void)
 {
-    if (macroPlayback == TRUE)
-    {
-        STO[4] = (float) ( ((int)STO[4]) -1 );
-        if (STO[4] > 0.0)
-        {
-            Macro_GotoE();
-        }
-    }
+    DecrementAndLoop(4, UNI_LBLE);
 }
 
 void Macro_LoopF(void)
 {
-    if (macroPlayback == TRUE)
-    {
-        STO[5] = (float) ( ((int)STO[5]) -1 );
-        if (STO[5] > 0.0)
-        {
-            Macro_GotoF();
-        }
-    }
+    DecrementAndLoop(5, UNI_LBLF);
 }
-
 
 void Macro_LoopG(void)
 {
-    if (macroPlayback == TRUE)
-    {
-        STO[6] = (float) ( ((int)STO[6]) -1 );
-        if (STO[6] > 0.0)
-        {
-            Macro_GotoF();
-        }
-    }
+    DecrementAndLoop(6, UNI_LBLG);
 }
-
 
 void Macro_LoopH(void)
 {
-    if (macroPlayback == TRUE)
-    {
-        STO[7] = (float) ( ((int)STO[7]) -1 );
-        if (STO[7] > 0.0)
-        {
-            Macro_GotoH();
-        }
-    }
+    DecrementAndLoop(7, UNI_LBLH);
 }
 
 void Macro_LoopI(void)
 {
-    if (macroPlayback == TRUE)
-    {
-        STO[8] = (float) ( ((int)STO[8]) -1 );
-        if (STO[8] > 0.0)
-        {
-            Macro_GotoI();
-        }
-    }
+    DecrementAndLoop(8, UNI_LBLI);
 }
 
 void Macro_LoopJ(void)
 {
-    if (macroPlayback == TRUE)
-    {
-        STO[9] = (float) ( ((int)STO[9]) -1 );
-        if (STO[9] > 0.0)
-        {
-            Macro_GotoJ();
-        }
-    }
+    DecrementAndLoop(9, UNI_LBLJ);
 }
 
 void Macro_LoopK(void)
 {
-    if (macroPlayback == TRUE)
-    {
-        STO[10] = (float) ( ((int)STO[10]) -1 );
-        if (STO[10] > 0.0)
-        {
-            Macro_GotoK();
-        }
-    }
+    DecrementAndLoop(10, UNI_LBLK);
 }
-
 
 void Macro_DSZ(void)
 {
@@ -1291,8 +1310,7 @@ void Macro_DSZ(void)
     {
         if (indirectRegister > 0)
         {
-            indirectRegister--;
-            if (indirectRegister == 0)
+            if (--indirectRegister == 0)
             {
                 currentMacroPlaybackIdx++;
             }
@@ -1302,9 +1320,17 @@ void Macro_DSZ(void)
 
 void Macro_Sto2i(void)
 {
-    if (indirectRegister >= 0 && indirectRegister < MAX_STO)
+    if (indirectRegister < MAX_STO)
     {
-        STO[indirectRegister] = X;
+        if (progMode == PROG_FLOAT)
+        {
+            STO[indirectRegister] = (uint32_t)STACK[STK_X];
+        }
+        else
+        {
+            STOL[indirectRegister] = (uint32_t)STACKL[STK_X];
+        }
+        blinkXDisplay(FALSE);
     }
     else
     {
@@ -1314,9 +1340,16 @@ void Macro_Sto2i(void)
 
 void Macro_Rcl2i(void)
 {
-    if (indirectRegister >= 0 && indirectRegister < MAX_STO)
+    if (indirectRegister < MAX_STO)
     {
-        StackPush(STO[indirectRegister]);
+        if (progMode == PROG_FLOAT)
+        {
+            StackPush(STO[indirectRegister]);
+        }
+        else
+        {
+            StackPushL(STOL[indirectRegister]);
+        }        
     }
     else
     {

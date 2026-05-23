@@ -264,7 +264,7 @@ void SCI_asin(void)
         SCI_asinh();
     else
     {
-        if (X < -1.0 || X > 1.0)
+        if (STACK[STK_X] < -1.0 || STACK[STK_X] > 1.0)
             RPN_error("ASIN:  X is out of range");
         else
             StackPush(FromRadians(asin(StackPop())));
@@ -276,7 +276,7 @@ void SCI_acos(void)
         SCI_acosh();
     else
     {
-        if (X < -1.0 || X > 1.0)
+        if (STACK[STK_X] < -1.0 || STACK[STK_X] > 1.0)
             RPN_error("ACOS:  X is out of range");
         else
             StackPush(FromRadians(acos(StackPop())));
@@ -324,7 +324,7 @@ void SCI_acosh(void)
 {
     double val;
 
-    if (X < 1.0)
+    if (STACK[STK_X] < 1.0)
     {
         RPN_error("ACOSH: X Must Be Greater Than or Equal To 1.0");
     }
@@ -339,7 +339,7 @@ void SCI_atanh(void)
 {
     double val;
 
-    if ((X * X) >= 1.0)
+    if ((STACK[STK_X] * STACK[STK_X]) >= 1.0)
     {
         RPN_error("ATANH: X*X Must Be Less Than 1.0");
     }
@@ -358,7 +358,7 @@ void SCI_10x(void)
 void SCI_sqrt(void)
 {
 
-    if (X < 0.0)
+    if (STACK[STK_X] < 0.0)
     {
         RPN_error("Square Root of Negative Number");
     }
@@ -370,7 +370,7 @@ void SCI_sqrt(void)
 
 void SCI_inverse(void)
 {
-    if (X == 0.0)
+    if (STACK[STK_X] == 0.0)
     {
         RPN_error("Divide By Zero");
     }
@@ -387,7 +387,7 @@ void SCI_exp(void)
 
 void SCI_ln(void)
 {
-    if (X <= 0.0)
+    if (STACK[STK_X] <= 0.0)
         RPN_error("LN:  X must be positive");
     else
         StackPush(log(StackPop()));
@@ -395,7 +395,7 @@ void SCI_ln(void)
 
 void SCI_log(void)
 {
-    if (X <= 0.0)
+    if (STACK[STK_X] <= 0.0)
         RPN_error("LOG:  X must be positive");
     else
         StackPush(log10(StackPop()));
@@ -419,7 +419,7 @@ void SCI_rand(void)
     randVal = randVal % 10000000;
 
     if (Xedit == X_ENTER)
-        X = ((float) randVal / 10000000.0);
+        STACK[STK_X] = ((float) randVal / 10000000.0);
     else
         StackPush((float) randVal / 10000000.0);
 }
@@ -427,7 +427,7 @@ void SCI_rand(void)
 void SCI_pi(void)
 {
     if (Xedit == X_ENTER)
-        X = M_PI;
+        STACK[STK_X] = M_PI;
     else
         StackPush(M_PI);
 }
@@ -549,10 +549,10 @@ void SCI_GCD(void)
     long l1, l2, t1, t2;
     long try_value;
 
-    l1 = (long) X;
-    l2 = (long) Y;
+    l1 = (long) STACK[STK_X];
+    l2 = (long) STACK[STK_Y];
 
-    if (X < 0.0 || Y < 0.0)
+    if (STACK[STK_X] < 0.0 || STACK[STK_Y] < 0.0)
     {
         RPN_error("GCD:  X,Y values should be greater than or equal to zero.");
         return;
@@ -586,14 +586,14 @@ void SCI_LCM(void)
     long most_tries;
     long orig_value;
 
-    if (X < 0.0 || Y < 0.0)
+    if (STACK[STK_X] < 0.0 || STACK[STK_Y] < 0.0)
     {
         RPN_error("LCM:  X,Y values should be greater than or equal to zero.");
         return;
     }
 
-    l1 = (long) X;
-    l2 = (long) Y;
+    l1 = (long) STACK[STK_X];
+    l2 = (long) STACK[STK_Y];
 
     // Get biggest of the 4 
     try_value = max(l1, l2);
@@ -1211,7 +1211,7 @@ void SCI_LogBase2(void)
 {
     double temp;
 
-    if (X <= 0.0)
+    if (STACK[STK_X] <= 0.0)
     {
         RPN_error("LOG:  X must be positive");
     }

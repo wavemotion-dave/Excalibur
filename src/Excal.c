@@ -54,7 +54,7 @@
                   "https://github.com/wavemotion-dave/Excalibur"      \
                   "\n\nThis version is BETA - Expect and report Bugs!"
 
-#define CONFIG_VERSION_MAIN 0xF00A  // If this changes, we wipe EVERYTHING
+#define CONFIG_VERSION_MAIN 0xF00B  // If this changes, we wipe EVERYTHING
 #define CONFIG_VERSION_SUB  0xF004  // If this changes, we reset x,y window position and reset constant tables (currency, physics constants, etc)
 
 #define END_OF_PROGRAM_STR "<End Of Program>"
@@ -123,26 +123,14 @@ char Xstr[64];         // Global buffer for X editing
 // ----------------
 // Global registers
 // ----------------
-double X;     // Main register X
-double Y;     // Main register Y
-double Z;     // Main register Z
-double T;     // Main Register T
-double A;     // Extended Stack A
-double B;     // Extended Stack B
-double C;     // Extended Stack C
-double D;     // Extended Stack D
+double STACK[MAX_STACK];     // The main RPN stack (X, Y, Z, T, A, B, C D)
+PROG_LONG STACKL[MAX_STACK]; // The main RPN stack in long integer form for Comp-Sci mode (X, Y, Z, T, A, B, C, D)
+
 double LASTX; // LAST X register
 double LASTY; // LAST Y register
+
 double lastFloat = 0.0;
 
-PROG_LONG XL;     // The main register X when in Comp-Sci mode
-PROG_LONG YL;     // The main register Y when in Comp-Sci mode
-PROG_LONG ZL;     // The main register Z when in Comp-Sci mode
-PROG_LONG TL;     // The main register T when in Comp-Sci mode
-PROG_LONG AL;     // The extended stack A when in Comp-Sci mode
-PROG_LONG BL;     // The extended stack B when in Comp-Sci mode
-PROG_LONG CL;     // The extended stack C when in Comp-Sci mode
-PROG_LONG DL;     // The extended stack D when in Comp-Sci mode
 PROG_LONG LASTXL; // LAST X when in Comp-Sci mode
 PROG_LONG LASTYL; // LAST Y when in Comp-Sci mode
 
@@ -174,6 +162,7 @@ double SUM[SUM_MAX];             // Statistics registers for the Statistics bank
 double cashFlow[MAX_CF];         // Cash flow registers for the Financial bank
 uint8_t CFn;                     // Number of cash flows currently entered (for financial functions that use cash flow registers)
 char excaliburNotes[NOTES_SIZE]; // A small scratchpad for the user to jot down some info (preserved on program exit)
+PROG_LONG STOL[MAX_STO];         // Storage registers R0-R99 when in Comp-Sci mode
 
 // ---------------------------------------------------------------------------------------------
 // This is the mapping from unique index to function for playback and macro recording purposes.
@@ -269,7 +258,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
     RegisterClassEx(&wndclass);
 
-    PreInit();
+    MemoryInit();
     ReadFromDisk(); // We need to know the footprint... so we need to read the config before we create the window.
 
     // This is the main Excalibur dialog window!
@@ -743,7 +732,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
             if (GetKeyState(VK_CONTROL) < 0)
             {
                 ClipboardCopySelection(calcMainWindow, COPY_X_FROM_CLIPBOARD);
-                blinkXDisplay(1);
+                blinkXDisplay(TRUE);
             }
             break;
 
@@ -751,7 +740,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
             if (GetKeyState(VK_CONTROL) < 0)
             {
                 ClipboardCopySelection(calcMainWindow, COPY_X_TO_CLIPBOARD);
-                blinkXDisplay(1);
+                blinkXDisplay(TRUE);
             }
             break;
 
@@ -1463,48 +1452,48 @@ void UpdateSpareBar_StoreRecall(void)
 // --------------------------------------------------------
 void FloatsToLongs(void)
 {
-    lastFloat = X;
-    if (X <= (float)INT64_MAX)
-        XL = (PROG_SIGNEDLONG)X;
+    lastFloat = STACK[STK_X];
+    if (STACK[STK_X] <= (float)INT64_MAX)
+        STACKL[STK_X] = (PROG_SIGNEDLONG)STACK[STK_X];
     else
-        XL = wordSizeMask;
+        STACKL[STK_X] = wordSizeMask;
 
-    if (Y <= (float)INT64_MAX)
-        YL = (PROG_SIGNEDLONG)Y;
+    if (STACK[STK_Y] <= (float)INT64_MAX)
+        STACKL[STK_Y] = (PROG_SIGNEDLONG)STACK[STK_Y];
     else
-        YL = wordSizeMask;
+        STACKL[STK_Y] = wordSizeMask;
 
-    if (Z <= (float)INT64_MAX)
-        ZL = (PROG_SIGNEDLONG)Z;
+    if (STACK[STK_Z] <= (float)INT64_MAX)
+        STACKL[STK_Z] = (PROG_SIGNEDLONG)STACK[STK_Z];
     else
-        ZL = wordSizeMask;
+        STACKL[STK_Z] = wordSizeMask;
 
-    if (T <= (float)INT64_MAX)
-        TL = (PROG_SIGNEDLONG)T;
+    if (STACK[STK_T] <= (float)INT64_MAX)
+        STACKL[STK_T] = (PROG_SIGNEDLONG)STACK[STK_T];
     else
-        TL = wordSizeMask;
+        STACKL[STK_T] = wordSizeMask;
 
     if (extendedStack)
     {
-        if (A <= (float)INT64_MAX)
-            AL = (PROG_SIGNEDLONG)A;
+        if (STACK[STK_A] <= (float)INT64_MAX)
+            STACKL[STK_A] = (PROG_SIGNEDLONG)STACK[STK_A];
         else
-            AL = wordSizeMask;
+            STACKL[STK_A] = wordSizeMask;
 
-        if (B <= (float)INT64_MAX)
-            BL = (PROG_SIGNEDLONG)B;
+        if (STACK[STK_B] <= (float)INT64_MAX)
+            STACKL[STK_B] = (PROG_SIGNEDLONG)STACK[STK_B];
         else
-            BL = wordSizeMask;
+            STACKL[STK_B] = wordSizeMask;
 
-        if (C <= (float)INT64_MAX)
-            CL = (PROG_SIGNEDLONG)C;
+        if (STACK[STK_C] <= (float)INT64_MAX)
+            STACKL[STK_C] = (PROG_SIGNEDLONG)STACK[STK_C];
         else
-            CL = wordSizeMask;
+            STACKL[STK_C] = wordSizeMask;
 
-        if (D <= (float)INT64_MAX)
-            DL = (PROG_SIGNEDLONG)D;
+        if (STACK[STK_D] <= (float)INT64_MAX)
+            STACKL[STK_D] = (PROG_SIGNEDLONG)STACK[STK_D];
         else
-            DL = wordSizeMask;
+            STACKL[STK_D] = wordSizeMask;
     }
 
     if (LASTX <= (float)INT64_MAX)
@@ -1525,44 +1514,55 @@ void LongsToFloats(void)
 {
     if (wordMode == COMPSCI_SIGNED)
     {
-        X = (double)(PROG_SIGNEDLONG)XL;
-        Y = (double)(PROG_SIGNEDLONG)YL;
-        Z = (double)(PROG_SIGNEDLONG)ZL;
-        T = (double)(PROG_SIGNEDLONG)TL;
-        A = (double)(PROG_SIGNEDLONG)AL;
-        B = (double)(PROG_SIGNEDLONG)BL;
-        C = (double)(PROG_SIGNEDLONG)CL;
-        D = (double)(PROG_SIGNEDLONG)DL;
+        STACK[STK_X] = (double)(PROG_SIGNEDLONG)STACKL[STK_X];
+        STACK[STK_Y] = (double)(PROG_SIGNEDLONG)STACKL[STK_Y];
+        STACK[STK_Z] = (double)(PROG_SIGNEDLONG)STACKL[STK_Z];
+        STACK[STK_T] = (double)(PROG_SIGNEDLONG)STACKL[STK_T];
+        STACK[STK_A] = (double)(PROG_SIGNEDLONG)STACKL[STK_A];
+        STACK[STK_B] = (double)(PROG_SIGNEDLONG)STACKL[STK_B];
+        STACK[STK_C] = (double)(PROG_SIGNEDLONG)STACKL[STK_C];
+        STACK[STK_D] = (double)(PROG_SIGNEDLONG)STACKL[STK_D];
         LASTX = (double)(PROG_SIGNEDLONG)LASTXL;
         LASTY = (double)(PROG_SIGNEDLONG)LASTYL;
     }
     else
     {
-        X = (double)(PROG_SIGNEDLONG)XL;
-        Y = (double)(PROG_SIGNEDLONG)YL;
-        Z = (double)(PROG_SIGNEDLONG)ZL;
-        T = (double)(PROG_SIGNEDLONG)TL;
-        A = (double)(PROG_SIGNEDLONG)AL;
-        B = (double)(PROG_SIGNEDLONG)BL;
-        C = (double)(PROG_SIGNEDLONG)CL;
-        D = (double)(PROG_SIGNEDLONG)DL;
+        STACK[STK_X] = (double)(PROG_SIGNEDLONG)STACKL[STK_X];
+        STACK[STK_Y] = (double)(PROG_SIGNEDLONG)STACKL[STK_Y];
+        STACK[STK_Z] = (double)(PROG_SIGNEDLONG)STACKL[STK_Z];
+        STACK[STK_T] = (double)(PROG_SIGNEDLONG)STACKL[STK_T];
+        STACK[STK_A] = (double)(PROG_SIGNEDLONG)STACKL[STK_A];
+        STACK[STK_B] = (double)(PROG_SIGNEDLONG)STACKL[STK_B];
+        STACK[STK_C] = (double)(PROG_SIGNEDLONG)STACKL[STK_C];
+        STACK[STK_D] = (double)(PROG_SIGNEDLONG)STACKL[STK_D];
         LASTX = (double)(PROG_SIGNEDLONG)LASTXL;
         LASTY = (double)(PROG_SIGNEDLONG)LASTYL;
     }
 }
 
-int PreInit(void)
+void MemoryInit(void)
 {
     int i, j, k;
 
-    X = 0.0;
-    Y = 0.0;
-    Z = 0.0;
-    T = 0.0;
-    A = 0.0;
-    B = 0.0;
-    C = 0.0;
-    D = 0.0;
+    STACK[STK_X] = 0.0;
+    STACK[STK_Y] = 0.0;
+    STACK[STK_Z] = 0.0;
+    STACK[STK_T] = 0.0;
+    STACK[STK_A] = 0.0;
+    STACK[STK_B] = 0.0;
+    STACK[STK_C] = 0.0;
+    STACK[STK_D] = 0.0;
+
+    for (i = 0; i < MAX_STO; i++)
+    {
+        STO[i] = 0.0;
+        STOL[i] = 0L;
+    }
+
+    for (i = 0; i < FIN_REG_MAX; i++)
+    {
+        FIN[i] = 0.0;
+    }
 
     for (i = 0; i < MAX_MACROS; i++)
     {
@@ -1570,11 +1570,12 @@ int PreInit(void)
         sprintf(macro_short_names[i], "P%02d", i + 1);
         playBackIdxSave[i] = 0;
     }
+
     playBackIdx = 0;
     currentMacroPlaybackIdx = 0;
-
-    // Since we don't want to pre-init the whole constants table we look for first FALSE entry and mark the rest FALSE!
-    // We read them in from disk again below so this won't harm anything to do it here!
+    indirectRegister = 0;
+    
+    // TBD - check this...
     for (k = 0; k < MAX_CONST_BANKS; k++)
     {
         for (i = 0; i < MAX_CONSTS; i++)
@@ -1582,7 +1583,9 @@ int PreInit(void)
             if (constants[k][i].includeInList == FALSE)
             {
                 for (j = i; j < MAX_CONSTS; j++)
+                {
                     constants[k][j].includeInList = FALSE;
+                }
                 break;
             }
         }
@@ -1592,13 +1595,15 @@ int PreInit(void)
     GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_ITIME, tmpStr, 5);
     tmpStr[4] = CNULL;
     if (atoi(tmpStr) == 1)
+    {
         showTime24HourFormat = TRUE;
-
+    }
     // Get regional comma format...
     GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SDECIMAL, tmpStr, 5);
     if (tmpStr[0] == ',')
+    {
         numberDisplayMode = NONINTERNATIONAL;
-    return (0);
+    }
 }
 
 int Init(void)
@@ -1753,10 +1758,10 @@ void RPN_fact(void)
         int fact;
         double temp;
 
-        if (X >= 0.0 && X <= 170.0)
+        if (STACK[STK_X] >= 0.0 && STACK[STK_X] <= 170.0)
         {
             temp = 1.0;
-            for (fact = (int) X; fact > 0; fact--)
+            for (fact = (int) STACK[STK_X]; fact > 0; fact--)
             {
                 temp = (double) temp *(double) fact;
             }
@@ -1773,10 +1778,10 @@ void RPN_fact(void)
         PROG_LONG fact;
         PROG_LONG temp;
 
-        if (XL >= 0 && XL <= 20)
+        if (STACKL[STK_X] >= 0 && STACKL[STK_X] <= 20)
         {
             temp = 1;
-            for (fact = XL; fact > 0; fact--)
+            for (fact = STACKL[STK_X]; fact > 0; fact--)
             {
                 temp = temp * fact;
             }
@@ -1834,7 +1839,7 @@ struct funcStruct RPNkeys[] = {
     {RPN_PLAYBACK,  UNI_PLAY,   USES_FL, NORECORD, 'p', "", NO_L,   X_NEW,      RPN_Playback,       "Run Program",          "Run the the currently loaded program."},
     {RPN_DROP,      UNI_DROP,   USES_FL, ALLOWREC, 'd', "", YES_L,  X_NEW,      RPN_drop,           "Drop Stack",           "Drops the X register and the rest of stack shifts down."},
     {RPN_LARG,      UNI_LARG,   USES_FL, ALLOWREC, ' ', "", NO_L,   X_NEW,      RPN_larg,           "Last Arguments",       "Retrieves the last X and Y pair before last operation."},
-    {RPN_SHOW,      UNI_SHOW,   USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_show,           "Show Values",          "Show Full Stack, Registers, Statistics, etc."},
+    {RPN_SHOW,      UNI_SHOW,   USES_FL, NORECORD, 's', "", NO_L,   X_NULL,     RPN_show,           "Show Values",          "Show Full Stack, Registers, Statistics, etc."},
     {RPN_EDIT,      UNI_EDIT,   USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_edit,           "Edit X Register",      "Used to place the X register back in edit mode if it is not already."},
     {RPN_POW,       UNI_POW,    USES_FL, ALLOWREC, '^', "", YES_L,  X_NEW,      RPN_pow,            "Raise to Power",       "Raise Y to the power of X"},
     {RPN_NOTES,     UNI_NOTES,  USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_Notes,          "Excalibur Notepad",    "Allows some simple notes to be stored/saved."},
@@ -2293,7 +2298,7 @@ void ShowStack(void)
         }
         else
         {
-            FormatNumberForStack(X, tmpStr);
+            FormatNumberForStack(STACK[STK_X], tmpStr);
         }
 
         if (rightAlignStack == 1)
@@ -2306,7 +2311,7 @@ void ShowStack(void)
             SetDlgItemText(calcMainWindow, RPN_STACK_X, tmpStr);
         }
 
-        FormatNumberForStack(Y, tmpStr);
+        FormatNumberForStack(STACK[STK_Y], tmpStr);
         if (rightAlignStack == 1)
         {
             sprintf(stackStr, (bExactFont ? "%24s" : "%22s"), tmpStr);
@@ -2319,7 +2324,7 @@ void ShowStack(void)
 
         if (recModeON == 0 && showTrace == FALSE)
         {
-            FormatNumberForStack(Z, tmpStr);
+            FormatNumberForStack(STACK[STK_Z], tmpStr);
             if (rightAlignStack == 1)
             {
                 sprintf(stackStr, (bExactFont ? "%24s" : "%22s"), tmpStr);
@@ -2330,7 +2335,7 @@ void ShowStack(void)
                 SetDlgItemText(calcMainWindow, RPN_STACK_Z, tmpStr);
             }
 
-            FormatNumberForStack(T, tmpStr);
+            FormatNumberForStack(STACK[STK_T], tmpStr);
             if (rightAlignStack == 1)
             {
                 sprintf(stackStr, (bExactFont ? "%24s" : "%22s"), tmpStr);
@@ -2346,25 +2351,25 @@ void ShowStack(void)
     {
         if (Xedit == X_EDIT)
         {
-            XL = ConvertCompSciStrTo64(Xstr);
+            STACKL[STK_X] = ConvertCompSciStrTo64(Xstr);
         }
 
-        MakeCompSciStr(XL, stackStr);
+        MakeCompSciStr(STACKL[STK_X], stackStr);
         sprintf(tmpStr, (bExactFont ? "%23s%c%c" : "%20s%c%c"), stackStr, Radix(progMode), RadixBIN(progMode));
         SetDlgItemText(calcMainWindow, RPN_STACK_X, tmpStr);
 
-        MakeCompSciStr(YL, stackStr);
+        MakeCompSciStr(STACKL[STK_Y], stackStr);
         sprintf(tmpStr, (bExactFont ? "%23s%c%c" : "%20s%c%c"), stackStr, Radix(progMode), RadixBIN(progMode));
         SetDlgItemText(calcMainWindow, RPN_STACK_Y, tmpStr);
 
         // Show Z and T registers provided we haven't repurposed them above...
         if (recModeON == 0 && traceMacroPlayback == FALSE)
         {
-            MakeCompSciStr(ZL, stackStr);
+            MakeCompSciStr(STACKL[STK_Z], stackStr);
             sprintf(tmpStr, (bExactFont ? "%23s%c%c" : "%20s%c%c"), stackStr, Radix(progMode), RadixBIN(progMode));
             SetDlgItemText(calcMainWindow, RPN_STACK_Z, tmpStr);
 
-            MakeCompSciStr(TL, stackStr);
+            MakeCompSciStr(STACKL[STK_T], stackStr);
             sprintf(tmpStr, (bExactFont ? "%23s%c%c" : "%20s%c%c"), stackStr, Radix(progMode), RadixBIN(progMode));
             SetDlgItemText(calcMainWindow, RPN_STACK_T, tmpStr);
         }
@@ -2401,15 +2406,15 @@ void StackPush(double temp)
 
     if (extendedStack)
     {
-        D = C;
-        C = B;
-        B = A;
-        A = T;
+        STACK[STK_D] = STACK[STK_C];
+        STACK[STK_C] = STACK[STK_B];
+        STACK[STK_B] = STACK[STK_A];
+        STACK[STK_A] = STACK[STK_T];
     }
-    T = Z;
-    Z = Y;
-    Y = X;
-    X = temp;
+    STACK[STK_T] = STACK[STK_Z];
+    STACK[STK_Z] = STACK[STK_Y];
+    STACK[STK_Y] = STACK[STK_X];
+    STACK[STK_X] = temp;
 
     FloatsToLongs();
 }
@@ -2420,23 +2425,23 @@ double StackPop(void)
 
     stackPops++;
 
-    temp = X;
-    X = Y;
-    Y = Z;
-    Z = T;
+    temp = STACK[STK_X];
+    STACK[STK_X] = STACK[STK_Y];
+    STACK[STK_Y] = STACK[STK_Z];
+    STACK[STK_Z] = STACK[STK_T];
     if (extendedStack)
     {
-        T = A;
-        A = B;
-        B = C;
-        C = D;
+        STACK[STK_T] = STACK[STK_A];
+        STACK[STK_A] = STACK[STK_B];
+        STACK[STK_B] = STACK[STK_C];
+        STACK[STK_C] = STACK[STK_D];
         if (popFillZero != 0)
-            D = 0.0;
+            STACK[STK_D] = 0.0;
     }
     else
     {
         if (popFillZero != 0)
-            T = 0.0;
+            STACK[STK_T] = 0.0;
     }
 
     FloatsToLongs();
@@ -2452,6 +2457,7 @@ void RPN_clearStack(void)
     if (rpnStoreRecall & 0x03)
     {
         memset(STO, 0x00, sizeof(STO));
+        memset(STOL, 0x00, sizeof(STOL));
     }
     else
     {
@@ -2461,6 +2467,7 @@ void RPN_clearStack(void)
             char savedStr[64];
 
             memset(STO, 0x00, sizeof(STO));
+            memset(STOL, 0x00, sizeof(STOL));
             memset(cashFlow, 0x00, sizeof(cashFlow));
             memset(SUM, 0x00, sizeof(SUM));
             memset(FIN, 0x00, sizeof(FIN));
@@ -2476,14 +2483,14 @@ void RPN_clearStack(void)
         {
             RPN_clearL();
         }
-        X = 0.0;
-        Y = 0.0;
-        Z = 0.0;
-        T = 0.0;
-        A = 0.0;
-        B = 0.0;
-        C = 0.0;
-        D = 0.0;
+        STACK[STK_X] = 0.0;
+        STACK[STK_Y] = 0.0;
+        STACK[STK_Z] = 0.0;
+        STACK[STK_T] = 0.0;
+        STACK[STK_A] = 0.0;
+        STACK[STK_B] = 0.0;
+        STACK[STK_C] = 0.0;
+        STACK[STK_D] = 0.0;
         LASTX = 0.0;
         LASTY = 0.0;
         progModecarry = 0;
@@ -2494,14 +2501,14 @@ void RPN_clearStack(void)
 
 void RPN_clearL(void)
 {
-    XL = 0L;
-    YL = 0L;
-    ZL = 0L;
-    TL = 0L;
-    AL = 0L;
-    BL = 0L;
-    CL = 0L;
-    DL = 0L;
+    STACKL[STK_X] = 0L;
+    STACKL[STK_Y] = 0L;
+    STACKL[STK_Z] = 0L;
+    STACKL[STK_T] = 0L;
+    STACKL[STK_A] = 0L;
+    STACKL[STK_B] = 0L;
+    STACKL[STK_C] = 0L;
+    STACKL[STK_D] = 0L;
     LASTXL = 0L;
     LASTYL = 0L;
     progModecarry = 0;
@@ -2522,18 +2529,18 @@ void RPN_enter(void)
         else
         {
             if (progMode == PROG_FLOAT)
-                StackPush(X);
+                StackPush(STACK[STK_X]);
             else
-                StackPushL(XL);
+                StackPushL(STACKL[STK_X]);
         }
         Xedit = X_NEW;
     }
     else
     {
         if (progMode == PROG_FLOAT)
-            StackPush(X);
+            StackPush(STACK[STK_X]);
         else
-            StackPushL(XL);
+            StackPushL(STACKL[STK_X]);
         Xedit = X_ENTER;
     }
 
@@ -2601,7 +2608,7 @@ void RPN_Ex(void)
             ptr = strchr(Xstr, 'e'); // Don't allow 'e' over existing 'e'
             if (ptr == NULL)
             {
-                if (X == 0.0)
+                if (STACK[STK_X] == 0.0)
                 {
                     strcpy(Xstr, "1e+");
                 }
@@ -2641,27 +2648,51 @@ void RPN_digit(WPARAM key)
             // See if we are doing any sort of STO Arithmetic...
             if (rpnStoreRecall & REG_PLUS)
             {
-                STO[reg] += X;
+                if (progMode == PROG_FLOAT)
+                    STO[reg] += STACK[STK_X];
+                else
+                    STOL[reg] += STACKL[STK_X];
             }
             else if (rpnStoreRecall & REG_MINUS)
             {
-                STO[reg] -= X;
+                if (progMode == PROG_FLOAT)
+                    STO[reg] -= STACK[STK_X];
+                else
+                    STOL[reg] -= STACKL[STK_X];
             }
             else if (rpnStoreRecall & REG_MULTIPLY)
             {
-                STO[reg] *= X;
+                if (progMode == PROG_FLOAT)
+                    STO[reg] *= STACK[STK_X];
+                else
+                    STOL[reg] *= STACKL[STK_X];
             }
             else if (rpnStoreRecall & REG_DIVIDE)
             {
-                if (X != 0.0)
-                    STO[reg] /= X;
+                if (progMode == PROG_FLOAT)
+                {
+                    if (STACK[STK_X] != 0.0)
+                    {
+                        STO[reg] /= STACK[STK_X];
+                    }
+                }
+                else
+                {
+                    if (STACKL[STK_X] != 0L)
+                    {
+                        STOL[reg] /= STACKL[STK_X];
+                    }
+                }
             }
             else
             {
-                STO[reg] = X;
+                if (progMode == PROG_FLOAT)
+                    STO[reg] = STACK[STK_X];
+                else
+                    STOL[reg] = STACKL[STK_X];
             }
 
-            blinkXDisplay(0);
+            blinkXDisplay(FALSE);
         }
         else if (rpnStoreRecall & REG_RECALL)
         {
@@ -2669,20 +2700,35 @@ void RPN_digit(WPARAM key)
             // In this case the stack does NOT lift.
             if (rpnStoreRecall & REG_PLUS)
             {
-                X = X + STO[reg];
+                if (progMode == PROG_FLOAT)
+                    STACK[STK_X] = STACK[STK_X] + STO[reg];
+                else
+                    STACKL[STK_X] = STACKL[STK_X] + STOL[reg];
             }
             else if (rpnStoreRecall & REG_MINUS)
             {
-                X = X - STO[reg];
+                if (progMode == PROG_FLOAT)
+                    STACK[STK_X] = STACK[STK_X] - STO[reg];
+                else
+                    STACKL[STK_X] = STACKL[STK_X] - STOL[reg];
             }
             else if (rpnStoreRecall & REG_MULTIPLY)
             {
-                X = X * STO[reg];
+                if (progMode == PROG_FLOAT)
+                    STACK[STK_X] = STACK[STK_X] * STO[reg];
+                else
+                    STACKL[STK_X] = STACKL[STK_X] * STOL[reg];
             }
             else if (rpnStoreRecall & REG_DIVIDE)
             {
-                if (STO[reg] != 0.0)
-                    X = X / STO[reg];
+                if (progMode == PROG_FLOAT)
+                {
+                    if (STO[reg] != 0.0) STACK[STK_X] = STACK[STK_X] / STO[reg];
+                }
+                else
+                {
+                    if (STOL[reg] != 0L) STACKL[STK_X] = STACKL[STK_X] / STOL[reg];
+                }
             }
             else // Normal RCL will lift the stack
             {
@@ -2692,28 +2738,40 @@ void RPN_digit(WPARAM key)
                 }
                 else if (Xedit == X_NEW)
                 {
-                    if (progMode != PROG_FLOAT)
-                        StackPushL(0L);
-                    else
+                    if (progMode == PROG_FLOAT)
                         StackPush(0.0);
+                    else
+                        StackPushL(0L);
                 }
                 else
                     Xedit = X_NEW;
 
-                X = STO[reg];
+                if (progMode == PROG_FLOAT)
+                    STACK[STK_X] = STO[reg];
+                else
+                    STACKL[STK_X] = STOL[reg];
             }
         }
         else if (rpnStoreRecall & REG_EXCHANGE)
         {
-            tmp1 = X;
-            X = STO[reg];
-            STO[reg] = tmp1;
+            if (progMode == PROG_FLOAT)
+            {
+                double exch = STACK[STK_X];
+                STACK[STK_X] = STO[reg];
+                STO[reg] = exch;
+            }
+            else
+            {
+                PROG_LONG exch = STACKL[STK_X];
+                STACKL[STK_X] = STOL[reg];
+                STOL[reg] = exch;
+            }
 
             if (Xedit == X_EDIT)
                 Xedit = X_NEW;
         }
 
-        XL = MaskStack((PROG_LONG)X);
+        STACKL[STK_X] = MaskStack(STACKL[STK_X]);
         RPN_ClearModifiers(!macroPlayback);
         return;
     }
@@ -2750,7 +2808,7 @@ void RPN_digit(WPARAM key)
 
     if (strchr(Xstr, '/') == NULL)
     {
-        X = atof(Xstr);
+        STACK[STK_X] = atof(Xstr);
     }
     else
     {
@@ -2769,12 +2827,12 @@ void RPN_digit(WPARAM key)
         }
 
         if (tmp2 != 0.0)
-            X = tmp3 + (tmp1 / tmp2);
+            STACK[STK_X] = tmp3 + (tmp1 / tmp2);
         else
-            X = 0.0;
+            STACK[STK_X] = 0.0;
     }
-    XL = ConvertCompSciStrTo64(Xstr);
-
+    
+    STACKL[STK_X] = ConvertCompSciStrTo64(Xstr);
     RPN_ClearModifiers(!macroPlayback);
     Xedit = X_EDIT;
 }
@@ -3004,11 +3062,12 @@ void RPN_backspace(void)
         if (strlen(Xstr) > 0)
         {
             Xstr[strlen(Xstr) - 1] = CNULL;
-            X = atof(Xstr);
+            STACK[STK_X] = atof(Xstr);
         }
         else
         {
-            X = 0.0;
+            STACK[STK_X] = 0.0;
+            STACKL[STK_X] = 0;
         }
     }
     else
@@ -3083,7 +3142,7 @@ void RPN_divide(void)
         return;
     }
 
-    if (X == 0.0)
+    if (STACK[STK_X] == 0.0)
     {
         RPN_error("Divide By Zero");
     }
@@ -3176,7 +3235,7 @@ void RPN_negate_x(void)
             *ptr = '-';
         else
             *ptr = '+';
-        X = atof(Xstr);
+        STACK[STK_X] = atof(Xstr);
     }
     else
     {
@@ -3191,7 +3250,7 @@ void RPN_negate_x(void)
                 sprintf(tmpStr, "-%s", Xstr);
                 strcpy(Xstr, tmpStr);
             }
-            X = atof(Xstr);
+            STACK[STK_X] = atof(Xstr);
         }
         else
         {
@@ -3212,19 +3271,49 @@ void RPN_rotateStackUp(void)
     Xedit = X_NEW;
     if (progMode == PROG_FLOAT)
     {
-        temp = T;
-        T = Z;
-        Z = Y;
-        Y = X;
-        X = temp;
+        if (extendedStack)
+        {
+            temp = STACK[STK_D];
+            STACK[STK_D] = STACK[STK_C];
+            STACK[STK_C] = STACK[STK_B];
+            STACK[STK_B] = STACK[STK_A];
+            STACK[STK_A] = STACK[STK_T];
+            STACK[STK_T] = STACK[STK_Z];
+            STACK[STK_Z] = STACK[STK_Y];
+            STACK[STK_Y] = STACK[STK_X];
+            STACK[STK_X] = temp;
+        }
+        else
+        {
+            temp = STACK[STK_T];
+            STACK[STK_T] = STACK[STK_Z];
+            STACK[STK_Z] = STACK[STK_Y];
+            STACK[STK_Y] = STACK[STK_X];
+            STACK[STK_X] = temp;
+        }
     }
     else
     {
-        tempL = TL;
-        TL = ZL;
-        ZL = YL;
-        YL = XL;
-        XL = tempL;
+        if (extendedStack)
+        {
+            tempL = STACKL[STK_D];
+            STACKL[STK_D] = STACKL[STK_C];
+            STACKL[STK_C] = STACKL[STK_B];
+            STACKL[STK_B] = STACKL[STK_A];
+            STACKL[STK_A] = STACKL[STK_T];
+            STACKL[STK_T] = STACKL[STK_Z];
+            STACKL[STK_Z] = STACKL[STK_Y];
+            STACKL[STK_Y] = STACKL[STK_X];
+            STACKL[STK_X] = tempL;
+        }
+        else
+        {
+            tempL = STACKL[STK_T];
+            STACKL[STK_T] = STACKL[STK_Z];
+            STACKL[STK_Z] = STACKL[STK_Y];
+            STACKL[STK_Y] = STACKL[STK_X];
+            STACKL[STK_X] = tempL;
+        }
     }
 }
 
@@ -3236,19 +3325,49 @@ void RPN_rotateStackDn(void)
     Xedit = X_NEW;
     if (progMode == PROG_FLOAT)
     {
-        temp = X;
-        X = Y;
-        Y = Z;
-        Z = T;
-        T = temp;
+        if (extendedStack)
+        {
+            temp = STACK[STK_X];
+            STACK[STK_X] = STACK[STK_Y];
+            STACK[STK_Y] = STACK[STK_Z];
+            STACK[STK_Z] = STACK[STK_T];
+            STACK[STK_T] = STACK[STK_A];
+            STACK[STK_A] = STACK[STK_B];
+            STACK[STK_B] = STACK[STK_C];
+            STACK[STK_C] = STACK[STK_D];            
+            STACK[STK_D] = temp;
+        }
+        else
+        {
+            temp = STACK[STK_X];
+            STACK[STK_X] = STACK[STK_Y];
+            STACK[STK_Y] = STACK[STK_Z];
+            STACK[STK_Z] = STACK[STK_T];
+            STACK[STK_T] = temp;
+        }
     }
     else
     {
-        tempL = XL;
-        XL = YL;
-        YL = ZL;
-        ZL = TL;
-        TL = tempL;
+        if (extendedStack)
+        {
+            tempL = STACKL[STK_X];
+            STACKL[STK_X] = STACKL[STK_Y];
+            STACKL[STK_Y] = STACKL[STK_Z];
+            STACKL[STK_Z] = STACKL[STK_T];
+            STACKL[STK_T] = STACKL[STK_A];
+            STACKL[STK_A] = STACKL[STK_B];
+            STACKL[STK_B] = STACKL[STK_C];
+            STACKL[STK_C] = STACKL[STK_D];            
+            STACKL[STK_D] = tempL;
+        }
+        else
+        {
+            tempL = STACKL[STK_X];
+            STACKL[STK_X] = STACKL[STK_Y];
+            STACKL[STK_Y] = STACKL[STK_Z];
+            STACKL[STK_Z] = STACKL[STK_T];
+            STACKL[STK_T] = tempL;
+        }
     }
 }
 
@@ -3550,31 +3669,16 @@ void SaveToDisk(void)
         fwrite(&hexSpacing,         sizeof(hexSpacing),         1, outfile);
         fwrite(&wordSizeMask,       sizeof(wordSizeMask),       1, outfile);
 
-        fwrite(&X,                  sizeof(X),                  1, outfile);
-        fwrite(&Y,                  sizeof(Y),                  1, outfile);
-        fwrite(&Z,                  sizeof(Z),                  1, outfile);
-        fwrite(&T,                  sizeof(T),                  1, outfile);
+        fwrite(STACK,               sizeof(STACK),              1, outfile);
+        fwrite(STACKL,              sizeof(STACKL),             1, outfile);
         fwrite(&LASTX,              sizeof(LASTX),              1, outfile);
         fwrite(&LASTY,              sizeof(LASTY),              1, outfile);
         fwrite(&lastFloat,          sizeof(lastFloat),          1, outfile);
-
-        fwrite(&XL,                 sizeof(XL),                 1, outfile);
-        fwrite(&YL,                 sizeof(YL),                 1, outfile);
-        fwrite(&ZL,                 sizeof(ZL),                 1, outfile);
-        fwrite(&TL,                 sizeof(TL),                 1, outfile);
         fwrite(&LASTXL,             sizeof(LASTXL),             1, outfile);
         fwrite(&LASTYL,             sizeof(LASTYL),             1, outfile);
 
-        fwrite(&A,                  sizeof(A),                  1, outfile);
-        fwrite(&B,                  sizeof(B),                  1, outfile);
-        fwrite(&C,                  sizeof(C),                  1, outfile);
-        fwrite(&D,                  sizeof(D),                  1, outfile);
-        fwrite(&AL,                 sizeof(AL),                 1, outfile);
-        fwrite(&BL,                 sizeof(BL),                 1, outfile);
-        fwrite(&CL,                 sizeof(CL),                 1, outfile);
-        fwrite(&DL,                 sizeof(DL),                 1, outfile);
-
         fwrite(&STO,                sizeof(STO),                1, outfile);
+        fwrite(&STOL,               sizeof(STOL),               1, outfile);
         fwrite(&SUM,                sizeof(SUM),                1, outfile);
         fwrite(&FIN,                sizeof(FIN),                1, outfile);
         fwrite(&cashFlow,           sizeof(cashFlow),           1, outfile);
@@ -3679,31 +3783,16 @@ void ReadFromDisk(void)
         fread(&hexSpacing,         sizeof(hexSpacing),         1, infile);
         fread(&wordSizeMask,       sizeof(wordSizeMask),       1, infile);
 
-        fread(&X,                  sizeof(X),                  1, infile);
-        fread(&Y,                  sizeof(Y),                  1, infile);
-        fread(&Z,                  sizeof(Z),                  1, infile);
-        fread(&T,                  sizeof(T),                  1, infile);
+        fread(STACK,               sizeof(STACK),              1, infile);
+        fread(STACKL,              sizeof(STACKL),             1, infile);
         fread(&LASTX,              sizeof(LASTX),              1, infile);
         fread(&LASTY,              sizeof(LASTY),              1, infile);
         fread(&lastFloat,          sizeof(lastFloat),          1, infile);
-
-        fread(&XL,                 sizeof(XL),                 1, infile);
-        fread(&YL,                 sizeof(YL),                 1, infile);
-        fread(&ZL,                 sizeof(ZL),                 1, infile);
-        fread(&TL,                 sizeof(TL),                 1, infile);
         fread(&LASTXL,             sizeof(LASTXL),             1, infile);
         fread(&LASTYL,             sizeof(LASTYL),             1, infile);
 
-        fread(&A,                  sizeof(A),                  1, infile);
-        fread(&B,                  sizeof(B),                  1, infile);
-        fread(&C,                  sizeof(C),                  1, infile);
-        fread(&D,                  sizeof(D),                  1, infile);
-        fread(&AL,                 sizeof(AL),                 1, infile);
-        fread(&BL,                 sizeof(BL),                 1, infile);
-        fread(&CL,                 sizeof(CL),                 1, infile);
-        fread(&DL,                 sizeof(DL),                 1, infile);
-
         fread(&STO,                sizeof(STO),                1, infile);
+        fread(&STOL,               sizeof(STOL),               1, infile);
         fread(&SUM,                sizeof(SUM),                1, infile);
         fread(&FIN,                sizeof(FIN),                1, infile);
         fread(&cashFlow,           sizeof(cashFlow),           1, infile);
@@ -4702,8 +4791,8 @@ void init_key_pos(void) // for tool tips
 
 void RPN_clearX(void)
 {
-    X = 0.0;
-    XL = 0L;
+    STACK[STK_X] = 0.0;
+    STACKL[STK_X] = 0L;
     progModecarry = 0;
     Xedit = X_ENTER;
     RPN_ClearModifiers(!macroPlayback);
@@ -4734,22 +4823,22 @@ void RPN_larg(void) // drop the stack
 }
 
 
-BOOL CALLBACK fnDIALOG_ShowStack(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
+BOOL CALLBACK fnDIALOG_ShowMemory(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
 void RPN_show(void)
 {
-    DLGPROC lpfnDIALOG_ShowStack;
+    DLGPROC lpfnDIALOG_ShowMemory;
 
-    lpfnDIALOG_ShowStack = (DLGPROC)MakeProcInstance((FARPROC)fnDIALOG_ShowStack, hExcaliburInstance);
+    lpfnDIALOG_ShowMemory = (DLGPROC)MakeProcInstance((FARPROC)fnDIALOG_ShowMemory, hExcaliburInstance);
 
-    if ((DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_SHOW", calcMainWindow, lpfnDIALOG_ShowStack)) == -1)
+    if ((DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_SHOW", calcMainWindow, lpfnDIALOG_ShowMemory)) == -1)
     {
         MessageBox(NULL, "Unable to display dialog", "System Error", MB_SYSTEMMODAL | MB_ICONHAND | MB_OK);
     }
-    FreeProcInstance((FARPROC)lpfnDIALOG_ShowStack);
+    FreeProcInstance((FARPROC)lpfnDIALOG_ShowMemory);
     ShowStatus();
 }
 
-BOOL CALLBACK fnDIALOG_ShowStack(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK fnDIALOG_ShowMemory(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
 {
     char tmp[64];
     WORD i;
@@ -4762,101 +4851,37 @@ BOOL CALLBACK fnDIALOG_ShowStack(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
             SendMessage(GetDlgItem(hDlg, i), WM_SETFONT, (WPARAM) hFixedFont, FALSE);
         }
 
-        // Main Stack - might be floats or longs
+        // Main and Extended Stack - might be floats or longs
         if (progMode == PROG_FLOAT)
         {
-            sprintf(tmp, "%-.14g", X);
+            for (i=0; i<MAX_STACK; i++)
+            {
+                sprintf(tmp, "%-.14g", STACK[i]);
+                makeInternational(tmp);
+                SetDlgItemText(hDlg, IDC_SHOW_X+i, tmp);
+            }
         }
         else
         {
-            MakeCompSciStr(XL, tmp);
+            for (i=0; i<MAX_STACK; i++)
+            {
+                MakeCompSciStr(STACKL[i], tmp);
+                SetDlgItemText(hDlg, IDC_SHOW_X+i, tmp);
+            }
         }
-        makeInternational(tmp);
-        SetDlgItemText(hDlg, IDC_SHOW_X, tmp);
-
-        if (progMode == PROG_FLOAT)
-        {
-            sprintf(tmp, "%-.14g", Y);
-        }
-        else
-        {
-            MakeCompSciStr(YL, tmp);
-        }
-        makeInternational(tmp);
-        SetDlgItemText(hDlg, IDC_SHOW_Y, tmp);
-
-        if (progMode == PROG_FLOAT)
-        {
-            sprintf(tmp, "%-.14g", Z);
-        }
-        else
-        {
-            MakeCompSciStr(ZL, tmp);
-        }
-        makeInternational(tmp);
-        SetDlgItemText(hDlg, IDC_SHOW_Z, tmp);
-
-        if (progMode == PROG_FLOAT)
-        {
-            sprintf(tmp, "%-.14g", T);
-        }
-        else
-        {
-            MakeCompSciStr(TL, tmp);
-        }
-        makeInternational(tmp);
-        SetDlgItemText(hDlg, IDC_SHOW_T, tmp);
-
-        // Extended Stack
-        if (progMode == PROG_FLOAT)
-        {
-            sprintf(tmp, "%-.14g", D);
-        }
-        else
-        {
-            MakeCompSciStr(DL, tmp);
-        }
-        makeInternational(tmp);
-        SetDlgItemText(hDlg, IDC_SHOW_D, tmp);
-
-        if (progMode == PROG_FLOAT)
-        {
-            sprintf(tmp, "%-.14g", C);
-        }
-        else
-        {
-            MakeCompSciStr(CL, tmp);
-        }
-        makeInternational(tmp);
-        SetDlgItemText(hDlg, IDC_SHOW_C, tmp);
-
-        if (progMode == PROG_FLOAT)
-        {
-            sprintf(tmp, "%-.14g", B);
-        }
-        else
-        {
-            MakeCompSciStr(BL, tmp);
-        }
-        makeInternational(tmp);
-        SetDlgItemText(hDlg, IDC_SHOW_B, tmp);
-
-        if (progMode == PROG_FLOAT)
-        {
-            sprintf(tmp, "%-.14g", A);
-        }
-        else
-        {
-            MakeCompSciStr(AL, tmp);
-        }
-        makeInternational(tmp);
-        SetDlgItemText(hDlg, IDC_SHOW_A, tmp);
 
         // Registers (R00-R20)
         for (i=0; i<=20; i++)
         {
-            sprintf(tmp, "%-.14g", STO[i]);
-            makeInternational(tmp);
+            if (progMode == PROG_FLOAT)
+            {
+                sprintf(tmp, "%-.14g", STO[i]);
+                makeInternational(tmp);
+            }
+            else
+            {
+                MakeCompSciStr(STOL[i], tmp);
+            }
             SetDlgItemText(hDlg, IDC_SHOW_R00+i, tmp);
         }
 
@@ -5195,10 +5220,10 @@ void callButtonFunc(void (*routine)(void), char useFloatsLongs, char allowRecord
 
     if (saveLastX == YES_L)
     {
-        LASTX = X;
-        LASTXL = XL;
-        LASTY = Y;
-        LASTYL = YL;
+        LASTX = STACK[STK_X];
+        LASTXL = STACKL[STK_X];
+        LASTY = STACK[STK_Y];
+        LASTYL = STACKL[STK_Y];
     }
 
     // Before we call the button function we need to ensure both stacks look right.
@@ -5246,10 +5271,10 @@ void callButtonFunc_fast(void (*routine)(void), char useFloatsLongs, uint16_t un
 
     if (saveLastX == YES_L)
     {
-        LASTX = X;
-        LASTXL = XL;
-        LASTY = Y;
-        LASTYL = YL;
+        LASTX = STACK[STK_X];
+        LASTXL = STACKL[STK_X];
+        LASTY = STACK[STK_Y];
+        LASTYL = STACKL[STK_Y];
     }
 
     // -----------------------------------------------------------------------------
@@ -5491,18 +5516,18 @@ void RPN_Notes(void)
 void RPN_Copy(void)
 {
     ClipboardCopySelection(calcMainWindow, COPY_X_TO_CLIPBOARD);
-    blinkXDisplay(0);
+    blinkXDisplay(FALSE);
 }
 
 void RPN_Paste(void)
 {
     ClipboardCopySelection(calcMainWindow, COPY_X_FROM_CLIPBOARD);
-    blinkXDisplay(0);
+    blinkXDisplay(FALSE);
 }
 
 void RPN_inverse(void)
 {
-    if (X == 0.0)
+    if (STACK[STK_X] == 0.0)
     {
         RPN_error("Divide By Zero");
     }

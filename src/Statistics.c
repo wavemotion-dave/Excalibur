@@ -173,11 +173,11 @@ void STAT_PdevY(void)
 void STAT_sumPlus(void)
 {
     SUM[SUM_N] += 1.0F;
-    SUM[SUM_X] += X;
-    SUM[SUM_Y] += Y;
-    SUM[SUM_XSQ] += X * X;
-    SUM[SUM_YSQ] += Y * Y;
-    SUM[SUM_XY] += X * Y;
+    SUM[SUM_X] += STACK[STK_X];
+    SUM[SUM_Y] += STACK[STK_Y];
+    SUM[SUM_XSQ] += STACK[STK_X] * STACK[STK_X];
+    SUM[SUM_YSQ] += STACK[STK_Y] * STACK[STK_Y];
+    SUM[SUM_XY] += STACK[STK_X] * STACK[STK_Y];
     StackPop();
     StackPush(SUM[SUM_N]);
 }
@@ -185,11 +185,11 @@ void STAT_sumPlus(void)
 void STAT_sumMinus(void)
 {
     SUM[SUM_N] -= 1.0F;
-    SUM[SUM_X] -= X;
-    SUM[SUM_Y] -= Y;
-    SUM[SUM_XSQ] -= X * X;
-    SUM[SUM_YSQ] -= Y * Y;
-    SUM[SUM_XY] -= X * Y;
+    SUM[SUM_X] -= STACK[STK_X];
+    SUM[SUM_Y] -= STACK[STK_Y];
+    SUM[SUM_XSQ] -= STACK[STK_X] * STACK[STK_X];
+    SUM[SUM_YSQ] -= STACK[STK_Y] * STACK[STK_Y];
+    SUM[SUM_XY] -= STACK[STK_X] * STACK[STK_Y];
     StackPop();
     StackPush(SUM[SUM_N]);
 }

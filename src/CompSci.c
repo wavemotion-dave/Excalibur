@@ -293,16 +293,16 @@ void StackPushL(PROG_LONG temp)
 
     if (extendedStack)
     {
-        DL = MaskStack(CL);
-        CL = MaskStack(BL);
-        BL = MaskStack(AL);
-        AL = MaskStack(TL);
+        STACKL[STK_D] = MaskStack(STACKL[STK_C]);
+        STACKL[STK_C] = MaskStack(STACKL[STK_B]);
+        STACKL[STK_B] = MaskStack(STACKL[STK_A]);
+        STACKL[STK_A] = MaskStack(STACKL[STK_T]);
     }
 
-    TL = MaskStack(ZL);
-    ZL = MaskStack(YL);
-    YL = MaskStack(XL);
-    XL = MaskStack(temp);
+    STACKL[STK_T] = MaskStack(STACKL[STK_Z]);
+    STACKL[STK_Z] = MaskStack(STACKL[STK_Y]);
+    STACKL[STK_Y] = MaskStack(STACKL[STK_X]);
+    STACKL[STK_X] = MaskStack(temp);
 
     LongsToFloats();
 }
@@ -311,23 +311,23 @@ PROG_LONG StackPopL(void)
 {
     PROG_LONG temp;
     stackPops++;
-    temp = MaskStack(XL);
-    XL = MaskStack(YL);
-    YL = MaskStack(ZL);
-    ZL = MaskStack(TL);
+    temp = MaskStack(STACKL[STK_X]);
+    STACKL[STK_X] = MaskStack(STACKL[STK_Y]);
+    STACKL[STK_Y] = MaskStack(STACKL[STK_Z]);
+    STACKL[STK_Z] = MaskStack(STACKL[STK_T]);
     if (extendedStack)
     {
-        TL = MaskStack(AL);
-        AL = MaskStack(BL);
-        BL = MaskStack(CL);
-        CL = MaskStack(DL);
+        STACKL[STK_T] = MaskStack(STACKL[STK_A]);
+        STACKL[STK_A] = MaskStack(STACKL[STK_B]);
+        STACKL[STK_B] = MaskStack(STACKL[STK_C]);
+        STACKL[STK_C] = MaskStack(STACKL[STK_D]);
         if (popFillZero != 0)
-            DL = MaskStack(0L);
+            STACKL[STK_D] = MaskStack(0L);
     }
     else
     {
         if (popFillZero != 0)
-            TL = MaskStack(0L);
+            STACKL[STK_T] = MaskStack(0L);
     }
 
     LongsToFloats();
@@ -343,38 +343,38 @@ PROG_LONG StackPopL(void)
 void PROG_hex(void)
 {
     progMode = PROG_HEX;
-    XL = MaskStack(XL);
-    YL = MaskStack(YL);
-    ZL = MaskStack(ZL);
-    TL = MaskStack(TL);
+    STACKL[STK_X] = MaskStack(STACKL[STK_X]);
+    STACKL[STK_Y] = MaskStack(STACKL[STK_Y]);
+    STACKL[STK_Z] = MaskStack(STACKL[STK_Z]);
+    STACKL[STK_T] = MaskStack(STACKL[STK_T]);
 }
 
 void PROG_bin(void)
 {
     progMode = PROG_BIN;
     binMode = 0;
-    XL = MaskStack(XL);
-    YL = MaskStack(YL);
-    ZL = MaskStack(ZL);
-    TL = MaskStack(TL);
+    STACKL[STK_X] = MaskStack(STACKL[STK_X]);
+    STACKL[STK_Y] = MaskStack(STACKL[STK_Y]);
+    STACKL[STK_Z] = MaskStack(STACKL[STK_Z]);
+    STACKL[STK_T] = MaskStack(STACKL[STK_T]);
 }
 
 void PROG_oct(void)
 {
     progMode = PROG_OCT;
-    XL = MaskStack(XL);
-    YL = MaskStack(YL);
-    ZL = MaskStack(ZL);
-    TL = MaskStack(TL);
+    STACKL[STK_X] = MaskStack(STACKL[STK_X]);
+    STACKL[STK_Y] = MaskStack(STACKL[STK_Y]);
+    STACKL[STK_Z] = MaskStack(STACKL[STK_Z]);
+    STACKL[STK_T] = MaskStack(STACKL[STK_T]);
 }
 
 void PROG_dec(void)
 {
     progMode = PROG_DEC;
-    XL = MaskStack(XL);
-    YL = MaskStack(YL);
-    ZL = MaskStack(ZL);
-    TL = MaskStack(TL);
+    STACKL[STK_X] = MaskStack(STACKL[STK_X]);
+    STACKL[STK_Y] = MaskStack(STACKL[STK_Y]);
+    STACKL[STK_Z] = MaskStack(STACKL[STK_Z]);
+    STACKL[STK_T] = MaskStack(STACKL[STK_T]);
 }
 
 void PROG_hexA(void)
@@ -397,7 +397,7 @@ void PROG_hexA(void)
                 strcat(Xstr, "A");
             }
         }
-        XL = ConvertCompSciStrTo64(Xstr);
+        STACKL[STK_X] = ConvertCompSciStrTo64(Xstr);
         Xedit = X_EDIT;
     }
 }
@@ -422,7 +422,7 @@ void PROG_hexB(void)
                 strcat(Xstr, "B");
             }
         }
-        XL = ConvertCompSciStrTo64(Xstr);
+        STACKL[STK_X] = ConvertCompSciStrTo64(Xstr);
         Xedit = X_EDIT;
     }
 }
@@ -448,7 +448,7 @@ void PROG_hexC(void)
             }
         }
 
-        XL = ConvertCompSciStrTo64(Xstr);
+        STACKL[STK_X] = ConvertCompSciStrTo64(Xstr);
         Xedit = X_EDIT;
     }
 }
@@ -474,7 +474,7 @@ void PROG_hexD(void)
             }
         }
 
-        XL = ConvertCompSciStrTo64(Xstr);
+        STACKL[STK_X] = ConvertCompSciStrTo64(Xstr);
         Xedit = X_EDIT;
     }
 }
@@ -499,7 +499,7 @@ void PROG_hexE(void)
                 strcat(Xstr, "E");
             }
         }
-        XL = ConvertCompSciStrTo64(Xstr);
+        STACKL[STK_X] = ConvertCompSciStrTo64(Xstr);
         Xedit = X_EDIT;
     }
 }
@@ -524,7 +524,7 @@ void PROG_hexF(void)
                 strcat(Xstr, "F");
             }
         }
-        XL = ConvertCompSciStrTo64(Xstr);
+        STACKL[STK_X] = ConvertCompSciStrTo64(Xstr);
         Xedit = X_EDIT;
     }
 }
@@ -603,7 +603,7 @@ void PROG_ror(void)
 void PROG_mod(void)
 {
     PROG_LONG l1, l2;
-    if (XL == 0L)
+    if (STACKL[STK_X] == 0L)
     {
         RPN_error("MOD:  Divide By Zero");
     }
@@ -706,7 +706,7 @@ BOOL CALLBACK fnDIALOG_ASCIIProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
             sprintf(tmp, "%3s  %3d   %02X   %8s  %3s", ASCII_Str(i), i, i, tmp3, tmp4);
             SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
         }
-        i = (unsigned char) (XL & 0x000000FF);
+        i = (unsigned char) (STACKL[STK_X] & 0x000000FF);
         SendDlgItemMessage(hDlg, 101, LB_SETCURSEL, i, 0);
         SetFocus(GetDlgItem(hDlg, 101));
         return TRUE;
@@ -751,20 +751,20 @@ void PROG_binHi(void)
 {
     progMode = PROG_BIN;
     binMode = 1;
-    XL = MaskStack(XL);
-    YL = MaskStack(YL);
-    ZL = MaskStack(ZL);
-    TL = MaskStack(TL);
+    STACKL[STK_X] = MaskStack(STACKL[STK_X]);
+    STACKL[STK_Y] = MaskStack(STACKL[STK_Y]);
+    STACKL[STK_Z] = MaskStack(STACKL[STK_Z]);
+    STACKL[STK_T] = MaskStack(STACKL[STK_T]);
 }
 
 void PROG_binLo(void)
 {
     progMode = PROG_BIN;
     binMode = 0;
-    XL = MaskStack(XL);
-    YL = MaskStack(YL);
-    ZL = MaskStack(ZL);
-    TL = MaskStack(TL);
+    STACKL[STK_X] = MaskStack(STACKL[STK_X]);
+    STACKL[STK_Y] = MaskStack(STACKL[STK_Y]);
+    STACKL[STK_Z] = MaskStack(STACKL[STK_Z]);
+    STACKL[STK_T] = MaskStack(STACKL[STK_T]);
 }
 
 void PROG_shlX(void)
@@ -1043,10 +1043,10 @@ BOOL CALLBACK fnDIALOG_WordSizeProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
             ShowStatus();
 
             Xedit = X_NEW;
-            TL = MaskStack(TL);
-            ZL = MaskStack(ZL);
-            YL = MaskStack(YL);
-            XL = MaskStack(XL);
+            STACKL[STK_T] = MaskStack(STACKL[STK_T]);
+            STACKL[STK_Z] = MaskStack(STACKL[STK_Z]);
+            STACKL[STK_Y] = MaskStack(STACKL[STK_Y]);
+            STACKL[STK_X] = MaskStack(STACKL[STK_X]);
             ShowStack();
 
             return TRUE;

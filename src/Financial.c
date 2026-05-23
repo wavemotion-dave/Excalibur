@@ -180,23 +180,23 @@ void FIN_tax(void)
 
 void FIN_percent(void)
 {
-    StackPush((StackPop() / 100.0F) * X);
+    StackPush((StackPop() / 100.0F) * STACK[STK_X]);
 }
 
 void FIN_percentChg(void)
 {
-    if (Y == 0.0)
+    if (STACK[STK_Y] == 0.0)
         RPN_error("Percent Change:  Y register cannot equal 0");
     else
-        StackPush(100.0F * ((StackPop() - X) / X));
+        StackPush(100.0F * ((StackPop() - STACK[STK_X]) / STACK[STK_X]));
 }
 
 void FIN_percentTot(void)
 {
-    if (Y == 0.0)
+    if (STACK[STK_Y] == 0.0)
         RPN_error("Percent Total:  Y register cannot equal 0");
     else
-        StackPush(100.0F * (StackPop() / X));
+        StackPush(100.0F * (StackPop() / STACK[STK_X]));
 }
 
 void FIN_clearReg(void)
@@ -240,9 +240,9 @@ void FIN_fv(void)
     }
     else if (!wasLastKeyFinReg())
     {
-        FIN[FIN_REG_FV] = X;
+        FIN[FIN_REG_FV] = STACK[STK_X];
         Xedit = X_NEW;
-        blinkXDisplay(0);
+        blinkXDisplay(FALSE);
         return;
     }
 
@@ -263,7 +263,7 @@ void FIN_fv(void)
         fintemp1 = FIN[FIN_REG_PV] * powTerm;
         fintemp2 = FIN[FIN_REG_PMT] * (1.0 + i * payMode) * annuityFactor;
         StackPush((fintemp1 + fintemp2) / -1.0);
-        FIN[FIN_REG_FV] = X;
+        FIN[FIN_REG_FV] = STACK[STK_X];
     }
 }
 
@@ -280,9 +280,9 @@ void FIN_pv(void)
     }
     else if (!wasLastKeyFinReg())
     {
-        FIN[FIN_REG_PV] = X;
+        FIN[FIN_REG_PV] = STACK[STK_X];
         Xedit = X_NEW;
-        blinkXDisplay(0);
+        blinkXDisplay(FALSE);
         return;
     }
 
@@ -302,7 +302,7 @@ void FIN_pv(void)
 
         fintemp1 = -1.0 * FIN[FIN_REG_PMT] * (1.0 + i * payMode) * annuityFactor - FIN[FIN_REG_FV];
         StackPush(fintemp1 / powTerm);
-        FIN[FIN_REG_PV] = X;
+        FIN[FIN_REG_PV] = STACK[STK_X];
     }
 }
 
@@ -465,9 +465,9 @@ void FIN_pmt(void)
     }
     else if (!wasLastKeyFinReg())
     {
-        FIN[FIN_REG_PMT] = X;
+        FIN[FIN_REG_PMT] = STACK[STK_X];
         Xedit = X_NEW;
-        blinkXDisplay(0);
+        blinkXDisplay(FALSE);
         return;
     }
 
@@ -494,7 +494,7 @@ void FIN_pmt(void)
             annuityFactor = (1.0 + i * payMode) * ((powTerm - 1.0) / i);
         }
         StackPush(fintemp1 / annuityFactor);
-        FIN[FIN_REG_PMT] = X;
+        FIN[FIN_REG_PMT] = STACK[STK_X];
     }
 }
 
@@ -535,9 +535,9 @@ void FIN_n(void)
     }
     else if (!wasLastKeyFinReg())
     {
-        FIN[FIN_REG_n] = X;
+        FIN[FIN_REG_n] = STACK[STK_X];
         Xedit = X_NEW;
-        blinkXDisplay(0);
+        blinkXDisplay(FALSE);
         return;
     }
 
@@ -553,7 +553,7 @@ void FIN_n(void)
     if (fabs(f_lo) < 1.0e-12)
     {
         StackPush(0.0);
-        FIN[FIN_REG_n] = X;
+        FIN[FIN_REG_n] = STACK[STK_X];
         return;
     }
 
@@ -568,7 +568,7 @@ void FIN_n(void)
     if (fabs(f_hi) < 1.0e-12)
     {
         StackPush(hi);
-        FIN[FIN_REG_n] = X;
+        FIN[FIN_REG_n] = STACK[STK_X];
         return;
     }
 
@@ -581,7 +581,7 @@ void FIN_n(void)
             if (fabs(f_mid) < 1.0e-12 || (hi - lo) < 1.0e-12)
             {
                 StackPush(mid);
-                FIN[FIN_REG_n] = X;
+                FIN[FIN_REG_n] = STACK[STK_X];
                 found = TRUE;
                 break;
             }
@@ -636,9 +636,9 @@ void FIN_i(void)
     }
     else if (!wasLastKeyFinReg())
     {
-        FIN[FIN_REG_i] = X;
+        FIN[FIN_REG_i] = STACK[STK_X];
         Xedit = X_NEW;
-        blinkXDisplay(0);
+        blinkXDisplay(FALSE);
         return;
     }
 
@@ -654,7 +654,7 @@ void FIN_i(void)
     if (fabs(f_lo) < 1.0e-12)
     {
         StackPush(0.0);
-        FIN[FIN_REG_i] = X;
+        FIN[FIN_REG_i] = STACK[STK_X];
         return;
     }
 
@@ -669,7 +669,7 @@ void FIN_i(void)
     if (fabs(f_hi) < 1.0e-12)
     {
         StackPush(hi * 100.0);
-        FIN[FIN_REG_i] = X;
+        FIN[FIN_REG_i] = STACK[STK_X];
         return;
     }
 
@@ -682,7 +682,7 @@ void FIN_i(void)
             if (fabs(f_mid) < 1.0e-12 || (hi - lo) < 1.0e-12)
             {
                 StackPush(mid * 100.0);
-                FIN[FIN_REG_i] = X;
+                FIN[FIN_REG_i] = STACK[STK_X];
                 found = TRUE;
                 break;
             }
@@ -709,8 +709,8 @@ void FIN_cashFlow0(void)
 {
     CFn = 0;
     FIN[FIN_REG_n] = 0.0;
-    cashFlow[CFn] = X;
-    blinkXDisplay(0);
+    cashFlow[CFn] = STACK[STK_X];
+    blinkXDisplay(FALSE);
 }
 
 void FIN_cashFlowj(void)
@@ -723,8 +723,8 @@ void FIN_cashFlowj(void)
     {
         CFn++;
         FIN[FIN_REG_n] = CFn;
-        cashFlow[CFn] = X;
-        blinkXDisplay(0);
+        cashFlow[CFn] = STACK[STK_X];
+        blinkXDisplay(FALSE);
     }
 }
 
@@ -732,9 +732,9 @@ void FIN_cashFlowNj(void)
 {
     int loop, finalLoop;
 
-    blinkXDisplay(0);
+    blinkXDisplay(FALSE);
 
-    finalLoop = (int) X - 1;
+    finalLoop = (int) STACK[STK_X] - 1;
     if (finalLoop < 0)
         finalLoop = 0;
     if (CFn < 1)
@@ -986,7 +986,7 @@ void FIN_today(void)
     else
         sprintf(finTmpStr, "%d.%02d%04d", day, month, year);
     if (Xedit == X_ENTER)
-        X = (double) atof(finTmpStr);
+        STACK[STK_X] = (double) atof(finTmpStr);
     else
         StackPush((double) atof(finTmpStr));
 }
@@ -1004,9 +1004,9 @@ void FIN_muc(void)
     }
     else if (!wasLastKeyFinReg())
     {
-        FIN[FIN_REG_MUC] = X;
+        FIN[FIN_REG_MUC] = STACK[STK_X];
         Xedit = X_NEW;
-        blinkXDisplay(0);
+        blinkXDisplay(FALSE);
         return;
     }
 
@@ -1018,7 +1018,7 @@ void FIN_muc(void)
         muc = (FIN[FIN_REG_PRICE] - FIN[FIN_REG_COST]) / FIN[FIN_REG_COST];
         muc = muc * 100.0;
         StackPush(muc);
-        FIN[FIN_REG_MUC] = X;
+        FIN[FIN_REG_MUC] = STACK[STK_X];
     }
 }
 
@@ -1034,9 +1034,9 @@ void FIN_mup(void)
     }
     else if (!wasLastKeyFinReg())
     {
-        FIN[FIN_REG_MUP] = X;
+        FIN[FIN_REG_MUP] = STACK[STK_X];
         Xedit = X_NEW;
-        blinkXDisplay(0);
+        blinkXDisplay(FALSE);
         return;
     }
 
@@ -1048,7 +1048,7 @@ void FIN_mup(void)
         muc = (FIN[FIN_REG_PRICE] - FIN[FIN_REG_COST]) / FIN[FIN_REG_PRICE];
         muc = muc * 100.0;
         StackPush(muc);
-        FIN[FIN_REG_MUP] = X;
+        FIN[FIN_REG_MUP] = STACK[STK_X];
     }
 }
 
@@ -1064,9 +1064,9 @@ void FIN_cost(void)
     }
     else if (!wasLastKeyFinReg())
     {
-        FIN[FIN_REG_COST] = X;
+        FIN[FIN_REG_COST] = STACK[STK_X];
         Xedit = X_NEW;
-        blinkXDisplay(0);
+        blinkXDisplay(FALSE);
         return;
     }
 
@@ -1075,7 +1075,7 @@ void FIN_cost(void)
     else
         cost = FIN[FIN_REG_PRICE] * (1.0 - (FIN[FIN_REG_MUP] / 100.0));
     StackPush(cost);
-    FIN[FIN_REG_COST] = X;
+    FIN[FIN_REG_COST] = STACK[STK_X];
 }
 
 void FIN_price(void)
@@ -1090,9 +1090,9 @@ void FIN_price(void)
     }
     else if (!wasLastKeyFinReg())
     {
-        FIN[FIN_REG_PRICE] = X;
+        FIN[FIN_REG_PRICE] = STACK[STK_X];
         Xedit = X_NEW;
-        blinkXDisplay(0);
+        blinkXDisplay(FALSE);
         return;
     }
 
@@ -1101,7 +1101,7 @@ void FIN_price(void)
     else
         price = FIN[FIN_REG_COST] / (1.0 - (FIN[FIN_REG_MUP] / 100.0));
     StackPush(price);
-    FIN[FIN_REG_PRICE] = X;
+    FIN[FIN_REG_PRICE] = STACK[STK_X];
 }
 
 extern BOOL CALLBACK fnDIALOG_FinancialProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);

@@ -47,7 +47,7 @@ void PushConstant(double value)
     int i, startPos;
 
     if (Xedit == X_ENTER)
-        X = (double) value;
+        STACK[STK_X] = (double) value;
     else
         StackPush((double) value);
 
