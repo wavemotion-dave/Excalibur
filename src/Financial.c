@@ -71,9 +71,6 @@ char finRegDesc[FIN_REG_MAX][18] = {
     "Price(markup)",
 };
 
-double cashFlow[MAX_CF];
-uint8_t CFn;
-
 char finTmpStr[64];
 
 extern void FIN_tax(void);

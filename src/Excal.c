@@ -45,7 +45,7 @@
 #define VERSION_STR "v3.XX-04"
 
 #define ABOUT_MSG "Excalibur for Windows 32-bit\n"                    \
-                  "Version 3.XX-04  -  May 22, 2026\n\n"              \
+                  "Version 3.XX-04  -  May 25, 2026\n\n"              \
                   "Copyright 1994-2026 David Bernazzani\n\n"          \
                   "Please read the disclaimer and understand the\n"   \
                   "accuracy and precision issues before using.\n\n"   \
@@ -55,7 +55,7 @@
                   "\n\nThis version is BETA - Expect and report Bugs!"
 
 #define CONFIG_VERSION_MAIN 0xF00A  // If this changes, we wipe EVERYTHING
-#define CONFIG_VERSION_SUB  0xF003  // If this changes, we reset x,y window position and reset constant tables (currency, physics constants, etc)
+#define CONFIG_VERSION_SUB  0xF004  // If this changes, we reset x,y window position and reset constant tables (currency, physics constants, etc)
 
 #define END_OF_PROGRAM_STR "<End Of Program>"
 #define PROGRAM_ASSIGNED_KEY_STR "Program Assigned Key"
@@ -152,26 +152,28 @@ uint64_t stackPops = 0;   // Total number of Stack Pops
 uint32_t inFocusTime = 0; // Number of minutes Excalibur window in 'focus'
 
 // A number of status registers for various modes and functions
-uint8_t AngleMode = 0;          // 0=Degrees, 1=Radians, 2=Gradients
-uint8_t commaMode = 1;          // 0=International, 1=American
-uint8_t eexMode = 1;            // 0=EEX, 1=E
-uint8_t numLockMode = 1;        // Turn on NumLock when program starts?
-uint8_t toolTipsOn = 1;         // Enable tooltips?
-uint8_t extendedStack = 0;      // Standard Stack is 4 deep. Extended is 8 deep.
-uint8_t footPrint = 0;          // Classic layout by default
-uint8_t popFillZero = 0;        // T register fills with zero?
-int32_t lastChosenConst = 0;    // Last chosen constant
-int32_t lastConstBank = 0;      // Last chosen constant bank
-int32_t decimal_places = 13;    // Default decimal places
-uint8_t sci_format = 'g';       // Default scientific display format
+uint8_t  AngleMode = 0;         // 0=Degrees, 1=Radians, 2=Gradients
+uint8_t  commaMode = 1;         // 0=International, 1=US (commas vs periods for decimal and thousand separators)
+uint8_t  eexMode = 1;           // 0=EEX, 1=E, CHS vs +/-
+uint8_t  numLockMode = 1;       // Turn on NumLock when program starts?
+uint8_t  toolTipsOn = 1;        // Enable tooltips?
+uint8_t  extendedStack = 0;     // Standard Stack is 4 deep. Extended is 8 deep.
+uint8_t  footPrint = 0;         // Classic layout by default
+uint8_t  popFillZero = 0;       // T register fills with zero?
+int32_t  lastChosenConst = 0;   // Last chosen constant
+int32_t  lastConstBank = 0;     // Last chosen constant bank
+int32_t  decimal_places = 13;   // Default decimal places
+uint8_t  sci_format = 'g';      // Default scientific display format
 uint32_t indirectRegister = 0;  // For programming - (i) register
-uint8_t progMode = PROG_FLOAT;  // Normal floating-point mode
+uint8_t  progMode = PROG_FLOAT; // Normal floating-point mode (vs HEX, DEC, OCT, BIN)
 uint16_t lastUniqueIndex = 0;   // Index of the last function that was called (useful in Financial Register handling)
 
 // Various storage arrays for RPN use
 double STO[MAX_STO];             // Storage registers R0-R99
 double SUM[SUM_MAX];             // Statistics registers for the Financial bank
-char excaliburNotes[NOTES_SIZE]; // A small scratchpad for the user to jot down some info
+double cashFlow[MAX_CF];         // Cash flow registers for the Financial bank
+uint8_t CFn;                     // Number of cash flows currently entered (for financial functions that use cash flow registers)
+char excaliburNotes[NOTES_SIZE]; // A small scratchpad for the user to jot down some info (preserved on program exit)
 
 // ---------------------------------------------------------------------------------------------
 // This is the mapping from unique index to function for playback and macro recording purposes.
@@ -202,16 +204,16 @@ struct funcStruct *lastFuncs = (struct funcStruct *)&Scientific_funcs;
 
 uint32_t slowTimer = 0; // Ticks at roughly 300ms intervals
 
-#define MIN_WINDOW_WIDTH 5
-#define MIN_WINDOW_HEIGHT 5
-#define MAX_WINDOW_X 2000
-#define MAX_WINDOW_Y 2000
-#define MIN_WINDOW_X 0
-#define MIN_WINDOW_Y 0
+#define MIN_WINDOW_WIDTH    5
+#define MIN_WINDOW_HEIGHT   5
+#define MAX_WINDOW_X        2000
+#define MAX_WINDOW_Y        2000
+#define MIN_WINDOW_X        0
+#define MIN_WINDOW_Y        0
 
 // This will force a "default" size...
-int32_t main_x = -1;
-int32_t main_y = 50;
+int32_t main_x  = -1;
+int32_t main_y  = 50;
 int32_t main_cx = 100;
 int32_t main_cy = 100;
 
@@ -225,7 +227,7 @@ HINSTANCE hExcaliburInstance; // The global instance of Excalibur (assigned by t
 HWND calcMainWindow;          // A handle to the Main Window
 HMENU hMainMenu;              // A handle to the Main Menu
 
-// Brushes that we need for this application.
+// Brushes that we need for this application to paint backgrounds
 static HBRUSH backgroundBrush;
 static HBRUSH helpWindowBackgroundBrush;
 
@@ -5556,6 +5558,8 @@ void RPN_endConst(void)
                        "CTRL A     Copy All Registers to the clipboard.\n"                          \
                        "CTRL V     Paste X Register from the clipboard.\n"                          \
                        "CTRL X     Exits Excalibur (same as pressing the Close icon).\n"            \
+                       "\n"                                                                         \
+                       "Right Click on any key to provide short context help for that function.\n"  \
                        ""
 
 extern BOOL CALLBACK HelpDialog(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
@@ -5588,7 +5592,7 @@ BOOL CALLBACK HelpDialog(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
         SelectObject(hdc, hFixedFont);
         dw = GetTextExtentPoint32(hdc, "WWWWW88888OOOOOXXXXXWWWWW88888OOOOOXXXXXWWWWW88888OOOOOXXXXXOOOOOXXXXXXX", 72, &lpSize);
         ReleaseDC(hDlg, hdc);
-        MoveWindow(hDlg, main_x + 100, main_y + 5, lpSize.cx + 60, (lpSize.cy * 29) + 12, TRUE);
+        MoveWindow(hDlg, main_x + 100, main_y + 5, lpSize.cx + 60, (lpSize.cy * 31) + 12, TRUE);
 
         return TRUE;
 

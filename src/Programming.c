@@ -845,6 +845,8 @@ double getNewDebugVal(void)
 }
 
 
+static uint32_t last_debug_register_checksum = 0xFFFFBEEF;
+
 BOOL CALLBACK debugWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     LRESULT item;
@@ -852,6 +854,7 @@ BOOL CALLBACK debugWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam
      switch(message)
      {
      case WM_INITDIALOG:
+          last_debug_register_checksum = 0xFFFFBEEF;
           return TRUE;
 
      case WM_SIZE:
@@ -987,7 +990,6 @@ void UpdateDebugRegs(void)
     SendMessage(GetDlgItem(debugTraceWindow, TRACE_REGS2), WM_SETFONT, (WPARAM) hFixedFont, FALSE);
 
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_RESETCONTENT, 0, 0);
-    SendDlgItemMessage(debugTraceWindow, TRACE_REGS2, LB_RESETCONTENT, 0, 0);
 
     sprintf(tmp, " Extended Stack");
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
@@ -1084,6 +1086,7 @@ void UpdateDebugRegs(void)
     makeInternational(tmp);
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
+
     for (i = 0; i < MAX_CF; i++)
     {
         sprintf(tmp, " CF[%2d]:%-16.11g", i, cashFlow[i]);
@@ -1091,11 +1094,31 @@ void UpdateDebugRegs(void)
         SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
     }
 
-    for (i = 0; i < MAX_STO; i++)
+    // ------------------------------------------------------------------------
+    // Block for local vars... Here we don't want to update the entire 100
+    // registers if they haven't changed. So we do a simple checksum and see.
+    // ------------------------------------------------------------------------
     {
-        sprintf(tmp, " R%02d: %-18.11g", i, STO[i]);
-        makeInternational(tmp);
-        SendDlgItemMessage(debugTraceWindow, TRACE_REGS2, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+        uint32_t debug_register_checksum = 0;
+        uint8_t *ptr = (uint8_t *)STO;
+
+        for (i = 0; i < sizeof(STO); i++)    
+        {
+            debug_register_checksum += *ptr++;
+        }
+
+        if (debug_register_checksum != last_debug_register_checksum)
+        {
+            last_debug_register_checksum = debug_register_checksum;
+            SendDlgItemMessage(debugTraceWindow, TRACE_REGS2, LB_RESETCONTENT, 0, 0);
+
+            for (i = 0; i < MAX_STO; i++)
+            {
+                sprintf(tmp, " R%02d: %-18.11g", i, STO[i]);
+                makeInternational(tmp);
+                SendDlgItemMessage(debugTraceWindow, TRACE_REGS2, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+            }
+        }
     }
 }
 
