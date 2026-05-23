@@ -695,7 +695,7 @@ void Macro_RclInd(void)
         if (progMode == PROG_FLOAT)
             X = indirectRegister;
         else
-            XL = maskStackStuff((PROG_LONG) indirectRegister);
+            XL = MaskStack((PROG_LONG) indirectRegister);
     }
     else
     {

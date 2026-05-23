@@ -2346,25 +2346,25 @@ void ShowStack(void)
     {
         if (Xedit == X_EDIT)
         {
-            XL = MakeProgStr(Xstr);
+            XL = ConvertCompSciStrTo64(Xstr);
         }
 
-        MakeRadixStr(XL, stackStr);
+        MakeCompSciStr(XL, stackStr);
         sprintf(tmpStr, (bExactFont ? "%23s%c%c" : "%20s%c%c"), stackStr, Radix(progMode), RadixBIN(progMode));
         SetDlgItemText(calcMainWindow, RPN_STACK_X, tmpStr);
 
-        MakeRadixStr(YL, stackStr);
+        MakeCompSciStr(YL, stackStr);
         sprintf(tmpStr, (bExactFont ? "%23s%c%c" : "%20s%c%c"), stackStr, Radix(progMode), RadixBIN(progMode));
         SetDlgItemText(calcMainWindow, RPN_STACK_Y, tmpStr);
 
         // Show Z and T registers provided we haven't repurposed them above...
         if (recModeON == 0 && traceMacroPlayback == FALSE)
         {
-            MakeRadixStr(ZL, stackStr);
+            MakeCompSciStr(ZL, stackStr);
             sprintf(tmpStr, (bExactFont ? "%23s%c%c" : "%20s%c%c"), stackStr, Radix(progMode), RadixBIN(progMode));
             SetDlgItemText(calcMainWindow, RPN_STACK_Z, tmpStr);
 
-            MakeRadixStr(TL, stackStr);
+            MakeCompSciStr(TL, stackStr);
             sprintf(tmpStr, (bExactFont ? "%23s%c%c" : "%20s%c%c"), stackStr, Radix(progMode), RadixBIN(progMode));
             SetDlgItemText(calcMainWindow, RPN_STACK_T, tmpStr);
         }
@@ -2713,7 +2713,7 @@ void RPN_digit(WPARAM key)
                 Xedit = X_NEW;
         }
 
-        XL = maskStackStuff((PROG_LONG)X);
+        XL = MaskStack((PROG_LONG)X);
         RPN_ClearModifiers(!macroPlayback);
         return;
     }
@@ -2773,7 +2773,7 @@ void RPN_digit(WPARAM key)
         else
             X = 0.0;
     }
-    XL = MakeProgStr(Xstr);
+    XL = ConvertCompSciStrTo64(Xstr);
 
     RPN_ClearModifiers(!macroPlayback);
     Xedit = X_EDIT;
@@ -4769,7 +4769,7 @@ BOOL CALLBACK fnDIALOG_ShowStack(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
         }
         else
         {
-            sprintf(tmp, "%ld", XL);
+            MakeCompSciStr(XL, tmp);
         }
         makeInternational(tmp);
         SetDlgItemText(hDlg, IDC_SHOW_X, tmp);
@@ -4780,7 +4780,7 @@ BOOL CALLBACK fnDIALOG_ShowStack(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
         }
         else
         {
-            sprintf(tmp, "%ld", YL);
+            MakeCompSciStr(YL, tmp);
         }
         makeInternational(tmp);
         SetDlgItemText(hDlg, IDC_SHOW_Y, tmp);
@@ -4791,7 +4791,7 @@ BOOL CALLBACK fnDIALOG_ShowStack(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
         }
         else
         {
-            sprintf(tmp, "%ld", ZL);
+            MakeCompSciStr(ZL, tmp);
         }
         makeInternational(tmp);
         SetDlgItemText(hDlg, IDC_SHOW_Z, tmp);
@@ -4802,7 +4802,7 @@ BOOL CALLBACK fnDIALOG_ShowStack(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
         }
         else
         {
-            sprintf(tmp, "%ld", TL);
+            MakeCompSciStr(TL, tmp);
         }
         makeInternational(tmp);
         SetDlgItemText(hDlg, IDC_SHOW_T, tmp);
@@ -4814,7 +4814,7 @@ BOOL CALLBACK fnDIALOG_ShowStack(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
         }
         else
         {
-            sprintf(tmp, "%ld", DL);
+            MakeCompSciStr(DL, tmp);
         }
         makeInternational(tmp);
         SetDlgItemText(hDlg, IDC_SHOW_D, tmp);
@@ -4825,7 +4825,7 @@ BOOL CALLBACK fnDIALOG_ShowStack(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
         }
         else
         {
-            sprintf(tmp, "%ld", CL);
+            MakeCompSciStr(CL, tmp);
         }
         makeInternational(tmp);
         SetDlgItemText(hDlg, IDC_SHOW_C, tmp);
@@ -4836,7 +4836,7 @@ BOOL CALLBACK fnDIALOG_ShowStack(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
         }
         else
         {
-            sprintf(tmp, "%ld", BL);
+            MakeCompSciStr(BL, tmp);
         }
         makeInternational(tmp);
         SetDlgItemText(hDlg, IDC_SHOW_B, tmp);
@@ -4847,7 +4847,7 @@ BOOL CALLBACK fnDIALOG_ShowStack(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
         }
         else
         {
-            sprintf(tmp, "%ld", AL);
+            MakeCompSciStr(AL, tmp);
         }
         makeInternational(tmp);
         SetDlgItemText(hDlg, IDC_SHOW_A, tmp);

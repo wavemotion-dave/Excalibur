@@ -166,7 +166,13 @@ void PutHexSpaces(char *str)
     str[out_len] = CNULL;
 }
 
-void MakeRadixStr(PROG_LONG val, char *tmpL)
+// ---------------------------------------------------------------------------------------------------
+// This routine takes a long value and converts it to a string based on the current programming mode.
+// It also adds spaces for hex mode and commas for decimal mode as needed.  The resulting string is 
+// returned in tmpL which should be at least 60 characters long to be safe.  This routine is used 
+// by the computer science mode display and also by the stack display when in Comp-Sci mode.
+// ---------------------------------------------------------------------------------------------------
+void MakeCompSciStr(PROG_LONG val, char *tmpL)
 {
     char temp[60];
     char temp2[60];
@@ -259,13 +265,13 @@ void MakeRadixStr(PROG_LONG val, char *tmpL)
 }
 
 
-PROG_LONG MakeProgStr(char *str)
+PROG_LONG ConvertCompSciStrTo64(char *str)
 {
     char *tmpPtr;
     return(strtoi64(str, &tmpPtr, progMode));
 }
 
-PROG_LONG maskStackStuff(PROG_LONG lng)
+PROG_LONG MaskStack(PROG_LONG lng)
 {
     PROG_LONG mask;
 
@@ -287,16 +293,16 @@ void StackPushL(PROG_LONG temp)
 
     if (extendedStack)
     {
-        DL = maskStackStuff(CL);
-        CL = maskStackStuff(BL);
-        BL = maskStackStuff(AL);
-        AL = maskStackStuff(TL);
+        DL = MaskStack(CL);
+        CL = MaskStack(BL);
+        BL = MaskStack(AL);
+        AL = MaskStack(TL);
     }
 
-    TL = maskStackStuff(ZL);
-    ZL = maskStackStuff(YL);
-    YL = maskStackStuff(XL);
-    XL = maskStackStuff(temp);
+    TL = MaskStack(ZL);
+    ZL = MaskStack(YL);
+    YL = MaskStack(XL);
+    XL = MaskStack(temp);
 
     LongsToFloats();
 }
@@ -305,23 +311,23 @@ PROG_LONG StackPopL(void)
 {
     PROG_LONG temp;
     stackPops++;
-    temp = maskStackStuff(XL);
-    XL = maskStackStuff(YL);
-    YL = maskStackStuff(ZL);
-    ZL = maskStackStuff(TL);
+    temp = MaskStack(XL);
+    XL = MaskStack(YL);
+    YL = MaskStack(ZL);
+    ZL = MaskStack(TL);
     if (extendedStack)
     {
-        TL = maskStackStuff(AL);
-        AL = maskStackStuff(BL);
-        BL = maskStackStuff(CL);
-        CL = maskStackStuff(DL);
+        TL = MaskStack(AL);
+        AL = MaskStack(BL);
+        BL = MaskStack(CL);
+        CL = MaskStack(DL);
         if (popFillZero != 0)
-            DL = maskStackStuff(0L);
+            DL = MaskStack(0L);
     }
     else
     {
         if (popFillZero != 0)
-            TL = maskStackStuff(0L);
+            TL = MaskStack(0L);
     }
 
     LongsToFloats();
@@ -337,38 +343,38 @@ PROG_LONG StackPopL(void)
 void PROG_hex(void)
 {
     progMode = PROG_HEX;
-    XL = maskStackStuff(XL);
-    YL = maskStackStuff(YL);
-    ZL = maskStackStuff(ZL);
-    TL = maskStackStuff(TL);
+    XL = MaskStack(XL);
+    YL = MaskStack(YL);
+    ZL = MaskStack(ZL);
+    TL = MaskStack(TL);
 }
 
 void PROG_bin(void)
 {
     progMode = PROG_BIN;
     binMode = 0;
-    XL = maskStackStuff(XL);
-    YL = maskStackStuff(YL);
-    ZL = maskStackStuff(ZL);
-    TL = maskStackStuff(TL);
+    XL = MaskStack(XL);
+    YL = MaskStack(YL);
+    ZL = MaskStack(ZL);
+    TL = MaskStack(TL);
 }
 
 void PROG_oct(void)
 {
     progMode = PROG_OCT;
-    XL = maskStackStuff(XL);
-    YL = maskStackStuff(YL);
-    ZL = maskStackStuff(ZL);
-    TL = maskStackStuff(TL);
+    XL = MaskStack(XL);
+    YL = MaskStack(YL);
+    ZL = MaskStack(ZL);
+    TL = MaskStack(TL);
 }
 
 void PROG_dec(void)
 {
     progMode = PROG_DEC;
-    XL = maskStackStuff(XL);
-    YL = maskStackStuff(YL);
-    ZL = maskStackStuff(ZL);
-    TL = maskStackStuff(TL);
+    XL = MaskStack(XL);
+    YL = MaskStack(YL);
+    ZL = MaskStack(ZL);
+    TL = MaskStack(TL);
 }
 
 void PROG_hexA(void)
@@ -391,7 +397,7 @@ void PROG_hexA(void)
                 strcat(Xstr, "A");
             }
         }
-        XL = MakeProgStr(Xstr);
+        XL = ConvertCompSciStrTo64(Xstr);
         Xedit = X_EDIT;
     }
 }
@@ -416,7 +422,7 @@ void PROG_hexB(void)
                 strcat(Xstr, "B");
             }
         }
-        XL = MakeProgStr(Xstr);
+        XL = ConvertCompSciStrTo64(Xstr);
         Xedit = X_EDIT;
     }
 }
@@ -442,7 +448,7 @@ void PROG_hexC(void)
             }
         }
 
-        XL = MakeProgStr(Xstr);
+        XL = ConvertCompSciStrTo64(Xstr);
         Xedit = X_EDIT;
     }
 }
@@ -468,7 +474,7 @@ void PROG_hexD(void)
             }
         }
 
-        XL = MakeProgStr(Xstr);
+        XL = ConvertCompSciStrTo64(Xstr);
         Xedit = X_EDIT;
     }
 }
@@ -493,7 +499,7 @@ void PROG_hexE(void)
                 strcat(Xstr, "E");
             }
         }
-        XL = MakeProgStr(Xstr);
+        XL = ConvertCompSciStrTo64(Xstr);
         Xedit = X_EDIT;
     }
 }
@@ -518,7 +524,7 @@ void PROG_hexF(void)
                 strcat(Xstr, "F");
             }
         }
-        XL = MakeProgStr(Xstr);
+        XL = ConvertCompSciStrTo64(Xstr);
         Xedit = X_EDIT;
     }
 }
@@ -745,20 +751,20 @@ void PROG_binHi(void)
 {
     progMode = PROG_BIN;
     binMode = 1;
-    XL = maskStackStuff(XL);
-    YL = maskStackStuff(YL);
-    ZL = maskStackStuff(ZL);
-    TL = maskStackStuff(TL);
+    XL = MaskStack(XL);
+    YL = MaskStack(YL);
+    ZL = MaskStack(ZL);
+    TL = MaskStack(TL);
 }
 
 void PROG_binLo(void)
 {
     progMode = PROG_BIN;
     binMode = 0;
-    XL = maskStackStuff(XL);
-    YL = maskStackStuff(YL);
-    ZL = maskStackStuff(ZL);
-    TL = maskStackStuff(TL);
+    XL = MaskStack(XL);
+    YL = MaskStack(YL);
+    ZL = MaskStack(ZL);
+    TL = MaskStack(TL);
 }
 
 void PROG_shlX(void)
@@ -1037,10 +1043,10 @@ BOOL CALLBACK fnDIALOG_WordSizeProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
             ShowStatus();
 
             Xedit = X_NEW;
-            TL = maskStackStuff(TL);
-            ZL = maskStackStuff(ZL);
-            YL = maskStackStuff(YL);
-            XL = maskStackStuff(XL);
+            TL = MaskStack(TL);
+            ZL = MaskStack(ZL);
+            YL = MaskStack(YL);
+            XL = MaskStack(XL);
             ShowStack();
 
             return TRUE;
