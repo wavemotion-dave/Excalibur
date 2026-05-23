@@ -170,7 +170,7 @@ uint16_t lastUniqueIndex = 0;   // Index of the last function that was called (u
 
 // Various storage arrays for RPN use
 double STO[MAX_STO];             // Storage registers R0-R99
-double SUM[SUM_MAX];             // Statistics registers for the Financial bank
+double SUM[SUM_MAX];             // Statistics registers for the Statistics bank
 double cashFlow[MAX_CF];         // Cash flow registers for the Financial bank
 uint8_t CFn;                     // Number of cash flows currently entered (for financial functions that use cash flow registers)
 char excaliburNotes[NOTES_SIZE]; // A small scratchpad for the user to jot down some info (preserved on program exit)
@@ -996,8 +996,8 @@ void SelectNewBank(struct funcStruct *funcs)
     // ------------------------------------------------------------------------------------------------
     if (currentFuncs == (struct funcStruct *)&CompSci_funcs || progMode != PROG_FLOAT)
     {
-        if ((funcs != (struct funcStruct *)&Program1_funcs) && 
-            (funcs != (struct funcStruct *)&Program2_funcs) && 
+        if ((funcs != (struct funcStruct *)&Program1_funcs) &&
+            (funcs != (struct funcStruct *)&Program2_funcs) &&
             (funcs != (struct funcStruct *)&CompSci_funcs))
         {
             LongsToFloats();
@@ -1834,7 +1834,7 @@ struct funcStruct RPNkeys[] = {
     {RPN_PLAYBACK,  UNI_PLAY,   USES_FL, NORECORD, 'p', "", NO_L,   X_NEW,      RPN_Playback,       "Run Program",          "Run the the currently loaded program."},
     {RPN_DROP,      UNI_DROP,   USES_FL, ALLOWREC, 'd', "", YES_L,  X_NEW,      RPN_drop,           "Drop Stack",           "Drops the X register and the rest of stack shifts down."},
     {RPN_LARG,      UNI_LARG,   USES_FL, ALLOWREC, ' ', "", NO_L,   X_NEW,      RPN_larg,           "Last Arguments",       "Retrieves the last X and Y pair before last operation."},
-    {RPN_FRAC,      UNI_FRAC,   USES_FL, ALLOWREC, ' ', "", NO_L,   X_EDIT,     RPN_frac,           "Fraction Bar",         "Insert Fraction to current X edit"},
+    {RPN_SHOW,      UNI_SHOW,   USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_show,           "Show Values",          "Show Full Stack, Registers, Statistics, etc."},
     {RPN_EDIT,      UNI_EDIT,   USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_edit,           "Edit X Register",      "Used to place the X register back in edit mode if it is not already."},
     {RPN_POW,       UNI_POW,    USES_FL, ALLOWREC, '^', "", YES_L,  X_NEW,      RPN_pow,            "Raise to Power",       "Raise Y to the power of X"},
     {RPN_NOTES,     UNI_NOTES,  USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_Notes,          "Excalibur Notepad",    "Allows some simple notes to be stored/saved."},
@@ -1889,7 +1889,7 @@ struct keyPosStruct RPNkeyPos[] = {
     {RPN_PLAYBACK   ,0,     0},
     {RPN_DROP       ,0,     0},
     {RPN_LARG       ,0,     0},
-    {RPN_FRAC       ,0,     0},
+    {RPN_SHOW       ,0,     0},
     {RPN_EDIT       ,0,     0},
     {RPN_POW        ,0,     0},
     {RPN_NOTES      ,0,     0},
@@ -2463,7 +2463,7 @@ void RPN_clearStack(void)
             memset(STO, 0x00, sizeof(STO));
             memset(cashFlow, 0x00, sizeof(cashFlow));
             memset(SUM, 0x00, sizeof(SUM));
-            memset(fin_reg, 0x00, sizeof(fin_reg));
+            memset(FIN, 0x00, sizeof(FIN));
             CFn = 0;
 
             GetDlgItemText(calcMainWindow, RPN_STACK_X, savedStr, MAX_STACK_STRLEN);
@@ -3543,11 +3543,11 @@ void SaveToDisk(void)
         fwrite(&decimal_places,     sizeof(decimal_places),     1, outfile);
         fwrite(&sci_format,         sizeof(sci_format),         1, outfile);
         fwrite(&numberDisplayMode,  sizeof(numberDisplayMode),  1, outfile);
-        fwrite(&lastProgMode,       sizeof(lastProgMode),       1, outfile);        
+        fwrite(&lastProgMode,       sizeof(lastProgMode),       1, outfile);
         fwrite(&padZeros,           sizeof(padZeros),           1, outfile);
         fwrite(&wordSize,           sizeof(wordSize),           1, outfile);
         fwrite(&wordMode,           sizeof(wordMode),           1, outfile);
-        fwrite(&hexSpacing,         sizeof(hexSpacing),         1, outfile);        
+        fwrite(&hexSpacing,         sizeof(hexSpacing),         1, outfile);
         fwrite(&wordSizeMask,       sizeof(wordSizeMask),       1, outfile);
 
         fwrite(&X,                  sizeof(X),                  1, outfile);
@@ -3556,7 +3556,7 @@ void SaveToDisk(void)
         fwrite(&T,                  sizeof(T),                  1, outfile);
         fwrite(&LASTX,              sizeof(LASTX),              1, outfile);
         fwrite(&LASTY,              sizeof(LASTY),              1, outfile);
-        fwrite(&lastFloat,          sizeof(lastFloat),          1, outfile);        
+        fwrite(&lastFloat,          sizeof(lastFloat),          1, outfile);
 
         fwrite(&XL,                 sizeof(XL),                 1, outfile);
         fwrite(&YL,                 sizeof(YL),                 1, outfile);
@@ -3576,7 +3576,7 @@ void SaveToDisk(void)
 
         fwrite(&STO,                sizeof(STO),                1, outfile);
         fwrite(&SUM,                sizeof(SUM),                1, outfile);
-        fwrite(&fin_reg,            sizeof(fin_reg),            1, outfile);
+        fwrite(&FIN,                sizeof(FIN),                1, outfile);
         fwrite(&cashFlow,           sizeof(cashFlow),           1, outfile);
         fwrite(&CFn,                sizeof(CFn),                1, outfile);
 
@@ -3676,7 +3676,7 @@ void ReadFromDisk(void)
         fread(&padZeros,           sizeof(padZeros),           1, infile);
         fread(&wordSize,           sizeof(wordSize),           1, infile);
         fread(&wordMode,           sizeof(wordMode),           1, infile);
-        fread(&hexSpacing,         sizeof(hexSpacing),         1, infile);        
+        fread(&hexSpacing,         sizeof(hexSpacing),         1, infile);
         fread(&wordSizeMask,       sizeof(wordSizeMask),       1, infile);
 
         fread(&X,                  sizeof(X),                  1, infile);
@@ -3685,7 +3685,7 @@ void ReadFromDisk(void)
         fread(&T,                  sizeof(T),                  1, infile);
         fread(&LASTX,              sizeof(LASTX),              1, infile);
         fread(&LASTY,              sizeof(LASTY),              1, infile);
-        fread(&lastFloat,          sizeof(lastFloat),          1, infile);        
+        fread(&lastFloat,          sizeof(lastFloat),          1, infile);
 
         fread(&XL,                 sizeof(XL),                 1, infile);
         fread(&YL,                 sizeof(YL),                 1, infile);
@@ -3705,7 +3705,7 @@ void ReadFromDisk(void)
 
         fread(&STO,                sizeof(STO),                1, infile);
         fread(&SUM,                sizeof(SUM),                1, infile);
-        fread(&fin_reg,            sizeof(fin_reg),            1, infile);
+        fread(&FIN,                sizeof(FIN),                1, infile);
         fread(&cashFlow,           sizeof(cashFlow),           1, infile);
         fread(&CFn,                sizeof(CFn),                1, infile);
 
@@ -4733,38 +4733,172 @@ void RPN_larg(void) // drop the stack
     }
 }
 
-void RPN_frac(void)
-{
-    int i;
 
-    if (progMode == PROG_FLOAT)
+BOOL CALLBACK fnDIALOG_ShowStack(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
+void RPN_show(void)
+{
+    DLGPROC lpfnDIALOG_ShowStack;
+
+    lpfnDIALOG_ShowStack = (DLGPROC)MakeProcInstance((FARPROC)fnDIALOG_ShowStack, hExcaliburInstance);
+
+    if ((DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_SHOW", calcMainWindow, lpfnDIALOG_ShowStack)) == -1)
     {
-        if (Xedit == X_NEW)
+        MessageBox(NULL, "Unable to display dialog", "System Error", MB_SYSTEMMODAL | MB_ICONHAND | MB_OK);
+    }
+    FreeProcInstance((FARPROC)lpfnDIALOG_ShowStack);
+    ShowStatus();
+}
+
+BOOL CALLBACK fnDIALOG_ShowStack(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
+{
+    char tmp[64];
+    WORD i;
+
+    switch (wMessage)
+    {
+    case WM_INITDIALOG:
+        for (i=101; i<250; i++) // Set fixed font for all number outputs...
         {
-            StackPush(0.0);
-            strcpy(Xstr, "0/");
+            SendMessage(GetDlgItem(hDlg, i), WM_SETFONT, (WPARAM) hFixedFont, FALSE);
         }
-        else if (Xedit == X_ENTER)
+
+        // Main Stack - might be floats or longs
+        if (progMode == PROG_FLOAT)
         {
-            strcpy(Xstr, "0/");
+            sprintf(tmp, "%-.14g", X);
         }
         else
         {
-            if (strchr(Xstr, '~') == NULL)
-            {
-                for (i = 0; i < (int)strlen(Xstr); i++)
-                {
-                    if ((Xstr[i] == '.') || (Xstr[i] == '/'))
-                    {
-                        Xstr[i] = '~';
-                    }
-                }
-                Xstr[strlen(Xstr) + 1] = (char)NULL;
-                Xstr[strlen(Xstr)] = '/';
-            }
+            sprintf(tmp, "%ld", XL);
+        }
+        makeInternational(tmp);
+        SetDlgItemText(hDlg, IDC_SHOW_X, tmp);
+
+        if (progMode == PROG_FLOAT)
+        {
+            sprintf(tmp, "%-.14g", Y);
+        }
+        else
+        {
+            sprintf(tmp, "%ld", YL);
+        }
+        makeInternational(tmp);
+        SetDlgItemText(hDlg, IDC_SHOW_Y, tmp);
+
+        if (progMode == PROG_FLOAT)
+        {
+            sprintf(tmp, "%-.14g", Z);
+        }
+        else
+        {
+            sprintf(tmp, "%ld", ZL);
+        }
+        makeInternational(tmp);
+        SetDlgItemText(hDlg, IDC_SHOW_Z, tmp);
+
+        if (progMode == PROG_FLOAT)
+        {
+            sprintf(tmp, "%-.14g", T);
+        }
+        else
+        {
+            sprintf(tmp, "%ld", TL);
+        }
+        makeInternational(tmp);
+        SetDlgItemText(hDlg, IDC_SHOW_T, tmp);
+
+        // Extended Stack
+        if (progMode == PROG_FLOAT)
+        {
+            sprintf(tmp, "%-.14g", D);
+        }
+        else
+        {
+            sprintf(tmp, "%ld", DL);
+        }
+        makeInternational(tmp);
+        SetDlgItemText(hDlg, IDC_SHOW_D, tmp);
+
+        if (progMode == PROG_FLOAT)
+        {
+            sprintf(tmp, "%-.14g", C);
+        }
+        else
+        {
+            sprintf(tmp, "%ld", CL);
+        }
+        makeInternational(tmp);
+        SetDlgItemText(hDlg, IDC_SHOW_C, tmp);
+
+        if (progMode == PROG_FLOAT)
+        {
+            sprintf(tmp, "%-.14g", B);
+        }
+        else
+        {
+            sprintf(tmp, "%ld", BL);
+        }
+        makeInternational(tmp);
+        SetDlgItemText(hDlg, IDC_SHOW_B, tmp);
+
+        if (progMode == PROG_FLOAT)
+        {
+            sprintf(tmp, "%-.14g", A);
+        }
+        else
+        {
+            sprintf(tmp, "%ld", AL);
+        }
+        makeInternational(tmp);
+        SetDlgItemText(hDlg, IDC_SHOW_A, tmp);
+
+        // Registers (R00-R20)
+        for (i=0; i<=20; i++)
+        {
+            sprintf(tmp, "%-.14g", STO[i]);
+            makeInternational(tmp);
+            SetDlgItemText(hDlg, IDC_SHOW_R00+i, tmp);
+        }
+
+        // Financial Registers (at least the TVM ones)
+        for (i=0; i<=5; i++)
+        {
+            sprintf(tmp, "%-.14g", FIN[i]);
+            makeInternational(tmp);
+            SetDlgItemText(hDlg, IDC_SHOW_FIN_N+i, tmp);
+        }
+
+        // Statistics Registers
+        for (i=0; i<=5; i++)
+        {
+            sprintf(tmp, "%-.14g", SUM[i]);
+            makeInternational(tmp);
+            SetDlgItemText(hDlg, IDC_SHOW_STATS_N+i, tmp);
+        }
+
+        return TRUE;
+
+    case WM_COMMAND:
+        switch (wParam)
+        {
+        case (IDOK): // OK was pressed
+            EndDialog(hDlg, FALSE);
+            return TRUE;
+        default:
+            return FALSE;
+        }
+
+    case WM_SYSCOMMAND:
+        switch (wParam & 0xFFF0)
+        {
+        case SC_CLOSE:
+            EndDialog(hDlg, FALSE);
+            return TRUE;
         }
     }
+    return FALSE;
 }
+
 
 void RPN_edit(void)
 {
@@ -5393,7 +5527,7 @@ void RPN_pow(void)
     else
     {
         PROG_LONG i, xtemp64, ytemp64;
-        
+
         xtemp64 = StackPopL();
         ytemp64 = StackPopL();
         if (ytemp64 == 0 && xtemp64 < 0)
@@ -5432,7 +5566,7 @@ void blinkXDisplay(uint8_t no_peek)
         if (no_peek) Sleep(250);
         else sleep_and_peek(250);
         GetDlgItemText(calcMainWindow, RPN_STACK_X, tmpStr, MAX_STACK_STRLEN);
-        
+
         hControl = GetDlgItem(calcMainWindow, RPN_STACK_X);
         InvalidateRect(hControl, NULL, TRUE);
         UpdateWindow(hControl);
@@ -5458,11 +5592,11 @@ void blinkStack(uint8_t no_peek)
         SetDlgItemText(calcMainWindow, RPN_STACK_Y, " ");
         SetDlgItemText(calcMainWindow, RPN_STACK_Z, " ");
         SetDlgItemText(calcMainWindow, RPN_STACK_T, " ");
-        
+
         hControl = GetDlgItem(calcMainWindow, RPN_STACK);
         InvalidateRect(hControl, NULL, TRUE);
         UpdateWindow(hControl);
-        
+
         if (no_peek) Sleep(250);
         else sleep_and_peek(250);
         GetDlgItemText(calcMainWindow, RPN_STACK_X, tmp1, MAX_STACK_STRLEN);

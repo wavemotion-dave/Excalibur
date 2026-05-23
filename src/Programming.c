@@ -994,19 +994,19 @@ void UpdateDebugRegs(void)
     sprintf(tmp, " Extended Stack");
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
-    sprintf(tmp, " D: %-18.11g", D);
+    sprintf(tmp, " D: %-20.13g", D);
     makeInternational(tmp);
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
-    sprintf(tmp, " C: %-18.11g", C);
+    sprintf(tmp, " C: %-20.13g", C);
     makeInternational(tmp);
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
-    sprintf(tmp, " B: %-18.11g", B);
+    sprintf(tmp, " B: %-20.13g", B);
     makeInternational(tmp);
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
-    sprintf(tmp, " A: %-18.11g", A);
+    sprintf(tmp, " A: %-20.13g", A);
     makeInternational(tmp);
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
@@ -1015,19 +1015,19 @@ void UpdateDebugRegs(void)
     sprintf(tmp, " Main Stack");
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
-    sprintf(tmp, " T: %-18.11g", T);
+    sprintf(tmp, " T: %-20.13g", T);
     makeInternational(tmp);
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
-    sprintf(tmp, " Z: %-18.11g", Z);
+    sprintf(tmp, " Z: %-20.13g", Z);
     makeInternational(tmp);
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
-    sprintf(tmp, " Y: %-18.11g", Y);
+    sprintf(tmp, " Y: %-20.13g", Y);
     makeInternational(tmp);
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
-    sprintf(tmp, " X: %-18.11g", X);
+    sprintf(tmp, " X: %-20.13g", X);
     makeInternational(tmp);
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
@@ -1047,35 +1047,35 @@ void UpdateDebugRegs(void)
     sprintf(tmp, " Financial Regs");
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
-    sprintf(tmp, " Num: %-18.11g", fin_reg[0]);
+    sprintf(tmp, " Num: %-20.13g", FIN[0]);
     makeInternational(tmp);
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
-    sprintf(tmp, " Int: %-18.11g", fin_reg[1]);
+    sprintf(tmp, " Int: %-20.13g", FIN[1]);
     makeInternational(tmp);
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
-    sprintf(tmp, " PV:  %-18.11g", fin_reg[2]);
+    sprintf(tmp, " PV:  %-20.13g", FIN[2]);
     makeInternational(tmp);
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
-    sprintf(tmp, " FV:  %-18.11g", fin_reg[3]);
+    sprintf(tmp, " FV:  %-20.13g", FIN[3]);
     makeInternational(tmp);
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
-    sprintf(tmp, " MkC: %-18.11g", fin_reg[4]);
+    sprintf(tmp, " MkC: %-20.13g", FIN[4]);
     makeInternational(tmp);
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
-    sprintf(tmp, " MkP: %-18.11g", fin_reg[5]);
+    sprintf(tmp, " MkP: %-20.13g", FIN[5]);
     makeInternational(tmp);
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
-    sprintf(tmp, " CST: %-18.11g", fin_reg[6]);
+    sprintf(tmp, " CST: %-20.13g", FIN[6]);
     makeInternational(tmp);
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
-    sprintf(tmp, " PRC: %-18.11g", fin_reg[7]);
+    sprintf(tmp, " PRC: %-20.13g", FIN[7]);
     makeInternational(tmp);
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
@@ -1114,7 +1114,7 @@ void UpdateDebugRegs(void)
 
             for (i = 0; i < MAX_STO; i++)
             {
-                sprintf(tmp, " R%02d: %-18.11g", i, STO[i]);
+                sprintf(tmp, " R%02d: %-20.13g", i, STO[i]);
                 makeInternational(tmp);
                 SendDlgItemMessage(debugTraceWindow, TRACE_REGS2, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
             }

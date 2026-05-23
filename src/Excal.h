@@ -235,7 +235,7 @@ extern uint8_t CFn;
 extern uint8_t binMode;
 
 #define FIN_REG_MAX     9
-extern double fin_reg[FIN_REG_MAX];
+extern double FIN[FIN_REG_MAX];
 extern uint8_t payMode;
 extern uint8_t dateMode;
 
@@ -351,7 +351,7 @@ extern void RPN_Ex(void);
 extern void RPN_clearX(void);
 extern void RPN_drop(void);
 extern void RPN_larg(void);
-extern void RPN_frac(void);
+extern void RPN_show(void);
 extern void RPN_edit(void);
 extern void RPN_Notes(void);
 extern void RPN_Copy(void);
@@ -541,7 +541,7 @@ enum UniqueButtonIndexTag
     UNI_PLAY,
     UNI_DROP,
     UNI_LARG,
-    UNI_FRAC,
+    UNI_SHOW,
     UNI_EDIT,
     UNI_CONST,
     UNI_NOTES,
@@ -923,7 +923,7 @@ extern uint32_t userTicks;
 #define RPN_PLAYBACK                    130
 #define RPN_DROP                        131
 #define RPN_LARG                        132
-#define RPN_FRAC                        133
+#define RPN_SHOW                        133
 #define RPN_EDIT                        134
 #define RPN_POW                         135
 #define RPN_NOTES                       136
@@ -1019,6 +1019,50 @@ extern uint32_t userTicks;
 #define RPN_STACK_Z                     2002
 #define RPN_STACK_Y                     2001
 #define RPN_STACK_X                     2000
+
+// For the Show Internal Values dialog...
+#define IDC_SHOW_X                      101
+#define IDC_SHOW_Y                      102
+#define IDC_SHOW_Z                      103
+#define IDC_SHOW_T                      104
+#define IDC_SHOW_A                      105
+#define IDC_SHOW_B                      106
+#define IDC_SHOW_C                      107
+#define IDC_SHOW_D                      108
+
+#define IDC_SHOW_FIN_N                  110
+#define IDC_SHOW_FIN_I                  111
+#define IDC_SHOW_FIN_PMT                112
+#define IDC_SHOW_FIN_PV                 113
+#define IDC_SHOW_FIN_FV                 114
+
+#define IDC_SHOW_STATS_N                120
+#define IDC_SHOW_STATS_X                121
+#define IDC_SHOW_STATS_Y                122
+#define IDC_SHOW_STATS_XX               123
+#define IDC_SHOW_STATS_YY               124
+
+#define IDC_SHOW_R00                    200
+#define IDC_SHOW_R01                    201
+#define IDC_SHOW_R02                    202
+#define IDC_SHOW_R03                    203
+#define IDC_SHOW_R04                    204
+#define IDC_SHOW_R05                    205
+#define IDC_SHOW_R06                    206
+#define IDC_SHOW_R07                    207
+#define IDC_SHOW_R08                    208
+#define IDC_SHOW_R09                    209
+#define IDC_SHOW_R10                    210
+#define IDC_SHOW_R11                    211
+#define IDC_SHOW_R12                    212
+#define IDC_SHOW_R13                    213
+#define IDC_SHOW_R14                    214
+#define IDC_SHOW_R15                    215
+#define IDC_SHOW_R16                    216
+#define IDC_SHOW_R17                    217
+#define IDC_SHOW_R18                    218
+#define IDC_SHOW_R19                    219
+#define IDC_SHOW_R20                    220
 
 // For the Custom Button dialog...
 #define IDC_CUSTOM_OK                   100
