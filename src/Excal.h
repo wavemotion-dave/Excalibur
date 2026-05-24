@@ -563,7 +563,7 @@ enum UniqueButtonIndexTag
     UNI_STAT,
     UNI_PROG1,
     UNI_PROG2,
-    UNI_CUST,
+    UNI_CUSTOM,
 
     UNI_SIN,
     UNI_COS,

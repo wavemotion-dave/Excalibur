@@ -343,6 +343,7 @@ PROG_LONG StackPopL(void)
 void PROG_hex(void)
 {
     progMode = PROG_HEX;
+    lastProgMode = PROG_HEX;
     STACKL[STK_X] = MaskStack(STACKL[STK_X]);
     STACKL[STK_Y] = MaskStack(STACKL[STK_Y]);
     STACKL[STK_Z] = MaskStack(STACKL[STK_Z]);
@@ -352,6 +353,7 @@ void PROG_hex(void)
 void PROG_bin(void)
 {
     progMode = PROG_BIN;
+    lastProgMode = PROG_BIN;
     binMode = 0;
     STACKL[STK_X] = MaskStack(STACKL[STK_X]);
     STACKL[STK_Y] = MaskStack(STACKL[STK_Y]);
@@ -362,6 +364,7 @@ void PROG_bin(void)
 void PROG_oct(void)
 {
     progMode = PROG_OCT;
+    lastProgMode = PROG_OCT;
     STACKL[STK_X] = MaskStack(STACKL[STK_X]);
     STACKL[STK_Y] = MaskStack(STACKL[STK_Y]);
     STACKL[STK_Z] = MaskStack(STACKL[STK_Z]);
@@ -371,6 +374,7 @@ void PROG_oct(void)
 void PROG_dec(void)
 {
     progMode = PROG_DEC;
+    lastProgMode = PROG_DEC;
     STACKL[STK_X] = MaskStack(STACKL[STK_X]);
     STACKL[STK_Y] = MaskStack(STACKL[STK_Y]);
     STACKL[STK_Z] = MaskStack(STACKL[STK_Z]);

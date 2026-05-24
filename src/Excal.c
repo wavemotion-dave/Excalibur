@@ -40,7 +40,7 @@
 #include <shlobj.h>
 #include "Excal.h"
 
-#define WINDOW_TITLE "Excalibur 32-bit"
+#define WINDOW_TITLE "Excalibur RPN Calculator"
 
 #define VERSION_STR "v3.XX-04"
 
@@ -123,16 +123,16 @@ char Xstr[64];         // Global buffer for X editing
 // ----------------
 // Global registers
 // ----------------
-double STACK[MAX_STACK];     // The main RPN stack (X, Y, Z, T, A, B, C D)
+double STACK[MAX_STACK];     // The main RPN stack (X, Y, Z, T, A, B, C D) in double floating point mode
 PROG_LONG STACKL[MAX_STACK]; // The main RPN stack in long integer form for Comp-Sci mode (X, Y, Z, T, A, B, C, D)
 
 double LASTX; // LAST X register
 double LASTY; // LAST Y register
 
-double lastFloat = 0.0;
-
 PROG_LONG LASTXL; // LAST X when in Comp-Sci mode
 PROG_LONG LASTYL; // LAST Y when in Comp-Sci mode
+
+double lastFloat = 0.0;
 
 // Some statistics registers for how Excalibur is being utilized
 uint64_t stackPushes = 0; // Total number of Stack Pushes
@@ -157,12 +157,12 @@ uint8_t  progMode = PROG_FLOAT; // Normal floating-point mode (vs HEX, DEC, OCT,
 uint16_t lastUniqueIndex = 0;   // Index of the last function that was called (useful in Financial Register handling)
 
 // Various storage arrays for RPN use
-double STO[MAX_STO];             // Storage registers R0-R99
-double SUM[SUM_MAX];             // Statistics registers for the Statistics bank
-double cashFlow[MAX_CF];         // Cash flow registers for the Financial bank
-uint8_t CFn;                     // Number of cash flows currently entered (for financial functions that use cash flow registers)
-char excaliburNotes[NOTES_SIZE]; // A small scratchpad for the user to jot down some info (preserved on program exit)
-PROG_LONG STOL[MAX_STO];         // Storage registers R0-R99 when in Comp-Sci mode
+double      STO[MAX_STO];               // Storage registers R0-R99
+PROG_LONG   STOL[MAX_STO];              // Storage registers R0-R99 when in Comp-Sci mode
+double      SUM[SUM_MAX];               // Statistics registers for the Statistics bank
+double      cashFlow[MAX_CF];           // Cash flow registers for the Financial bank
+uint8_t     CFn;                        // Number of cash flows currently entered (for financial functions that use cash flow registers)
+char        excaliburNotes[NOTES_SIZE]; // A small scratchpad for the user to jot down some info (preserved on program exit)
 
 // ---------------------------------------------------------------------------------------------
 // This is the mapping from unique index to function for playback and macro recording purposes.
@@ -989,11 +989,33 @@ void SelectNewBank(struct funcStruct *funcs)
             (funcs != (struct funcStruct *)&Program2_funcs) &&
             (funcs != (struct funcStruct *)&CompSci_funcs))
         {
+            if (recModeON == 1)
+            {
+                if (funcs == (struct funcStruct *)&Scientific_funcs)  SaveProgramStep(UNI_SCI);
+                if (funcs == (struct funcStruct *)&Scientific2_funcs) SaveProgramStep(UNI_SCI2);
+                if (funcs == (struct funcStruct *)&Financial_funcs)   SaveProgramStep(UNI_FIN);
+                if (funcs == (struct funcStruct *)&Conversion_funcs)  SaveProgramStep(UNI_CONV);
+                if (funcs == (struct funcStruct *)&Statistics_funcs)  SaveProgramStep(UNI_STAT);
+                if (funcs == (struct funcStruct *)&Custom_funcs)      SaveProgramStep(UNI_CUSTOM);
+            } 
+
+            lastProgMode = progMode; // Remember if the user switches back...
             LongsToFloats();
             progMode = PROG_FLOAT;
             ShowStack();
             ShowStatus();
         }
+    }
+
+    // ----------------------------------------------------------------------
+    // If we are switching into Comp-Sci mode from a floating-point mode...
+    // Restore the last known prog mode (HEX, DEC, BIN, OCT). Stack and
+    // values are handled further below on the switch into Comp-Sci.
+    // ----------------------------------------------------------------------
+    if (funcs == (struct funcStruct *)&CompSci_funcs && progMode == PROG_FLOAT)
+    {
+        if (recModeON == 1) SaveProgramStep(UNI_COMPSCI);
+        progMode = lastProgMode;
     }
 
     // ---------------------------------------------------------------------------------
@@ -1818,9 +1840,9 @@ struct funcStruct RPNkeys[] = {
     {RPN_DIGIT_9,   UNI_DIG9,   USES_FL, ALLOWREC, '9', "", NO_L,   X_NULL,     RPN_digit9,         "Digit 9",              "Used in keypad number entry."},
     {RPN_DIGIT_DP,  UNI_DIGDP,  USES_FL, ALLOWREC, '.', "", NO_L,   X_NULL,     RPN_dp,             "Decimal Point",        "Used in keypad number entry and can also be used to enter fractions into the X display (press twice)"},
     {RPN_CLEAR_X,   UNI_CLX,    USES_FL, ALLOWREC,  9,  "", NO_L,   X_NULL,     RPN_clearX,         "Clear X",              "Used to clear the X Register contents."},
-    {RPN_DIVIDE,    UNI_DIV,    USES_FL, ALLOWREC, '/', "", YES_L,  X_NULL,     RPN_divide,         "Divide",               "Division of Y by X(Y/X)"},
+    {RPN_DIVIDE,    UNI_DIV,    USES_FL, ALLOWREC, '/', "", YES_L,  X_NULL,     RPN_divide,         "Divide",               "Division of Y by X : (Y/X)"},
     {RPN_MULTIPLY,  UNI_MUL,    USES_FL, ALLOWREC, '*', "", YES_L,  X_NULL,     RPN_multiply,       "Multiply",             "Multiplication of Y and X"},
-    {RPN_SUBTRACT,  UNI_SUB,    USES_FL, ALLOWREC, '-', "", YES_L,  X_NULL,     RPN_minus,          "Minus",                "Subtraction of X from Y(Y-X)"},
+    {RPN_SUBTRACT,  UNI_SUB,    USES_FL, ALLOWREC, '-', "", YES_L,  X_NULL,     RPN_minus,          "Minus",                "Subtraction of X from Y : (Y-X)"},
     {RPN_PLUS,      UNI_PLUS,   USES_FL, ALLOWREC, '+', "", YES_L,  X_NULL,     RPN_plus,           "Plus",                 "Addition of X and Y"},
     {RPN_ENTER,     UNI_ENT,    USES_FL, ALLOWREC, 13,  "", NO_L,   X_NULL,     RPN_enter,          "Enter",                "Used to separate numbers in the RPN stack"},
 
@@ -1838,11 +1860,11 @@ struct funcStruct RPNkeys[] = {
     {RPN_FACT,      UNI_FACT,   USES_FL, ALLOWREC, '!', "", YES_L,  X_NEW,      RPN_fact,           "Factorial X",          "Compute the Factorial of X"},
     {RPN_PLAYBACK,  UNI_PLAY,   USES_FL, NORECORD, 'p', "", NO_L,   X_NEW,      RPN_Playback,       "Run Program",          "Run the the currently loaded program."},
     {RPN_DROP,      UNI_DROP,   USES_FL, ALLOWREC, 'd', "", YES_L,  X_NEW,      RPN_drop,           "Drop Stack",           "Drops the X register and the rest of stack shifts down."},
-    {RPN_LARG,      UNI_LARG,   USES_FL, ALLOWREC, ' ', "", NO_L,   X_NEW,      RPN_larg,           "Last Arguments",       "Retrieves the last X and Y pair before last operation."},
+    {RPN_LARG,      UNI_LARG,   USES_FL, ALLOWREC, ' ', "", NO_L,   X_NEW,      RPN_larg,           "Last Arguments",       "Retrieves the X and Y argument pair before last operation."},
     {RPN_SHOW,      UNI_SHOW,   USES_FL, NORECORD, 's', "", NO_L,   X_NULL,     RPN_show,           "Show Values",          "Show Full Stack, Registers, Statistics, etc."},
     {RPN_EDIT,      UNI_EDIT,   USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_edit,           "Edit X Register",      "Used to place the X register back in edit mode if it is not already."},
     {RPN_POW,       UNI_POW,    USES_FL, ALLOWREC, '^', "", YES_L,  X_NEW,      RPN_pow,            "Raise to Power",       "Raise Y to the power of X"},
-    {RPN_NOTES,     UNI_NOTES,  USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_Notes,          "Excalibur Notepad",    "Allows some simple notes to be stored/saved."},
+    {RPN_NOTES,     UNI_NOTES,  USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_Notes,          "Excalibur Notepad",    "Allows simple notes to be stored/saved."},
     {RPN_INV,       UNI_INVX,   USES_FL, ALLOWREC, 'i', "", YES_L,  X_NEW,      RPN_inverse,        "Inverse X",            "Computes the inverse of X"},
     {RPN_REC,       UNI_REC,    USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_Record,         "Record Mode On/Off",   "When ON - Records button presses for playback."},
     {RPN_EXREG,     UNI_EXREG,  USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_ExchangeReg,    "Exchange X with Reg",  "Exchange X with one of the Registers (next digit/dp selects R0-R19)"},
@@ -1852,17 +1874,17 @@ struct funcStruct RPNkeys[] = {
     {RPN_LN,        UNI_LN,     USES_FL, ALLOWREC, ' ', "", YES_L,  X_NEW,      SCI_ln,             "Natural Logarithm",    "Computes the natural logarithm (base e) of X"},
     {RPN_LOG,       UNI_LOG,    USES_FL, ALLOWREC, ' ', "", YES_L,  X_NEW,      SCI_log,            "Base 10 Logarithm",    "Raises the base 10 logarithm of X"},
 
-    {RPN_SCI,       UNI_SCI,    USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectSci,      "Select Scientific I",  "Selects the Scientific I Layout"},
-    {RPN_SCI2,      UNI_SCI2,   USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectSci2,     "Select Scientific II", "Selects the Scientific II Layout"},
-    {RPN_COMPSCI,   UNI_COMPSCI,USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectCompSci,  "Select Comp Sci",      "Selects the Computer Science Layout"},
-    {RPN_FIN,       UNI_FIN,    USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectFin,      "Select Financial",     "Selects the Financial Layout"},
-    {RPN_CONV,      UNI_CONV,   USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectConv,     "Select Conversion",    "Selects the Conversion Layout"},
-    {RPN_STAT,      UNI_STAT,   USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectStat,     "Select Statistics",    "Selects the Statistical Layout"},
+    {RPN_SCI,       UNI_SCI,    USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectSci,      "Select Scientific I",  "Selects the Scientific I Bank"},
+    {RPN_SCI2,      UNI_SCI2,   USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectSci2,     "Select Scientific II", "Selects the Scientific II Bank"},
+    {RPN_COMPSCI,   UNI_COMPSCI,USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectCompSci,  "Select Comp-Sci",      "Selects the Computer Science Bank"},
+    {RPN_FIN,       UNI_FIN,    USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectFin,      "Select Financial",     "Selects the Financial Bank"},
+    {RPN_CONV,      UNI_CONV,   USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectConv,     "Select Conversion",    "Selects the Conversion Bank"},
+    {RPN_STAT,      UNI_STAT,   USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectStat,     "Select Statistics",    "Selects the Statistics Bank"},
     {RPN_PROGI,     UNI_PROG1,  USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectProgI,    "Select Program I",     "Selects Program Bank I"},
     {RPN_PROGII,    UNI_PROG2,  USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectProgII,   "Select Program II",    "Selects Program Bank II"},
-    {RPN_CUST,      UNI_CUST,   USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectCustom,   "Select Custom",        "Selects the Custom Layout"},
+    {RPN_CUST,      UNI_CUSTOM, USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectCustom,   "Select Custom",        "Selects the Custom Bank"},
 
-    {RPN_LAST_KEY,  UNI_UNUSED, USES_FL, ALLOWREC, ' ', "", NO_L,   X_NEW,      NULL,               "Unused",               "Unused"}
+    {RPN_LAST_KEY,  UNI_UNUSED, USES_FL, NORECORD, ' ', "", NO_L,   X_NEW,      NULL,               "Unused",               "Unused"}
 };
 
 struct keyPosStruct
@@ -1879,34 +1901,34 @@ struct keyPosStruct
 // with the Exchange of X/Y key and goes through the rest of the RPN keys and then the function bank keys.
 // -------------------------------------------------------------------------------------------------------
 struct keyPosStruct RPNkeyPos[] = {
-    {RPN_EXCH_X_Y   ,0,     0},
-    {RPN_NEGATE     ,0,     0},
-    {RPN_E          ,0,     0},
-    {RPN_STO        ,0,     0},
-    {RPN_RCL        ,0,     0},
-    {RPN_R_UP       ,0,     0},
-    {RPN_R_DN       ,0,     0},
-    {RPN_LASTX      ,0,     0},
-    {RPN_MODE       ,0,     0},
-    {RPN_BKSP       ,0,     0},
-    {RPN_CLR_STACK  ,0,     0},
-    {RPN_FACT       ,0,     0},
-    {RPN_PLAYBACK   ,0,     0},
-    {RPN_DROP       ,0,     0},
-    {RPN_LARG       ,0,     0},
-    {RPN_SHOW       ,0,     0},
-    {RPN_EDIT       ,0,     0},
-    {RPN_POW        ,0,     0},
-    {RPN_NOTES      ,0,     0},
-    {RPN_INV        ,0,     0},
-    {RPN_REC        ,0,     0},
-    {RPN_EXREG      ,0,     0},
-    {RPN_COPY       ,0,     0},
-    {RPN_PASTE      ,0,     0},
-    {RPN_SQRT       ,0,     0},
-    {RPN_LN         ,0,     0},
-    {RPN_LOG        ,0,     0},
-    {RPN_LAST_KEY,   0,     0}
+    {RPN_EXCH_X_Y,  0,          0},
+    {RPN_NEGATE,    0,          0},
+    {RPN_E,         0,          0},
+    {RPN_STO,       0,          0},
+    {RPN_RCL,       0,          0},
+    {RPN_R_UP,      0,          0},
+    {RPN_R_DN,      0,          0},
+    {RPN_LASTX,     0,          0},
+    {RPN_MODE,      0,          0},
+    {RPN_BKSP,      0,          0},
+    {RPN_CLR_STACK, 0,          0},
+    {RPN_FACT,      0,          0},
+    {RPN_PLAYBACK,  0,          0},
+    {RPN_DROP,      0,          0},
+    {RPN_LARG,      0,          0},
+    {RPN_SHOW,      0,          0},
+    {RPN_EDIT,      0,          0},
+    {RPN_POW,       0,          0},
+    {RPN_NOTES,     0,          0},
+    {RPN_INV,       0,          0},
+    {RPN_REC,       0,          0},
+    {RPN_EXREG,     0,          0},
+    {RPN_COPY,      0,          0},
+    {RPN_PASTE,     0,          0},
+    {RPN_SQRT,      0,          0},
+    {RPN_LN,        0,          0},
+    {RPN_LOG,       0,          0},
+    {RPN_LAST_KEY,  0,          0}
 };
 
 struct keyPosStruct FunctionBankKeyPos[] = {
