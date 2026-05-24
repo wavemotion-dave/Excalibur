@@ -4875,11 +4875,16 @@ BOOL CALLBACK fnDIALOG_ShowMemory(HWND hDlg, UINT wMessage, WPARAM wParam, LPARA
         {
             if (progMode == PROG_FLOAT)
             {
+                sprintf(tmp, "R%02d", i);
+                SetDlgItemText(hDlg, IDC_SHOW_LBL_R00+i, tmp);
+
                 sprintf(tmp, "%-.14g", STO[i]);
                 makeInternational(tmp);
             }
             else
             {
+                sprintf(tmp, "L%02d", i);
+                SetDlgItemText(hDlg, IDC_SHOW_LBL_R00+i, tmp);
                 MakeCompSciStr(STOL[i], tmp);
             }
             SetDlgItemText(hDlg, IDC_SHOW_R00+i, tmp);

@@ -1067,6 +1067,28 @@ extern uint32_t userTicks;
 #define IDC_SHOW_R19                    219
 #define IDC_SHOW_R20                    220
 
+#define IDC_SHOW_LBL_R00                300
+#define IDC_SHOW_LBL_R01                301
+#define IDC_SHOW_LBL_R02                302
+#define IDC_SHOW_LBL_R03                303
+#define IDC_SHOW_LBL_R04                304
+#define IDC_SHOW_LBL_R05                305
+#define IDC_SHOW_LBL_R06                306
+#define IDC_SHOW_LBL_R07                307
+#define IDC_SHOW_LBL_R08                308
+#define IDC_SHOW_LBL_R09                309
+#define IDC_SHOW_LBL_R10                310
+#define IDC_SHOW_LBL_R11                311
+#define IDC_SHOW_LBL_R12                312
+#define IDC_SHOW_LBL_R13                313
+#define IDC_SHOW_LBL_R14                314
+#define IDC_SHOW_LBL_R15                315
+#define IDC_SHOW_LBL_R16                316
+#define IDC_SHOW_LBL_R17                317
+#define IDC_SHOW_LBL_R18                318
+#define IDC_SHOW_LBL_R19                319
+#define IDC_SHOW_LBL_R20                320
+
 // For the Custom Button dialog...
 #define IDC_CUSTOM_OK                   100
 #define IDC_CUSTOM_SCI                  190
