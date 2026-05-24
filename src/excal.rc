@@ -142,7 +142,7 @@ BEGIN
     RADIOBUTTON     "Statistics",RPN_STAT,187,71,44,10
     RADIOBUTTON     "Financial",RPN_FIN,187,54,44,10
     RADIOBUTTON     "Conversion",RPN_CONV,187,88,47,10
-    RADIOBUTTON     "Comp Sci",RPN_COMPSCI,187,105,46,10
+    RADIOBUTTON     "Comp-Sci",RPN_COMPSCI,187,105,46,10
     RADIOBUTTON     "Scientific II",RPN_SCI2,187,37,47,10
     RADIOBUTTON     "Program I",RPN_PROGI,187,122,46,10
     RADIOBUTTON     "Program II",RPN_PROGII,187,139,48,10
@@ -311,7 +311,7 @@ BEGIN
                     10,54,50,10
     CONTROL         "Conversion",IDC_CUSTOM_CONV,"Button",BS_AUTORADIOBUTTON,
                     10,86,50,10
-    CONTROL         "Comp Sci",IDC_CUSTOM_COMPSCI,"Button",
+    CONTROL         "Comp-Sci",IDC_CUSTOM_COMPSCI,"Button",
                     BS_AUTORADIOBUTTON,10,102,50,10
     CONTROL         "Scientific II",IDC_CUSTOM_SCI2,"Button",
                     BS_AUTORADIOBUTTON,10,38,50,10

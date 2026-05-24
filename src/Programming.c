@@ -1013,15 +1013,13 @@ BOOL CALLBACK debugWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam
 }
 
 
-int CreateDebugWindow(HWND hwnd, HINSTANCE hInstance)
+void CreateDebugWindow(HWND hwnd, HINSTANCE hInstance)
 {
     static char szAppName3[] = "DIALOG_PROGTRACE";
     debugTraceWindow = CreateDialog(hInstance, szAppName3, 0, ( DLGPROC )debugWndProc);
     ShowWindow(debugTraceWindow, SW_HIDE);
     UpdateWindow(debugTraceWindow);
     SetFocus(calcMainWindow);
-
-    return 0;
 }
 
 void Macro_Debug(void)
@@ -1198,7 +1196,10 @@ void UpdateDebugProgram(int resetProgramList)
     }
 }
 
-int DecrementAndLoop(int index, uint16_t uniqueLabel)
+// --------------------------------------------------------------------------------------
+// Handles both floating point and PROG_LONG Registers depending on which mode we are in.
+// --------------------------------------------------------------------------------------
+void DecrementAndLoop(int index, uint16_t uniqueLabel)
 {
     if (macroPlayback == TRUE)
     {
@@ -1219,7 +1220,6 @@ int DecrementAndLoop(int index, uint16_t uniqueLabel)
             }
         }
     }
-    return 0;
 }
 
 void Macro_LoopA(void)

@@ -51,7 +51,6 @@ void PushConstant(double value)
     else
         StackPush((double) value);
 
-    //@TODO convert this to a simple UNI_xxx value
     if (recModeON == 1) // If recording, generate key sequence to playback struct
     {
         sprintf(tmpStr, "%.13g", value);

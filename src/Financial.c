@@ -852,7 +852,7 @@ unsigned long dateSerial360(struct dateStruct dt)
     serial = 0;
     for (i = 1900; i < (dt.year); i++)
     {
-        serial += 360;          // TBD, check leap years 
+        serial += 360;          // TBD, check leap years?
     }
 
     for (i = 0; i < (dt.month - 1); i++)

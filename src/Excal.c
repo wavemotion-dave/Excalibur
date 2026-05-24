@@ -314,9 +314,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
         SendMessage(GetDlgItem(calcMainWindow, id), WM_SETFONT, (WPARAM)hMainFont, FALSE);
     }
 
-    Init();
-    ShowWindow(calcMainWindow, iCmdShow);           // Now show the window the way it was asked to be displayed...
-    CreateToolTipWindow(calcMainWindow, hInstance); // Create the tool-tip window that goes with buttons...
+    ExcalInit();                                    // Setup based on configuration read from disk.
+    ShowWindow(calcMainWindow, iCmdShow);           // Now show the window the way it was asked to be displayed.
+    CreateToolTipWindow(calcMainWindow, hInstance); // Create the tool-tip window that goes with buttons.
     CreateDebugWindow(calcMainWindow, hInstance);   // Create the debug window for program traceback, register view, etc.
     SelectNewBank(currentFuncs);                    // Make sure the right bank is selected
 
@@ -331,7 +331,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     return msg.wParam;
 }
 
-int CreateToolTipWindow(HWND hwnd, HINSTANCE hInstance)
+void CreateToolTipWindow(HWND hwnd, HINSTANCE hInstance)
 {
     static TCHAR toolTipWndName[] = TEXT("ToolTipWindow");
     WNDCLASS wndclass;
@@ -350,26 +350,26 @@ int CreateToolTipWindow(HWND hwnd, HINSTANCE hInstance)
     if (!RegisterClass(&wndclass))
     {
         MessageBox(NULL, TEXT("Unable to register the Excalibur Class with Windows.\nThis is a fatal error and the program will now exit."), toolTipWndName, MB_ICONERROR);
-        return 0;
+        exit(0);
     }
+    else
+    {
+        toolTipWnd = CreateWindow(toolTipWndName,       // window class name
+                                TEXT("ExcalHelp"),    // window caption
+                                WS_POPUP | WS_BORDER, // window style
+                                CW_USEDEFAULT,        // initial x position
+                                CW_USEDEFAULT,        // initial y position
+                                100,                  // initial x size (will get auto-resized)
+                                50,                   // initial y size (will get auto-resized)
+                                hwnd,                 // parent window handle
+                                NULL,                 // window menu handle
+                                hInstance,            // program instance handle
+                                NULL);                // creation parameters
 
-    toolTipWnd = CreateWindow(toolTipWndName,       // window class name
-                              TEXT("ExcalHelp"),    // window caption
-                              WS_POPUP | WS_BORDER, // window style
-                              CW_USEDEFAULT,        // initial x position
-                              CW_USEDEFAULT,        // initial y position
-                              100,                  // initial x size (will get auto-resized)
-                              50,                   // initial y size (will get auto-resized)
-                              hwnd,                 // parent window handle
-                              NULL,                 // window menu handle
-                              hInstance,            // program instance handle
-                              NULL);                // creation parameters
-
-    ShowWindow(toolTipWnd, SW_HIDE);
-    toolTipCounter = 0;
-    UpdateWindow(toolTipWnd);
-
-    return 0;
+        ShowWindow(toolTipWnd, SW_HIDE);
+        toolTipCounter = 0;
+        UpdateWindow(toolTipWnd);
+    }
 }
 
 void sleep_and_peek(int timeMs)
@@ -700,7 +700,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
         return 0;
         break;
 
-    case WM_KEYDOWN: // TBD - how to stop macro if playback and what do do about WM char message that will follow!
+    case WM_KEYDOWN:
         if (macroPlayback == TRUE)
             break;
         switch ((int)wParam)
@@ -1567,14 +1567,11 @@ void MemoryInit(void)
 {
     int i, j, k;
 
-    STACK[STK_X] = 0.0;
-    STACK[STK_Y] = 0.0;
-    STACK[STK_Z] = 0.0;
-    STACK[STK_T] = 0.0;
-    STACK[STK_A] = 0.0;
-    STACK[STK_B] = 0.0;
-    STACK[STK_C] = 0.0;
-    STACK[STK_D] = 0.0;
+    for (i = 0; i < MAX_STACK; i++)
+    {
+        STACK[i] = 0.0;
+        STACKL[i] = 0L;
+    }
 
     for (i = 0; i < MAX_STO; i++)
     {
@@ -1587,6 +1584,12 @@ void MemoryInit(void)
         FIN[i] = 0.0;
     }
 
+    for (i = 0; i < SUM_MAX; i++)
+    {
+        SUM[i] = 0.0;
+    }
+    CFn = 0;
+
     for (i = 0; i < MAX_MACROS; i++)
     {
         strcpy(macroName[i], "Not Currently Defined");
@@ -1598,7 +1601,7 @@ void MemoryInit(void)
     currentMacroPlaybackIdx = 0;
     indirectRegister = 0;
     
-    // TBD - check this...
+    // Mark unused constants as not included to be shown...
     for (k = 0; k < MAX_CONST_BANKS; k++)
     {
         for (i = 0; i < MAX_CONSTS; i++)
@@ -1629,7 +1632,7 @@ void MemoryInit(void)
     }
 }
 
-int Init(void)
+void ExcalInit(void)
 {
     UINT flags;
 
@@ -1678,7 +1681,6 @@ int Init(void)
     {
         SetDlgItemText(calcMainWindow, RPN_DIGIT_DP, ",");
     }
-    return (0);
 }
 
 void ShowStatus(void)
