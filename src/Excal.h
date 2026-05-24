@@ -539,20 +539,22 @@ enum UniqueButtonIndexTag
     UNI_MODE,
     UNI_BKSP,
     UNI_CLRSTK,
-    UNI_HELP,
+    UNI_FACT,
     UNI_PLAY,
     UNI_DROP,
     UNI_LARG,
     UNI_SHOW,
     UNI_EDIT,
-    UNI_CONST,
+    UNI_POW,
     UNI_NOTES,
     UNI_INVX,
     UNI_REC,
     UNI_EXREG,
     UNI_COPY,
     UNI_PASTE,
-    UNI_CPYX,
+    UNI_SQRT,
+    UNI_LN,
+    UNI_LOG,
     UNI_UNUSED,
 
     UNI_SCI,
@@ -574,13 +576,8 @@ enum UniqueButtonIndexTag
     UNI_ATAN,
     UNI_ABS,
     UNI_XX,
-    UNI_SQRT,
     UNI_INV,
-    UNI_POW,
     UNI_EXP,
-    UNI_LN,
-    UNI_LOG,
-    UNI_FACT,
     UNI_POW10,
     UNI_INT,
     UNI_FRACT,
@@ -597,7 +594,7 @@ enum UniqueButtonIndexTag
     UNI_LCM,
     UNI_MINR,
     UNI_MAXR,
-    UNI_PRIME,
+    UNI_CONST,
     UNI_METRIC,
     UNI_ELEMENT,
     UNI_ASTRO,
@@ -622,7 +619,7 @@ enum UniqueButtonIndexTag
     UNI_RESIST,
     UNI_QUAD,
     UNI_PYTH,
-    UNI_CIRCA,
+    UNI_PRIME,
     UNI_GAMMA,
     UNI_TOPOLAR,
     UNI_FROMPOLAR,
@@ -685,42 +682,52 @@ enum UniqueButtonIndexTag
     UNI_CURR,
     UNI_EFF,
     UNI_INFL,
+
     UNI_CINV,
     UNI_LBKG,
     UNI_OZGR,
     UNI_OZML,
+
     UNI_GALL,
     UNI_GALCM3,
     UNI_PINL,
     UNI_IGALL,
+
     UNI_FACE,
     UNI_FAKE,
     UNI_INCM,
     UNI_INMM,
+
     UNI_FTMI,
     UNI_FTKM,
     UNI_FTFA,
     UNI_FTM,
+
     UNI_MIKM,
     UNI_IN2CM2,
     UNI_FT2M2,
     UNI_IN3CM3,
+
     UNI_FT3M3,
     UNI_ACRFT2,
     UNI_ATPSI,
     UNI_HHMS,
+
     UNI_DRAD,
     UNI_RP,
     UNI_KMHMPS,
     UNI_KNOTMPH,
+
     UNI_AHCOL,
     UNI_AHFAR,
     UNI_HPKW,
     UNI_JCAL,
+
     UNI_MILMM,
     UNI_STONLB,
     UNI_LTONLB,
     UNI_MTONLB,
+
     UNI_NEWLBF,
     UNI_HZTOAF,
     UNI_MPAPSI,
@@ -1023,7 +1030,7 @@ extern uint32_t userTicks;
 #define RPN_STACK_Y                     2001
 #define RPN_STACK_X                     2000
 
-// For the Show Internal Values dialog...
+// For the Show Memory dialog...
 #define IDC_SHOW_X                      101
 #define IDC_SHOW_Y                      102
 #define IDC_SHOW_Z                      103

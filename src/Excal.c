@@ -265,6 +265,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     if (footPrint == 1)
     {
         calcMainWindow = CreateDialog(hInstance, "DIALOG_4BANGER", 0, NULL);
+        lastProgMode = PROG_FLOAT;
         progMode = PROG_FLOAT;
         lastConstBank = 0;
         currentFuncs = (struct funcStruct *)&Scientific_funcs;
@@ -1861,7 +1862,7 @@ struct funcStruct RPNkeys[] = {
     {RPN_PLAYBACK,  UNI_PLAY,   USES_FL, NORECORD, 'p', "", NO_L,   X_NEW,      RPN_Playback,       "Run Program",          "Run the the currently loaded program."},
     {RPN_DROP,      UNI_DROP,   USES_FL, ALLOWREC, 'd', "", YES_L,  X_NEW,      RPN_drop,           "Drop Stack",           "Drops the X register and the rest of stack shifts down."},
     {RPN_LARG,      UNI_LARG,   USES_FL, ALLOWREC, ' ', "", NO_L,   X_NEW,      RPN_larg,           "Last Arguments",       "Retrieves the X and Y argument pair before last operation."},
-    {RPN_SHOW,      UNI_SHOW,   USES_FL, NORECORD, 's', "", NO_L,   X_NULL,     RPN_show,           "Show Values",          "Show Full Stack, Registers, Statistics, etc."},
+    {RPN_SHOW,      UNI_SHOW,   USES_FL, NORECORD, '`', "", NO_L,   X_NULL,     RPN_show,           "Show Memory",          "Show Full Stack, Registers, Financial Values, Statistics, etc."},
     {RPN_EDIT,      UNI_EDIT,   USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_edit,           "Edit X Register",      "Used to place the X register back in edit mode if it is not already."},
     {RPN_POW,       UNI_POW,    USES_FL, ALLOWREC, '^', "", YES_L,  X_NEW,      RPN_pow,            "Raise to Power",       "Raise Y to the power of X"},
     {RPN_NOTES,     UNI_NOTES,  USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_Notes,          "Excalibur Notepad",    "Allows simple notes to be stored/saved."},
@@ -4948,6 +4949,7 @@ BOOL CALLBACK fnDIALOG_ShowMemory(HWND hDlg, UINT wMessage, WPARAM wParam, LPARA
             return TRUE;
         }
     }
+
     return FALSE;
 }
 
