@@ -54,7 +54,7 @@
                   "https://github.com/wavemotion-dave/Excalibur"      \
                   "\n\nThis version is BETA - Expect and report Bugs!"
 
-#define CONFIG_VERSION_MAIN 0xF00B  // If this changes, we wipe EVERYTHING
+#define CONFIG_VERSION_MAIN 0xF00C  // If this changes, we wipe EVERYTHING
 #define CONFIG_VERSION_SUB  0xF004  // If this changes, we reset x,y window position and reset constant tables (currency, physics constants, etc)
 
 #define END_OF_PROGRAM_STR "<End Of Program>"

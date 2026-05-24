@@ -823,18 +823,15 @@ enum UniqueButtonIndexTag
     UNI_GOTOI,
     UNI_GSBI,
     UNI_LOOPI,
-    UNI_RET,
-    UNI_HALT,
-    UNI_PAUSE,
-    UNI_DSZ,
     UNI_LBLJ,
     UNI_GOTOJ,
     UNI_GSBJ,
     UNI_LOOPJ,
-    UNI_LBLK,
-    UNI_GOTOK,
-    UNI_GSBK,
-    UNI_LOOPK,
+
+    UNI_RET,
+    UNI_HALT,
+    UNI_PAUSE,
+    UNI_DSZ,
     UNI_INPA,
     UNI_INPB,
     UNI_INPC,
@@ -843,6 +840,10 @@ enum UniqueButtonIndexTag
     UNI_CFX,
     UNI_TFX,
     UNI_CLRFL,
+    UNI_XLTR0,
+    UNI_XGTR0,
+    UNI_XLTR1,
+    UNI_XGTR1,
     UNI_XLEY,
     UNI_XGY,
     UNI_XEY,
@@ -1657,9 +1658,6 @@ extern uint32_t userTicks;
 #define T_LBLJ          "Label J"
 #define T_GOTOJ         "Goto J"
 #define T_GSBJ          "Gosub J"
-#define T_LBLK          "Label K"
-#define T_GOTOK         "Goto K"
-#define T_GSBK          "Gosub K"
 #define T_INPC          "Input R2"
 #define H_INPC          "Prompt user for R2 register value."
 #define T_INPD          "Input R3"
@@ -1700,8 +1698,14 @@ extern uint32_t userTicks;
 #define H_LOOPI         "Decrement R8 register, if above zero branch to I."
 #define T_LOOPJ         "Loop J"
 #define H_LOOPJ         "Decrement R9 register, if above zero branch to J."
-#define T_LOOPK         "Loop K"
-#define H_LOOPK         "Decrement R10 register, if above zero branch to K."
+#define T_XLTR0         "X < R0?"
+#define H_XLTR0         "Check if X is less than R0 and skip next instruction if true."
+#define T_XGTR0         "X > R0?"
+#define H_XGTR0         "Check if X is greater than R0 and skip next instruction if true."
+#define T_XLTR1         "X < R1?"
+#define H_XLTR1         "Check if X is less than R1 and skip next instruction if true."
+#define T_XGTR1         "X > R1?"
+#define H_XGTR1         "Check if X is greater than R1 and skip next instruction if true."
 #define T_DSZ           "Decrement Skip if Zero"
 #define H_DSZ           "Decrement the Indirect (i) Register and skip next instruction if zero."
 #define T_TIMERPUSH     "Timer Push"
