@@ -109,7 +109,6 @@ char macro_short_names[MAX_MACROS][7];
 char clipboardBuffer[MAX_IMPORT_CLIPBOARD_SIZE + 1];
 char statusBar[32];
 char helpTitle[64];
-char functionBar[64];
 char helpMsg[256];
 char tmpStr[256];
 BYTE keyState[256];
@@ -126,13 +125,13 @@ char Xstr[64];         // Global buffer for X editing
 double STACK[MAX_STACK];     // The main RPN stack (X, Y, Z, T, A, B, C D) in double floating point mode
 PROG_LONG STACKL[MAX_STACK]; // The main RPN stack in long integer form for Comp-Sci mode (X, Y, Z, T, A, B, C, D)
 
-double LASTX; // LAST X register
-double LASTY; // LAST Y register
+double LASTX; // LAST X register in double floating point mode
+double LASTY; // LAST Y register in double floating point mode
 
 PROG_LONG LASTXL; // LAST X when in Comp-Sci mode
 PROG_LONG LASTYL; // LAST Y when in Comp-Sci mode
 
-double lastFloat = 0.0;
+double lastFloat = 0.0;   // Preserve the last floating value on entry to Comp-Sci
 
 // Some statistics registers for how Excalibur is being utilized
 uint64_t stackPushes = 0; // Total number of Stack Pushes
@@ -1582,6 +1581,10 @@ void LongsToFloats(void)
     }
 }
 
+// ------------------------------------------------------------------------------------
+// Make sure all of the key memory areas are initialized when the program is launched.
+// Most of this will be overwritten by what is read from the config file.
+// ------------------------------------------------------------------------------------
 void MemoryInit(void)
 {
     int i, j, k;
@@ -1651,6 +1654,10 @@ void MemoryInit(void)
     }
 }
 
+// ---------------------------------------------------------------------
+// Called after the config file is read - sets up various key windows 
+// attributes based on user preferences.
+// ---------------------------------------------------------------------
 void ExcalInit(void)
 {
     UINT flags;
@@ -1707,6 +1714,9 @@ void ExcalInit(void)
     }
 }
 
+// ---------------------------------------------------------------------
+// Show information in the status bar at the bottom of the main window.
+// ---------------------------------------------------------------------
 void ShowStatus(void)
 {
     if (progMode != PROG_FLOAT)
@@ -1791,8 +1801,7 @@ void UpdateVersionBar()
 
 void ShowFunctionBar(char *msg)
 {
-    sprintf(functionBar, "%s", msg);
-    SetDlgItemText(calcMainWindow, FUNC_BAR, functionBar);
+    SetDlgItemText(calcMainWindow, FUNC_BAR, msg);
 }
 
 void RPN_error(char *msg)
@@ -1844,6 +1853,17 @@ void RPN_fact(void)
     }
 }
 
+// --------------------------------------------------------------------------------
+// This is where the smoke-and-mirrors happens with our use of double precision 
+// floating-point numbers. Here we will convert the floating number to a string
+// with 1 less digit than double precision allows... and then convert it back
+// to a floating point value. This hides all sorts of small inconsistencies that
+// would otherwise plague the calcualtor - for example, with IEEE floating point
+// the sum of 0.1 + 0.2 does not EXACTLY equal 0.3... but with this function we
+// can ensure that whatever inaccuracies there are between 0.1, 0.2 and 0.3 - the
+// inaccuracies will be applied equally and the MakeAccurate versions of 0.1+0.2
+// will, indeed, equal 0.3
+// --------------------------------------------------------------------------------
 double MakeAccurate(double val)
 {
     unsigned char str[64];
@@ -1881,7 +1901,7 @@ struct funcStruct RPNkeys[] = {
     {RPN_R_UP,      UNI_RUP,    USES_FL, ALLOWREC, 38,  "", NO_L,   X_NEW,      RPN_rotateStackUp,  "Rotate Stack Up",      "Rotates the contents of the stack up"},
     {RPN_R_DN,      UNI_RDN,    USES_FL, ALLOWREC, 40,  "", NO_L,   X_NEW,      RPN_rotateStackDn,  "Rotate Stack Down",    "Rotates the contents of the stack down"},
     {RPN_LASTX,     UNI_LSTX,   USES_FL, ALLOWREC, 'l', "", NO_L,   X_NEW,      RPN_lastX,          "Last X",               "Retrieves the last value of X before the last operation occurred"},
-    {RPN_MODE,      UNI_MODE,   USES_FL, ALLOWREC, 'm', "", NO_L,   X_NEW,      RPN_mode,           "Select Mode",          "Used to select number format mode"},
+    {RPN_MODE,      UNI_MODE,   USES_FL, ALLOWREC, 'm', "", NO_L,   X_NEW,      RPN_mode,           "Display Mode",         "Used to select the display mode for the stack"},
     {RPN_BKSP,      UNI_BKSP,   USES_FL, ALLOWREC,  8,  "", NO_L,   X_NULL,     RPN_backspace,      "Backspace",            "Used to correct mistakes in number entry"},
     {RPN_CLR_STACK, UNI_CLRSTK, USES_FL, ALLOWREC, 'c', "", YES_L,  X_ENTER,    RPN_clearStack,     "Clear Stack",          "Used to clear the entire stack contents. Press twice to clear all registers as well."},
     {RPN_FACT,      UNI_FACT,   USES_FL, ALLOWREC, '!', "", YES_L,  X_NEW,      RPN_fact,           "Factorial X",          "Compute the Factorial of X"},
@@ -2250,7 +2270,7 @@ void PutCommas(char *str)
     makeInternational(str); // To swap commas and DPs if needed
 }
 
-void MakeEngineeringFormat(double val, char *Fstr)
+void MakeEngineeringFormat(double val, char *outstr)
 {
     char engStr[64];
     char *sp;
@@ -2260,8 +2280,8 @@ void MakeEngineeringFormat(double val, char *Fstr)
         sprintf(engStr, "%%- 21.%dE", decimal_places);
     else
         sprintf(engStr, "%%- 21.%dE", 2);
-    sprintf(Fstr, engStr, val);
-    sp = strchr(Fstr, 'E');
+    sprintf(outstr, engStr, val);
+    sp = strchr(outstr, 'E');
     sp++;
     exponent = atoi(sp);
     shiftDP = (exponent % 3);
@@ -2269,19 +2289,19 @@ void MakeEngineeringFormat(double val, char *Fstr)
         shiftDP += 3;
     while (shiftDP != 0)
     {
-        sp = strchr(Fstr, '.');
+        sp = strchr(outstr, '.');
         *sp = *(sp + 1);
         sp++;
         *sp = '.';
         shiftDP--;
         exponent--;
     }
-    sp = strchr(Fstr, 'E');
+    sp = strchr(outstr, 'E');
     sp++;
     sprintf(sp, "%d", exponent);
 }
 
-void FormatNumberForStack(double val, char *Fstr)
+void FormatNumberForStack(double val, char *outstr)
 {
     char sciStr[64];
     char str[64];
@@ -2292,7 +2312,7 @@ void FormatNumberForStack(double val, char *Fstr)
     {
         if (sci_format == 'Z') // ENGINEERING FORMAT
         {
-            MakeEngineeringFormat(val, Fstr);
+            MakeEngineeringFormat(val, outstr);
         }
         else
         {
@@ -2310,12 +2330,12 @@ void FormatNumberForStack(double val, char *Fstr)
     }
     if (sci_format != 'Z') // ENGINEERING FORMAT
     {
-        sprintf(Fstr, str, val);
-        PutCommas(Fstr);
-        for (i = strlen(Fstr) - 1; i > 0; i--) // Remove trailing spaces...
+        sprintf(outstr, str, val);
+        PutCommas(outstr);
+        for (i = strlen(outstr) - 1; i > 0; i--) // Remove trailing spaces...
         {
-            if (Fstr[i] == ' ')
-                Fstr[i] = CNULL;
+            if (outstr[i] == ' ')
+                outstr[i] = CNULL;
             else
                 break;
         }
@@ -2972,7 +2992,7 @@ int allowDigitBasedOnMaxStringSize(char *Xstr, char digit)
 }
 
 extern BOOL CALLBACK fnDIALOG_DisplayModeProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam);
-void RPN_mode2(HWND hDlg)
+void RPN_modeFromDialog(HWND hDlg)
 {
     DLGPROC lpfnDIALOG_DisplayModeProc;
 
@@ -4671,6 +4691,7 @@ BOOL CALLBACK fnDIALOG_SettingsProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
             {
                 angleMode = ANGLE_GRAD;
             }
+            
             bs = SendMessage(GetDlgItem(hDlg, 109), BM_GETCHECK, (WORD)0, (DWORD)0L);
             if (bs != 0L)
                 useSeparator = 1;
@@ -4746,12 +4767,13 @@ BOOL CALLBACK fnDIALOG_SettingsProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
             ShowStatus();
             ShowStack();
             return TRUE;
+            
         case (102): // CANCEL
             EndDialog(hDlg, FALSE);
             return TRUE;
 
         case (113): // DISPLAY MODES
-            RPN_mode2(hDlg);
+            RPN_modeFromDialog(hDlg);
             break;
 
         default:
@@ -5956,6 +5978,9 @@ void turnOnNumLock(void)
     }
 }
 
+// -----------------------------------------------------
+// Remove leading and trailing whitespace from a string
+// -----------------------------------------------------
 void trim(char *str)
 {
     char *start = str;
@@ -6009,7 +6034,9 @@ static int char_to_val(char c, int base)
     return (val < base) ? val : -1;
 }
 
-// Custom strtou64 implementation
+// --------------------------------------------------------------------------
+// Custom strtou64 implementation since the older C library doesn't have it.
+// --------------------------------------------------------------------------
 uint64_t strtou64(const char *nptr, char **endptr, int base)
 {
     const char *s = nptr;
@@ -6109,7 +6136,9 @@ uint64_t strtou64(const char *nptr, char **endptr, int base)
     return acc;
 }
 
-// Custom strtoi64 implementation
+// --------------------------------------------------------------------------
+// Custom strtoi64 implementation since the older C library doesn't have it.
+// --------------------------------------------------------------------------
 int64_t strtoi64(const char *nptr, char **endptr, int base)
 {
     const char *s = nptr;
