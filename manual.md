@@ -5,11 +5,17 @@ At one time, Excalibur had extensive help and an RPN tutorial that was largely n
 * Internally uses IEEE double precision floating point for rough accuracy out to about 15 places. Excalibur will show up to 13 significant digits - reserving the last two for internal rounding.
 * Uses a classic HP 4-deep RPN stack (X, Y, Z, T). In settings you can change this to 8-deep (adding A, B, C, D).
 * Default for ENTER key is to duplicate the X register into Y like the classic HP calculators. In settings, you can switch to eRPN (Entry RPN) for a more RPL-like entry.
+* Default angle mode is in Degrees. You can change to Radians or Gradients in settings.
 * Excalibur has 3 different layouts. The classic layout by default and in settings you can switch to left-positioned Operators (-+×÷) or to a smaller 4-banger (it's a bit more than that!) layout.
 * Setting the display of numbers is done with the 'Disp' button near the middle-top row. This is the equivilent of the FIX, SCI, ENG handling of HP calculators.
 * By default, the Change-Sign (CHS) and Exponent (EEX) keys are in the old HP naming style. You can change them to more modern equivilents in settings.
 * Programming is non-merged keystroke based much like the earliest HP calculators. You can have up to 40 different programs and each program can have up to 400 steps (total of 16K worth of programming steps).
 * By default, the comma is used for the thousands seperator and the decimal point is the radix seperator. You can change this in settings.
+* STO/RCL work much like classic HP Voyager series. R10-R19 are handled via STO .0 through STO .9. There are 100 internal registers - beyond 20 you must use indirect addressing on the Programming bank.
+* STO has register arithmetic. RCL has recall register arithmetic.
+* TVM (Time-Value Money) on the Financial bank is handled quite like the HP-12C.
+* Base (HEX, DEC, OCT, BIN) operations and word size are handled quite like the HP-16C (though 64-bit words are supported on Excalibur).
+* If you want to see what's going on "under the hood" with memory, use the 'Show' button to the left of the main keypad.
 * To see a list of common keyboard keys that you can press to activate common functions of the calculator - see  the 'Help' menu.
   
 **Number Formats - Real vs Integer**
@@ -137,7 +143,7 @@ For example, to compute the area of 2 circles with the first circle's radius in 
 009 - Multiply<br>
 010 - Return<br>
 011 - \<End Of Program\><br>
-Checksum: 0D2E<br>
+Checksum: 0671<br>
 
 Now entering a radius in X and a radius in Y and pressing "Play" will yield the area of both circles. The code is a little tricky but not overly complicated. The first line simply tells Excalibur to go to subroutine A (indicated by the Label A instruction). Excalibur will jump to label A and continue executing until a Return statement is reached at which time control is given back to the line after the Gosub A call and execution continues from there. There is no limit to the number of subroutines that can be called, however if a subroutine calls itself (recursively), the number of recursive calls can be nested only 1000 levels deep (Excalibur will give you an error dialog box if you attempt to call nested subroutines deeper than that).
 
@@ -145,7 +151,7 @@ Now entering a radius in X and a radius in Y and pressing "Play" will yield the 
 
 To assign a program directly to a key, simply record any program you wish. Save it using "Program Manager" from the File menu. You can give it a short "key" name and a longer more descriptive name. Then you can go to the Define Custom Set menu item also in the File menu. There you will see a list of all keys and programs and you can click to assign any key or program to any desired custom key on the custom key bank. When you show the Custom bank you will see the short key name of your program and the tool-tip will be the longer more descriptive name. Pressing that key will load and invoke the program (but will not harm the contents of any current REC/PLAY macro program).
 
-This should allow you to make your own constants, conversions, formulas, etc. with relative ease. As of right now, menu items are not saved as part of the program record process - just buttons. This should pose very little problem since you can always type in the constant value as part of the program or use the StoA/RclA or StoB/RclB keys to get at more saved storage.
+This should allow you to make your own constants, conversions, formulas, etc. with relative ease. As of right now, menu items are not saved as part of the program record process - just buttons. This should pose very little problem since you can always type in the constant value as part of the program or use the STO/RCL keys to get at more saved storage.
 
 **Editing Programs**
 
