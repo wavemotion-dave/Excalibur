@@ -649,17 +649,16 @@ BEGIN
                     15,26,48,11
     CONTROL         "Gradients",106,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,
                     15,36,48,11
-    CONTROL         "XXX , XXX . YY",116,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP | WS_TABSTOP,15,63,64,10
-    CONTROL         "XXX . XXX , YY",117,"Button",BS_AUTORADIOBUTTON | 
-                    WS_TABSTOP,15,73,65,10
+    CONTROL         "XXX , XXX . YY",116,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,99,64,61,10
+    CONTROL         "XXX . XXX , YY",117,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,99,76,61,10
+    CONTROL         "XXX  XXX . YY",118,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,99,88,61,10
     CONTROL         "Active On Entry",107,"Button",BS_AUTORADIOBUTTON | 
                     WS_GROUP | WS_TABSTOP,99,21,61,10
     CONTROL         "Unchanged",108,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,
-                    99,31,63,10
+                    99,32,63,10
     CONTROL         "ON",109,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
-                    WS_TABSTOP,99,63,33,10
-    CONTROL         "OFF",110,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,99,73,
+                    WS_TABSTOP,15,63,33,10
+    CONTROL         "OFF",110,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,15,73,
                     31,10
     CONTROL         "4 Level",124,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
                     WS_TABSTOP,16,99,48,11
@@ -676,31 +675,31 @@ BEGIN
     CONTROL         "+/-      E",111,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
                     WS_TABSTOP,178,21,43,10
     CONTROL         "CHS  EEX",112,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,
-                    178,31,48,10
+                    178,32,48,10
     CONTROL         "ON",114,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
-                    WS_TABSTOP,178,63,33,10
+                    WS_TABSTOP,178,64,33,10
     CONTROL         "OFF",115,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,178,
-                    73,31,10
-    EDITTEXT        103,220,96,32,12
-    EDITTEXT        123,220,121,32,12
+                    76,31,10
+    EDITTEXT        103,220,111,32,12
+    EDITTEXT        123,220,136,32,12
     PUSHBUTTON      "Display Modes",113,103,181,54,14
     PUSHBUTTON      "Cancel",102,173,181,52,14
     GROUPBOX        "Angle Mode",IDC_STATIC,9,7,78,42
     GROUPBOX        "Num Lock",IDC_STATIC,93,7,72,42
     GROUPBOX        "Key Settings",IDC_STATIC,171,7,72,42
-    GROUPBOX        "Comma Format",IDC_STATIC,9,54,78,32
-    GROUPBOX        "Comma Display",IDC_STATIC,93,54,72,32
-    GROUPBOX        "Tool Tips",IDC_STATIC,171,54,72,32
+    GROUPBOX        "Number Separator",IDC_STATIC,93,54,72,49
+    GROUPBOX        "Separator Display",IDC_STATIC,9,54,78,32
+    GROUPBOX        "Tool Tips",IDC_STATIC,171,54,72,42
     GROUPBOX        "Stack Options",IDC_STATIC,9,90,78,81
-    LTEXT           "Tax Constant:",IDC_STATIC,172,98,48,8
-    LTEXT           "Pause/Trace Delay (ms):",IDC_STATIC,172,118,48,18
-    CONTROL         "Classic",118,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
-                    WS_TABSTOP,99,99,56,10
-    CONTROL         "Classic - Left Ops",119,"Button",BS_AUTORADIOBUTTON | 
-                    WS_TABSTOP,99,111,63,10
-    CONTROL         "4-Banger",120,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,
-                    99,123,57,10
-    GROUPBOX        "Footprint",IDC_STATIC,93,90,72,46
+    LTEXT           "Tax Constant:",IDC_STATIC,172,113,48,8
+    LTEXT           "Pause/Trace Delay (ms):",IDC_STATIC,172,133,48,18
+    CONTROL         "Classic",119,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
+                    WS_TABSTOP,99,117,56,10
+    CONTROL         "Classic - Left Ops",120,"Button",BS_AUTORADIOBUTTON | 
+                    WS_TABSTOP,99,129,63,10
+    CONTROL         "4-Banger",121,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,
+                    99,141,57,10
+    GROUPBOX        "Footprint",IDC_STATIC,93,108,72,46
 END
 
 DIALOG_FINANCIAL DIALOG DISCARDABLE  40, 20, 324, 85

@@ -200,7 +200,7 @@ extern int32_t main_x;
 extern int32_t main_y;
 
 extern double  taxConstant;
-extern uint8_t commaMode;
+extern uint8_t useSeparator;
 extern uint8_t eexMode;
 extern uint8_t numLockMode;
 extern uint8_t lastProgMode;
@@ -398,8 +398,13 @@ extern struct customSaveStruct customSave[MAX_FUNCS];
 extern uint64_t stackPushes;
 extern uint64_t stackPops;
 
-#define INTERNATIONAL     0
-#define NONINTERNATIONAL  1
+#define SEPARATOR_COMMA_DP  0
+#define SEPARATOR_DP_COMMA  1
+#define SEPARATOR_SPACE_DP  2
+
+#define ANGLE_DEG           0
+#define ANGLE_RAD           1
+#define ANGLE_GRAD          2
 
 #define M_PI              3.14159265358979
 #define CNULL            '\0'

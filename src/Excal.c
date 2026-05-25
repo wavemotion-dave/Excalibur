@@ -54,7 +54,7 @@
                   "https://github.com/wavemotion-dave/Excalibur"      \
                   "\n\nThis version is BETA - Expect and report Bugs!"
 
-#define CONFIG_VERSION_MAIN 0xF00D  // If this changes, we wipe EVERYTHING
+#define CONFIG_VERSION_MAIN 0xF00E  // If this changes, we wipe EVERYTHING
 #define CONFIG_VERSION_SUB  0xF004  // If this changes, we reset x,y window position and reset constant tables (currency, physics constants, etc)
 
 #define END_OF_PROGRAM_STR "<End Of Program>"
@@ -83,7 +83,7 @@ uint64_t wordSizeMask = (uint64_t) 0xFFFFFFFFL;
 uint8_t padZeros = COMPSCI_NOPADZEROS;
 uint8_t wordMode = COMPSCI_SIGNED;
 uint8_t hexSpacing = HEX_SPACE_NONE;
-uint8_t numberDisplayMode = INTERNATIONAL;
+uint8_t numberDisplayMode = SEPARATOR_COMMA_DP;
 uint8_t lastProgMode = PROG_FLOAT;
 uint16_t traceDelayValueMs = 1000;
 
@@ -140,8 +140,8 @@ uint64_t stackPops = 0;   // Total number of Stack Pops
 uint32_t inFocusTime = 0; // Number of minutes Excalibur window in 'focus'
 
 // A number of status registers for various modes and functions
-uint8_t  AngleMode = 0;         // 0=Degrees, 1=Radians, 2=Gradients
-uint8_t  commaMode = 1;         // 0=International, 1=US (commas vs periods for decimal and thousand separators)
+uint8_t  angleMode = ANGLE_DEG; // 0=Degrees, 1=Radians, 2=Gradients
+uint8_t  useSeparator = 1;      // 1=Show Separator, 0=Hide Separator
 uint8_t  eexMode = 1;           // 0=EEX, 1=E, CHS vs +/-
 uint8_t  numLockMode = 1;       // Turn on NumLock when program starts?
 uint8_t  toolTipsOn = 1;        // Enable tooltips?
@@ -1278,11 +1278,16 @@ void ClipboardCopySelection(HWND hwnd, uint8_t copytype)
         lstrcpyn(tmp2, lpMem, MAX_STACK_STRLEN);
         GlobalUnlock(hMem);
         CloseClipboard();
+        
+        // -------------------------------------------------------
+        // If we are pasting from clipboard, look at display mode
+        // to see if we need to manipualte commas and DPs.
+        // -------------------------------------------------------
         tmp2[20] = '\0';
         j = 0;
         for (i = 0; i < (int)strlen(tmp2); i++)
         {
-            if (numberDisplayMode == NONINTERNATIONAL)
+            if (numberDisplayMode == SEPARATOR_DP_COMMA)
             {
                 if (tmp2[i] != '.') // Strip decimal points out....
                 {
@@ -1290,7 +1295,7 @@ void ClipboardCopySelection(HWND hwnd, uint8_t copytype)
                     j++;
                 }
             }
-            else
+            else if (numberDisplayMode == SEPARATOR_COMMA_DP)
             {
                 if (tmp2[i] != ',') // Otherwise, Strip commas out...
                 {
@@ -1298,9 +1303,18 @@ void ClipboardCopySelection(HWND hwnd, uint8_t copytype)
                     j++;
                 }
             }
+            else if (numberDisplayMode == SEPARATOR_SPACE_DP)
+            {
+                if (tmp2[i] != ' ') // Otherwise, Strip spaces out...
+                {
+                    tmp3[j] = tmp2[i];
+                    j++;
+                }
+            }
         }
+
         tmp3[j] = (char)NULL;
-        if (numberDisplayMode == NONINTERNATIONAL) // Turn comma into dp
+        if (numberDisplayMode == SEPARATOR_DP_COMMA) // Turn comma into dp
         {
             for (i = 0; i < (int)strlen(tmp3); i++)
             {
@@ -1308,6 +1322,7 @@ void ClipboardCopySelection(HWND hwnd, uint8_t copytype)
                     tmp3[i] = '.';
             }
         }
+
         Xedit = X_NEW;
         if (progMode == PROG_FLOAT)
         {
@@ -1628,11 +1643,11 @@ void MemoryInit(void)
     {
         showTime24HourFormat = TRUE;
     }
-    // Get regional comma format...
+    // Get regional decimal separator format...
     GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SDECIMAL, tmpStr, 5);
     if (tmpStr[0] == ',')
     {
-        numberDisplayMode = NONINTERNATIONAL;
+        numberDisplayMode = SEPARATOR_DP_COMMA;
     }
 }
 
@@ -1681,9 +1696,14 @@ void ExcalInit(void)
         SetDlgItemText(calcMainWindow, RPN_NEGATE, "CHS");
         SetDlgItemText(calcMainWindow, RPN_E, "EEX");
     }
-    if (numberDisplayMode == NONINTERNATIONAL)
+
+    if (numberDisplayMode == SEPARATOR_DP_COMMA)
     {
         SetDlgItemText(calcMainWindow, RPN_DIGIT_DP, ",");
+    }
+    else
+    {
+        SetDlgItemText(calcMainWindow, RPN_DIGIT_DP, ".");
     }
 }
 
@@ -1750,11 +1770,11 @@ void ShowStatus(void)
         sprintf(statusBar, "FIX %2d", decimal_places);
     SetDlgItemText(calcMainWindow, STATUS_BAR, statusBar);
 
-    if (AngleMode == 0)
+    if (angleMode == ANGLE_DEG)
         sprintf(tmpStr, "DEG");
-    if (AngleMode == 1)
+    if (angleMode == ANGLE_RAD)
         sprintf(tmpStr, "RAD");
-    if (AngleMode == 2)
+    if (angleMode == ANGLE_GRAD)
         sprintf(tmpStr, "GRA");
     SetDlgItemText(calcMainWindow, ANGLE_BAR, tmpStr);
 }
@@ -2022,8 +2042,10 @@ int ProcessDirectKeyHit(WPARAM key)
 
     keyStroke = LOBYTE(key);
 
-    if (numberDisplayMode == NONINTERNATIONAL && keyStroke == ',') // Allow comma as DP separator on keyboard...
+    if (numberDisplayMode == SEPARATOR_COMMA_DP && keyStroke == ',') // Allow comma as DP separator on keyboard...
+    {
         keyStroke = '.';
+    }
 
     found = 0;
     for (i = 0; i < MAX_FUNCS; i++)
@@ -2149,17 +2171,34 @@ char RadixBIN(int progM) // Shows bin HI arrow!
     return (' ');
 }
 
+// ---------------------------------------------------------------------
+// The normal format generated is commas for separating thousands and
+// the decimal point (DP) to separate the decimal from fractional part.
+// This routine will do the necessary substitutions for other formats.
+// ---------------------------------------------------------------------
 void makeInternational(char *str)
 {
     int j;
-    if (numberDisplayMode == NONINTERNATIONAL)
+
+    if (numberDisplayMode == SEPARATOR_DP_COMMA)
     {
+        // Swap DPs and Commas
         for (j = 0; j < (int)strlen(str); j++)
         {
             if (str[j] == '.')
                 str[j] = ',';
             else if (str[j] == ',')
                 str[j] = '.';
+        }
+    }
+    else
+    if (numberDisplayMode == SEPARATOR_SPACE_DP)
+    {
+        // Turn all commas into spaces
+        for (j = 0; j < (int)strlen(str); j++)
+        {
+            if (str[j] == ',')
+                str[j] = ' ';
         }
     }
 }
@@ -2171,7 +2210,7 @@ void PutCommas(char *str)
     char *orgp2;
     int i, j, k, dpCount;
 
-    if ((commaMode != 0) && (strchr(str, '/') == NULL)) // No commas for fractions
+    if ((useSeparator != 0) && (strchr(str, '/') == NULL)) // No commas for fractions
     {
         orgp = strchr(str, '.');
         if (orgp == NULL)
@@ -3417,9 +3456,9 @@ double ToRadians(double t)
 {
     double temp;
 
-    if (AngleMode == 0)
+    if (angleMode == ANGLE_DEG)
         temp = t / (180.0 / M_PI);
-    else if (AngleMode == 2)
+    else if (angleMode == ANGLE_GRAD)
         temp = t / ((180.0 / M_PI) * (400.0 / 360.0));
     else
         temp = t;
@@ -3431,9 +3470,9 @@ double FromRadians(double t)
 {
     double temp;
 
-    if (AngleMode == 0)
+    if (angleMode == ANGLE_DEG)
         temp = t * (180.0 / M_PI);
-    else if (AngleMode == 2)
+    else if (angleMode == ANGLE_GRAD)
         temp = t * ((180.0 / M_PI) * (400.0 / 360.0));
     else
         temp = t;
@@ -3657,6 +3696,7 @@ void SaveToDisk(void)
     FILE *outfile;
     uint8_t menuCurrentFuncs, menuLastFuncs;
     uint16_t configVersionMain, configVersionSub;
+    uint8_t spare8 = 0;
 
     outfile = fopen(GetConfigurationDirectory(), "wb+");
 
@@ -3697,6 +3737,13 @@ void SaveToDisk(void)
         fwrite(&wordMode,           sizeof(wordMode),           1, outfile);
         fwrite(&hexSpacing,         sizeof(hexSpacing),         1, outfile);
         fwrite(&wordSizeMask,       sizeof(wordSizeMask),       1, outfile);
+        fwrite(&angleMode,          sizeof(angleMode),          1, outfile);
+        fwrite(&taxConstant,        sizeof(taxConstant),        1, outfile);
+        fwrite(&useSeparator,       sizeof(useSeparator),       1, outfile);
+        fwrite(&eexMode,            sizeof(eexMode),            1, outfile);
+        fwrite(&numLockMode,        sizeof(numLockMode),        1, outfile);
+        fwrite(&toolTipsOn,         sizeof(toolTipsOn),         1, outfile);
+        fwrite(&spare8,             sizeof(spare8),             1, outfile);
 
         fwrite(STACK,               sizeof(STACK),              1, outfile);
         fwrite(STACKL,              sizeof(STACKL),             1, outfile);
@@ -3713,12 +3760,6 @@ void SaveToDisk(void)
         fwrite(&cashFlow,           sizeof(cashFlow),           1, outfile);
         fwrite(&CFn,                sizeof(CFn),                1, outfile);
 
-        fwrite(&AngleMode,          sizeof(AngleMode),          1, outfile);
-        fwrite(&taxConstant,        sizeof(taxConstant),        1, outfile);
-        fwrite(&commaMode,          sizeof(commaMode),          1, outfile);
-        fwrite(&eexMode,            sizeof(eexMode),            1, outfile);
-        fwrite(&numLockMode,        sizeof(numLockMode),        1, outfile);
-        fwrite(&toolTipsOn,         sizeof(toolTipsOn),         1, outfile);
         fwrite(&payMode,            sizeof(payMode),            1, outfile);
         fwrite(&dateMode,           sizeof(dateMode),           1, outfile);
         fwrite(&depreciationType,   sizeof(depreciationType),   1, outfile);
@@ -3774,6 +3815,7 @@ void ReadFromDisk(void)
     FILE *infile;
     uint8_t menuCurrentFuncs, menuLastFuncs;
     uint16_t configVersionMain, configVersionSub;
+    uint8_t spare8 = 0;
 
     infile = fopen(GetConfigurationDirectory(), "rb");
     if (infile != NULL)
@@ -3811,6 +3853,13 @@ void ReadFromDisk(void)
         fread(&wordMode,           sizeof(wordMode),           1, infile);
         fread(&hexSpacing,         sizeof(hexSpacing),         1, infile);
         fread(&wordSizeMask,       sizeof(wordSizeMask),       1, infile);
+        fread(&angleMode,          sizeof(angleMode),          1, infile);
+        fread(&taxConstant,        sizeof(taxConstant),        1, infile);
+        fread(&useSeparator,       sizeof(useSeparator),       1, infile);
+        fread(&eexMode,            sizeof(eexMode),            1, infile);
+        fread(&numLockMode,        sizeof(numLockMode),        1, infile);
+        fread(&toolTipsOn,         sizeof(toolTipsOn),         1, infile);
+        fread(&spare8,             sizeof(spare8),             1, infile);
 
         fread(STACK,               sizeof(STACK),              1, infile);
         fread(STACKL,              sizeof(STACKL),             1, infile);
@@ -3827,12 +3876,6 @@ void ReadFromDisk(void)
         fread(&cashFlow,           sizeof(cashFlow),           1, infile);
         fread(&CFn,                sizeof(CFn),                1, infile);
 
-        fread(&AngleMode,          sizeof(AngleMode),          1, infile);
-        fread(&taxConstant,        sizeof(taxConstant),        1, infile);
-        fread(&commaMode,          sizeof(commaMode),          1, infile);
-        fread(&eexMode,            sizeof(eexMode),            1, infile);
-        fread(&numLockMode,        sizeof(numLockMode),        1, infile);
-        fread(&toolTipsOn,         sizeof(toolTipsOn),         1, infile);
         fread(&payMode,            sizeof(payMode),            1, infile);
         fread(&dateMode,           sizeof(dateMode),           1, infile);
         fread(&depreciationType,   sizeof(depreciationType),   1, infile);
@@ -4499,11 +4542,11 @@ BOOL CALLBACK fnDIALOG_SettingsProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
         SetDlgItemText(hDlg, 123, tmpStr);
 
         if (footPrint == 2) // 4-Banger mode
-            SendMessage(GetDlgItem(hDlg, 120), BM_SETCHECK, (WORD)1, (DWORD)0L);
+            SendMessage(GetDlgItem(hDlg, 121), BM_SETCHECK, (WORD)1, (DWORD)0L);
         else if (footPrint == 1) // Excalibur Left Ops
-            SendMessage(GetDlgItem(hDlg, 119), BM_SETCHECK, (WORD)1, (DWORD)0L);
+            SendMessage(GetDlgItem(hDlg, 120), BM_SETCHECK, (WORD)1, (DWORD)0L);
         else // else Classic mode
-            SendMessage(GetDlgItem(hDlg, 118), BM_SETCHECK, (WORD)1, (DWORD)0L);
+            SendMessage(GetDlgItem(hDlg, 119), BM_SETCHECK, (WORD)1, (DWORD)0L);
 
         if (extendedStack)
             SendMessage(GetDlgItem(hDlg, 125), BM_SETCHECK, (WORD)1, (DWORD)0L);
@@ -4513,8 +4556,8 @@ BOOL CALLBACK fnDIALOG_SettingsProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
         if (popFillZero != 0)
             SendMessage(GetDlgItem(hDlg, IDC_CHECK1), BM_SETCHECK, (WORD)1, (DWORD)0L);
 
-        SendMessage(GetDlgItem(hDlg, 104 + AngleMode), BM_SETCHECK, (WORD)1, (DWORD)0L);
-        if (commaMode == 0)
+        SendMessage(GetDlgItem(hDlg, 104 + angleMode), BM_SETCHECK, (WORD)1, (DWORD)0L);
+        if (useSeparator == 0)
             SendMessage(GetDlgItem(hDlg, 110), BM_SETCHECK, (WORD)1, (DWORD)0L);
         else
             SendMessage(GetDlgItem(hDlg, 109), BM_SETCHECK, (WORD)1, (DWORD)0L);
@@ -4533,10 +4576,12 @@ BOOL CALLBACK fnDIALOG_SettingsProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
         else
             SendMessage(GetDlgItem(hDlg, 115), BM_SETCHECK, (WORD)1, (DWORD)0L);
 
-        if (numberDisplayMode == INTERNATIONAL)
+        if (numberDisplayMode == SEPARATOR_COMMA_DP)
             SendMessage(GetDlgItem(hDlg, 116), BM_SETCHECK, (WORD)1, (DWORD)0L);
-        else
+        else if (numberDisplayMode == SEPARATOR_DP_COMMA)
             SendMessage(GetDlgItem(hDlg, 117), BM_SETCHECK, (WORD)1, (DWORD)0L);
+        else // SEPARATOR_SPACE_DP
+            SendMessage(GetDlgItem(hDlg, 118), BM_SETCHECK, (WORD)1, (DWORD)0L);
 
         if (showXMinimized == 1)
             SendMessage(GetDlgItem(hDlg, IDC_CHECK2), BM_SETCHECK, (WORD)1, (DWORD)0L);
@@ -4555,7 +4600,7 @@ BOOL CALLBACK fnDIALOG_SettingsProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
 
             GetDlgItemText(hDlg, 103, tmpStr, 8);
             taxConstant = atof(tmpStr);
-            if (taxConstant == 0.0)
+            if (taxConstant <= 0.0)
                 taxConstant = 1.05;
 
             GetDlgItemText(hDlg, 123, tmpStr, 9);
@@ -4575,7 +4620,7 @@ BOOL CALLBACK fnDIALOG_SettingsProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
             else
                 popFillZero = 0;
 
-            bs = SendMessage(GetDlgItem(hDlg, 118), BM_GETCHECK, (WORD)0, (DWORD)0L);
+            bs = SendMessage(GetDlgItem(hDlg, 119), BM_GETCHECK, (WORD)0, (DWORD)0L);
             if (bs != 0L)
             {
                 if (footPrint != 0)
@@ -4587,7 +4632,7 @@ BOOL CALLBACK fnDIALOG_SettingsProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
                 footPrint = 0;
             }
 
-            bs = SendMessage(GetDlgItem(hDlg, 119), BM_GETCHECK, (WORD)0, (DWORD)0L);
+            bs = SendMessage(GetDlgItem(hDlg, 120), BM_GETCHECK, (WORD)0, (DWORD)0L);
             if (bs != 0L)
             {
                 if (footPrint != 1)
@@ -4599,7 +4644,7 @@ BOOL CALLBACK fnDIALOG_SettingsProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
                 footPrint = 1;
             }
 
-            bs = SendMessage(GetDlgItem(hDlg, 120), BM_GETCHECK, (WORD)0, (DWORD)0L);
+            bs = SendMessage(GetDlgItem(hDlg, 121), BM_GETCHECK, (WORD)0, (DWORD)0L);
             if (bs != 0L)
             {
                 if (footPrint != 2)
@@ -4614,23 +4659,23 @@ BOOL CALLBACK fnDIALOG_SettingsProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
             bs = SendMessage(GetDlgItem(hDlg, 104), BM_GETCHECK, (WORD)0, (DWORD)0L);
             if (bs != 0L)
             {
-                AngleMode = 0; // Degrees
+                angleMode = ANGLE_DEG;
             }
             bs = SendMessage(GetDlgItem(hDlg, 105), BM_GETCHECK, (WORD)0, (DWORD)0L);
             if (bs != 0L)
             {
-                AngleMode = 1; // Radians
+                angleMode = ANGLE_RAD;
             }
             bs = SendMessage(GetDlgItem(hDlg, 106), BM_GETCHECK, (WORD)0, (DWORD)0L);
             if (bs != 0L)
             {
-                AngleMode = 2; // Gradients
+                angleMode = ANGLE_GRAD;
             }
             bs = SendMessage(GetDlgItem(hDlg, 109), BM_GETCHECK, (WORD)0, (DWORD)0L);
             if (bs != 0L)
-                commaMode = 1;
+                useSeparator = 1;
             else
-                commaMode = 0;
+                useSeparator = 0;
 
             bs = SendMessage(GetDlgItem(hDlg, 107), BM_GETCHECK, (WORD)0, (DWORD)0L);
             if (bs != 0L)
@@ -4647,13 +4692,22 @@ BOOL CALLBACK fnDIALOG_SettingsProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
             bs = SendMessage(GetDlgItem(hDlg, 116), BM_GETCHECK, (WORD)0, (DWORD)0L);
             if (bs != 0L)
             {
-                numberDisplayMode = INTERNATIONAL;
+                numberDisplayMode = SEPARATOR_COMMA_DP;
                 SetDlgItemText(calcMainWindow, RPN_DIGIT_DP, ".");
             }
-            else
+            
+            bs = SendMessage(GetDlgItem(hDlg, 117), BM_GETCHECK, (WORD)0, (DWORD)0L);
+            if (bs != 0L)
             {
-                numberDisplayMode = NONINTERNATIONAL;
+                numberDisplayMode = SEPARATOR_DP_COMMA;
                 SetDlgItemText(calcMainWindow, RPN_DIGIT_DP, ",");
+            }
+
+            bs = SendMessage(GetDlgItem(hDlg, 118), BM_GETCHECK, (WORD)0, (DWORD)0L);
+            if (bs != 0L)
+            {
+                numberDisplayMode = SEPARATOR_SPACE_DP;
+                SetDlgItemText(calcMainWindow, RPN_DIGIT_DP, ".");
             }
 
             bs = SendMessage(GetDlgItem(hDlg, 111), BM_GETCHECK, (WORD)0, (DWORD)0L);
@@ -5643,7 +5697,6 @@ void blinkXDisplay(uint8_t no_peek)
 
         SetDlgItemText(calcMainWindow, RPN_STACK_X, tmpStr);
 
-        hControl = GetDlgItem(calcMainWindow, RPN_STACK_X);
         InvalidateRect(hControl, NULL, TRUE);
         UpdateWindow(hControl);
         Sleep(10);
