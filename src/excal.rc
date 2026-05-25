@@ -984,8 +984,8 @@ BEGIN
     RTEXT           "D-00000.00000",IDC_SHOW_X,30,87,107,8
     GROUPBOX        "Financial",IDC_STATIC,9,105,133,60
     LTEXT           "FV:",IDC_STATIC,16,154,13,8
-    LTEXT           "PV:",IDC_STATIC,16,144,18,8
-    LTEXT           "PMT:",IDC_STATIC,16,134,19,8
+    LTEXT           "PMT:",IDC_STATIC,16,144,18,8
+    LTEXT           "PV:",IDC_STATIC,16,134,19,8
     LTEXT           "i:",IDC_STATIC,16,124,10,8
     LTEXT           "n:",IDC_STATIC,16,114,10,8
     RTEXT           "D-00000.00000",IDC_SHOW_FIN_N,36,114,100,8
