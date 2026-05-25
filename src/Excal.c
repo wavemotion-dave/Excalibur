@@ -262,7 +262,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     ReadFromDisk(); // We need to know the footprint... so we need to read the config before we create the window.
 
     // This is the main Excalibur dialog window!
-    if (footPrint == 1)
+    if (footPrint == 2)
     {
         calcMainWindow = CreateDialog(hInstance, "DIALOG_4BANGER", 0, NULL);
         lastProgMode = PROG_FLOAT;
@@ -270,6 +270,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
         lastConstBank = 0;
         currentFuncs = (struct funcStruct *)&Scientific_funcs;
         lastFuncs = (struct funcStruct *)&Scientific_funcs;
+    }
+    else if (footPrint == 1)
+    {
+        calcMainWindow = CreateDialog(hInstance, "DIALOG_EXCALIBUR_LEFT", 0, NULL);
     }
     else
     {
@@ -2024,7 +2028,7 @@ int ProcessDirectKeyHit(WPARAM key)
     found = 0;
     for (i = 0; i < MAX_FUNCS; i++)
     {
-        if (footPrint == 0)
+        if (footPrint < 2)
         {
             if (toupper(keyStroke) == toupper(currentFuncs[i].op) && keyStroke != ' ')
             {
@@ -4494,9 +4498,11 @@ BOOL CALLBACK fnDIALOG_SettingsProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
         sprintf(tmpStr, "%d", traceDelayValueMs);
         SetDlgItemText(hDlg, 123, tmpStr);
 
-        if (footPrint == 1) // 4-Banger mode
+        if (footPrint == 2) // 4-Banger mode
+            SendMessage(GetDlgItem(hDlg, 120), BM_SETCHECK, (WORD)1, (DWORD)0L);
+        else if (footPrint == 1) // Excalibur Left Ops
             SendMessage(GetDlgItem(hDlg, 119), BM_SETCHECK, (WORD)1, (DWORD)0L);
-        else
+        else // else Classic mode
             SendMessage(GetDlgItem(hDlg, 118), BM_SETCHECK, (WORD)1, (DWORD)0L);
 
         if (extendedStack)
@@ -4580,6 +4586,7 @@ BOOL CALLBACK fnDIALOG_SettingsProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
                 }
                 footPrint = 0;
             }
+
             bs = SendMessage(GetDlgItem(hDlg, 119), BM_GETCHECK, (WORD)0, (DWORD)0L);
             if (bs != 0L)
             {
@@ -4590,6 +4597,18 @@ BOOL CALLBACK fnDIALOG_SettingsProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
                                "Excalibur Footprint Change", MB_OK);
                 }
                 footPrint = 1;
+            }
+
+            bs = SendMessage(GetDlgItem(hDlg, 120), BM_GETCHECK, (WORD)0, (DWORD)0L);
+            if (bs != 0L)
+            {
+                if (footPrint != 2)
+                {
+                    MessageBox(hDlg,
+                               "Changing the footprint size requires you to close and restart Excalibur for the new setting to take place.",
+                               "Excalibur Footprint Change", MB_OK);
+                }
+                footPrint = 2;
             }
 
             bs = SendMessage(GetDlgItem(hDlg, 104), BM_GETCHECK, (WORD)0, (DWORD)0L);
@@ -4719,7 +4738,7 @@ WORD GetMouseHelp(WORD xPos, WORD yPos)
     int i;
     WORD status = 0;
 
-    if (footPrint == 0)
+    if (footPrint < 2)
     {
         i = 0;
         while (FunctionBankKeyPos[i].controlID != RPN_LAST_KEY)
