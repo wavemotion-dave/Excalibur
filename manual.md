@@ -6,9 +6,9 @@ At one time, Excalibur had extensive help and an RPN tutorial that was largely n
 * Uses a classic HP 4-deep RPN stack (X, Y, Z, T). In settings you can change this to 8-deep (adding A, B, C, D).
 * Default for ENTER key is to duplicate the X register into Y like the classic HP calculators. In settings, you can switch to eRPN (Entry RPN) for a more RPL-like entry.
 * Excalibur has 3 different layouts. The classic layout by default and in settings you can switch to classic-HP left-positioned Operators (-+×÷) or to a smaller 4-banger (it's a bit more than that!) layout.
-* Setting the format of numbers is done with the 'Disp' button near the middle-top row. This is the equivilent of the FIX, SCI, ENG handling of HP calculators.
-* By default, the Change-Sign (CHS) and Exponent (EEX) keys are in the old HP naming style. You can change them to more modern equivilents in settings.
-* Things like Angle Mode (degrees, radians, gradients) or the use of comma vs decimal point for seperators are found in the Settings menu.
+* Setting the format of numbers is done with the 'Disp' button near the middle-top row. This is the equivalent of the FIX, SCI, ENG handling of HP calculators.
+* By default, the Change-Sign (CHS) and Exponent (EEX) keys are in the old HP naming style. You can change them to more modern equivalents in settings.
+* Things like Angle Mode (degrees, radians, gradients) or the use of comma vs decimal point for separators are found in the Settings menu.
 * STO/RCL work much like classic HP Voyager series. R10-R19 are handled via STO .0 through STO .9. There are 100 internal registers - beyond 20 you must use indirect addressing on the Programming bank.
 * STO has standard HP register arithmetic. RCL has recall register arithmetic similar to the HP-15C).
 * TVM (Time-Value Money) on the Financial bank is handled quite like the HP-12C (with the exception that the 12-multiply and 12-divide functions do not automatically store into n/i registers).
