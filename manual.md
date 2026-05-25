@@ -177,27 +177,27 @@ If you want to see the program played out slowly so you can try and debug it, yo
 
 **Indirect Addressing**
 
-One of the most powerful programming techniques is the use of indirect addressing. Indirect addressing allows variable branch labels and register access. To indirectly address one of the 26 storage registers, use the StoXth and RclXth keys.  These use the X register as the index to determine which storage register should be used. For example, entering 1 in X and pressing StoXth will store the current Y value to the first register (the R0 register).  Using StoXth and RclXth all 26 registers can be addressed with 1=A, 2=B … 26=Z.  StoXth and RclXth both drop the stack so the index value is no longer on the stack at the end of the operation.  For example, if you wanted to store the value 123 to the R26 register, key in the following sequence:
+One of the most powerful programming techniques is the use of indirect addressing. Indirect addressing allows variable branch labels and register access. To indirectly address one of the 26 storage registers, use the StoXth and RclXth keys.  These use the X register as the index to determine which storage register should be used. For example, entering 1 in X and pressing StoXth will store the current Y value to the first register (the R0 register).  Using StoXth and RclXth all 100 registers can be addressed (R00 through R99). StoXth and RclXth both drop the stack so the index value is no longer on the stack at the end of the operation.  For example, if you wanted to store the value 123 to the R26 register, key in the following sequence:
 
 123<br>
 ENTER<br>
 26<br>
 StoXth<br>
 
-This will drop the stack and use 26 as the index to the register that should be used to STO the 123 value from the stack. You can use the Program Debugger or the normal STO key on the main keypad to verify the value was saved properly. To save time and keystrokes the first half dozen registers can be stored and recalled with buttons located on Program Bank II.
+This will drop the stack and use 26 as the index to the register that should be used to STO the 123 value from the stack.
 
-Perhaps of greater importance to programmers using Excalibur, labels can also be indirectly addressed. Excalibur uses a special Indirect Register called 'i' which is an integer based internal register. To store a number into the indirect register use the "Sto i" key. To recall the indirect register to the stack, use the "Rcl i" key. The number in the Indirect Register represents a program label with 0=label A, 1=label B, 9=label J.  Using the Goto(i) or Gsb(i) keys will jump to the label indicaetd by the value of the Indirect register.
+Perhaps of greater importance to programmers using Excalibur, labels can also be indirectly addressed. Excalibur uses a special Indirect Register called 'i' which is an integer based internal register. To store a number into the indirect register use the "Sto i" key. To recall the indirect register to the stack, use the "Rcl i" key. The number in the Indirect Register represents a program label with 0=label A, 1=label B, 9=label J.  Using the Goto(i) or Gsb(i) keys will jump to the label indicaetd by the value of the Indirect register. If you try to jump to a label that doesn't exist (outside A-J), you will get a run-time error when your program executes.
 
 **Excalibur Programming Speed**
 
-Excalibur program steps run based on the speed of your computer. But, in practice it hardly matters. It will execute many thousands of steps per second on even the lowliest computer capable of running a 32-bit Windows operating system.  On my fairly modest PC it performs about 60,000 steps per second. I ran an experiment taking a simple 6 step program that incremented a counter, inverted the value and then took the SIN of the value and then looped back to do it again. I let a variety of calculators run the program for 30 seconds. What I found was:
+Excalibur program steps run based on the speed of your computer. In practice this hardly matters. It will execute many thousands of steps per second on even the lowliest computer capable of running a 32-bit Windows operating system.  On my fairly modest PC it performs about 60,000 steps per second. I ran an experiment taking a simple 6 step program that incremented a counter, inverted the value and then took the SIN of the value and then looped back to do it again. I let a variety of calculators run the program for 30 seconds. What I found was:
 
 HP15C ran 24 iterations of the program in 30 seconds.<br>
 HP11C ran 27 iterations of the program in 30 seconds.<br>
 HP25 ran 32 iterations of the program in 30 seconds.<br>
 HP41C ran 51 iterations of the program in 30 seconds.<br>
 HP32SII ran 237 iterations of the program in 30 seconds.<br>
-Excalibur v3.00 on a modest i5 ran 57,335,221 iterations of the program in 30 seconds.<br>
+Excalibur v3.00 (on a modest i5) ran 57,335,221 iterations of the program in 30 seconds.<br>
 
 Based on this simple experiment, I think it’s safe to say that Excalibur runs more than 1 million times faster than the early HP handhelds.
 
@@ -226,7 +226,7 @@ Older HP calculators tend to be a bit expensive but in my experience they are wo
 
 # Precision, Accuracy and Overflow
 
-Currently, Excalibur for Windows uses an 8 byte IEEE floating point representation of all numbers. This means that there are approximately 15 significant digits and Excalibur will show up to 13 of those.
+Excalibur for Windows uses an 8 byte IEEE floating point representation of all numbers. This means that there are approximately 15 significant digits and Excalibur will show up to 13 of those.
 
 Because of this Excalibur will NOT be as accurate as a hand-held calculator nor some of the more modern decimal-math based online calculators. This is because floating point decimal values using IEEE floating point representation generally do not have an exact binary representation. This is a side effect of how the CPU represents floating point data. For this reason, you may experience some loss of precision, and some floating point operations may produce unexpected results.
 
