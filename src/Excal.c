@@ -5801,7 +5801,7 @@ BOOL CALLBACK HelpDialog(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
         SelectObject(hdc, hFixedFont);
         dw = GetTextExtentPoint32(hdc, "WWWWW88888OOOOOXXXXXWWWWW88888OOOOOXXXXXWWWWW88888OOOOOXXXXXOOOOOXXXXXXX", 72, &lpSize);
         ReleaseDC(hDlg, hdc);
-        MoveWindow(hDlg, main_x + 100, main_y + 5, lpSize.cx + 60, (lpSize.cy * 31) + 12, TRUE);
+        MoveWindow(hDlg, main_x + 100, main_y + 5, lpSize.cx + 60, (lpSize.cy * 31) + 5, TRUE);
 
         return TRUE;
 

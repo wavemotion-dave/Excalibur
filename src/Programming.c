@@ -1075,8 +1075,8 @@ BOOL CALLBACK debugWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam
 
 void CreateDebugWindow(HWND hwnd, HINSTANCE hInstance)
 {
-    static char szAppName3[] = "DIALOG_PROGTRACE";
-    debugTraceWindow = CreateDialog(hInstance, szAppName3, 0, ( DLGPROC )debugWndProc);
+    static char szAppNameDbg[] = "DIALOG_PROGTRACE";
+    debugTraceWindow = CreateDialog(hInstance, szAppNameDbg, 0, ( DLGPROC )debugWndProc);
     ShowWindow(debugTraceWindow, SW_HIDE);
     UpdateWindow(debugTraceWindow);
     SetFocus(calcMainWindow);
