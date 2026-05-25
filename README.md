@@ -33,7 +33,7 @@ The 3.XX series is still in BETA. You can find a link to the older 2.05 as well 
 to the right of this page. If you find a problem, please report it via the Github Issues tracker at the top of this page (or contact
 me at daveber --AT-- gmail DOT com).
 
-<img width="789" height="549" alt="image" src="https://github.com/user-attachments/assets/2992bd56-7e5d-4c48-a2e5-440693f7ed29" />
+<img width="786" height="449" alt="image" src="https://github.com/user-attachments/assets/2fd47163-e1b0-4ed2-9f64-ce52cefd202b" />
 <br>
 
 The manual can be found here:  [Excalibur Manual](manual.md)
