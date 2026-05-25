@@ -903,7 +903,7 @@ BOOL CALLBACK debugWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam
      switch(message)
      {
      case WM_INITDIALOG:
-          last_debug_register_checksum = 0xFFFFBEEF;
+          last_debug_register_checksum = 0xDEADBEEF;
           return TRUE;
 
      case WM_SIZE:
@@ -1202,7 +1202,6 @@ void UpdateDebugRegs(void)
     makeInternational(tmp);
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
-
     for (i = 0; i < MAX_CF; i++)
     {
         sprintf(tmp, " CF[%2d]:%-16.11g", i, cashFlow[i]);
@@ -1214,21 +1213,47 @@ void UpdateDebugRegs(void)
     // Block for local vars... Here we don't want to update the entire 100
     // registers if they haven't changed. So we do a simple checksum and see.
     // ------------------------------------------------------------------------
-    SendDlgItemMessage(debugTraceWindow, TRACE_REGS2, LB_RESETCONTENT, 0, 0);
-
-    for (i = 0; i < MAX_STO; i++)
     {
+        uint32_t checksum = 0;
+
         if (progMode == PROG_FLOAT)
         {
-            sprintf(tmp, " R%02d: %-20.13g", i, STO[i]);
-            makeInternational(tmp);
+            uint8_t *ptr = (uint8_t *)STO;
+            for (i = 0; i < sizeof(STO); i++)    
+            {
+                checksum += *ptr++;
+            }
         }
         else
         {
-            MakeCompSciStr(STOL[i], tmp2);
-            sprintf(tmp, " L%02d: %-20s", i, tmp2);
+            uint8_t *ptr = (uint8_t *)STOL;
+            for (i = 0; i < sizeof(STOL); i++)    
+            {
+                checksum += *ptr++;
+            }
         }
-        SendDlgItemMessage(debugTraceWindow, TRACE_REGS2, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+
+        if (checksum != last_debug_register_checksum)
+        {
+            last_debug_register_checksum = checksum;
+
+            SendDlgItemMessage(debugTraceWindow, TRACE_REGS2, LB_RESETCONTENT, 0, 0);
+
+            for (i = 0; i < MAX_STO; i++)
+            {
+                if (progMode == PROG_FLOAT)
+                {
+                    sprintf(tmp, " R%02d: %-20.13g", i, STO[i]);
+                    makeInternational(tmp);
+                }
+                else
+                {
+                    MakeCompSciStr(STOL[i], tmp2);
+                    sprintf(tmp, " L%02d: %-20s", i, tmp2);
+                }
+                SendDlgItemMessage(debugTraceWindow, TRACE_REGS2, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+            }
+        }
     }
 }
 
