@@ -17,6 +17,7 @@ At one time, Excalibur had extensive help and an RPN tutorial that was largely n
 * If you want to see what's going on "under the hood" with memory, use the 'Show' button to the left of the main keypad.
 * Programming is non-merged keystroke based much like the earliest HP calculators. You can have up to 40 different programs and each program can have up to 400 steps (total of 16K worth of programming steps).
 * Excalibur passes the Turing-Complete test as a general computational device given the ability to handle logic conditions and branching.
+* Right-clicking on any Excalibur key/button will produce a short bit of context sensitive help.
 * To see a list of common keyboard keys that you can press to activate common functions of the calculator - see  the 'Help' menu.
   
 **Number Formats - Real vs Integer**
@@ -231,8 +232,8 @@ Because of this Excalibur will NOT be as accurate as a hand-held calculator nor 
 
 In addition, the calculator only does a modest amount of checking for overflow (numbers greater than the maximum or less than the minimum). The 8 byte float limits for Excalibur are shown below:
 
-DBL\_MIN2.2250738585072014e-308<br>
-DBL\_MAX1.7976931348623158e+308<br>
+DBL\_MIN  2.2250738585072014e-308<br>
+DBL\_MAX  1.7976931348623158e+308<br>
 
 As stated in the license disclaimer, this program has no guarantees associated with it. If the precision (or lack thereof) is a problem for you, please discontinue use of Excalibur.<b>
 
