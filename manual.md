@@ -45,7 +45,7 @@ REC (ends recording)<br>
 
 which would effectively multiply the X value by 9 every time PLAY is hit. Give it a try… enter a number into the X register and hit PLAY.
 
-Several hundred Excalibur keys can be recorded in this way. Once recorded, the program will stay with the calculator (even between sessions – it’s saved to disk) until a new REC takes place. If you want to save your program more permanently, simply use the "Program Manager" menu selection from the File menu. The program manager allows you to store up to 200 programs – each of which can be up to 300 steps long. That’s a ton of programming power! Let’s look at the various programming techniques in a bit more detail.
+Several hundred Excalibur keys can be recorded in this way. Once recorded, the program will stay with the calculator (even between sessions – it’s saved to disk) until a new REC takes place. If you want to save your program more permanently, simply use the "Program Manager" menu selection from the File menu. The program manager allows you to store up to 40 programs – each of which can be up to 400 steps long (that's roughly 16K worth of programming steps in total).
 
 **Keystroke Programming**
 
@@ -56,7 +56,7 @@ Keystroke programming is the most simple form of programming and the most common
 003 - Multiply<br>
 004 - \<End Of Program\><br>
 <br>
-Checksum: 0279 (you can see the program checksum from the File/Program Manager dialog box)<br>
+Checksum: 00A0 (you can see the program checksum from the File/Program Manager dialog box)<br>
 
 You have now entered the sequence of keystrokes to produce the area of a circle given the radius in X. Now enter a radius into X and press Play - you will see the answer displayed in X. A nearly infinite number of similar programs can be created in this manner. The Program Manager (on the File menu) allows you to see the entire program at a glance along with the checksum. This checksum is useful to determine if you’ve keyed in the program correctly (it is also used when programs are copied/pasted to and from the clipboard – they ensure that your program transferred correctly).
 
