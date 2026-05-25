@@ -5640,7 +5640,8 @@ void blinkXDisplay(uint8_t no_peek)
 
         if (no_peek) Sleep(250);
         else sleep_and_peek(250);
-        GetDlgItemText(calcMainWindow, RPN_STACK_X, tmpStr, MAX_STACK_STRLEN);
+
+        SetDlgItemText(calcMainWindow, RPN_STACK_X, tmpStr);
 
         hControl = GetDlgItem(calcMainWindow, RPN_STACK_X);
         InvalidateRect(hControl, NULL, TRUE);
@@ -5663,6 +5664,7 @@ void blinkStack(uint8_t no_peek)
         GetDlgItemText(calcMainWindow, RPN_STACK_Y, tmp2, MAX_STACK_STRLEN);
         GetDlgItemText(calcMainWindow, RPN_STACK_Z, tmp3, MAX_STACK_STRLEN);
         GetDlgItemText(calcMainWindow, RPN_STACK_T, tmp4, MAX_STACK_STRLEN);
+        
         SetDlgItemText(calcMainWindow, RPN_STACK_X, " ");
         SetDlgItemText(calcMainWindow, RPN_STACK_Y, " ");
         SetDlgItemText(calcMainWindow, RPN_STACK_Z, " ");
@@ -5674,12 +5676,12 @@ void blinkStack(uint8_t no_peek)
 
         if (no_peek) Sleep(250);
         else sleep_and_peek(250);
-        GetDlgItemText(calcMainWindow, RPN_STACK_X, tmp1, MAX_STACK_STRLEN);
-        GetDlgItemText(calcMainWindow, RPN_STACK_Y, tmp2, MAX_STACK_STRLEN);
-        GetDlgItemText(calcMainWindow, RPN_STACK_Z, tmp3, MAX_STACK_STRLEN);
-        GetDlgItemText(calcMainWindow, RPN_STACK_T, tmp4, MAX_STACK_STRLEN);
 
-        hControl = GetDlgItem(calcMainWindow, RPN_STACK);
+        SetDlgItemText(calcMainWindow, RPN_STACK_X, tmp1);
+        SetDlgItemText(calcMainWindow, RPN_STACK_Y, tmp2);
+        SetDlgItemText(calcMainWindow, RPN_STACK_Z, tmp3);
+        SetDlgItemText(calcMainWindow, RPN_STACK_T, tmp4);
+
         InvalidateRect(hControl, NULL, TRUE);
         UpdateWindow(hControl);
         Sleep(10);
