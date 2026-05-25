@@ -81,7 +81,6 @@ Normally the program execution flows from the beginning of the program to the en
 015 - Divide<br>
 016 - Halt Program<br>
 017 - <End Of Program><br>
-<br>
 Checksum: 0864<br>
 <br>
 
@@ -114,7 +113,6 @@ Looping is simply a branch to an earlier instruction that is predicated on the o
 019 - Recall Register<br>
 020 - Digit 0<br>
 021 - /<End Of Program/><br>
-<br>
 Checksum: 0465<br>
 <br>
 
@@ -137,7 +135,6 @@ For example, to compute the area of 2 circles with the first circle's radius in 
 009 - Multiply<br>
 010 - Return<br>
 011 - \<End Of Program\><br>
-<br>
 Checksum: 0D2E<br>
 
 Now entering a radius in X and a radius in Y and pressing "Play" will yield the area of both circles. The code is a little tricky but not overly complicated. The first line simply tells Excalibur to go to subroutine A (indicated by the Label A instruction). Excalibur will jump to label A and continue executing until a Return statement is reached at which time control is given back to the line after the Gosub A call and execution continues from there. There is no limit to the number of subroutines that can be called, however if a subroutine calls itself (recursively), the number of recursive calls can be nested only 1000 levels deep (Excalibur will give you an error dialog box if you attempt to call nested subroutines deeper than that).
