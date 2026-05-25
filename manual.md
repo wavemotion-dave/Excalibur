@@ -14,6 +14,7 @@ At one time, Excalibur had extensive help and an RPN tutorial that was largely n
 * STO has register arithmetic. RCL has recall register arithmetic.
 * TVM (Time-Value Money) on the Financial bank is handled quite like the HP-12C.
 * Base (HEX, DEC, OCT, BIN) operations and word size are handled quite like the HP-16C (though 64-bit words are supported on Excalibur).
+* Many of the Scientific I and II bank functions are inspired by the HP-11C and HP-15C though Matrix and Vector Support are not included (I found calculator entry of these to be cumbersome and if you're using Excalibur, you've on a computer with better tools).
 * If you want to see what's going on "under the hood" with memory, use the 'Show' button to the left of the main keypad.
 * Programming is non-merged keystroke based much like the earliest HP calculators. You can have up to 40 different programs and each program can have up to 400 steps (total of 16K worth of programming steps).
 * Excalibur passes the Turing-Complete test as a general computational device given the ability to handle logic conditions and branching.
