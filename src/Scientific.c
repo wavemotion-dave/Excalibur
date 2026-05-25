@@ -2,7 +2,7 @@
 // Excalibur RPN Calculator is Copyright(c) 1994-2026 by Dave Bernazzani(wavemotion-dave)
 //
 // This is legacy code that was created to run under Visual C++ 4.5 and 5.0 circa 1995 and
-// was largely developed with Windows 95 through Windows 98SE(some very early portions
+// was largely developed with Windows 95 through Windows 98SE (some very early portions
 // of code were started during the Windows 3.1 era but were quickly ported for 32-bit).
 //
 // I don't think there is any proprietary code here... and as such I release all of this
@@ -221,9 +221,9 @@ void SCI_hyp(void)
 {
     modifiers ^= MOD_HYPERBOLIC;
     if (modifiers & MOD_HYPERBOLIC)
-        UpdateSpareBar("HYP");
+        UpdateInfoBar("HYP");
     else
-        UpdateSpareBar(" ");
+        UpdateInfoBar(" ");
 }
 
 void SCI_sin(void)

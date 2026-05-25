@@ -2,7 +2,7 @@
 // Excalibur RPN Calculator is Copyright(c) 1994-2026 by Dave Bernazzani(wavemotion-dave)
 //
 // This is legacy code that was created to run under Visual C++ 4.5 and 5.0 circa 1995 and
-// was largely developed with Windows 95 through Windows 98SE(some very early portions
+// was largely developed with Windows 95 through Windows 98SE (some very early portions
 // of code were started during the Windows 3.1 era but were quickly ported for 32-bit).
 //
 // I don't think there is any proprietary code here... and as such I release all of this
@@ -240,6 +240,20 @@ extern double FIN[FIN_REG_MAX];
 extern uint8_t payMode;
 extern uint8_t dateMode;
 
+// TVM Registers 
+#define FIN_REG_n      0
+#define FIN_REG_i      1
+#define FIN_REG_PV     2
+#define FIN_REG_PMT    3
+#define FIN_REG_FV     4
+
+// Markup Registers 
+#define FIN_REG_MUC    5
+#define FIN_REG_MUP    6
+#define FIN_REG_COST   7
+#define FIN_REG_PRICE  8
+
+
 // Programming mode defines
 extern uint8_t  padZeros;
 extern uint32_t wordSize;
@@ -267,7 +281,7 @@ extern void FloatsToLongs(void);
 extern void LongsToFloats(void);
 extern void ExcalInit(void);
 extern void ShowStatus(void);
-extern void UpdateSpareBar(char *msg);
+extern void UpdateInfoBar(char *msg);
 extern void UpdateVersionBar(void);
 extern void ShowFunctionBar(char *msg);
 extern double MakeAccurate(double val);
@@ -960,7 +974,7 @@ extern uint32_t userTicks;
 #define FUNC_BAR                        301
 #define TIME_BAR                        302
 #define REC_BAR                         303
-#define SPARE_BAR                       304
+#define INFO_BAR                       304
 #define ANGLE_BAR                       305
 #define PROG_BAR                        306
 #define RPN_CARRY                       307

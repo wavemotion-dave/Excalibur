@@ -2,7 +2,7 @@
 // Excalibur RPN Calculator is Copyright(c) 1994-2026 by Dave Bernazzani(wavemotion-dave)
 //
 // This is legacy code that was created to run under Visual C++ 4.5 and 5.0 circa 1995 and
-// was largely developed with Windows 95 through Windows 98SE(some very early portions
+// was largely developed with Windows 95 through Windows 98SE (some very early portions
 // of code were started during the Windows 3.1 era but were quickly ported for 32-bit).
 //
 // I don't think there is any proprietary code here... and as such I release all of this
@@ -889,11 +889,10 @@ BOOL CALLBACK inputDebugValue(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lP
 double getNewDebugVal(void)
 {
     dinputDebugInProgress = 1;
-    DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_INPUT", calcMainWindow, inputDebugValue);
+    DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_DEBUG_INPUT", calcMainWindow, inputDebugValue);
     dinputDebugInProgress = 0;
     return debugValue;
 }
-
 
 static uint32_t last_debug_register_checksum = 0xFFFFBEEF;
 
@@ -938,35 +937,95 @@ BOOL CALLBACK debugWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam
                         item = SendDlgItemMessage(hwnd, TRACE_REGS1, LB_GETCURSEL, 0, 0L);
                         switch((int)item)
                         {
-                            case 0:
+                            case 1:
+                                debugValue = STACK[STK_D];
+                                STACK[STK_D] = getNewDebugVal();
+                                STACKL[STK_D] = (PROG_LONG) STACK[STK_D];
+                                break;
+                            case 2:
+                                debugValue = STACK[STK_C];
+                                STACK[STK_C] = getNewDebugVal();
+                                STACKL[STK_C] = (PROG_LONG) STACK[STK_C];
+                                break;
+                            case 3:
+                                debugValue = STACK[STK_B];
+                                STACK[STK_B] = getNewDebugVal();
+                                STACKL[STK_B] = (PROG_LONG) STACK[STK_B];
+                                break;
+                            case 4:
+                                debugValue = STACK[STK_A];
+                                STACK[STK_A] = getNewDebugVal();
+                                STACKL[STK_A] = (PROG_LONG) STACK[STK_A];
+                                break;
+
+                            case 7:
                                 debugValue = STACK[STK_T];
                                 STACK[STK_T] = getNewDebugVal();
                                 STACKL[STK_T] = (PROG_LONG) STACK[STK_T];
                                 break;
-                            case 1:
+                            case 8:
                                 debugValue = STACK[STK_Z];
                                 STACK[STK_Z] = getNewDebugVal();
                                 STACKL[STK_Z] = (PROG_LONG) STACK[STK_Z];
                                 break;
-                            case 2:
+                            case 9:
                                 debugValue = STACK[STK_Y];
                                 STACK[STK_Y] = getNewDebugVal();
                                 STACKL[STK_Y] = (PROG_LONG) STACK[STK_Y];
                                 break;
-                            case 3:
+                            case 10:
                                 debugValue = STACK[STK_X];
                                 STACK[STK_X] = getNewDebugVal();
                                 STACKL[STK_X] = (PROG_LONG) STACK[STK_X];
                                 break;
-                            case 5:
+
+                            case 12:
                                 debugValue = (double) indirectRegister;
                                 indirectRegister = (int)getNewDebugVal();
+                                break;
+
+                            case 16:
+                                debugValue = FIN[FIN_REG_n];
+                                FIN[FIN_REG_n] = (int)getNewDebugVal();
+                                break;
+                            case 17:
+                                debugValue = FIN[FIN_REG_i];
+                                FIN[FIN_REG_i] = getNewDebugVal();
+                                break;
+                            case 18:
+                                debugValue = FIN[FIN_REG_PV];
+                                FIN[FIN_REG_PV] = getNewDebugVal();
+                                break;
+                            case 19:
+                                debugValue = FIN[FIN_REG_PMT];
+                                FIN[FIN_REG_PMT] = getNewDebugVal();
+                                break;
+                            case 20:
+                                debugValue = FIN[FIN_REG_FV];
+                                FIN[FIN_REG_FV] = getNewDebugVal();
+                                break;
+                            case 21:
+                                debugValue = FIN[FIN_REG_MUC];
+                                FIN[FIN_REG_MUC] = getNewDebugVal();
+                                break;
+                            case 22:
+                                debugValue = FIN[FIN_REG_MUP];
+                                FIN[FIN_REG_MUP] = getNewDebugVal();
+                                break;
+                            case 23:
+                                debugValue = FIN[FIN_REG_COST];
+                                FIN[FIN_REG_COST] = getNewDebugVal();
+                                break;
+                            case 24:
+                                debugValue = FIN[FIN_REG_PRICE];
+                                FIN[FIN_REG_PRICE] = getNewDebugVal();
                                 break;
                         }
                         ShowStack();
                         return TRUE;
                     }
                     break;
+
                 case TRACE_REGS2:
                     if ((dinputDebugInProgress == 0) && (HIWORD(wParam) == LBN_DBLCLK))
                     {
@@ -985,20 +1044,21 @@ BOOL CALLBACK debugWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam
                         return TRUE;
                     }
                     break;
+
                 case TRACE_PROGRAM:
                     item = SendDlgItemMessage(hwnd, TRACE_PROGRAM, LB_GETCURSEL, 0, 0L);
                     if (recModeON)
                     {
-                        currentMacroPlaybackIdx = (short int)item;
+                        currentMacroPlaybackIdx = (int16_t)item;
                         if (currentMacroPlaybackIdx > playBackIdx)
                             currentMacroPlaybackIdx = playBackIdx;
                     }
                     else
                     {
                         if (item > 0)
-                            currentMacroPlaybackIdx = (short int) item-1;
+                            currentMacroPlaybackIdx = (int16_t) item-1;
                         else
-                            currentMacroPlaybackIdx = (short int) 0;
+                            currentMacroPlaybackIdx = (int16_t) 0;
                     }
                     ShowStack();
                     return TRUE;
@@ -1099,35 +1159,39 @@ void UpdateDebugRegs(void)
     sprintf(tmp, " Financial Regs");
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
-    sprintf(tmp, " Num: %-20.13g", FIN[0]);
+    sprintf(tmp, "   n: %-20.13g", FIN[FIN_REG_n]);
     makeInternational(tmp);
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
-    sprintf(tmp, " Int: %-20.13g", FIN[1]);
+    sprintf(tmp, "   i: %-20.13g", FIN[FIN_REG_i]);
     makeInternational(tmp);
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
-    sprintf(tmp, " PV:  %-20.13g", FIN[2]);
+    sprintf(tmp, "  PV: %-20.13g", FIN[FIN_REG_PV]);
     makeInternational(tmp);
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
-    sprintf(tmp, " FV:  %-20.13g", FIN[3]);
+    sprintf(tmp, " PMT: %-20.13g", FIN[FIN_REG_PMT]);
     makeInternational(tmp);
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
-    sprintf(tmp, " MkC: %-20.13g", FIN[4]);
+    sprintf(tmp, "  FV: %-20.13g", FIN[FIN_REG_FV]);
     makeInternational(tmp);
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
-    sprintf(tmp, " MkP: %-20.13g", FIN[5]);
+    sprintf(tmp, " MkC: %-20.13g", FIN[FIN_REG_MUC]);
     makeInternational(tmp);
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
-    sprintf(tmp, " CST: %-20.13g", FIN[6]);
+    sprintf(tmp, " MkP: %-20.13g", FIN[FIN_REG_MUP]);
     makeInternational(tmp);
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
-    sprintf(tmp, " PRC: %-20.13g", FIN[7]);
+    sprintf(tmp, " CST: %-20.13g", FIN[FIN_REG_COST]);
+    makeInternational(tmp);
+    SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+
+    sprintf(tmp, " PRC: %-20.13g", FIN[FIN_REG_PRICE]);
     makeInternational(tmp);
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 

@@ -2,7 +2,7 @@
 // Excalibur RPN Calculator is Copyright(c) 1994-2026 by Dave Bernazzani(wavemotion-dave)
 //
 // This is legacy code that was created to run under Visual C++ 4.5 and 5.0 circa 1995 and
-// was largely developed with Windows 95 through Windows 98SE(some very early portions
+// was largely developed with Windows 95 through Windows 98SE (some very early portions
 // of code were started during the Windows 3.1 era but were quickly ported for 32-bit).
 //
 // I don't think there is any proprietary code here... and as such I release all of this
@@ -184,7 +184,7 @@ extern void RPN_digit8(void);
 extern void RPN_digit9(void);
 
 extern void callButtonFunc(void (*routine)(void), char useFloatsLongs,
-                           char allowRecord, uint16_t uniqueIndex, char saveLastX, char newXedit, int updateSpareBar);
+                           char allowRecord, uint16_t uniqueIndex, char saveLastX, char newXedit, int UpdateInfoBar);
 extern void mapButtonFuncs(void);
 void DoMacroSaveRecall(void);
 
@@ -1433,10 +1433,10 @@ __inline void RPN_ClearModifiers(int updateSpare)
     modifiers = 0x00;
     rpnStoreRecall = 0x00;
     if (updateSpare)
-        UpdateSpareBar(" ");
+        UpdateInfoBar(" ");
 }
 
-void UpdateSpareBar_StoreRecall(void)
+void UpdateInfoBar_StoreRecall(void)
 {
     char tmpStr[16];
     if (rpnStoreRecall && !macroPlayback)
@@ -1465,7 +1465,7 @@ void UpdateSpareBar_StoreRecall(void)
         if (rpnStoreRecall & REG_DP)
             strcat(tmpStr, " ·");
 
-        UpdateSpareBar(tmpStr);
+        UpdateInfoBar(tmpStr);
     }
 }
 
@@ -1637,7 +1637,7 @@ void ExcalInit(void)
     UINT flags;
 
     UpdateVersionBar();
-    UpdateSpareBar("    ");
+    UpdateInfoBar("    ");
     ShowFunctionBar(FUNC_BAR_TEXT_SCI_I);
 
     mapButtonFuncs();
@@ -1755,9 +1755,9 @@ void ShowStatus(void)
     SetDlgItemText(calcMainWindow, ANGLE_BAR, tmpStr);
 }
 
-void UpdateSpareBar(char *msg)
+void UpdateInfoBar(char *msg)
 {
-    SetDlgItemText(calcMainWindow, SPARE_BAR, msg);
+    SetDlgItemText(calcMainWindow, INFO_BAR, msg);
 }
 
 void UpdateVersionBar()
@@ -2088,7 +2088,7 @@ int ProcessHelp(WPARAM key)
         }
         i++;
     }
-    UpdateSpareBar(" ");
+    UpdateInfoBar(" ");
     return (0);
 }
 
@@ -2579,7 +2579,7 @@ void RPN_dp(void)
     if (rpnStoreRecall)
     {
         rpnStoreRecall |= REG_DP;
-        UpdateSpareBar_StoreRecall();
+        UpdateInfoBar_StoreRecall();
         return;
     }
 
@@ -3111,7 +3111,7 @@ void RPN_plus(void)
     {
         rpnStoreRecall &= 0x0F;
         rpnStoreRecall |= REG_PLUS;
-        UpdateSpareBar_StoreRecall();
+        UpdateInfoBar_StoreRecall();
         return;
     }
 
@@ -3137,7 +3137,7 @@ void RPN_multiply(void)
     {
         rpnStoreRecall &= 0x0F;
         rpnStoreRecall |= REG_MULTIPLY;
-        UpdateSpareBar_StoreRecall();
+        UpdateInfoBar_StoreRecall();
         return;
     }
 
@@ -3163,7 +3163,7 @@ void RPN_divide(void)
     {
         rpnStoreRecall &= 0x0F;
         rpnStoreRecall |= REG_DIVIDE;
-        UpdateSpareBar_StoreRecall();
+        UpdateInfoBar_StoreRecall();
         return;
     }
 
@@ -3208,7 +3208,7 @@ void RPN_minus(void)
     {
         rpnStoreRecall &= 0x0F;
         rpnStoreRecall |= REG_MINUS;
-        UpdateSpareBar_StoreRecall();
+        UpdateInfoBar_StoreRecall();
         return;
     }
 
@@ -3447,13 +3447,13 @@ void RPN_store(void)
     if (rpnStoreRecall & REG_STORE)
     {
         if (!macroPlayback)
-            UpdateSpareBar(" ");
+            UpdateInfoBar(" ");
         rpnStoreRecall = 0x00;
     }
     else
     {
         rpnStoreRecall ^= REG_STORE;
-        UpdateSpareBar_StoreRecall();
+        UpdateInfoBar_StoreRecall();
     }
 }
 
@@ -3463,13 +3463,13 @@ void RPN_recall(void)
     if (rpnStoreRecall & REG_RECALL)
     {
         if (!macroPlayback)
-            UpdateSpareBar(" ");
+            UpdateInfoBar(" ");
         rpnStoreRecall = 0x00;
     }
     else
     {
         rpnStoreRecall ^= REG_RECALL;
-        UpdateSpareBar_StoreRecall();
+        UpdateInfoBar_StoreRecall();
     }
 }
 
@@ -3479,13 +3479,13 @@ void RPN_ExchangeReg(void)
     if (rpnStoreRecall & REG_EXCHANGE)
     {
         if (!macroPlayback)
-            UpdateSpareBar(" ");
+            UpdateInfoBar(" ");
         rpnStoreRecall = 0x00;
     }
     else
     {
         rpnStoreRecall ^= REG_EXCHANGE;
-        UpdateSpareBar_StoreRecall();
+        UpdateInfoBar_StoreRecall();
     }
 }
 
@@ -5236,7 +5236,7 @@ void SaveProgramStep(uint16_t uniqueIndex)
 }
 
 void callButtonFunc(void (*routine)(void), char useFloatsLongs, char allowRecord,
-                    uint16_t uniqueIndex, char saveLastX, char newXedit, int updateSpareBar)
+                    uint16_t uniqueIndex, char saveLastX, char newXedit, int UpdateInfoBar)
 {
     if (IsWindowVisible(toolTipWnd)) // A button press reset's the window!
     {
@@ -5286,7 +5286,7 @@ void callButtonFunc(void (*routine)(void), char useFloatsLongs, char allowRecord
     if (newXedit != X_NULL)
     {
         Xedit = newXedit;
-        RPN_ClearModifiers(updateSpareBar);
+        RPN_ClearModifiers(UpdateInfoBar);
     }
 }
 
@@ -5428,9 +5428,9 @@ void RPN_Playback(void)
             {
                 lastSlowTimer = slowTimer;
                 if (++flashRunningDsp & 1)
-                    UpdateSpareBar(" ");
+                    UpdateInfoBar(" ");
                 else
-                    UpdateSpareBar("Run...");
+                    UpdateInfoBar("Run...");
             }
         }
 
@@ -5460,7 +5460,7 @@ void RPN_Playback(void)
 
     SetWindowText(GetDlgItem(calcMainWindow, RPN_PLAYBACK), "Run"); // Reset button text
 
-    UpdateSpareBar(" ");
+    UpdateInfoBar(" ");
     macroPlayback = FALSE;
 }
 
@@ -5503,7 +5503,7 @@ void RPN_SingleStep(void)
     sleep_and_peek(traceDelayValueMs);
     ShowStack();
 
-    UpdateSpareBar("    ");
+    UpdateInfoBar("    ");
     macroPlayback = FALSE;
     traceMacroPlayback = FALSE;
 }
