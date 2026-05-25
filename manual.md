@@ -9,13 +9,14 @@ At one time, Excalibur had extensive help and an RPN tutorial that was largely n
 * Excalibur has 3 different layouts. The classic layout by default and in settings you can switch to left-positioned Operators (-+×÷) or to a smaller 4-banger (it's a bit more than that!) layout.
 * Setting the display of numbers is done with the 'Disp' button near the middle-top row. This is the equivilent of the FIX, SCI, ENG handling of HP calculators.
 * By default, the Change-Sign (CHS) and Exponent (EEX) keys are in the old HP naming style. You can change them to more modern equivilents in settings.
-* Programming is non-merged keystroke based much like the earliest HP calculators. You can have up to 40 different programs and each program can have up to 400 steps (total of 16K worth of programming steps).
 * By default, the comma is used for the thousands seperator and the decimal point is the radix seperator. You can change this in settings.
 * STO/RCL work much like classic HP Voyager series. R10-R19 are handled via STO .0 through STO .9. There are 100 internal registers - beyond 20 you must use indirect addressing on the Programming bank.
 * STO has register arithmetic. RCL has recall register arithmetic.
 * TVM (Time-Value Money) on the Financial bank is handled quite like the HP-12C.
 * Base (HEX, DEC, OCT, BIN) operations and word size are handled quite like the HP-16C (though 64-bit words are supported on Excalibur).
 * If you want to see what's going on "under the hood" with memory, use the 'Show' button to the left of the main keypad.
+* Programming is non-merged keystroke based much like the earliest HP calculators. You can have up to 40 different programs and each program can have up to 400 steps (total of 16K worth of programming steps).
+* Excalibur passes the Turing-Complete test as a general computational device given the ability to handle logic conditions and branching.
 * To see a list of common keyboard keys that you can press to activate common functions of the calculator - see  the 'Help' menu.
   
 **Number Formats - Real vs Integer**
