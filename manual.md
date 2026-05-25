@@ -80,7 +80,8 @@ Normally the program execution flows from the beginning of the program to the en
 014 - Digit 3<br>
 015 - Divide<br>
 016 - Halt Program<br>
-017 - <End Of Program><br>
+017 - \<End Of Program\><br>
+<br>
 Checksum: 0864<br>
 <br>
 
@@ -112,7 +113,8 @@ Looping is simply a branch to an earlier instruction that is predicated on the o
 018 - Clear Stack<br>
 019 - Recall Register<br>
 020 - Digit 0<br>
-021 - /<End Of Program/><br>
+021 - \<End Of Program\><br>
+<br>
 Checksum: 0465<br>
 <br>
 
