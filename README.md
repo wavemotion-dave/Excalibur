@@ -1,5 +1,4 @@
-# Excalibur
-Excalibur RPN Calculator
+# Excalibur RPN Calculator
 
 Designed as an HP-like calculator for Windows.
 Win32-based and will run on any version of Windows from 98 up to Windows 11 and generally runs quite well under Linux wine.
