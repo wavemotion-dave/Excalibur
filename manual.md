@@ -225,6 +225,16 @@ Where can you get a handheld RPN calculator? Well, many years ago the best calcu
 
 Older HP calculators tend to be a bit expensive but in my experience they are worth it. They have a number of models which are RPN only, some that are Algebraic only and some that switch-hit between the two notations. If you want an RPN calculator, stick with an RPN only. One of the most ubiquitous and common HP RPN calculators is the 12C Financial. While it doesn't have trig operations, this is a workhorse and HP has released a number of modern versions. I'd recommend getting a classic HP 12C that was designed in the 1980s vs one of the modern versions which are not quite that classic quality. An original 12C in reasonably good shape with case should run you no more than about US$20 on eBay.
 
+# Excalibur Resources
+
+Excalibur does not use any dynamic memory allocation - beyond requesting some system memory for the copy/paste buffer. Everything is staticaly linked which means it should run on anything that provides basic Win32 support without need for any specific framework (.NET, .COM, etc) to be installed. This also lets it run smoothly under a virtualization or interepretation layer such as Linux Wine.
+
+The memory required to run is mostly a function of the operating system... older OS versions consume about 1.5 MB and the latest Windows 11 Enterprise consuems about 2.4 MB.
+
+Assuming your machine has even some absolutely minimal specifications, this should still represent a tiny fraction of your available resources.
+
+<img width="643" height="237" alt="image" src="https://github.com/user-attachments/assets/e99887db-db37-4003-890a-bed18c1ea87b" />
+
 # Precision, Accuracy and Overflow
 
 Excalibur for Windows uses an 8 byte IEEE floating point representation of all numbers. This means that there are approximately 15 significant digits and Excalibur will show up to 13 of those.
