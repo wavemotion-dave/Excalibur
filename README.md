@@ -35,7 +35,7 @@ of this page (or contact me at daveber --AT-- gmail DOT com).
 
 <img width="786" height="449" alt="image" src="https://github.com/user-attachments/assets/f347d9e4-cf90-4561-8316-1cb3f1f7805e" />
 <br>
-
+<br>
 The brief manual can be found here:  [Excalibur Manual](manual.md)
 <br>
 
