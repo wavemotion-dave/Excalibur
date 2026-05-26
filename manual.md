@@ -16,6 +16,7 @@ At one time, Excalibur had extensive help and an RPN tutorial that was largely n
 * Many of the Scientific bank functions are inspired by the HP-11C and HP-15C though Matrix and Vector Support are not included (I found calculator entry of these to be cumbersome and if you're using Excalibur, you're on a computer with better tools).
 * If you want to see what's going on "under the hood" with memory, use the 'Show' button to the left of the main keypad.
 * Programming is non-merged keystroke based much like the earliest HP calculators. You can have up to 40 different programs and each program can have up to 400 steps (total of 16K worth of programming steps).
+* Complex Number support uses register pairs to represent the Real and Imaginary parts of the number. X=Real, Y=Imaginary, Z=Real, T=Imaginary. The 8-deep stack helps if you need the headroom.
 * Excalibur passes the Turing-Complete test as a general computational device given the ability to handle logic conditions and branching.
 * Right-clicking on any Excalibur key/button will produce a short bit of context sensitive help.
 * To see a list of common keyboard keys that you can press to activate common functions of the calculator - see  the 'Help' menu.
