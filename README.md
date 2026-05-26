@@ -29,14 +29,14 @@ it will pick a default Linux system font that will be reasonable).
 
 Place the executable virtually anywhere (yes, it will run from an old 360K IBM Floppy if you really wish!) and double click to run.
 
-The 3.XX series is still in BETA. You can find a link to the older 2.05 as well as the latest 3.XX beta in the **Releases** section 
-to the right of this page. If you find a problem, please report it via the Github Issues tracker at the top of this page (or contact
-me at daveber --AT-- gmail DOT com).
+The 3.XX series is still in BETA but is quite functional. You can find a link to the older 2.05 as well as the latest 3.XX beta in 
+the **Releases** section to the right of this page. If you find a problem, please report it via the Github Issues tracker at the top
+of this page (or contact me at daveber --AT-- gmail DOT com).
 
 <img width="786" height="449" alt="image" src="https://github.com/user-attachments/assets/2fd47163-e1b0-4ed2-9f64-ce52cefd202b" />
 <br>
 
-The manual can be found here:  [Excalibur Manual](manual.md)
+The brief manual can be found here:  [Excalibur Manual](manual.md)
 <br>
 
 # Donations Welcome (but never required!)
