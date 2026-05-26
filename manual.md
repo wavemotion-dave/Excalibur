@@ -229,7 +229,7 @@ Older HP calculators tend to be a bit expensive but in my experience they are wo
 
 Excalibur does not use any dynamic memory allocation - beyond requesting some system memory for the copy/paste buffer. Everything is staticaly linked which means it should run on anything that provides basic Win32 support without need for any specific framework (.NET, .COM, etc) to be installed. This also lets it run smoothly under a virtualization or interepretation layer such as Linux Wine.
 
-The memory required to run is mostly a function of the operating system... older OS versions consume about 1.5 MB and the latest Windows 11 Enterprise consuems about 2.4 MB.
+The memory required to run is mostly a function of the operating system... older OS versions consume about 1.5 MB and the latest Windows 11 Enterprise consumes about 2.4 MB. When idle, Excalibur generally uses 0% of your CPU - feel free to just leave it open.
 
 Assuming your machine has even some absolutely minimal specifications, this should still represent a tiny fraction of your available resources.
 
