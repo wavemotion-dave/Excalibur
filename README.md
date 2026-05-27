@@ -1,5 +1,4 @@
-# Excalibur
-Excalibur RPN Calculator
+# Excalibur RPN Calculator
 
 Designed as an HP-like calculator for Windows.
 Win32-based and will run on any version of Windows from 98 up to Windows 11 and generally runs quite well under Linux wine.
@@ -33,7 +32,8 @@ The 3.XX series is still in BETA but is quite functional. You can find a link to
 the **Releases** section to the right of this page. If you find a problem, please report it via the Github Issues tracker at the top
 of this page (or contact me at daveber --AT-- gmail DOT com).
 
-<img width="786" height="449" alt="image" src="https://github.com/user-attachments/assets/2fd47163-e1b0-4ed2-9f64-ce52cefd202b" />
+<img width="786" height="449" alt="image" src="https://github.com/user-attachments/assets/f347d9e4-cf90-4561-8316-1cb3f1f7805e" />
+<br>
 <br>
 
 The brief manual can be found here:  [Excalibur Manual](manual.md)
