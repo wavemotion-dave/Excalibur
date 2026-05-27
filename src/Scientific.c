@@ -385,12 +385,41 @@ void SCI_exp(void)
     StackPush(exp(StackPop()));
 }
 
+double custom_log1p(double x) {
+    double xp1 = 1.0 + x;
+    if (xp1 == 1.0) {
+        return x;
+    } else {
+        return x * (log(xp1) / (xp1 - 1.0));
+    }
+}
+
 void SCI_ln(void)
 {
     if (STACK[STK_X] <= 0.0)
         RPN_error("LN:  X must be positive");
     else
-        StackPush(log(StackPop()));
+    {
+        double val = StackPop();
+        // For numbers close to 1, we use the custom log1p which is more accurate.
+        if (val > 1.0 && val < 1.1)
+        {
+            char tmp[25];
+            char *ptr;
+            sprintf(tmp, "%.13g", val);
+            ptr = tmp;
+            while (*ptr != '1')
+            {
+                ptr++;
+            }
+            *ptr = '0';
+            StackPush(custom_log1p(atof(tmp)));
+        }
+        else // Use standard log function
+        {
+            StackPush(log(val));
+        }
+    }
 }
 
 void SCI_log(void)

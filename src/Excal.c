@@ -45,7 +45,7 @@
 #define VERSION_STR "v3.XX-05"
 
 #define ABOUT_MSG "Excalibur for Windows 32-bit\n"                    \
-                  "Version 3.XX-05  -  May 26, 2026\n\n"              \
+                  "Version 3.XX-05  -  May 27, 2026\n\n"              \
                   "Copyright 1994-2026 David Bernazzani\n\n"          \
                   "Please read the disclaimer and understand the\n"   \
                   "accuracy and precision issues before using.\n\n"   \
@@ -54,8 +54,8 @@
                   "https://github.com/wavemotion-dave/Excalibur"      \
                   "\n\nThis version is BETA - Expect and report Bugs!"
 
-#define CONFIG_VERSION_MAIN 0xF00E  // If this changes, we wipe EVERYTHING
-#define CONFIG_VERSION_SUB  0xF004  // If this changes, we reset x,y window position and reset constant tables (currency, physics constants, etc)
+#define CONFIG_VERSION_MAIN 0xF010  // If this changes, we wipe EVERYTHING
+#define CONFIG_VERSION_SUB  0x0001  // If this changes, we reset x,y window position and reset constant tables (currency, physics constants, etc)
 
 #define END_OF_PROGRAM_STR "<End Of Program>"
 #define PROGRAM_ASSIGNED_KEY_STR "Program Assigned Key"
@@ -103,6 +103,8 @@ uint8_t alwaysOnTop = 0;
 uint8_t reservedOpt1 = 0;
 uint8_t reservedOpt2 = 0;
 uint8_t reservedOpt3 = 0;
+uint8_t reservedOpt4 = 0;
+uint8_t reservedOpt5 = 1;   // With a different default... just in case
 
 char macroName[MAX_MACROS][MAX_MACRO_FUNC_TEXT];
 char macro_short_names[MAX_MACROS][7];
@@ -111,7 +113,7 @@ char statusBar[32];
 char helpTitle[64];
 char helpMsg[256];
 char tmpStr[256];
-BYTE keyState[256];
+BYTE keyStateBuf[256];
 
 // ----------------------------------------------
 // Buffers and status for editing the X register
@@ -1612,6 +1614,8 @@ void MemoryInit(void)
     }
     CFn = 0;
 
+    memset(excaliburNotes, 0x00, sizeof(excaliburNotes));
+
     for (i = 0; i < MAX_MACROS; i++)
     {
         strcpy(macroName[i], "Not Currently Defined");
@@ -1917,18 +1921,18 @@ struct funcStruct RPNkeys[] = {
     {RPN_EXREG,     UNI_EXREG,  USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_ExchangeReg,    "Exchange X with Reg",  "Exchange X with one of the Registers (next digit/dp selects R0-R19)"},
     {RPN_COPY,      UNI_COPY,   USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_Copy,           "Copy X Register",      "Copy X register to the clipboard"},
     {RPN_PASTE,     UNI_PASTE,  USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_Paste,          "Paste X Register",     "Paste X register from the clipboard"},
-    {RPN_SQRT,      UNI_SQRT,   USES_FL, ALLOWREC, ' ', "", YES_L,  X_NEW,      SCI_sqrt,           "Square Root",          "Computes the Square Root of the value in X"},
-    {RPN_LN,        UNI_LN,     USES_FL, ALLOWREC, ' ', "", YES_L,  X_NEW,      SCI_ln,             "Natural Logarithm",    "Computes the natural logarithm (base e) of X"},
+    {RPN_SQRT,      UNI_SQRT,   USES_FL, ALLOWREC, 'q', "", YES_L,  X_NEW,      SCI_sqrt,           "Square Root",          "Computes the Square Root of the value in X"},
+    {RPN_LN,        UNI_LN,     USES_FL, ALLOWREC, 'g', "", YES_L,  X_NEW,      SCI_ln,             "Natural Logarithm",    "Computes the natural logarithm (base e) of X"},
     {RPN_LOG,       UNI_LOG,    USES_FL, ALLOWREC, ' ', "", YES_L,  X_NEW,      SCI_log,            "Base 10 Logarithm",    "Raises the base 10 logarithm of X"},
 
     {RPN_SCI,       UNI_SCI,    USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectSci,      "Select Scientific I",  "Selects the Scientific I Bank"},
     {RPN_SCI2,      UNI_SCI2,   USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectSci2,     "Select Scientific II", "Selects the Scientific II Bank"},
-    {RPN_COMPSCI,   UNI_COMPSCI,USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectCompSci,  "Select Comp-Sci",      "Selects the Computer Science Bank"},
     {RPN_FIN,       UNI_FIN,    USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectFin,      "Select Financial",     "Selects the Financial Bank"},
     {RPN_CONV,      UNI_CONV,   USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectConv,     "Select Conversion",    "Selects the Conversion Bank"},
     {RPN_STAT,      UNI_STAT,   USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectStat,     "Select Statistics",    "Selects the Statistics Bank"},
-    {RPN_PROGI,     UNI_PROG1,  USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectProgI,    "Select Program I",     "Selects Program Bank I"},
-    {RPN_PROGII,    UNI_PROG2,  USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectProgII,   "Select Program II",    "Selects Program Bank II"},
+    {RPN_COMPSCI,   UNI_COMPSCI,USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectCompSci,  "Select Comp-Sci",      "Selects the Computer Science Bank"},
+    {RPN_PROGI,     UNI_PROG1,  USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectProgI,    "Select Program I",     "Selects the Program I Bank"},
+    {RPN_PROGII,    UNI_PROG2,  USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectProgII,   "Select Program II",    "Selects the Program II Bank"},
     {RPN_CUST,      UNI_CUSTOM, USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_SelectCustom,   "Select Custom",        "Selects the Custom Bank"},
 
     {RPN_LAST_KEY,  UNI_UNUSED, USES_FL, NORECORD, ' ', "", NO_L,   X_NEW,      NULL,               "Unused",               "Unused"}
@@ -3716,7 +3720,6 @@ void SaveToDisk(void)
     FILE *outfile;
     uint8_t menuCurrentFuncs, menuLastFuncs;
     uint16_t configVersionMain, configVersionSub;
-    uint8_t spare8 = 0;
 
     outfile = fopen(GetConfigurationDirectory(), "wb+");
 
@@ -3763,23 +3766,6 @@ void SaveToDisk(void)
         fwrite(&eexMode,            sizeof(eexMode),            1, outfile);
         fwrite(&numLockMode,        sizeof(numLockMode),        1, outfile);
         fwrite(&toolTipsOn,         sizeof(toolTipsOn),         1, outfile);
-        fwrite(&spare8,             sizeof(spare8),             1, outfile);
-
-        fwrite(STACK,               sizeof(STACK),              1, outfile);
-        fwrite(STACKL,              sizeof(STACKL),             1, outfile);
-        fwrite(&LASTX,              sizeof(LASTX),              1, outfile);
-        fwrite(&LASTY,              sizeof(LASTY),              1, outfile);
-        fwrite(&lastFloat,          sizeof(lastFloat),          1, outfile);
-        fwrite(&LASTXL,             sizeof(LASTXL),             1, outfile);
-        fwrite(&LASTYL,             sizeof(LASTYL),             1, outfile);
-
-        fwrite(&STO,                sizeof(STO),                1, outfile);
-        fwrite(&STOL,               sizeof(STOL),               1, outfile);
-        fwrite(&SUM,                sizeof(SUM),                1, outfile);
-        fwrite(&FIN,                sizeof(FIN),                1, outfile);
-        fwrite(&cashFlow,           sizeof(cashFlow),           1, outfile);
-        fwrite(&CFn,                sizeof(CFn),                1, outfile);
-
         fwrite(&payMode,            sizeof(payMode),            1, outfile);
         fwrite(&dateMode,           sizeof(dateMode),           1, outfile);
         fwrite(&depreciationType,   sizeof(depreciationType),   1, outfile);
@@ -3797,6 +3783,23 @@ void SaveToDisk(void)
         fwrite(&reservedOpt1,       sizeof(reservedOpt1),       1, outfile);
         fwrite(&reservedOpt2,       sizeof(reservedOpt2),       1, outfile);
         fwrite(&reservedOpt3,       sizeof(reservedOpt3),       1, outfile);
+        fwrite(&reservedOpt4,       sizeof(reservedOpt4),       1, outfile);
+        fwrite(&reservedOpt5,       sizeof(reservedOpt5),       1, outfile);
+
+        fwrite(STACK,               sizeof(STACK),              1, outfile);
+        fwrite(STACKL,              sizeof(STACKL),             1, outfile);
+        fwrite(&LASTX,              sizeof(LASTX),              1, outfile);
+        fwrite(&LASTY,              sizeof(LASTY),              1, outfile);
+        fwrite(&lastFloat,          sizeof(lastFloat),          1, outfile);
+        fwrite(&LASTXL,             sizeof(LASTXL),             1, outfile);
+        fwrite(&LASTYL,             sizeof(LASTYL),             1, outfile);
+
+        fwrite(&STO,                sizeof(STO),                1, outfile);
+        fwrite(&STOL,               sizeof(STOL),               1, outfile);
+        fwrite(&SUM,                sizeof(SUM),                1, outfile);
+        fwrite(&FIN,                sizeof(FIN),                1, outfile);
+        fwrite(&cashFlow,           sizeof(cashFlow),           1, outfile);
+        fwrite(&CFn,                sizeof(CFn),                1, outfile);
 
         fwrite(&playBack,           sizeof(playBack),           1, outfile);
         fwrite(&playBackSave,       sizeof(playBackSave),       1, outfile);
@@ -3879,23 +3882,6 @@ void ReadFromDisk(void)
         fread(&eexMode,            sizeof(eexMode),            1, infile);
         fread(&numLockMode,        sizeof(numLockMode),        1, infile);
         fread(&toolTipsOn,         sizeof(toolTipsOn),         1, infile);
-        fread(&spare8,             sizeof(spare8),             1, infile);
-
-        fread(STACK,               sizeof(STACK),              1, infile);
-        fread(STACKL,              sizeof(STACKL),             1, infile);
-        fread(&LASTX,              sizeof(LASTX),              1, infile);
-        fread(&LASTY,              sizeof(LASTY),              1, infile);
-        fread(&lastFloat,          sizeof(lastFloat),          1, infile);
-        fread(&LASTXL,             sizeof(LASTXL),             1, infile);
-        fread(&LASTYL,             sizeof(LASTYL),             1, infile);
-
-        fread(&STO,                sizeof(STO),                1, infile);
-        fread(&STOL,               sizeof(STOL),               1, infile);
-        fread(&SUM,                sizeof(SUM),                1, infile);
-        fread(&FIN,                sizeof(FIN),                1, infile);
-        fread(&cashFlow,           sizeof(cashFlow),           1, infile);
-        fread(&CFn,                sizeof(CFn),                1, infile);
-
         fread(&payMode,            sizeof(payMode),            1, infile);
         fread(&dateMode,           sizeof(dateMode),           1, infile);
         fread(&depreciationType,   sizeof(depreciationType),   1, infile);
@@ -3913,6 +3899,23 @@ void ReadFromDisk(void)
         fread(&reservedOpt1,       sizeof(reservedOpt1),       1, infile);
         fread(&reservedOpt2,       sizeof(reservedOpt2),       1, infile);
         fread(&reservedOpt3,       sizeof(reservedOpt3),       1, infile);
+        fread(&reservedOpt4,       sizeof(reservedOpt4),       1, infile);
+        fread(&reservedOpt5,       sizeof(reservedOpt5),       1, infile);
+
+        fread(STACK,               sizeof(STACK),              1, infile);
+        fread(STACKL,              sizeof(STACKL),             1, infile);
+        fread(&LASTX,              sizeof(LASTX),              1, infile);
+        fread(&LASTY,              sizeof(LASTY),              1, infile);
+        fread(&lastFloat,          sizeof(lastFloat),          1, infile);
+        fread(&LASTXL,             sizeof(LASTXL),             1, infile);
+        fread(&LASTYL,             sizeof(LASTYL),             1, infile);
+
+        fread(&STO,                sizeof(STO),                1, infile);
+        fread(&STOL,               sizeof(STOL),               1, infile);
+        fread(&SUM,                sizeof(SUM),                1, infile);
+        fread(&FIN,                sizeof(FIN),                1, infile);
+        fread(&cashFlow,           sizeof(cashFlow),           1, infile);
+        fread(&CFn,                sizeof(CFn),                1, infile);
 
         fread(&playBack,           sizeof(playBack),           1, infile);
         fread(&playBackSave,       sizeof(playBackSave),       1, infile);
@@ -5947,9 +5950,9 @@ int _matherr(struct _exception *except)
 
 void SetNumLock(BOOL bState)
 {
-    GetKeyboardState((LPBYTE)&keyState);
-    if ((bState && !(keyState[VK_NUMLOCK] & 1)) ||
-        (!bState && (keyState[VK_NUMLOCK] & 1)))
+    GetKeyboardState((LPBYTE)keyStateBuf);
+    if ((bState && !(keyStateBuf[VK_NUMLOCK] & 1)) ||
+        (!bState && (keyStateBuf[VK_NUMLOCK] & 1)))
     {
         // Simulate a key press
         keybd_event(VK_NUMLOCK, 0x45, KEYEVENTF_EXTENDEDKEY | 0, 0);
@@ -5972,9 +5975,9 @@ void turnOnNumLock(void)
     }
     else // Windows 9x
     {
-        GetKeyboardState(keyState);
-        keyState[VK_NUMLOCK] = (char)0x81;
-        SetKeyboardState(keyState);
+        GetKeyboardState(keyStateBuf);
+        keyStateBuf[VK_NUMLOCK] = (char)0x81;
+        SetKeyboardState(keyStateBuf);
     }
 }
 

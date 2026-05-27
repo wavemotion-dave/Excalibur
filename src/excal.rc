@@ -649,9 +649,12 @@ BEGIN
                     15,26,48,11
     CONTROL         "Gradients",106,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,
                     15,36,48,11
-    CONTROL         "XXX , XXX . YY",116,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,99,64,61,10
-    CONTROL         "XXX . XXX , YY",117,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,99,76,61,10
-    CONTROL         "XXX  XXX . YY",118,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,99,88,61,10
+    CONTROL         "XXX , XXX . YY",116,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP | WS_TABSTOP,99,64,61,10
+    CONTROL         "XXX . XXX , YY",117,"Button",BS_AUTORADIOBUTTON | 
+                    WS_TABSTOP,99,76,61,10
+    CONTROL         "XXX  XXX . YY",118,"Button",BS_AUTORADIOBUTTON | 
+                    WS_TABSTOP,99,88,61,10
     CONTROL         "Active On Entry",107,"Button",BS_AUTORADIOBUTTON | 
                     WS_GROUP | WS_TABSTOP,99,21,61,10
     CONTROL         "Unchanged",108,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,
@@ -1039,8 +1042,8 @@ BEGIN
     LTEXT           "Sum N:",IDC_STATIC,14,178,23,8
     LTEXT           "Sum X:",IDC_STATIC,14,188,23,8
     LTEXT           "Sum Y:",IDC_STATIC,14,198,23,8
-    LTEXT           "Sum X²:",IDC_STATIC,14,208,23,8
-    LTEXT           "Sum Y²:",IDC_STATIC,14,218,23,8
+    LTEXT           "Sum X²:",IDC_STATIC,14,208,28,8
+    LTEXT           "Sum Y²:",IDC_STATIC,14,218,28,8
     RTEXT           "D-00000.00000",IDC_SHOW_STATS_N,40,178,97,8
     RTEXT           "D-00000.00000",IDC_SHOW_STATS_X,40,188,97,8
     RTEXT           "D-00000.00000",IDC_SHOW_STATS_Y,40,198,97,8
