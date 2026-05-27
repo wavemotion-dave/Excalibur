@@ -244,14 +244,14 @@ extern double FIN[FIN_REG_MAX];
 extern uint8_t payMode;
 extern uint8_t dateMode;
 
-// TVM Registers 
+// TVM Registers
 #define FIN_REG_n      0
 #define FIN_REG_i      1
 #define FIN_REG_PV     2
 #define FIN_REG_PMT    3
 #define FIN_REG_FV     4
 
-// Markup Registers 
+// Markup Registers
 #define FIN_REG_MUC    5
 #define FIN_REG_MUP    6
 #define FIN_REG_COST   7
@@ -711,26 +711,23 @@ enum UniqueButtonIndexTag
     UNI_OZGR,
     UNI_OZML,
 
+    UNI_INCM,
+    UNI_INMM,
+    UNI_FACE,
+    UNI_FAKE,
+
+    UNI_MIKM,
+    UNI_FTM,
+    UNI_FTKM,
+    UNI_FTMI,
     UNI_GALL,
     UNI_GALCM3,
     UNI_PINL,
     UNI_IGALL,
-
-    UNI_FACE,
-    UNI_FAKE,
-    UNI_INCM,
-    UNI_INMM,
-
-    UNI_FTMI,
-    UNI_FTKM,
     UNI_FTFA,
-    UNI_FTM,
-
-    UNI_MIKM,
     UNI_IN2CM2,
     UNI_FT2M2,
     UNI_IN3CM3,
-
     UNI_FT3M3,
     UNI_ACRFT2,
     UNI_ATPSI,
