@@ -204,6 +204,7 @@ extern uint8_t useSeparator;
 extern uint8_t eexMode;
 extern uint8_t numLockMode;
 extern uint8_t lastProgMode;
+extern uint8_t rotateThroughCarry;
 
 extern HINSTANCE hExcaliburInstance;
 extern HWND calcMainWindow;

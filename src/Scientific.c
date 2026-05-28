@@ -357,7 +357,6 @@ void SCI_10x(void)
 
 void SCI_sqrt(void)
 {
-
     if (STACK[STK_X] < 0.0)
     {
         RPN_error("Square Root of Negative Number");

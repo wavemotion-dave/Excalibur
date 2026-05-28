@@ -438,24 +438,36 @@ void Macro_Return(void)
 
 void Macro_SFx(void)
 {
-    int iX = PopStackInteger();
-    unsigned int mask = (0x00000001 << iX);
-    progFlags = progFlags | mask;
+    uint8_t iX = (uint8_t)PopStackInteger();
+    uint32_t mask = (0x00000001 << iX);
+
+    if (iX == 32) progModeCarry = 1;
+    else
+    if (iX == 33) progModeOverflow = 1;
+    else progFlags = progFlags | mask;
+
 }
 
 void Macro_CFx(void)
 {
-    int iX = PopStackInteger();
-    unsigned int mask = (0x00000001 << iX);
-    progFlags = progFlags & ~mask;
+    uint8_t iX = (uint8_t)PopStackInteger();
+    uint32_t mask = (0x00000001 << iX);
+
+    if (iX == 32) progModeCarry = 0;
+    else
+    if (iX == 33) progModeOverflow = 0;
+    else progFlags = progFlags & ~mask;
 }
 
 void Macro_TFx(void)
 {
-    int iX = PopStackInteger();
-    unsigned int mask = (0x00000001 << iX);
+    uint8_t iX = (uint8_t)PopStackInteger();
+    uint32_t mask = (0x00000001 << iX);
     
-    CheckMacroCondition(progFlags & mask);
+    if (iX == 32) CheckMacroCondition(progModeCarry);
+    else
+    if (iX == 33) CheckMacroCondition(progModeOverflow);
+    else CheckMacroCondition(progFlags & mask);
 }
 
 void Macro_XLTR0(void)

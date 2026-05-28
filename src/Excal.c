@@ -93,6 +93,7 @@ uint32_t ticksUsed = 0;
 
 uint8_t ClearStackOnExit = 0;
 uint8_t eRPN = 0;
+uint8_t rotateThroughCarry = 0;
 uint8_t progModeCarry = 0;
 uint8_t progModeOverflow = 0;
 uint8_t rightAlignStack = 0;
@@ -2571,9 +2572,6 @@ void RPN_clearStack(void)
             memset(FIN, 0x00, sizeof(FIN));
             CFn = 0;
 
-            progModeOverflow = 0;
-            progModeCarry = 0;
-
             GetDlgItemText(calcMainWindow, RPN_STACK_X, savedStr, MAX_STACK_STRLEN);
             SetDlgItemText(calcMainWindow, RPN_STACK_X, "  ...MEMORY CLEAR...  ");
             sleep_and_peek(500);
@@ -2583,7 +2581,10 @@ void RPN_clearStack(void)
         if (progMode)
         {
             RPN_clearL();
+            progModeOverflow = 0;
+            progModeCarry = 0;
         }
+
         STACK[STK_X] = 0.0;
         STACK[STK_Y] = 0.0;
         STACK[STK_Z] = 0.0;
@@ -3199,79 +3200,44 @@ void RPN_plus(void)
     {
         xl = StackPopL();
         yl = StackPopL();
+
+        if (wordMode == COMPSCI_SIGNED)
+        {
+            int64_t a = (int64_t)xl;
+            int64_t b = (int64_t)yl;
+            int64_t r = a+b;
+            if (((a ^ r) & (b ^ r)) & (1 << (wordSize-1)))
+            {
+                progModeOverflow = 1;
+            }
+            else
+            {
+                progModeOverflow = 0;
+            }
+
+            if (r < a) progModeCarry = 1; else progModeCarry = 0;
+        }
+        else // Unsigned (Carry same as Overflow)
+        {
+            uint64_t a = (uint64_t)xl;
+            uint64_t b = (uint64_t)yl;
+            uint64_t r = (a+b) & wordSizeMask;
+            if (r < a)
+            {
+                progModeOverflow = 1;
+                progModeCarry = 1;
+            }
+            else
+            {
+                progModeOverflow = 0;
+                progModeCarry = 0;
+            }
+        }
+
         StackPushL(xl + yl);
     }
 }
 
-void RPN_multiply(void)
-{
-    PROG_LONG xl, yl;
-
-    Xedit = X_NEW;
-
-    if (rpnStoreRecall & 0x03)
-    {
-        rpnStoreRecall &= 0x0F;
-        rpnStoreRecall |= REG_MULTIPLY;
-        UpdateInfoBar_StoreRecall();
-        return;
-    }
-
-    if (progMode == PROG_FLOAT)
-        StackPush(StackPop() * StackPop());
-    else
-    {
-        xl = StackPopL();
-        yl = StackPopL();
-        StackPushL(xl * yl);
-    }
-}
-
-void RPN_divide(void)
-{
-    double x, y;
-    PROG_LONG xl, yl;
-    PROG_SIGNEDLONG sxl, syl;
-
-    Xedit = X_NEW;
-
-    if (rpnStoreRecall & 0x03)
-    {
-        rpnStoreRecall &= 0x0F;
-        rpnStoreRecall |= REG_DIVIDE;
-        UpdateInfoBar_StoreRecall();
-        return;
-    }
-
-    if (STACK[STK_X] == 0.0)
-    {
-        RPN_error("Divide By Zero");
-    }
-    else
-    {
-        if (progMode == PROG_FLOAT)
-        {
-            x = StackPop();
-            y = StackPop();
-            StackPush(y / x);
-        }
-        else
-        {
-            if (wordMode == COMPSCI_SIGNED)
-            {
-                sxl = (PROG_SIGNEDLONG)StackPopL();
-                syl = (PROG_SIGNEDLONG)StackPopL();
-                StackPushL(syl / sxl);
-            }
-            else
-            {
-                xl = StackPopL();
-                yl = StackPopL();
-                StackPushL(yl / xl);
-            }
-        }
-    }
-}
 
 void RPN_minus(void)
 {
@@ -3298,7 +3264,186 @@ void RPN_minus(void)
     {
         xl = StackPopL();
         yl = StackPopL();
+
+        if (wordMode == COMPSCI_SIGNED)
+        {
+            int64_t a = (int64_t)xl;
+            int64_t b = (int64_t)yl;
+            int64_t r = a+b;
+            if (((a ^ b) & (1 << (wordSize-1))) && ((r ^ a) & (1 << (wordSize-1))))
+            {
+                progModeOverflow = 1;
+            }
+            else
+            {
+                progModeOverflow = 0;
+            }
+            
+            if (r < a) progModeCarry = 1; else progModeCarry = 0;
+        }
+        else // Unsigned - carry same as overflow
+        {
+            uint64_t a = (uint64_t)xl;
+            uint64_t b = (uint64_t)yl;
+            if (a > b)
+            {
+                progModeOverflow = 1;
+                progModeCarry = 1;
+            }
+            else
+            {
+                progModeOverflow = 0;
+                progModeCarry = 0;
+            }            
+        }
+
         StackPushL(yl - xl);
+    }
+}
+
+uint8_t will_unsigned_multiply_overflow(uint64_t a, uint64_t b) {
+    // 0 multiplied by anything is 0, so it never overflows
+    if (a == 0 || b == 0) {
+        return 0;
+    }
+    
+    // UINT64_MAX is (2^64 - 1)
+    return (b > (UINT64_MAX / a)) ? 1:0;
+}
+
+uint8_t will_signed_multiply_overflow(int64_t a, int64_t b) {
+    // Base cases for 0 and 1
+    if (a == 0 || b == 0) return 0;
+    if (a == 1 || b == 1) return 0;
+    
+    // Handle the dangerous -1 edge case because INT64_MIN / -1 overflows
+    if (a == -1) return (b == INT64_MIN) ? 1:0;
+    if (b == -1) return (a == INT64_MIN) ? 1:0;
+
+    if (a > 0) {
+        if (b > 0) {
+            // Positive * Positive
+            return (b > (INT64_MAX / a)) ? 1:0;
+        } else {
+            // Positive * Negative
+            return (b < (INT64_MIN / a)) ? 1:0;
+        }
+    } else {
+        if (b > 0) {
+            // Negative * Positive
+            return (a < (INT64_MIN / b)) ? 1:0;
+        } else {
+            // Negative * Negative (result must be <= INT64_MAX)
+            // Since both are negative, 'INT64_MAX / a' is negative.
+            // If b is smaller (more negative) than that, it overflows.
+            return (b < (INT64_MAX / a)) ? 1:0;
+        }
+    }
+}
+
+void RPN_multiply(void)
+{
+    PROG_LONG xl, yl;
+
+    Xedit = X_NEW;
+
+    if (rpnStoreRecall & 0x03)
+    {
+        rpnStoreRecall &= 0x0F;
+        rpnStoreRecall |= REG_MULTIPLY;
+        UpdateInfoBar_StoreRecall();
+        return;
+    }
+
+    if (progMode == PROG_FLOAT)
+    {
+        StackPush(StackPop() * StackPop());
+    }
+    else
+    {
+        xl = StackPopL();
+        yl = StackPopL();
+
+        progModeOverflow = 0;
+        if (wordMode == COMPSCI_SIGNED)
+        {
+            int64_t a = (int64_t)xl;
+            int64_t b = (int64_t)yl;
+            int64_t r = a * b;
+            if (wordSize == 64) progModeOverflow = will_signed_multiply_overflow(a,b);
+            if (wordSize == 32) if ((r > (int32_t)0x7FFFFFFF) || (r < (int32_t)0x80000000)) progModeOverflow = 1;
+            if (wordSize == 16) if ((r > (int16_t)0x7FFF) || (r < (int16_t)0x8000)) progModeOverflow = 1;
+            if (wordSize ==  8) if ((r > (int8_t)0x7F) || (r < (int8_t)0x80)) progModeOverflow = 1;
+        }
+        else
+        {
+            uint64_t a = (uint64_t)xl;
+            uint64_t b = (uint64_t)yl;
+            uint64_t r = a * b;
+            if (wordSize == 64) progModeOverflow = will_unsigned_multiply_overflow(a,b);
+            if (wordSize == 32) if (r > (uint64_t)0xFFFFFFFF) progModeOverflow = 1;
+            if (wordSize == 16) if (r > (uint64_t)0xFFFF) progModeOverflow = 1;
+            if (wordSize ==  8) if (r > (uint64_t)0xFF) progModeOverflow = 1;
+        }
+
+        StackPushL(xl * yl);
+    }
+}
+
+void RPN_divide(void)
+{
+    double x, y;
+    PROG_LONG xl, yl;
+    PROG_SIGNEDLONG sxl, syl;
+
+    Xedit = X_NEW;
+
+    if (rpnStoreRecall & 0x03)
+    {
+        rpnStoreRecall &= 0x0F;
+        rpnStoreRecall |= REG_DIVIDE;
+        UpdateInfoBar_StoreRecall();
+        return;
+    }
+
+    if (progMode == PROG_FLOAT)
+    {
+        if (STACK[STK_X] == 0.0)
+        {
+            RPN_error("Divide By Zero");
+        }
+        else
+        {
+            x = StackPop();
+            y = StackPop();
+            StackPush(y / x);
+        }
+    }
+    else
+    {
+        if (STACKL[STK_X] == 0)
+        {
+            progModeOverflow = 1;
+            // No error pop-up... we have the 'G' annunciator for overflow
+        }
+        else
+        {
+            progModeOverflow = 0;
+            if (wordMode == COMPSCI_SIGNED)
+            {
+                sxl = (PROG_SIGNEDLONG)StackPopL();
+                syl = (PROG_SIGNEDLONG)StackPopL();
+                StackPushL(syl / sxl);
+                progModeCarry = (syl % sxl) ? 1:0; // If it doesn't divide evenly... Carry
+            }
+            else
+            {
+                xl = StackPopL();
+                yl = StackPopL();
+                StackPushL(yl / xl);
+                progModeCarry = (yl % xl) ? 1:0; // If it doesn't divide evenly... Carry
+            }
+        }
     }
 }
 
@@ -3357,9 +3502,35 @@ void RPN_negate_x(void)
         {
             Xedit = X_NEW;
             if (progMode == PROG_FLOAT)
+            {
                 StackPush(StackPop() * -1.0);
+            }
             else
+            {
+                if (wordMode == COMPSCI_UNSIGNED)
+                {
+                    if (STACKL[STK_X] == 0)
+                    {
+                        progModeOverflow = 0;
+                    }
+                    else
+                    {
+                        progModeOverflow = 1;
+                    }
+                }
+                else // Signed...
+                {
+                    if (STACKL[STK_X] == smallestProgVal())
+                    {
+                        progModeOverflow = 1;
+                    }
+                    else
+                    {
+                        progModeOverflow = 0;
+                    }
+                }
                 StackPushL(StackPopL() * -1L);
+            }
         }
     }
 }
@@ -3791,6 +3962,7 @@ void SaveToDisk(void)
         fwrite(&progModeOverflow,   sizeof(progModeOverflow),   1, outfile);
         fwrite(&showXMinimized,     sizeof(showXMinimized),     1, outfile);
         fwrite(&eRPN,               sizeof(eRPN),               1, outfile);
+        fwrite(&rotateThroughCarry, sizeof(rotateThroughCarry), 1, outfile);
         fwrite(&ClearStackOnExit,   sizeof(ClearStackOnExit),   1, outfile);
         fwrite(&reservedOpt1,       sizeof(reservedOpt1),       1, outfile);
         fwrite(&reservedOpt2,       sizeof(reservedOpt2),       1, outfile);
@@ -3910,6 +4082,7 @@ void ReadFromDisk(void)
         fread(&progModeOverflow,   sizeof(progModeOverflow),   1, infile);
         fread(&showXMinimized,     sizeof(showXMinimized),     1, infile);
         fread(&eRPN,               sizeof(eRPN),               1, infile);
+        fread(&rotateThroughCarry, sizeof(rotateThroughCarry), 1, infile);
         fread(&ClearStackOnExit,   sizeof(ClearStackOnExit),   1, infile);
         fread(&reservedOpt1,       sizeof(reservedOpt1),       1, infile);
         fread(&reservedOpt2,       sizeof(reservedOpt2),       1, infile);
@@ -4931,7 +5104,6 @@ void RPN_clearX(void)
 {
     STACK[STK_X] = 0.0;
     STACKL[STK_X] = 0L;
-    progModeCarry = 0;
     Xedit = X_ENTER;
     RPN_ClearModifiers(!macroPlayback);
 }
@@ -5671,13 +5843,22 @@ void RPN_Paste(void)
 
 void RPN_inverse(void)
 {
-    if (STACK[STK_X] == 0.0)
+    if (progMode == PROG_FLOAT)
     {
-        RPN_error("Divide By Zero");
+        if (STACK[STK_X] == 0.0)
+        {
+            RPN_error("Divide By Zero");
+        }
+        else
+        {
+            StackPush(1.0 / StackPop());
+        }
     }
-    else
+    else    // Inverse makes no sense in integer mode... will always be zero.
     {
-        StackPush(1.0 / StackPop());
+        (void)StackPopL();
+        StackPushL(0L);
+        progModeOverflow = 1;
     }
 }
 

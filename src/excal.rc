@@ -43,7 +43,7 @@ STYLE DS_CENTER | WS_MINIMIZEBOX | WS_CAPTION | WS_SYSMENU
 CAPTION "Excalibur RPN Calculator"
 MENU EXCALIBUR_MENU
 CLASS "EXCALIBUR"
-FONT 10, "MS Sans Serif"
+FONT 10, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     PUSHBUTTON      "0",RPN_DIGIT_0,3,152,18,20
     PUSHBUTTON      "1",RPN_DIGIT_1,3,126,18,20
@@ -736,8 +736,8 @@ STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Word Size Options"
 FONT 10, "MS Sans Serif"
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,90,67,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,156,67,50,14
+    DEFPUSHBUTTON   "OK",IDOK,86,67,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,152,67,50,14
     GROUPBOX        "Word Size",IDC_STATIC,9,7,66,56
     CONTROL         "8-Bit",101,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
                     WS_TABSTOP,21,17,48,11
@@ -747,7 +747,7 @@ BEGIN
                     39,48,11
     CONTROL         "64-Bit",104,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,21,
                     50,48,11
-    GROUPBOX        "Decimal Mode",IDC_STATIC,79,7,66,56
+    GROUPBOX        "Word Mode",IDC_STATIC,79,7,66,56
     CONTROL         "Signed",105,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
                     WS_TABSTOP,91,20,48,11
     CONTROL         "Unsigned",106,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,
@@ -764,6 +764,8 @@ BEGIN
                     48,11
     CONTROL         "4",113,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,159,47,
                     48,11
+    CONTROL         "Rotate Thru Carry",114,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,218,71,68,10
 END
 
 DIALOG_MACRO_SAVE DIALOG DISCARDABLE  0, 65526, 434, 210

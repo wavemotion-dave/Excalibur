@@ -102,12 +102,12 @@ struct funcStruct CompSci_funcs[MAX_FUNCS] = {
     {FN18,  UNI_NOR,     USES_L,     ALLOWREC,   ' ',    "NOR",      YES_L,  X_NEW,      PROG_nor,       T_NOR,      H_NOR},
     {FN19,  UNI_2SCOMP,  USES_L,     ALLOWREC,   ' ',    "2's ",     YES_L,  X_NEW,      PROG_2sComp,    T_2COMP,    H_2COMP},
     {FN20,  UNI_ASR,     USES_L,     ALLOWREC,   ' ',    "ASR",      YES_L,  X_NEW,      PROG_ASR,       T_ASR,      H_ASR},
-    {FN21,  UNI_SHL,     USES_L,     ALLOWREC,   ' ',    "SHL",      YES_L,  X_NEW,      PROG_shl,       T_SL,       H_SL},
-    {FN22,  UNI_SHR,     USES_L,     ALLOWREC,   ' ',    "SHR",      YES_L,  X_NEW,      PROG_shr,       T_SR,       H_SR},
-    {FN23,  UNI_ROL,     USES_L,     ALLOWREC,   ' ',    "ROL",      YES_L,  X_NEW,      PROG_rol,       T_RL,       H_RL},
-    {FN24,  UNI_ROR,     USES_L,     ALLOWREC,   ' ',    "ROR",      YES_L,  X_NEW,      PROG_ror,       T_RR,       H_RR},
-    {FN25,  UNI_SHLX,    USES_L,     ALLOWREC,   ' ',    "SHL,x",    YES_L,  X_NEW,      PROG_shlX,      T_SLM,      H_SLM},
-    {FN26,  UNI_SHRX,    USES_L,     ALLOWREC,   ' ',    "SHR,x",    YES_L,  X_NEW,      PROG_shrX,      T_SRM,      H_SRM},
+    {FN21,  UNI_SHL,     USES_L,     ALLOWREC,   ' ',    "SL",       YES_L,  X_NEW,      PROG_shl,       T_SL,       H_SL},
+    {FN22,  UNI_SHR,     USES_L,     ALLOWREC,   ' ',    "SR",       YES_L,  X_NEW,      PROG_shr,       T_SR,       H_SR},
+    {FN23,  UNI_ROL,     USES_L,     ALLOWREC,   ' ',    "RL",       YES_L,  X_NEW,      PROG_rol,       T_RL,       H_RL},
+    {FN24,  UNI_ROR,     USES_L,     ALLOWREC,   ' ',    "RR",       YES_L,  X_NEW,      PROG_ror,       T_RR,       H_RR},
+    {FN25,  UNI_SHLX,    USES_L,     ALLOWREC,   ' ',    "SL,x",     YES_L,  X_NEW,      PROG_shlX,      T_SLM,      H_SLM},
+    {FN26,  UNI_SHRX,    USES_L,     ALLOWREC,   ' ',    "SR,x",     YES_L,  X_NEW,      PROG_shrX,      T_SRM,      H_SRM},
     {FN27,  UNI_RLX,     USES_L,     ALLOWREC,   ' ',    "RL,x",     YES_L,  X_NEW,      PROG_rlX,       T_RLX,      H_RLX},
     {FN28,  UNI_RRX,     USES_L,     ALLOWREC,   ' ',    "RR,x",     YES_L,  X_NEW,      PROG_rrX,       T_RRX,      H_RRX},
     {FN29,  UNI_MOD,     USES_L,     ALLOWREC,   ' ',    "MOD",      YES_L,  X_NEW,      PROG_mod,       T_MOD,      H_MOD},
@@ -566,16 +566,22 @@ void PROG_xor(void)
 
 void PROG_shl(void)
 {
-    StackPushL(StackPopL() << 1);     // this always shifts in a zero
+    PROG_LONG xl = StackPopL();
+    progModeOverflow = 0;
+    if (xl & (1 << (wordSize - 1))) progModeCarry = 1; else progModeCarry = 0;
+    StackPushL(xl << 1);     // this always shifts in a zero
 }
 
 void PROG_shr(void)
 {
     PROG_LONG mask;
     PROG_LONG val;
+    PROG_LONG xl = StackPopL();
 
-    val = (StackPopL() >> 1);
-    mask = 0x00000001L << (wordSize - 1);
+    progModeOverflow = 0;
+    if (xl & 1) progModeCarry = 1; else progModeCarry = 0;
+    val = (xl >> 1);
+    mask = 1 << (wordSize - 1);
     val &= (PROG_LONG) ~ mask;  // Always shift in a zero...
     StackPushL(val);
 }
@@ -583,11 +589,23 @@ void PROG_shr(void)
 void PROG_rol(void)
 {
     PROG_LONG r;
-    PROG_LONG mask;
+    PROG_LONG rotatedBit;
 
     r = StackPopL();                    // Get the value to be rotated from our stack.
-    mask = (r & (1 << (wordSize - 1))) >> (wordSize - 1);   // Get the bit that will be rotated around to the LSBit.
-    r = (r << 1) | mask;                // Shift left and OR in the bit that was rotated around to the LSBit.
+
+    progModeOverflow = 0;
+    if (rotateThroughCarry)
+    {
+        rotatedBit = (r & (1 << (wordSize - 1))) >> (wordSize - 1);   // Get the bit that will be rotated around to the LSBit.
+        r = (r << 1) | progModeCarry;                                 // Shift left and OR in the carry bit
+        progModeCarry = (uint8_t)rotatedBit;                          // The bit that was rotated off the word goes into Carry
+    }
+    else
+    {
+        rotatedBit = (r & (1 << (wordSize - 1))) >> (wordSize - 1);   // Get the bit that will be rotated around to the LSBit.
+        r = (r << 1) | rotatedBit;                                    // Shift left and OR in the bit that was rotated around to the LSBit.
+        progModeCarry = (uint8_t)rotatedBit;                          // The bit that was rotated around goes into Carry
+    }
 
     StackPushL(r);
 }
@@ -595,11 +613,23 @@ void PROG_rol(void)
 void PROG_ror(void)
 {
     PROG_LONG r;
-    PROG_LONG mask;
+    PROG_LONG rotatedBit;
 
     r = StackPopL();                    // Get the value to be rotated from our stack.
-    mask = (r & 1) << (wordSize - 1);   // Get the bit that will be rotated around to the MSBit.
-    r = (r >> 1) | mask;                // Shift right and OR in the bit that was rotated around to the MSBit.
+
+    progModeOverflow = 0;
+    if (rotateThroughCarry)
+    {
+        rotatedBit = (r & 1);                           // Get the bit that will be rotated around to the MSBit.
+        r = (r >> 1) | progModeCarry << (wordSize - 1); // Shift right and OR in the carry bit 
+        progModeCarry = (uint8_t)rotatedBit;            // The bit that was rotated off the word goes into Carry
+    }
+    else
+    {
+        rotatedBit = (r & 1);                           // Get the bit that will be rotated around to the MSBit.
+        r = (r >> 1) | rotatedBit << (wordSize - 1);    // Shift right and OR in the bit that was rotated around to the MSBit.
+        progModeCarry = (uint8_t)rotatedBit;            // The bit that was rotated around goes into Carry
+    }
 
     StackPushL(r);
 }
@@ -773,47 +803,51 @@ void PROG_binLo(void)
 
 void PROG_shlX(void)
 {
-    PROG_LONG shiftVal;
-    shiftVal = StackPopL();
-    StackPushL(StackPopL() << shiftVal);
+    // Limit to 16-bit... no sense otherwise
+    int16_t num = (int16_t)StackPopL();
+
+    while (num > 0)
+    {
+        PROG_shl();
+        num--;
+    }
 }
 
 
 void PROG_shrX(void)
 {
-    PROG_LONG mask;
-    PROG_LONG shiftVal;
+    // Limit to 16-bit... no sense otherwise
+    int16_t num = (int16_t)StackPopL();
 
-    shiftVal = StackPopL();
-
-    shiftVal = ((PROG_LONG) StackPopL() >> shiftVal);
-    mask = 0x00000001L << (wordSize - 1);
-    shiftVal &= (PROG_LONG) ~ mask;
-    StackPushL(shiftVal);
+    while (num > 0)
+    {
+        PROG_shr();
+        num--;
+    }
 }
 
 
 void PROG_rlX(void)
 {
-    PROG_LONG shiftVal;
-
-    shiftVal = StackPopL();
-    while (shiftVal != 0)
+    // Limit to 16-bit... no sense otherwise
+    int16_t num = (int16_t)StackPopL();
+    
+    while (num > 0)
     {
         PROG_rol();
-        shiftVal--;
+        num--;
     }
 }
 
 void PROG_rrX(void)
 {
-    PROG_LONG shiftVal;
-
-    shiftVal = StackPopL();
-    while (shiftVal != 0)
+    // Limit to 16-bit... no sense otherwise
+    int16_t num = (int16_t)StackPopL();
+    
+    while (num > 0)
     {
         PROG_ror();
-        shiftVal--;
+        num--;
     }
 }
 
@@ -825,6 +859,9 @@ void PROG_ASR(void)
     mask = 0x00000001L << (wordSize - 1);
 
     val = StackPopL();
+
+    progModeOverflow = 0;
+    if (val & 1) progModeCarry = 1; else progModeCarry = 0;
 
     if (wordMode == COMPSCI_SIGNED)
     {
@@ -979,6 +1016,11 @@ BOOL CALLBACK fnDIALOG_WordSizeProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
         else // HEX_SPACE_4
             SendMessage(GetDlgItem(hDlg, 113), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
 
+        if (rotateThroughCarry)
+        {
+            SendMessage(GetDlgItem(hDlg, 114), BM_SETCHECK, (WORD) 1, (DWORD) 0L);
+        }
+
         return TRUE;
 
     case WM_COMMAND:
@@ -1041,6 +1083,16 @@ BOOL CALLBACK fnDIALOG_WordSizeProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
             if (bs != 0L)
             {
                 hexSpacing = HEX_SPACE_4;
+            }
+
+            bs = SendMessage(GetDlgItem(hDlg, 114), BM_GETCHECK, (WORD) 0, (DWORD) 0L);
+            if (bs != 0L)
+            {
+                rotateThroughCarry = 1;
+            }
+            else 
+            {
+                rotateThroughCarry = 0;
             }
 
             EndDialog(hDlg, FALSE);
