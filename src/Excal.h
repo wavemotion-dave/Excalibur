@@ -465,7 +465,8 @@ extern int16_t playBackSave[MAX_MACROS][MAX_REC_PLAYBACK + 1];
 extern int16_t playBackIdxSave[MAX_MACROS];
 extern int16_t playBack[MAX_REC_PLAYBACK + 1];
 extern int16_t playBackIdx;
-extern uint8_t progModecarry;
+extern uint8_t progModeCarry;
+extern uint8_t progModeOverflow;
 extern uint8_t recModeON;
 extern uint16_t lastUniqueIndex;
 
@@ -511,7 +512,7 @@ extern int16_t currentMacroPlaybackIdx;
 #define MAX_MACRO_STACK 1000
 extern short int MacroStack[MAX_MACRO_STACK];
 extern short int MacroStackIdx;
-extern unsigned int macroFlags;
+extern unsigned int progFlags;
 extern uint8_t traceMacroPlayback;
 extern uint16_t traceDelayValueMs;
 
@@ -980,9 +981,9 @@ extern uint32_t userTicks;
 #define FUNC_BAR                        301
 #define TIME_BAR                        302
 #define REC_BAR                         303
-#define INFO_BAR                       304
+#define INFO_BAR                        304
 #define ANGLE_BAR                       305
-#define PROG_BAR                        306
+#define COMPSCI_BAR                     306
 #define RPN_CARRY                       307
 
 #define RPN_STACK                       400

@@ -440,14 +440,14 @@ void Macro_SFx(void)
 {
     int iX = PopStackInteger();
     unsigned int mask = (0x00000001 << iX);
-    macroFlags = macroFlags | mask;
+    progFlags = progFlags | mask;
 }
 
 void Macro_CFx(void)
 {
     int iX = PopStackInteger();
     unsigned int mask = (0x00000001 << iX);
-    macroFlags = macroFlags & ~mask;
+    progFlags = progFlags & ~mask;
 }
 
 void Macro_TFx(void)
@@ -455,7 +455,7 @@ void Macro_TFx(void)
     int iX = PopStackInteger();
     unsigned int mask = (0x00000001 << iX);
     
-    CheckMacroCondition(macroFlags & mask);
+    CheckMacroCondition(progFlags & mask);
 }
 
 void Macro_XLTR0(void)
@@ -509,7 +509,9 @@ void Macro_XGTR1(void)
 
 void Macro_ClearF(void)
 {
-    macroFlags = 0x00000000;
+    progFlags = 0x00000000;
+    progModeCarry = 0;
+    progModeOverflow = 0;
     blinkXDisplay(FALSE);
 }
 
@@ -1150,7 +1152,7 @@ void UpdateDebugRegs(void)
     makeInternational(tmp);
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
-    sprintf(tmp, " Flags: 0x%08X", macroFlags);
+    sprintf(tmp, " Flags: 0x%08X", progFlags);
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
     sprintf(tmp, " ");

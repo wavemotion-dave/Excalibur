@@ -54,7 +54,7 @@
                   "https://github.com/wavemotion-dave/Excalibur"      \
                   "\n\nThis version is BETA - Expect and report Bugs!"
 
-#define CONFIG_VERSION_MAIN 0xF010  // If this changes, we wipe EVERYTHING
+#define CONFIG_VERSION_MAIN 0xF012  // If this changes, we wipe EVERYTHING
 #define CONFIG_VERSION_SUB  0x0001  // If this changes, we reset x,y window position and reset constant tables (currency, physics constants, etc)
 
 #define END_OF_PROGRAM_STR "<End Of Program>"
@@ -75,7 +75,7 @@ uint8_t toolTipCounter = 0;
 uint8_t bExactFont = TRUE;
 int16_t MacroStack[MAX_MACRO_STACK];
 int16_t MacroStackIdx = 0;
-uint32_t macroFlags = 0x00000000;
+uint32_t progFlags = 0x00000000;
 uint8_t rpnStoreRecall = 0x00;
 
 uint32_t wordSize = 32;
@@ -93,7 +93,8 @@ uint32_t ticksUsed = 0;
 
 uint8_t ClearStackOnExit = 0;
 uint8_t eRPN = 0;
-uint8_t progModecarry = 0;
+uint8_t progModeCarry = 0;
+uint8_t progModeOverflow = 0;
 uint8_t rightAlignStack = 0;
 uint8_t showXMinimized = 0;
 uint8_t traceMacroPlayback = FALSE;
@@ -1282,9 +1283,9 @@ void ClipboardCopySelection(HWND hwnd, uint8_t copytype)
         
         // -------------------------------------------------------
         // If we are pasting from clipboard, look at display mode
-        // to see if we need to manipualte commas and DPs.
+        // to see if we need to manipulate commas and DPs.
         // -------------------------------------------------------
-        tmp2[20] = '\0';
+        tmp2[MAX_STACK_STRLEN] = '\0';
         j = 0;
         for (i = 0; i < (int)strlen(tmp2); i++)
         {
@@ -1626,6 +1627,8 @@ void MemoryInit(void)
     playBackIdx = 0;
     currentMacroPlaybackIdx = 0;
     indirectRegister = 0;
+    progModeOverflow = 0;
+    progModeCarry = 0;
     
     // Mark unused constants as not included to be shown...
     for (k = 0; k < MAX_CONST_BANKS; k++)
@@ -1725,15 +1728,18 @@ void ShowStatus(void)
 {
     if (progMode != PROG_FLOAT)
     {
-        if (progModecarry == 1)
-            sprintf(tmpStr, "C");
-        else
-            sprintf(tmpStr, "  ");
+        strcpy(tmpStr, "");
+        if (progModeOverflow == 1) strcat(tmpStr, "G ");
+        if (progModeCarry == 1) strcat(tmpStr, "C");
         SetDlgItemText(calcMainWindow, RPN_CARRY, tmpStr);
+    }
+    else
+    {
+        SetDlgItemText(calcMainWindow, RPN_CARRY, " ");
     }
 
     if (recModeON == 0)
-        sprintf(tmpStr, "   ");
+        sprintf(tmpStr, " ");
     else
         sprintf(tmpStr, "REC ");
     SetDlgItemText(calcMainWindow, REC_BAR, tmpStr);
@@ -1763,15 +1769,15 @@ void ShowStatus(void)
         }
         else
         {
-            strcat(tmpStr, "       ");
+            strcat(tmpStr, " ");
         }
 
-        SetDlgItemText(calcMainWindow, PROG_BAR, tmpStr);
+        SetDlgItemText(calcMainWindow, COMPSCI_BAR, tmpStr);
     }
     else
     {
-        sprintf(tmpStr, "    ");
-        SetDlgItemText(calcMainWindow, PROG_BAR, tmpStr);
+        sprintf(tmpStr, " ");
+        SetDlgItemText(calcMainWindow, COMPSCI_BAR, tmpStr);
     }
 
     if (sci_format == 'g')
@@ -1862,7 +1868,7 @@ void RPN_fact(void)
 // floating-point numbers. Here we will convert the floating number to a string
 // with 1 less digit than double precision allows... and then convert it back
 // to a floating point value. This hides all sorts of small inconsistencies that
-// would otherwise plague the calcualtor - for example, with IEEE floating point
+// would otherwise plague the calculator - for example, with IEEE floating point
 // the sum of 0.1 + 0.2 does not EXACTLY equal 0.3... but with this function we
 // can ensure that whatever inaccuracies there are between 0.1, 0.2 and 0.3 - the
 // inaccuracies will be applied equally and the MakeAccurate versions of 0.1+0.2
@@ -2565,6 +2571,9 @@ void RPN_clearStack(void)
             memset(FIN, 0x00, sizeof(FIN));
             CFn = 0;
 
+            progModeOverflow = 0;
+            progModeCarry = 0;
+
             GetDlgItemText(calcMainWindow, RPN_STACK_X, savedStr, MAX_STACK_STRLEN);
             SetDlgItemText(calcMainWindow, RPN_STACK_X, "  ...MEMORY CLEAR...  ");
             sleep_and_peek(500);
@@ -2585,7 +2594,7 @@ void RPN_clearStack(void)
         STACK[STK_D] = 0.0;
         LASTX = 0.0;
         LASTY = 0.0;
-        progModecarry = 0;
+        progModeCarry = 0;
         strcpy(Xstr, "");
     }
     RPN_ClearModifiers(!macroPlayback);
@@ -2603,7 +2612,7 @@ void RPN_clearL(void)
     STACKL[STK_D] = 0L;
     LASTXL = 0L;
     LASTYL = 0L;
-    progModecarry = 0;
+    progModeCarry = 0;
     strcpy(Xstr, "");
 }
 
@@ -3777,6 +3786,9 @@ void SaveToDisk(void)
         fwrite(&footPrint,          sizeof(footPrint),          1, outfile);
         fwrite(&popFillZero,        sizeof(popFillZero),        1, outfile);
         fwrite(&rightAlignStack,    sizeof(rightAlignStack),    1, outfile);
+        fwrite(&progFlags,          sizeof(progFlags),          1, outfile);
+        fwrite(&progModeCarry,      sizeof(progModeCarry),      1, outfile);
+        fwrite(&progModeOverflow,   sizeof(progModeOverflow),   1, outfile);
         fwrite(&showXMinimized,     sizeof(showXMinimized),     1, outfile);
         fwrite(&eRPN,               sizeof(eRPN),               1, outfile);
         fwrite(&ClearStackOnExit,   sizeof(ClearStackOnExit),   1, outfile);
@@ -3893,6 +3905,9 @@ void ReadFromDisk(void)
         fread(&footPrint,          sizeof(footPrint),          1, infile);
         fread(&popFillZero,        sizeof(popFillZero),        1, infile);
         fread(&rightAlignStack,    sizeof(rightAlignStack),    1, infile);
+        fread(&progFlags,          sizeof(progFlags),          1, infile);
+        fread(&progModeCarry,      sizeof(progModeCarry),      1, infile);
+        fread(&progModeOverflow,   sizeof(progModeOverflow),   1, infile);
         fread(&showXMinimized,     sizeof(showXMinimized),     1, infile);
         fread(&eRPN,               sizeof(eRPN),               1, infile);
         fread(&ClearStackOnExit,   sizeof(ClearStackOnExit),   1, infile);
@@ -4916,7 +4931,7 @@ void RPN_clearX(void)
 {
     STACK[STK_X] = 0.0;
     STACKL[STK_X] = 0L;
-    progModecarry = 0;
+    progModeCarry = 0;
     Xedit = X_ENTER;
     RPN_ClearModifiers(!macroPlayback);
 }
