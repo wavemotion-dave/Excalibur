@@ -373,14 +373,14 @@ int playBackIdxTmp;
 void CustMacroPlayback(int item)
 {
     // Save original macro...
-    playBackIdxTmp = playBackIdx;
+    playBackIdxTmp = playBackEndIdx;
     memcpy(playBackTmp, playBack, sizeof(playBack));
 
     memcpy(playBack, playBackSave[item], sizeof(playBack));
-    playBackIdx = playBackIdxSave[item];
+    playBackEndIdx = playBackIdxSave[item];
     RPN_Playback();
 
     // Restore original macro...
-    playBackIdx = playBackIdxTmp;
+    playBackEndIdx = playBackIdxTmp;
     memcpy(playBack, playBackTmp, sizeof(playBack));
 }

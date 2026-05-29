@@ -68,8 +68,8 @@ uint8_t macroPlayback = FALSE;
 uint8_t modifiers = 0x00;
 
 int16_t playBack[MAX_REC_PLAYBACK + 1];
-int16_t playBackIdx = 0;
-int16_t currentMacroPlaybackIdx = 0;
+int16_t playBackEndIdx = 0;
+int16_t currentPlaybackIdx = 0;
 uint8_t showTrace = FALSE;
 uint8_t toolTipCounter = 0;
 uint8_t bExactFont = TRUE;
@@ -1252,7 +1252,7 @@ void ClipboardCopySelection(HWND hwnd, uint8_t copytype)
     {
         strcpy(clipboardBuffer, "");
 
-        for (i = 0; i < playBackIdx; i++)
+        for (i = 0; i < playBackEndIdx; i++)
         {
             sprintf(tmpStr, "%03d - %s", i + 1, playBackMap[playBack[i]].funcText);
             strcat(clipboardBuffer, tmpStr);
@@ -1262,7 +1262,7 @@ void ClipboardCopySelection(HWND hwnd, uint8_t copytype)
         strcat(clipboardBuffer, tmpStr);
         strcat(clipboardBuffer, "\r\n");
         chksum = 0x0000;
-        for (i = 0; i < playBackIdx; i++)
+        for (i = 0; i < playBackEndIdx; i++)
             chksum += playBack[i];
         sprintf(tmpStr, "Checksum: %04X", chksum);
         strcat(clipboardBuffer, "\r\n");
@@ -1625,8 +1625,8 @@ void MemoryInit(void)
         playBackIdxSave[i] = 0;
     }
 
-    playBackIdx = 0;
-    currentMacroPlaybackIdx = 0;
+    playBackEndIdx = 0;
+    currentPlaybackIdx = 0;
     indirectRegister = 0;
     progModeOverflow = 0;
     progModeCarry = 0;
@@ -1729,14 +1729,20 @@ void ShowStatus(void)
 {
     if (progMode != PROG_FLOAT)
     {
-        strcpy(tmpStr, "");
-        if (progModeOverflow == 1) strcat(tmpStr, "G ");
-        if (progModeCarry == 1) strcat(tmpStr, "C");
-        SetDlgItemText(calcMainWindow, RPN_CARRY, tmpStr);
+        if (progModeOverflow == 1)
+            SetDlgItemText(calcMainWindow, RPN_OVERFLOW, "G");
+        else
+            SetDlgItemText(calcMainWindow, RPN_OVERFLOW, " ");
+
+        if (progModeCarry == 1)
+            SetDlgItemText(calcMainWindow, RPN_CARRY, "C");       
+        else
+            SetDlgItemText(calcMainWindow, RPN_CARRY, " ");
     }
     else
     {
         SetDlgItemText(calcMainWindow, RPN_CARRY, " ");
+        SetDlgItemText(calcMainWindow, RPN_OVERFLOW, " ");
     }
 
     if (recModeON == 0)
@@ -2359,14 +2365,14 @@ void ShowStack(void)
 
     if (recModeON == 1) // Special record mode - show current program step in Z register!
     {
-        sprintf(tmpStr, "%03d-Unknown!", currentMacroPlaybackIdx);
-        if (currentMacroPlaybackIdx == 0)
+        sprintf(tmpStr, "%03d-Unknown!", currentPlaybackIdx);
+        if (currentPlaybackIdx == 0)
         {
-            sprintf(tmpStr, "%03d-<Start Of Program>", currentMacroPlaybackIdx);
+            sprintf(tmpStr, "%03d-<Start Of Program>", currentPlaybackIdx);
         }
         else
         {
-            sprintf(tmpStr, "%03d-%s", currentMacroPlaybackIdx, playBackMap[playBack[currentMacroPlaybackIdx - 1]].funcText);
+            sprintf(tmpStr, "%03d-%s", currentPlaybackIdx, playBackMap[playBack[currentPlaybackIdx - 1]].funcText);
         }
         tmpStr[MAX_STACK_STRLEN] = CNULL;
         SetDlgItemText(calcMainWindow, RPN_STACK_T, tmpStr);
@@ -2374,13 +2380,13 @@ void ShowStack(void)
     }
     else if (showTrace == TRUE) // Are we showing a trace playback - repurpose Z register area
     {
-        if (currentMacroPlaybackIdx == playBackIdx)
+        if (currentPlaybackIdx == playBackEndIdx)
         {
-            sprintf(tmpStr, "%03d-<End Of Program>", currentMacroPlaybackIdx);
+            sprintf(tmpStr, "%03d-<End Of Program>", currentPlaybackIdx);
         }
         else
         {
-            sprintf(tmpStr, "%03d-%s", currentMacroPlaybackIdx, playBackMap[playBack[currentMacroPlaybackIdx]].funcText);
+            sprintf(tmpStr, "%03d-%s", currentPlaybackIdx, playBackMap[playBack[currentPlaybackIdx]].funcText);
         }
 
         tmpStr[MAX_STACK_STRLEN] = CNULL;
@@ -2581,8 +2587,6 @@ void RPN_clearStack(void)
         if (progMode)
         {
             RPN_clearL();
-            progModeOverflow = 0;
-            progModeCarry = 0;
         }
 
         STACK[STK_X] = 0.0;
@@ -2595,7 +2599,6 @@ void RPN_clearStack(void)
         STACK[STK_D] = 0.0;
         LASTX = 0.0;
         LASTY = 0.0;
-        progModeCarry = 0;
         strcpy(Xstr, "");
     }
     RPN_ClearModifiers(!macroPlayback);
@@ -2614,6 +2617,7 @@ void RPN_clearL(void)
     LASTXL = 0L;
     LASTYL = 0L;
     progModeCarry = 0;
+    progModeOverflow = 0;
     strcpy(Xstr, "");
 }
 
@@ -3987,7 +3991,7 @@ void SaveToDisk(void)
 
         fwrite(&playBack,           sizeof(playBack),           1, outfile);
         fwrite(&playBackSave,       sizeof(playBackSave),       1, outfile);
-        fwrite(&playBackIdx,        sizeof(playBackIdx),        1, outfile);
+        fwrite(&playBackEndIdx,        sizeof(playBackEndIdx),        1, outfile);
         fwrite(&playBackIdxSave,    sizeof(playBackIdxSave),    1, outfile);
         fwrite(&macroName,          sizeof(macroName),          1, outfile);
         fwrite(&macro_short_names,  sizeof(macro_short_names),  1, outfile);
@@ -4107,7 +4111,7 @@ void ReadFromDisk(void)
 
         fread(&playBack,           sizeof(playBack),           1, infile);
         fread(&playBackSave,       sizeof(playBackSave),       1, infile);
-        fread(&playBackIdx,        sizeof(playBackIdx),        1, infile);
+        fread(&playBackEndIdx,        sizeof(playBackEndIdx),        1, infile);
         fread(&playBackIdxSave,    sizeof(playBackIdxSave),    1, infile);
         fread(&macroName,          sizeof(macroName),          1, infile);
         fread(&macro_short_names,  sizeof(macro_short_names),  1, infile);
@@ -4287,7 +4291,7 @@ void CopyBufferToCurrentMacro(char *clipboardBuffer)
     int maxLen;
 
     userChecksum = 0xFFAA;
-    playBackIdx = 0;
+    playBackEndIdx = 0;
     idx = 0;
     tmpBidx = 0;
     done = 0;
@@ -4330,12 +4334,12 @@ void CopyBufferToCurrentMacro(char *clipboardBuffer)
                 maxLen = max(strlen(&tmpB[preambleIndex]), strlen(playBackMap[i].funcText));
                 if ((tmpB[preambleIndex] != CNULL) && (strncmp(&tmpB[preambleIndex], playBackMap[i].funcText, maxLen) == 0))
                 {
-                    playBack[playBackIdx] = i;
-                    playBackIdx++;
-                    if (playBackIdx >= MAX_REC_PLAYBACK)
+                    playBack[playBackEndIdx] = i;
+                    playBackEndIdx++;
+                    if (playBackEndIdx >= MAX_REC_PLAYBACK)
                     {
                         MessageBox(calcMainWindow, "Maximum program length has been reached.", "Excalibur Program Error", MB_OK);
-                        playBackIdx = 0;
+                        playBackEndIdx = 0;
                         done = 1;
                     }
                     found = 1;
@@ -4352,7 +4356,7 @@ void CopyBufferToCurrentMacro(char *clipboardBuffer)
             {
                 sprintf(outputBuffer, "Error importing program from clipboard.\n\nLine: [%s] unknown.", tmpB);
                 MessageBox(calcMainWindow, outputBuffer, "Excalibur For Windows", MB_ICONERROR);
-                playBackIdx = 0;
+                playBackEndIdx = 0;
                 break;
             }
         }
@@ -4369,7 +4373,7 @@ void CopyBufferToCurrentMacro(char *clipboardBuffer)
         }
         idx++;
     }
-    if (playBackIdx > 0)
+    if (playBackEndIdx > 0)
     {
         while ((idx < MAX_IMPORT_CLIPBOARD_SIZE))
         {
@@ -4400,7 +4404,7 @@ void CopyBufferToCurrentMacro(char *clipboardBuffer)
         }
 
         chksum = 0x0000;
-        for (i = 0; i < playBackIdx; i++)
+        for (i = 0; i < playBackEndIdx; i++)
             chksum += playBack[i];
         if (checksumFound)
         {
@@ -4456,12 +4460,12 @@ BOOL CALLBACK fnDIALOG_MACRO(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
         SendMessage(GetDlgItem(hDlg, IDC_LIST2), LB_RESETCONTENT, 0, 0);
 
         chksum = 0x0000;
-        for (i = 0; i < playBackIdx; i++)
+        for (i = 0; i < playBackEndIdx; i++)
             chksum += playBack[i];
         sprintf(tmpStr, "Checksum: %04X", chksum);
         SetDlgItemText(hDlg, IDC_CHECKSUM2, tmpStr);
 
-        for (i = 0; i < playBackIdx; i++)
+        for (i = 0; i < playBackEndIdx; i++)
         {
             sprintf(tmpStr, "%03d - %s", i + 1, playBackMap[playBack[i]].funcText);
             SendDlgItemMessage(hDlg, IDC_LIST2, LB_ADDSTRING, 0, (LONG)((LPSTR)tmpStr));
@@ -4523,11 +4527,11 @@ BOOL CALLBACK fnDIALOG_MACRO(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
                     strcpy(macroName[item], macName);
                     strcpy(macro_short_names[item], macShortName);
                     memcpy(playBackSave[item], playBack, sizeof(playBack));
-                    playBackIdxSave[item] = playBackIdx;
+                    playBackIdxSave[item] = playBackEndIdx;
                     lastChosenMacro = item;
                     SendMessage(GetDlgItem(hDlg, 101), LB_RESETCONTENT, 0, 0);
                     chksum = 0x0000;
-                    for (i = 0; i < playBackIdx; i++)
+                    for (i = 0; i < playBackEndIdx; i++)
                         chksum += playBack[i];
                     sprintf(tmpStr, "Checksum: %04X", chksum);
                     SetDlgItemText(hDlg, IDC_CHECKSUM2, tmpStr);
@@ -4554,16 +4558,16 @@ BOOL CALLBACK fnDIALOG_MACRO(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
             else
             {
                 memcpy(playBack, playBackSave[item], sizeof(playBack));
-                playBackIdx = playBackIdxSave[item];
+                playBackEndIdx = playBackIdxSave[item];
             }
             lastChosenMacro = item;
             SendMessage(GetDlgItem(hDlg, IDC_LIST2), LB_RESETCONTENT, 0, 0);
             chksum = 0x0000;
-            for (i = 0; i < playBackIdx; i++)
+            for (i = 0; i < playBackEndIdx; i++)
                 chksum += playBack[i];
             sprintf(tmpStr, "Checksum: %04X", chksum);
             SetDlgItemText(hDlg, IDC_CHECKSUM2, tmpStr);
-            for (i = 0; i < playBackIdx; i++)
+            for (i = 0; i < playBackEndIdx; i++)
             {
                 sprintf(tmpStr, "%03d - %s", i + 1, playBackMap[playBack[i]].funcText);
                 SendDlgItemMessage(hDlg, IDC_LIST2, LB_ADDSTRING, 0, (LONG)((LPSTR)tmpStr));
@@ -4639,11 +4643,11 @@ BOOL CALLBACK fnDIALOG_MACRO(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
                 lastChosenMacro = 0;
                 SendMessage(GetDlgItem(hDlg, IDC_LIST2), LB_RESETCONTENT, 0, 0);
                 chksum = 0x0000;
-                for (i = 0; i < playBackIdx; i++)
+                for (i = 0; i < playBackEndIdx; i++)
                     chksum += playBack[i];
                 sprintf(tmpStr, "Checksum: %04X", chksum);
                 SetDlgItemText(hDlg, IDC_CHECKSUM2, tmpStr);
-                for (i = 0; i < playBackIdx; i++)
+                for (i = 0; i < playBackEndIdx; i++)
                 {
                     sprintf(tmpStr, "%03d - %s", i + 1, playBackMap[playBack[i]].funcText);
                     SendDlgItemMessage(hDlg, IDC_LIST2, LB_ADDSTRING, 0, (LONG)((LPSTR)tmpStr));
@@ -5490,23 +5494,23 @@ void SaveProgramStep(uint16_t uniqueIndex)
     {
         if (uniqueIndex == playBackMap[i].uniqueIndex) // We always look up the function based on unique index!
         {
-            if (playBackIdx < (MAX_REC_PLAYBACK - 1))
+            if (playBackEndIdx < (MAX_REC_PLAYBACK - 1))
             {
-                if (currentMacroPlaybackIdx != playBackIdx) // Insert at current position!
+                if (currentPlaybackIdx != playBackEndIdx) // Insert at current position!
                 {
-                    for (k = playBackIdx; k >= currentMacroPlaybackIdx; k--)
+                    for (k = playBackEndIdx; k >= currentPlaybackIdx; k--)
                     {
                         playBack[k + 1] = playBack[k];
                     }
-                    playBackIdx++;
-                    playBack[currentMacroPlaybackIdx] = i;
-                    currentMacroPlaybackIdx++;
+                    playBackEndIdx++;
+                    playBack[currentPlaybackIdx] = i;
+                    currentPlaybackIdx++;
                 }
                 else // Insert at end!
                 {
-                    playBack[currentMacroPlaybackIdx] = i;
-                    playBackIdx++;
-                    currentMacroPlaybackIdx++;
+                    playBack[currentPlaybackIdx] = i;
+                    playBackEndIdx++;
+                    currentPlaybackIdx++;
                 }
             }
             else
@@ -5628,8 +5632,8 @@ void RPN_Record(void)
     if (recModeON == 0)
     {
         recModeON = 1;
-        playBackIdx = 0;
-        currentMacroPlaybackIdx = 0;
+        playBackEndIdx = 0;
+        currentPlaybackIdx = 0;
         Xedit = X_NEW;
     }
     else
@@ -5681,7 +5685,7 @@ void RPN_Playback(void)
     // as many recorded keystrokes as possible. On a fairly pedestrian i5 computer (circa 2018), this
     // will run about 1 million 'Excalibur Instructions' per second. Good enough.
     // ------------------------------------------------------------------------------------------------
-    for (currentMacroPlaybackIdx = 0; currentMacroPlaybackIdx < playBackIdx; currentMacroPlaybackIdx++)
+    for (currentPlaybackIdx = 0; currentPlaybackIdx < playBackEndIdx; currentPlaybackIdx++)
     {
         static int dampenSystemProcessing = 0;
 
@@ -5703,7 +5707,7 @@ void RPN_Playback(void)
             if (GetAsyncKeyState(VK_ESCAPE) & 0x0001)
                 break;
 
-            if (currentMacroPlaybackIdx == playBackIdx) // We may have ended the macro!!
+            if (currentPlaybackIdx == playBackEndIdx) // We may have ended the macro!!
                 break;
         }
 
@@ -5719,7 +5723,7 @@ void RPN_Playback(void)
             }
         }
 
-        idx = playBack[currentMacroPlaybackIdx];
+        idx = playBack[currentPlaybackIdx];
 
         if (playBackMap[idx].routine != NULL)
         {
@@ -5766,13 +5770,13 @@ void RPN_SingleStep(void)
     ShowStack();
     showTrace = FALSE;
 
-    if (currentMacroPlaybackIdx == playBackIdx) // We may have ended the macro!!
+    if (currentPlaybackIdx == playBackEndIdx) // We may have ended the macro!!
     {
         Xedit = X_NEW;
     }
     else
     {
-        idx = playBack[currentMacroPlaybackIdx];
+        idx = playBack[currentPlaybackIdx];
         if (playBackMap[idx].routine != NULL)
         {
             // Always disallow record of playback keystrokes!
@@ -5856,9 +5860,8 @@ void RPN_inverse(void)
     }
     else    // Inverse makes no sense in integer mode... will always be zero.
     {
-        (void)StackPopL();
-        StackPushL(0L);
-        progModeOverflow = 1;
+        StackPopL();
+        StackPushL(0L);        
     }
 }
 

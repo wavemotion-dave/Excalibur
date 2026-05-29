@@ -465,7 +465,7 @@ extern char macro_short_names[MAX_MACROS][7];
 extern int16_t playBackSave[MAX_MACROS][MAX_REC_PLAYBACK + 1];
 extern int16_t playBackIdxSave[MAX_MACROS];
 extern int16_t playBack[MAX_REC_PLAYBACK + 1];
-extern int16_t playBackIdx;
+extern int16_t playBackEndIdx;
 extern uint8_t progModeCarry;
 extern uint8_t progModeOverflow;
 extern uint8_t recModeON;
@@ -508,7 +508,7 @@ extern double STO[MAX_STO];
 extern PROG_LONG STOL[MAX_STO];
 
 extern uint8_t macroPlayback;
-extern int16_t currentMacroPlaybackIdx;
+extern int16_t currentPlaybackIdx;
 
 #define MAX_MACRO_STACK 1000
 extern short int MacroStack[MAX_MACRO_STACK];
@@ -712,12 +712,10 @@ enum UniqueButtonIndexTag
     UNI_LBKG,
     UNI_OZGR,
     UNI_OZML,
-
     UNI_INCM,
     UNI_INMM,
     UNI_FACE,
     UNI_FAKE,
-
     UNI_MIKM,
     UNI_FTM,
     UNI_FTKM,
@@ -734,22 +732,18 @@ enum UniqueButtonIndexTag
     UNI_ACRFT2,
     UNI_ATPSI,
     UNI_HHMS,
-
     UNI_DRAD,
     UNI_RP,
     UNI_KMHMPS,
     UNI_KNOTMPH,
-
     UNI_AHCOL,
     UNI_AHFAR,
     UNI_HPKW,
     UNI_JCAL,
-
     UNI_MILMM,
     UNI_STONLB,
     UNI_LTONLB,
     UNI_MTONLB,
-
     UNI_NEWLBF,
     UNI_HZTOAF,
     UNI_MPAPSI,
@@ -860,7 +854,7 @@ enum UniqueButtonIndexTag
     UNI_RET,
     UNI_HALT,
     UNI_PAUSE,
-    UNI_DSZ,
+    UNI_JUMP,
     UNI_INPA,
     UNI_INPB,
     UNI_INPC,
@@ -883,8 +877,8 @@ enum UniqueButtonIndexTag
     UNI_XNEZ,
     UNI_STOIND,
     UNI_RCLIND,
-    UNI_STOXTH,
-    UNI_RCLXTH,
+    UNI_EXCHXI,
+    UNI_DSZ,
     UNI_STO2I,
     UNI_RCL2I,
     UNI_GOTOIND,
@@ -986,6 +980,7 @@ extern uint32_t userTicks;
 #define ANGLE_BAR                       305
 #define COMPSCI_BAR                     306
 #define RPN_CARRY                       307
+#define RPN_OVERFLOW                    308
 
 #define RPN_STACK                       400
 #define RPN_X_LABEL                     401
@@ -1592,10 +1587,10 @@ extern uint32_t userTicks;
 #define H_PROJRANGE     "Computes the range of a projectile (in meters) given firing angle X and initial velocity Y (in m/s)."
 #define T_PROJHEIGHT    "Projectile Height"
 #define H_PROJHEIGHT    "Computes the height of a projectile (in meters) given firing angle X and initial velocity Y (in m/s)."
-#define T_RECALLN       "Recall Xth Register"
-#define H_RECALLN       "Recall's the Xth register (R0-R99). Convenient for programming use."
-#define T_STOREN        "Store Xth Register"
-#define H_STOREN        "Stores the Xth Register (R0-R99). Convenient for programming use."
+#define T_JUMP          "Jump Relative"
+#define H_JUMP          "Jump relative to the current instruction. If X is negative, it jumps backwards."
+#define T_EXCHXI        "Exchange X and i"
+#define H_EXCHXI        "Exchanges the contents of the X register with the Indirect register"
 #define T_GA_CM3        "Gallons to Cubic Centimeters"
 #define H_GA_CM3        "Convert Gallons to Cubic Centimeters"
 #define T_PINT_LI       "Pints to Liters"

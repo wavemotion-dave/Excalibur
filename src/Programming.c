@@ -45,8 +45,8 @@ double  debugValue = 0.0;
 uint8_t dinputDebugInProgress = 0;
 uint8_t RegisterToInput = 0;
 
-extern void Macro_RecallN(void);
-extern void Macro_StoreN(void);
+extern void Macro_ExchXi(void);
+extern void Macro_Jump(void);
 extern void Macro_LblH(void);
 extern void Macro_GotoH(void);
 extern void Macro_GsbH(void);
@@ -184,7 +184,7 @@ struct funcStruct Program2_funcs[MAX_FUNCS] =
     {FN1,   UNI_RET,        USES_FL,    ALLOWREC,   ' ',    "Return",   YES_L,      X_NEW,   Macro_Return,   T_RETURN,   H_RETURN},
     {FN2,   UNI_HALT,       USES_FL,    ALLOWREC,   ' ',    "Halt",     YES_L,      X_NEW,   Macro_Halt,     T_HALT,     H_HALT},
     {FN3,   UNI_PAUSE,      USES_FL,    ALLOWREC,   ' ',    "Pause",    YES_L,      X_NEW,   Macro_Pause,    T_PAUSE,    H_PAUSE},
-    {FN4,   UNI_DSZ,        USES_FL,    ALLOWREC,   ' ',    "DSZ",      YES_L,      X_NULL,  Macro_DSZ,      T_DSZ,      H_DSZ},
+    {FN4,   UNI_JUMP,       USES_FL,    ALLOWREC,   ' ',    "Jump",     YES_L,      X_NEW,   Macro_Jump,     T_JUMP,     H_JUMP},
 
     {FN5,   UNI_INPA,       USES_FL,    ALLOWREC,   ' ',    "Inp R0",   YES_L,      X_NEW,   Macro_InpA,     T_INPA,     H_INPA},
     {FN6,   UNI_INPB,       USES_FL,    ALLOWREC,   ' ',    "Inp R1",   YES_L,      X_NEW,   Macro_InpB,     T_INPB,     H_INPB},
@@ -213,8 +213,8 @@ struct funcStruct Program2_funcs[MAX_FUNCS] =
 
     {FN25,  UNI_STOIND,     USES_FL,    ALLOWREC,   ' ',    "Sto i",    YES_L,      X_NEW,   Macro_StoInd,   T_STOIND,   H_STOIND},
     {FN26,  UNI_RCLIND,     USES_FL,    ALLOWREC,   ' ',    "Rcl i",    YES_L,      X_NEW,   Macro_RclInd,   T_RCLIND,   H_RCLIND},
-    {FN27,  UNI_STOXTH,     USES_FL,    ALLOWREC,   ' ',    "StoXth",   YES_L,      X_NEW,   Macro_StoreN,   T_STOREN,   H_STOREN},
-    {FN28,  UNI_RCLXTH,     USES_FL,    ALLOWREC,   ' ',    "RclXth",   YES_L,      X_NEW,   Macro_RecallN,  T_RECALLN,  H_RECALLN},
+    {FN27,  UNI_EXCHXI,     USES_FL,    ALLOWREC,   ' ',    "X«»i",     YES_L,      X_NEW,   Macro_ExchXi,   T_EXCHXI,   H_EXCHXI},
+    {FN28,  UNI_DSZ,        USES_FL,    ALLOWREC,   ' ',    "DSZ",      YES_L,      X_NULL,  Macro_DSZ,      T_DSZ,      H_DSZ},
 
     {FN29,  UNI_STO2I,      USES_FL,    ALLOWREC,   ' ',    "Sto(i)",   YES_L,      X_NEW,   Macro_Sto2i,    T_STO2I,    H_STO2I},
     {FN30,  UNI_RCL2I,      USES_FL,    ALLOWREC,   ' ',    "Rcl(i)",   YES_L,      X_NEW,   Macro_Rcl2i,    T_RCL2I,    H_RCL2I},
@@ -251,11 +251,11 @@ void rpn_goto(uint16_t uniqueIdx)
     if (macroPlayback == TRUE)
     {
         // Find the first instance of the label - that's where we jump...
-        for (j = 0; j < playBackIdx; j++)
+        for (j = 0; j < playBackEndIdx; j++)
         {
             if (playBackMap[playBack[j]].uniqueIndex == uniqueIdx)
             {
-                currentMacroPlaybackIdx = j;
+                currentPlaybackIdx = j;
                 break;
             }
         }
@@ -279,13 +279,13 @@ void RPN_gosub(uint16_t uniqueIdx)
     {
         if (MacroStackIdx < MAX_MACRO_STACK - 1)
         {
-            MacroStack[MacroStackIdx++] = currentMacroPlaybackIdx;
+            MacroStack[MacroStackIdx++] = currentPlaybackIdx;
             rpn_goto(uniqueIdx);
         }
         else
         {
             RPN_error("Max Program Function Stack Reached - No more Gosubs!");
-            currentMacroPlaybackIdx = playBackIdx; // end program.
+            currentPlaybackIdx = playBackEndIdx; // end program.
         }
     }
 }
@@ -321,7 +321,7 @@ void CheckMacroCondition(int condition)
         }
         else // Skip next line
         {
-            currentMacroPlaybackIdx++;
+            currentPlaybackIdx++;
         }
     }
 }
@@ -429,9 +429,9 @@ void Macro_Return(void)
     if (macroPlayback == TRUE)
     {
         if (MacroStackIdx > 0)
-            currentMacroPlaybackIdx = MacroStack[--MacroStackIdx];
+            currentPlaybackIdx = MacroStack[--MacroStackIdx];
         else
-            currentMacroPlaybackIdx = playBackIdx;      // Jump to end of program...
+            currentPlaybackIdx = playBackEndIdx;      // Jump to end of program...
     }
 }
 
@@ -609,18 +609,18 @@ void Macro_DEL(void)
 {
     int k;
 
-    if (recModeON == 1 && currentMacroPlaybackIdx > 0)
+    if (recModeON == 1 && currentPlaybackIdx > 0)
     {
-        for (k = currentMacroPlaybackIdx - 1; k < playBackIdx; k++)
+        for (k = currentPlaybackIdx - 1; k < playBackEndIdx; k++)
             playBack[k] = playBack[k + 1];      // Shift everything down one line!
-        if (currentMacroPlaybackIdx == playBackIdx)
+        if (currentPlaybackIdx == playBackEndIdx)
         {
-            playBackIdx--;
-            currentMacroPlaybackIdx--;
+            playBackEndIdx--;
+            currentPlaybackIdx--;
         }
         else
         {
-            playBackIdx--;
+            playBackEndIdx--;
         }
         MacroStackIdx = 0;
     }
@@ -628,18 +628,18 @@ void Macro_DEL(void)
 
 void Macro_FWD(void)
 {
-    if (recModeON == 1 && currentMacroPlaybackIdx < playBackIdx)
+    if (recModeON == 1 && currentPlaybackIdx < playBackEndIdx)
     {
-        currentMacroPlaybackIdx++;
+        currentPlaybackIdx++;
         MacroStackIdx = 0;
     }
 }
 
 void Macro_REV(void)
 {
-    if (recModeON == 1 && currentMacroPlaybackIdx > 0)
+    if (recModeON == 1 && currentPlaybackIdx > 0)
     {
-        currentMacroPlaybackIdx--;
+        currentPlaybackIdx--;
         MacroStackIdx = 0;
     }
 }
@@ -667,13 +667,13 @@ void Macro_Step(void)
     if (recModeON == 0)         // Single Step...
     {
         RPN_SingleStep();
-        if (currentMacroPlaybackIdx < playBackIdx)
+        if (currentPlaybackIdx < playBackEndIdx)
         {
-            currentMacroPlaybackIdx++;
+            currentPlaybackIdx++;
         }
         else
         {
-            currentMacroPlaybackIdx=0;
+            currentPlaybackIdx=0;
         }
     }
 }
@@ -684,7 +684,7 @@ void Macro_EDIT(void)
     if (recModeON == 0)
     {
         recModeON = 1;
-        currentMacroPlaybackIdx = 0;
+        currentPlaybackIdx = 0;
         MacroStackIdx = 0;
         Xedit = X_NEW;
     }
@@ -695,7 +695,7 @@ void Macro_EDIT(void)
 
 void endRunningMacro(void)
 {
-    currentMacroPlaybackIdx = playBackIdx;
+    currentPlaybackIdx = playBackEndIdx;
     MacroStackIdx = 0;
     macroPlayback = FALSE;
 }
@@ -703,9 +703,8 @@ void endRunningMacro(void)
 
 void Macro_RecallN(void)
 {
-    int i;
+    int i = PopStackInteger();
 
-    i = PopStackInteger();
     if (i >= 0 && i < MAX_STO)
     {
         if (progMode == PROG_FLOAT)
@@ -723,21 +722,34 @@ void Macro_RecallN(void)
     }
 }
 
-void Macro_StoreN(void)
+void Macro_ExchXi(void)
 {
-    int i;
+    uint32_t temp = indirectRegister;
 
-    i = PopStackInteger();
-    if (i >= 0 && i < MAX_STO)
+    if (progMode == PROG_FLOAT)
     {
-        if (progMode == PROG_FLOAT)
-            STO[i] = STACK[STK_X];
-        else
-            STOL[i] = STACKL[STK_X];
+        indirectRegister = (uint32_t)STACK[STK_X];
+        STACK[STK_X] = temp;
     }
     else
     {
-        RPN_error("Register Out Of Range (R0 to R99)");
+        indirectRegister = (uint32_t)STACKL[STK_X];
+        STACKL[STK_X] = temp;
+    }
+}
+
+void Macro_Jump(void)
+{
+    int8_t relativeJump = (int8_t) PopStackInteger();
+
+    //TODO: fix this so it's useful
+    
+    // Jump Relative... but never before start or after end...
+    if (macroPlayback == TRUE)
+    {
+        currentPlaybackIdx += relativeJump;
+        if (currentPlaybackIdx < 0) currentPlaybackIdx = 0;
+        if (currentPlaybackIdx > playBackEndIdx) currentPlaybackIdx = playBackEndIdx;
     }
 }
 
@@ -794,11 +806,11 @@ void Macro_GotoInd(void)
                 case 8:  uniqueLabel=UNI_LBLI; break;
                 case 9:  uniqueLabel=UNI_LBLJ; break;
             }
-            for (j = 0; j < playBackIdx; j++)
+            for (j = 0; j < playBackEndIdx; j++)
             {
                 if (playBackMap[playBack[j]].uniqueIndex == uniqueLabel)  // Unique Index for label
                 {
-                    currentMacroPlaybackIdx = j;
+                    currentPlaybackIdx = j;
                     break;
                 }
             }
@@ -820,7 +832,7 @@ void Macro_GosubInd(void)
     {
         if (MacroStackIdx < MAX_MACRO_STACK - 1)
         {
-            MacroStack[MacroStackIdx++] = currentMacroPlaybackIdx;
+            MacroStack[MacroStackIdx++] = currentPlaybackIdx;
             if (indirectRegister < 10)
             {
                 switch(indirectRegister)
@@ -836,11 +848,11 @@ void Macro_GosubInd(void)
                     case 8:  uniqueLabel=UNI_LBLI; break;
                     case 9:  uniqueLabel=UNI_LBLJ; break;
                 }
-                for (j = 0; j < playBackIdx; j++)
+                for (j = 0; j < playBackEndIdx; j++)
                 {
                     if (playBackMap[playBack[j]].uniqueIndex == uniqueLabel)  // Unique Index for label
                     {
-                        currentMacroPlaybackIdx = j;
+                        currentPlaybackIdx = j;
                         break;
                     }
                 }
@@ -854,7 +866,7 @@ void Macro_GosubInd(void)
         else
         {
             RPN_error("Max Program Function Stack Reached - No more Gosubs!");
-            currentMacroPlaybackIdx = playBackIdx; // end program.
+            currentPlaybackIdx = playBackEndIdx; // end program.
         }
     }
 }
@@ -1063,16 +1075,16 @@ BOOL CALLBACK debugWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam
                     item = SendDlgItemMessage(hwnd, TRACE_PROGRAM, LB_GETCURSEL, 0, 0L);
                     if (recModeON)
                     {
-                        currentMacroPlaybackIdx = (int16_t)item;
-                        if (currentMacroPlaybackIdx > playBackIdx)
-                            currentMacroPlaybackIdx = playBackIdx;
+                        currentPlaybackIdx = (int16_t)item;
+                        if (currentPlaybackIdx > playBackEndIdx)
+                            currentPlaybackIdx = playBackEndIdx;
                     }
                     else
                     {
                         if (item > 0)
-                            currentMacroPlaybackIdx = (int16_t) item-1;
+                            currentPlaybackIdx = (int16_t) item-1;
                         else
-                            currentMacroPlaybackIdx = (int16_t) 0;
+                            currentPlaybackIdx = (int16_t) 0;
                     }
                     ShowStack();
                     return TRUE;
@@ -1281,7 +1293,7 @@ void UpdateDebugProgram(int resetProgramList)
         SendDlgItemMessage(debugTraceWindow, TRACE_PROGRAM, LB_RESETCONTENT, 0, 0);
         sprintf(tmp, "%03d - %s", 0, "<Start Of Program>");
         SendDlgItemMessage(debugTraceWindow, TRACE_PROGRAM, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
-        for (i = 0; i < playBackIdx; i++)
+        for (i = 0; i < playBackEndIdx; i++)
         {
             sprintf(tmp, "%03d - %s", i + 1, playBackMap[playBack[i]].funcText);
             SendDlgItemMessage(debugTraceWindow, TRACE_PROGRAM, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
@@ -1291,11 +1303,11 @@ void UpdateDebugProgram(int resetProgramList)
     }
     if (recModeON)
     {
-        SendDlgItemMessage(debugTraceWindow, TRACE_PROGRAM, LB_SETCURSEL, currentMacroPlaybackIdx, 0);
+        SendDlgItemMessage(debugTraceWindow, TRACE_PROGRAM, LB_SETCURSEL, currentPlaybackIdx, 0);
     }
     else
     {
-        SendDlgItemMessage(debugTraceWindow, TRACE_PROGRAM, LB_SETCURSEL, currentMacroPlaybackIdx+1, 0);
+        SendDlgItemMessage(debugTraceWindow, TRACE_PROGRAM, LB_SETCURSEL, currentPlaybackIdx+1, 0);
     }
 }
 
@@ -1383,7 +1395,7 @@ void Macro_DSZ(void)
         {
             if (--indirectRegister == 0)
             {
-                currentMacroPlaybackIdx++;
+                currentPlaybackIdx++;
             }
         }
     }
@@ -1391,39 +1403,116 @@ void Macro_DSZ(void)
 
 void Macro_Sto2i(void)
 {
-    if (indirectRegister < MAX_STO)
+    if (indirectRegister < MAX_STO+8)
     {
-        if (progMode == PROG_FLOAT)
+        if (indirectRegister == MAX_STO+0) 
         {
-            STO[indirectRegister] = (uint32_t)STACK[STK_X];
+            if (progMode == PROG_FLOAT) STACK[STK_X] = STACK[STK_X]; else STACKL[STK_X] = STACKL[STK_X];
         }
-        else
+        else 
+        if (indirectRegister == MAX_STO+1) 
         {
-            STOL[indirectRegister] = (uint32_t)STACKL[STK_X];
+            if (progMode == PROG_FLOAT) STACK[STK_Y] = STACK[STK_X]; else STACKL[STK_Y] = STACKL[STK_X];
+        }
+        else 
+        if (indirectRegister == MAX_STO+2) 
+        {
+            if (progMode == PROG_FLOAT) STACK[STK_Z] = STACK[STK_X]; else STACKL[STK_Z] = STACKL[STK_X];
+        }
+        else 
+        if (indirectRegister == MAX_STO+3) 
+        {
+            if (progMode == PROG_FLOAT) STACK[STK_T] = STACK[STK_X]; else STACKL[STK_T] = STACKL[STK_X];
+        }
+        else 
+        if (indirectRegister == MAX_STO+4) 
+        {
+            if (progMode == PROG_FLOAT) STACK[STK_A] = STACK[STK_X]; else STACKL[STK_A] = STACKL[STK_X];
+        }
+        else 
+        if (indirectRegister == MAX_STO+5) 
+        {
+            if (progMode == PROG_FLOAT) STACK[STK_B] = STACK[STK_X]; else STACKL[STK_B] = STACKL[STK_X];
+        }
+        else 
+        if (indirectRegister == MAX_STO+6) 
+        {
+            if (progMode == PROG_FLOAT) STACK[STK_C] = STACK[STK_X]; else STACKL[STK_C] = STACKL[STK_X];
+        }
+        else 
+        if (indirectRegister == MAX_STO+7) 
+        {
+            if (progMode == PROG_FLOAT) STACK[STK_D] = STACK[STK_X]; else STACKL[STK_D] = STACKL[STK_X];
+        }
+        else  // Must be one of the registers R00-R99
+        {
+            if (progMode == PROG_FLOAT)
+            {
+                STO[indirectRegister] = STACK[STK_X];
+            }
+            else
+            {
+                STOL[indirectRegister] = STACKL[STK_X];
+            }
         }
         blinkXDisplay(FALSE);
     }
     else
     {
-        RPN_error("Register Out Of Range(R0 to R99)");
+        RPN_error("Register Out Of Range(R0 to R99, XYZT, ABCD)");
     }
 }
 
 void Macro_Rcl2i(void)
 {
-    if (indirectRegister < MAX_STO)
+    if (indirectRegister < MAX_STO+8)
     {
-        if (progMode == PROG_FLOAT)
+        if (indirectRegister == MAX_STO+0) 
         {
-            StackPush(STO[indirectRegister]);
+            if (progMode == PROG_FLOAT) StackPush(STACK[STK_X]); else StackPushL(STACKL[STK_X]);
+        }
+        else if (indirectRegister == MAX_STO+1) 
+        {
+            if (progMode == PROG_FLOAT) StackPush(STACK[STK_Y]); else StackPushL(STACKL[STK_Y]);
+        }
+        else if (indirectRegister == MAX_STO+2) 
+        {
+            if (progMode == PROG_FLOAT) StackPush(STACK[STK_Z]); else StackPushL(STACKL[STK_Z]);
+        }
+        else if (indirectRegister == MAX_STO+3) 
+        {
+            if (progMode == PROG_FLOAT) StackPush(STACK[STK_T]); else StackPushL(STACKL[STK_T]);
+        }
+        else if (indirectRegister == MAX_STO+4) 
+        {
+            if (progMode == PROG_FLOAT) StackPush(STACK[STK_A]); else StackPushL(STACKL[STK_A]);
+        }
+        else if (indirectRegister == MAX_STO+5) 
+        {
+            if (progMode == PROG_FLOAT) StackPush(STACK[STK_B]); else StackPushL(STACKL[STK_B]);
+        }
+        else if (indirectRegister == MAX_STO+6) 
+        {
+            if (progMode == PROG_FLOAT) StackPush(STACK[STK_C]); else StackPushL(STACKL[STK_C]);
+        }
+        else if (indirectRegister == MAX_STO+7) 
+        {
+            if (progMode == PROG_FLOAT) StackPush(STACK[STK_D]); else StackPushL(STACKL[STK_D]);
         }
         else
         {
-            StackPushL(STOL[indirectRegister]);
-        }        
+            if (progMode == PROG_FLOAT)
+            {
+                StackPush(STO[indirectRegister]);
+            }
+            else
+            {
+                StackPushL(STOL[indirectRegister]);
+            }        
+        }
     }
     else
     {
-        RPN_error("Register Out Of Range(R0 to R99)");
+        RPN_error("Register Out Of Range(R0 to R99, XYZT, ABCD)");
     }
 }
