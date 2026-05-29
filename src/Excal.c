@@ -45,7 +45,7 @@
 #define VERSION_STR "v3.XX-05"
 
 #define ABOUT_MSG "Excalibur for Windows 32-bit\n"                    \
-                  "Version 3.XX-05  -  May 27, 2026\n\n"              \
+                  "Version 3.XX-05  -  May 30, 2026\n\n"              \
                   "Copyright 1994-2026 David Bernazzani\n\n"          \
                   "Please read the disclaimer and understand the\n"   \
                   "accuracy and precision issues before using.\n\n"   \
@@ -54,7 +54,7 @@
                   "https://github.com/wavemotion-dave/Excalibur"      \
                   "\n\nThis version is BETA - Expect and report Bugs!"
 
-#define CONFIG_VERSION_MAIN 0xF012  // If this changes, we wipe EVERYTHING
+#define CONFIG_VERSION_MAIN 0xF013  // If this changes, we wipe EVERYTHING
 #define CONFIG_VERSION_SUB  0x0001  // If this changes, we reset x,y window position and reset constant tables (currency, physics constants, etc)
 
 #define END_OF_PROGRAM_STR "<End Of Program>"
@@ -155,7 +155,7 @@ int32_t  lastChosenConst = 0;   // Last chosen constant
 int32_t  lastConstBank = 0;     // Last chosen constant bank
 int32_t  decimal_places = 13;   // Default decimal places
 uint8_t  sci_format = 'g';      // Default scientific display format
-uint32_t indirectRegister = 0;  // For programming - (i) register
+int32_t  indirectRegister = 0;  // For programming - (i) register
 uint8_t  progMode = PROG_FLOAT; // Normal floating-point mode (vs HEX, DEC, OCT, BIN)
 uint16_t lastUniqueIndex = 0;   // Index of the last function that was called (useful in Financial Register handling)
 
@@ -2380,7 +2380,7 @@ void ShowStack(void)
     }
     else if (showTrace == TRUE) // Are we showing a trace playback - repurpose Z register area
     {
-        if (currentPlaybackIdx == playBackEndIdx)
+        if (currentPlaybackIdx >= playBackEndIdx)
         {
             sprintf(tmpStr, "%03d-<End Of Program>", currentPlaybackIdx);
         }
@@ -3991,7 +3991,7 @@ void SaveToDisk(void)
 
         fwrite(&playBack,           sizeof(playBack),           1, outfile);
         fwrite(&playBackSave,       sizeof(playBackSave),       1, outfile);
-        fwrite(&playBackEndIdx,        sizeof(playBackEndIdx),        1, outfile);
+        fwrite(&playBackEndIdx,     sizeof(playBackEndIdx),     1, outfile);
         fwrite(&playBackIdxSave,    sizeof(playBackIdxSave),    1, outfile);
         fwrite(&macroName,          sizeof(macroName),          1, outfile);
         fwrite(&macro_short_names,  sizeof(macro_short_names),  1, outfile);
@@ -4111,7 +4111,7 @@ void ReadFromDisk(void)
 
         fread(&playBack,           sizeof(playBack),           1, infile);
         fread(&playBackSave,       sizeof(playBackSave),       1, infile);
-        fread(&playBackEndIdx,        sizeof(playBackEndIdx),        1, infile);
+        fread(&playBackEndIdx,     sizeof(playBackEndIdx),     1, infile);
         fread(&playBackIdxSave,    sizeof(playBackIdxSave),    1, infile);
         fread(&macroName,          sizeof(macroName),          1, infile);
         fread(&macro_short_names,  sizeof(macro_short_names),  1, infile);

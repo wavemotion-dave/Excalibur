@@ -71,9 +71,7 @@ enum StackPosition_t
 extern double STACK[MAX_STACK];     // The main RPN stack (X, Y, Z, T, A, B, C D)
 extern PROG_LONG STACKL[MAX_STACK]; // The main RPN stack in long integer form for Comp-Sci mode (X, Y, Z, T, A, B, C, D)
 
-
 #define MAX_IMPORT_CLIPBOARD_SIZE       (32 * 1024)
-
 
 // Defines for menu item IDs
 #define   IDM_OPEN                          101
@@ -194,7 +192,7 @@ extern double LASTX;            // LAST X register
 extern PROG_LONG LASTXL;        // Last X register in Comp-Sci mode
 extern double lastFloat;        // Last floating value in X (saved when switching into Comp-Sci mode)
 
-extern uint32_t indirectRegister;
+extern int32_t indirectRegister;
 
 extern int32_t main_x;
 extern int32_t main_y;
@@ -440,6 +438,7 @@ extern void turnOnNumLock(void);
 #define MAX_REC_PLAYBACK    400     // Maximum number of program steps per program
 #define MAX_MACROS          40      // Maximum number of total programs (each getting the max steps)
 #define MAX_MACRO_FUNC_TEXT 30      // Maximum macro text that can be assigned to any key
+#define MAX_LABELS          10      // Labels A=0 through J=9 for a total of 10 labels
 
 struct playbackStruct
 {
@@ -854,7 +853,7 @@ enum UniqueButtonIndexTag
     UNI_RET,
     UNI_HALT,
     UNI_PAUSE,
-    UNI_JUMP,
+    UNI_BEEP,
     UNI_INPA,
     UNI_INPB,
     UNI_INPC,
@@ -877,20 +876,20 @@ enum UniqueButtonIndexTag
     UNI_XNEZ,
     UNI_STOIND,
     UNI_RCLIND,
-    UNI_EXCHXI,
-    UNI_DSZ,
+    UNI_DSZI,
+    UNI_DSZ2I,
     UNI_STO2I,
     UNI_RCL2I,
     UNI_GOTOIND,
     UNI_GOSUBIND,
+    UNI_EXCHXI,
+    UNI_TRACE,
+    UNI_STEP,
+    UNI_DEBUG,
     UNI_MEDIT,
     UNI_REV,
     UNI_DEL,
     UNI_FWD,
-    UNI_TRACE,
-    UNI_STEP,
-    UNI_BEEP,
-    UNI_DEBUG,
 
     UNI_ENDCONST,
     UNI_STARTCONST,
@@ -1587,8 +1586,6 @@ extern uint32_t userTicks;
 #define H_PROJRANGE     "Computes the range of a projectile (in meters) given firing angle X and initial velocity Y (in m/s)."
 #define T_PROJHEIGHT    "Projectile Height"
 #define H_PROJHEIGHT    "Computes the height of a projectile (in meters) given firing angle X and initial velocity Y (in m/s)."
-#define T_JUMP          "Jump Relative"
-#define H_JUMP          "Jump relative to the current instruction. If X is negative, it jumps backwards."
 #define T_EXCHXI        "Exchange X and i"
 #define H_EXCHXI        "Exchanges the contents of the X register with the Indirect register"
 #define T_GA_CM3        "Gallons to Cubic Centimeters"
@@ -1752,8 +1749,10 @@ extern uint32_t userTicks;
 #define H_XLTR1         "Check if X is less than R1 and skip next instruction if true."
 #define T_XGTR1         "X > R1?"
 #define H_XGTR1         "Check if X is greater than R1 and skip next instruction if true."
-#define T_DSZ           "Decrement Skip if Zero"
+#define T_DSZ           "Decrement i Skip if Zero"
 #define H_DSZ           "Decrement the Indirect (i) Register and skip next instruction if zero."
+#define T_DSZ2I         "Decrement (i) Skip if Zero"
+#define H_DSZ2I         "Decrement the Register pointed to by the Indirect (i) Register and skip next instruction if zero."
 #define T_TIMERPUSH     "Timer Push"
 #define H_TIMERPUSH     "Pushes current timer value onto the stack."
 #define T_STON_LB       "Short Tons to Lbs"

@@ -121,7 +121,8 @@ extern void Macro_LoopG(void);
 extern void Macro_LoopH(void);
 extern void Macro_LoopI(void);
 extern void Macro_LoopJ(void);
-extern void Macro_DSZ(void);
+extern void Macro_DSZi(void);
+extern void Macro_DSZ2i(void);
 extern void Macro_Sto2i(void);
 extern void Macro_Rcl2i(void);
 extern void Macro_Beep(void);
@@ -184,7 +185,7 @@ struct funcStruct Program2_funcs[MAX_FUNCS] =
     {FN1,   UNI_RET,        USES_FL,    ALLOWREC,   ' ',    "Return",   YES_L,      X_NEW,   Macro_Return,   T_RETURN,   H_RETURN},
     {FN2,   UNI_HALT,       USES_FL,    ALLOWREC,   ' ',    "Halt",     YES_L,      X_NEW,   Macro_Halt,     T_HALT,     H_HALT},
     {FN3,   UNI_PAUSE,      USES_FL,    ALLOWREC,   ' ',    "Pause",    YES_L,      X_NEW,   Macro_Pause,    T_PAUSE,    H_PAUSE},
-    {FN4,   UNI_JUMP,       USES_FL,    ALLOWREC,   ' ',    "Jump",     YES_L,      X_NEW,   Macro_Jump,     T_JUMP,     H_JUMP},
+    {FN4,   UNI_BEEP,       USES_FL,    ALLOWREC,   ' ',    "Beep",     YES_L,      X_NEW,   Macro_Beep,     T_BEEP,     H_BEEP},
 
     {FN5,   UNI_INPA,       USES_FL,    ALLOWREC,   ' ',    "Inp R0",   YES_L,      X_NEW,   Macro_InpA,     T_INPA,     H_INPA},
     {FN6,   UNI_INPB,       USES_FL,    ALLOWREC,   ' ',    "Inp R1",   YES_L,      X_NEW,   Macro_InpB,     T_INPB,     H_INPB},
@@ -213,23 +214,23 @@ struct funcStruct Program2_funcs[MAX_FUNCS] =
 
     {FN25,  UNI_STOIND,     USES_FL,    ALLOWREC,   ' ',    "Sto i",    YES_L,      X_NEW,   Macro_StoInd,   T_STOIND,   H_STOIND},
     {FN26,  UNI_RCLIND,     USES_FL,    ALLOWREC,   ' ',    "Rcl i",    YES_L,      X_NEW,   Macro_RclInd,   T_RCLIND,   H_RCLIND},
-    {FN27,  UNI_EXCHXI,     USES_FL,    ALLOWREC,   ' ',    "X«»i",     YES_L,      X_NEW,   Macro_ExchXi,   T_EXCHXI,   H_EXCHXI},
-    {FN28,  UNI_DSZ,        USES_FL,    ALLOWREC,   ' ',    "DSZ",      YES_L,      X_NULL,  Macro_DSZ,      T_DSZ,      H_DSZ},
+    {FN27,  UNI_DSZI,       USES_FL,    ALLOWREC,   ' ',    "DSZ i",    YES_L,      X_NULL,  Macro_DSZi,     T_DSZ,      H_DSZ},
+    {FN28,  UNI_DSZ2I,      USES_FL,    ALLOWREC,   ' ',    "DSZ(i)",   YES_L,      X_NULL,  Macro_DSZ2i,    T_DSZ2I,    H_DSZ2I},
 
     {FN29,  UNI_STO2I,      USES_FL,    ALLOWREC,   ' ',    "Sto(i)",   YES_L,      X_NEW,   Macro_Sto2i,    T_STO2I,    H_STO2I},
     {FN30,  UNI_RCL2I,      USES_FL,    ALLOWREC,   ' ',    "Rcl(i)",   YES_L,      X_NEW,   Macro_Rcl2i,    T_RCL2I,    H_RCL2I},
     {FN31,  UNI_GOTOIND,    USES_FL,    ALLOWREC,   ' ',    "Goto(i)",  YES_L,      X_NEW,   Macro_GotoInd,  T_GOTOIND,  H_GOTOIND},
     {FN32,  UNI_GOSUBIND,   USES_FL,    ALLOWREC,   ' ',    "Gsb(i)",   YES_L,      X_NEW,   Macro_GosubInd, T_GSBIND,   H_GSBIND},
 
-    {FN33,  UNI_MEDIT,      USES_FL,    NORECORD,   ' ',    "EDIT",     YES_L,      X_NEW,   Macro_EDIT,     T_MEDIT,    H_MEDIT},
-    {FN34,  UNI_REV,        USES_FL,    NORECORD,   ' ',    "REV",      YES_L,      X_NEW,   Macro_REV,      T_REV,      H_REV},
-    {FN35,  UNI_DEL,        USES_FL,    NORECORD,   ' ',    "DEL",      YES_L,      X_NEW,   Macro_DEL,      T_DEL,      H_DEL},
-    {FN36,  UNI_FWD,        USES_FL,    NORECORD,   ' ',    "FWD",      YES_L,      X_NEW,   Macro_FWD,      T_FWD,      H_FWD},
+    {FN33,  UNI_EXCHXI,     USES_FL,    ALLOWREC,   ' ',    "X«»i",     YES_L,      X_NEW,   Macro_ExchXi,   T_EXCHXI,   H_EXCHXI},
+    {FN34,  UNI_TRACE,      USES_FL,    NORECORD,   ' ',    "Trace",    YES_L,      X_NEW,   Macro_Trace,    T_TRACE,    H_TRACE},
+    {FN35,  UNI_STEP,       USES_FL,    NORECORD,   ' ',    "Step",     YES_L,      X_NULL,  Macro_Step,     T_STEP,     H_STEP},
+    {FN36,  UNI_DEBUG,      USES_FL,    NORECORD,   ' ',    "Debug",    YES_L,      X_NEW,   Macro_Debug,    T_DEBUG,    H_DEBUG},
 
-    {FN37,  UNI_TRACE,      USES_FL,    NORECORD,   ' ',    "Trace",    YES_L,      X_NEW,   Macro_Trace,    T_TRACE,    H_TRACE},
-    {FN38,  UNI_STEP,       USES_FL,    NORECORD,   ' ',    "Step",     YES_L,      X_NULL,  Macro_Step,     T_STEP,     H_STEP},
-    {FN39,  UNI_BEEP,       USES_FL,    ALLOWREC,   ' ',    "Beep",     YES_L,      X_NEW,   Macro_Beep,     T_BEEP,     H_BEEP},
-    {FN40,  UNI_DEBUG,      USES_FL,    NORECORD,   ' ',    "Debug",    YES_L,      X_NEW,   Macro_Debug,    T_DEBUG,    H_DEBUG}
+    {FN37,  UNI_MEDIT,      USES_FL,    NORECORD,   ' ',    "EDIT",     YES_L,      X_NEW,   Macro_EDIT,     T_MEDIT,    H_MEDIT},
+    {FN38,  UNI_REV,        USES_FL,    NORECORD,   ' ',    "REV",      YES_L,      X_NEW,   Macro_REV,      T_REV,      H_REV},
+    {FN39,  UNI_DEL,        USES_FL,    NORECORD,   ' ',    "DEL",      YES_L,      X_NEW,   Macro_DEL,      T_DEL,      H_DEL},
+    {FN40,  UNI_FWD,        USES_FL,    NORECORD,   ' ',    "FWD",      YES_L,      X_NEW,   Macro_FWD,      T_FWD,      H_FWD}
 };
 
 
@@ -724,44 +725,30 @@ void Macro_RecallN(void)
 
 void Macro_ExchXi(void)
 {
-    uint32_t temp = indirectRegister;
+    int32_t temp = indirectRegister;
 
     if (progMode == PROG_FLOAT)
     {
-        indirectRegister = (uint32_t)STACK[STK_X];
-        STACK[STK_X] = temp;
+        indirectRegister = (int32_t)STACK[STK_X];
+        STACK[STK_X] = (double)temp;
     }
     else
     {
-        indirectRegister = (uint32_t)STACKL[STK_X];
-        STACKL[STK_X] = temp;
+        indirectRegister = (int32_t)STACKL[STK_X];
+        STACKL[STK_X] = (PROG_LONG)temp;
     }
 }
 
-void Macro_Jump(void)
-{
-    int8_t relativeJump = (int8_t) PopStackInteger();
-
-    //TODO: fix this so it's useful
-    
-    // Jump Relative... but never before start or after end...
-    if (macroPlayback == TRUE)
-    {
-        currentPlaybackIdx += relativeJump;
-        if (currentPlaybackIdx < 0) currentPlaybackIdx = 0;
-        if (currentPlaybackIdx > playBackEndIdx) currentPlaybackIdx = playBackEndIdx;
-    }
-}
 
 void Macro_StoInd(void)
 {
     if (progMode == PROG_FLOAT)
     {
-        indirectRegister = (uint32_t) STACK[STK_X];
+        indirectRegister = (int32_t) STACK[STK_X];
     }
     else
     {
-        indirectRegister = (uint32_t) STACKL[STK_X];
+        indirectRegister = (int32_t) STACKL[STK_X];
     }
     blinkXDisplay(FALSE);
 }
@@ -773,14 +760,14 @@ void Macro_RclInd(void)
         if (progMode == PROG_FLOAT)
             STACK[STK_X] = indirectRegister;
         else
-            STACKL[STK_X] = MaskStack((PROG_LONG) indirectRegister);
+            STACKL[STK_X] = MaskStack((int32_t) indirectRegister);
     }
     else
     {
         if (progMode == PROG_FLOAT)
             StackPush(indirectRegister);
         else
-            StackPushL(MaskStack((PROG_LONG) indirectRegister));
+            StackPushL(MaskStack((int32_t) indirectRegister));
     }
 }
 
@@ -791,7 +778,15 @@ void Macro_GotoInd(void)
 
     if (macroPlayback == TRUE)
     {
-        if (indirectRegister < 10)
+        if (indirectRegister < 0)
+        {
+            // ---------------------------------------------------------------------
+            // This is a backwards jump... but never earlier than start of program.
+            // ---------------------------------------------------------------------
+            currentPlaybackIdx += (int16_t)indirectRegister;
+            if (currentPlaybackIdx < 0) currentPlaybackIdx = 0;
+        }
+        else if (indirectRegister < MAX_LABELS)
         {
             switch(indirectRegister)
             {
@@ -833,7 +828,15 @@ void Macro_GosubInd(void)
         if (MacroStackIdx < MAX_MACRO_STACK - 1)
         {
             MacroStack[MacroStackIdx++] = currentPlaybackIdx;
-            if (indirectRegister < 10)
+            if (indirectRegister < 0)
+            {
+                // ---------------------------------------------------------------------
+                // This is a backwards gosub... but never earlier than start of program.
+                // ---------------------------------------------------------------------
+                currentPlaybackIdx += (int16_t)indirectRegister;
+                if (currentPlaybackIdx < 0) currentPlaybackIdx = 0;
+            }
+            else if (indirectRegister < MAX_LABELS)
             {
                 switch(indirectRegister)
                 {
@@ -1004,15 +1007,13 @@ BOOL CALLBACK debugWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam
                                 STACK[STK_X] = getNewDebugVal();
                                 STACKL[STK_X] = (PROG_LONG) STACK[STK_X];
                                 break;
-
                             case 12:
                                 debugValue = (double) indirectRegister;
-                                indirectRegister = (int)getNewDebugVal();
+                                indirectRegister = (int32_t)getNewDebugVal();
                                 break;
-
                             case 16:
                                 debugValue = FIN[FIN_REG_n];
-                                FIN[FIN_REG_n] = (int)getNewDebugVal();
+                                FIN[FIN_REG_n] = getNewDebugVal();
                                 break;
                             case 17:
                                 debugValue = FIN[FIN_REG_i];
@@ -1320,15 +1321,15 @@ void DecrementAndLoop(int index, uint16_t uniqueLabel)
     {
         if (progMode == PROG_FLOAT)
         {
-            STO[index] = (float) ( ((int)STO[index]) -1 );
-            if (STO[index] > 0.0)
+            STO[index] = (float) ( ((int)STO[index]) - 1);
+            if ((int64_t) STO[index] > 0)
             {
                 rpn_goto(uniqueLabel);
             }
         }
         else
         {
-            STOL[index] = (PROG_LONG) ( ((int)STOL[index]) -1 );
+            STOL[index] = (PROG_LONG) ( ((int)STOL[index]) - 1);
             if (STOL[index] > 0L)
             {
                 rpn_goto(uniqueLabel);
@@ -1387,7 +1388,7 @@ void Macro_LoopJ(void)
     DecrementAndLoop(9, UNI_LBLJ);
 }
 
-void Macro_DSZ(void)
+void Macro_DSZi(void)
 {
     if (macroPlayback == TRUE)
     {
@@ -1401,48 +1402,44 @@ void Macro_DSZ(void)
     }
 }
 
+void Macro_DSZ2i(void)
+{
+    if (macroPlayback == TRUE)
+    {
+        if ((indirectRegister >= 0) && (indirectRegister < MAX_STO))
+        {
+            if (progMode == PROG_FLOAT)
+            {
+                if ((int64_t)--STO[indirectRegister] == 0)
+                {
+                    currentPlaybackIdx++;
+                }
+            }
+            else
+            {
+                if (STOL[indirectRegister] == 0)
+                {
+                    currentPlaybackIdx++;
+                }
+            }
+        }
+    }
+}
+
 void Macro_Sto2i(void)
 {
-    if (indirectRegister < MAX_STO+8)
+    if ((indirectRegister >= 0) && (indirectRegister < MAX_STO+8))
     {
-        if (indirectRegister == MAX_STO+0) 
+        if (indirectRegister >= MAX_STO) 
         {
-            if (progMode == PROG_FLOAT) STACK[STK_X] = STACK[STK_X]; else STACKL[STK_X] = STACKL[STK_X];
-        }
-        else 
-        if (indirectRegister == MAX_STO+1) 
-        {
-            if (progMode == PROG_FLOAT) STACK[STK_Y] = STACK[STK_X]; else STACKL[STK_Y] = STACKL[STK_X];
-        }
-        else 
-        if (indirectRegister == MAX_STO+2) 
-        {
-            if (progMode == PROG_FLOAT) STACK[STK_Z] = STACK[STK_X]; else STACKL[STK_Z] = STACKL[STK_X];
-        }
-        else 
-        if (indirectRegister == MAX_STO+3) 
-        {
-            if (progMode == PROG_FLOAT) STACK[STK_T] = STACK[STK_X]; else STACKL[STK_T] = STACKL[STK_X];
-        }
-        else 
-        if (indirectRegister == MAX_STO+4) 
-        {
-            if (progMode == PROG_FLOAT) STACK[STK_A] = STACK[STK_X]; else STACKL[STK_A] = STACKL[STK_X];
-        }
-        else 
-        if (indirectRegister == MAX_STO+5) 
-        {
-            if (progMode == PROG_FLOAT) STACK[STK_B] = STACK[STK_X]; else STACKL[STK_B] = STACKL[STK_X];
-        }
-        else 
-        if (indirectRegister == MAX_STO+6) 
-        {
-            if (progMode == PROG_FLOAT) STACK[STK_C] = STACK[STK_X]; else STACKL[STK_C] = STACKL[STK_X];
-        }
-        else 
-        if (indirectRegister == MAX_STO+7) 
-        {
-            if (progMode == PROG_FLOAT) STACK[STK_D] = STACK[STK_X]; else STACKL[STK_D] = STACKL[STK_X];
+            if (progMode == PROG_FLOAT) 
+            {
+                STACK[STK_X+indirectRegister-MAX_STO] = STACK[STK_X]; 
+            }
+            else 
+            {
+                STACKL[STK_X+indirectRegister-MAX_STO] = STACKL[STK_X];
+            }
         }
         else  // Must be one of the registers R00-R99
         {
@@ -1465,41 +1462,23 @@ void Macro_Sto2i(void)
 
 void Macro_Rcl2i(void)
 {
-    if (indirectRegister < MAX_STO+8)
+    if ((indirectRegister >= 0) && (indirectRegister < MAX_STO+8))
     {
-        if (indirectRegister == MAX_STO+0) 
+        if (indirectRegister >= MAX_STO)
         {
-            if (progMode == PROG_FLOAT) StackPush(STACK[STK_X]); else StackPushL(STACKL[STK_X]);
+            if (indirectRegister == MAX_STO+0) 
+            {
+                if (progMode == PROG_FLOAT)
+                {
+                    StackPush(STACK[STK_X+indirectRegister-MAX_STO]); 
+                }
+                else
+                {
+                    StackPushL(STACKL[STK_X+indirectRegister-MAX_STO]);
+                }
+            }
         }
-        else if (indirectRegister == MAX_STO+1) 
-        {
-            if (progMode == PROG_FLOAT) StackPush(STACK[STK_Y]); else StackPushL(STACKL[STK_Y]);
-        }
-        else if (indirectRegister == MAX_STO+2) 
-        {
-            if (progMode == PROG_FLOAT) StackPush(STACK[STK_Z]); else StackPushL(STACKL[STK_Z]);
-        }
-        else if (indirectRegister == MAX_STO+3) 
-        {
-            if (progMode == PROG_FLOAT) StackPush(STACK[STK_T]); else StackPushL(STACKL[STK_T]);
-        }
-        else if (indirectRegister == MAX_STO+4) 
-        {
-            if (progMode == PROG_FLOAT) StackPush(STACK[STK_A]); else StackPushL(STACKL[STK_A]);
-        }
-        else if (indirectRegister == MAX_STO+5) 
-        {
-            if (progMode == PROG_FLOAT) StackPush(STACK[STK_B]); else StackPushL(STACKL[STK_B]);
-        }
-        else if (indirectRegister == MAX_STO+6) 
-        {
-            if (progMode == PROG_FLOAT) StackPush(STACK[STK_C]); else StackPushL(STACKL[STK_C]);
-        }
-        else if (indirectRegister == MAX_STO+7) 
-        {
-            if (progMode == PROG_FLOAT) StackPush(STACK[STK_D]); else StackPushL(STACKL[STK_D]);
-        }
-        else
+        else  // Must be one of the registers R00-R99
         {
             if (progMode == PROG_FLOAT)
             {
