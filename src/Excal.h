@@ -523,6 +523,7 @@ extern void UpdateDebugRegs(void);
 extern void UpdateDebugProgram(int resetProgramList);
 extern void RPN_Playback(void);
 extern void sleep_and_peek(int timeMs);
+extern void ShowTrace(void);
 
 extern LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
 extern LRESULT CALLBACK tooltipWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);

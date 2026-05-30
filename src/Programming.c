@@ -223,9 +223,9 @@ struct funcStruct Program2_funcs[MAX_FUNCS] =
     {FN32,  UNI_GOSUBIND,   USES_FL,    ALLOWREC,   ' ',    "Gsb(i)",   YES_L,      X_NEW,   Macro_GosubInd, T_GSBIND,   H_GSBIND},
 
     {FN33,  UNI_EXCHXI,     USES_FL,    ALLOWREC,   ' ',    "X«»i",     YES_L,      X_NEW,   Macro_ExchXi,   T_EXCHXI,   H_EXCHXI},
-    {FN34,  UNI_TRACE,      USES_FL,    NORECORD,   ' ',    "Trace",    YES_L,      X_NEW,   Macro_Trace,    T_TRACE,    H_TRACE},
-    {FN35,  UNI_STEP,       USES_FL,    NORECORD,   ' ',    "Step",     YES_L,      X_NULL,  Macro_Step,     T_STEP,     H_STEP},
-    {FN36,  UNI_DEBUG,      USES_FL,    NORECORD,   ' ',    "Debug",    YES_L,      X_NEW,   Macro_Debug,    T_DEBUG,    H_DEBUG},
+    {FN34,  UNI_TRACE,      USES_FL,    NORECORD,   ' ',    "TRACE",    YES_L,      X_NEW,   Macro_Trace,    T_TRACE,    H_TRACE},
+    {FN35,  UNI_STEP,       USES_FL,    NORECORD,   ' ',    "SST",      YES_L,      X_NULL,  Macro_Step,     T_STEP,     H_STEP},
+    {FN36,  UNI_DEBUG,      USES_FL,    NORECORD,   ' ',    "DEBUG",    YES_L,      X_NEW,   Macro_Debug,    T_DEBUG,    H_DEBUG},
 
     {FN37,  UNI_MEDIT,      USES_FL,    NORECORD,   ' ',    "EDIT",     YES_L,      X_NEW,   Macro_EDIT,     T_MEDIT,    H_MEDIT},
     {FN38,  UNI_REV,        USES_FL,    NORECORD,   ' ',    "REV",      YES_L,      X_NEW,   Macro_REV,      T_REV,      H_REV},
@@ -257,6 +257,7 @@ void rpn_goto(uint16_t uniqueIdx)
             if (playBackMap[playBack[j]].uniqueIndex == uniqueIdx)
             {
                 currentPlaybackIdx = j;
+                ShowTrace();
                 break;
             }
         }
@@ -806,6 +807,7 @@ void Macro_GotoInd(void)
                 if (playBackMap[playBack[j]].uniqueIndex == uniqueLabel)  // Unique Index for label
                 {
                     currentPlaybackIdx = j;
+                    ShowTrace();
                     break;
                 }
             }
@@ -856,6 +858,7 @@ void Macro_GosubInd(void)
                     if (playBackMap[playBack[j]].uniqueIndex == uniqueLabel)  // Unique Index for label
                     {
                         currentPlaybackIdx = j;
+                        ShowTrace();
                         break;
                     }
                 }

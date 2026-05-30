@@ -85,7 +85,7 @@ uint8_t wordMode = COMPSCI_SIGNED;
 uint8_t hexSpacing = HEX_SPACE_NONE;
 uint8_t numberDisplayMode = SEPARATOR_COMMA_DP;
 uint8_t lastProgMode = PROG_FLOAT;
-uint16_t traceDelayValueMs = 1000;
+uint16_t traceDelayValueMs = 500;
 
 int16_t totalMappedButtonFuncs = 0;
 uint32_t lastTickCount = 0;
@@ -5643,6 +5643,26 @@ void RPN_Record(void)
     ShowStatus();
 }
 
+void ShowTrace(void)
+{
+    MSG msg;
+
+    if (traceMacroPlayback == TRUE)    
+    {
+        showTrace = TRUE;
+        ShowStack();
+        showTrace = FALSE;
+
+        while (PeekMessage(&msg, debugTraceWindow, 0, 0, PM_REMOVE))
+        {
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+
+        sleep_and_peek(traceDelayValueMs);
+    }
+}
+
 // -------------------------------------------------------------------------------
 // This is the core driver for when we playback a macro. We loop through the
 // recorded macro steps and call the appropriate button functions. We also check
@@ -5654,8 +5674,8 @@ void RPN_Record(void)
 void RPN_Playback(void)
 {
     int idx;
-    int flashRunningDsp = 0;
     MSG msg;
+    int flashRunningDsp = 0;
     DWORD lastSlowTimer = 0;
 
     if (recModeON == 1) // Always turn off rec mode before playback!
@@ -5723,27 +5743,17 @@ void RPN_Playback(void)
             }
         }
 
+        // -----------------------------------------------------------
+        // Show the trace of the step that is about to be executed...
+        // -----------------------------------------------------------
+        ShowTrace();
+
         idx = playBack[currentPlaybackIdx];
 
         if (playBackMap[idx].routine != NULL)
         {
             callButtonFunc_fast(playBackMap[idx].routine, playBackMap[idx].useFloatsLongs,
                                 playBackMap[idx].uniqueIndex, playBackMap[idx].saveLastX, playBackMap[idx].newXedit);
-        }
-
-        if (traceMacroPlayback == TRUE)
-        {
-            sleep_and_peek(traceDelayValueMs);
-
-            showTrace = TRUE;
-            ShowStack();
-            showTrace = FALSE;
-
-            while (PeekMessage(&msg, debugTraceWindow, 0, 0, PM_REMOVE))
-            {
-                TranslateMessage(&msg);
-                DispatchMessage(&msg);
-            }
         }
     }
 
@@ -5766,9 +5776,10 @@ void RPN_SingleStep(void)
     macroPlayback = TRUE;
     traceMacroPlayback = TRUE;
 
-    showTrace = TRUE;
-    ShowStack();
-    showTrace = FALSE;
+    // -----------------------------------------------------------
+    // Show the trace of the step that is about to be executed...
+    // -----------------------------------------------------------
+    ShowTrace();
 
     if (currentPlaybackIdx == playBackEndIdx) // We may have ended the macro!!
     {
@@ -5789,7 +5800,6 @@ void RPN_SingleStep(void)
         }
     }
 
-    sleep_and_peek(traceDelayValueMs);
     ShowStack();
 
     UpdateInfoBar("    ");
