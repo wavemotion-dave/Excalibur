@@ -228,9 +228,9 @@ struct funcStruct Program2_funcs[MAX_FUNCS] =
     {FN36,  UNI_DEBUG,      USES_FL,    NORECORD,   ' ',    "DEBUG",    YES_L,      X_NEW,   Macro_Debug,    T_DEBUG,    H_DEBUG},
 
     {FN37,  UNI_MEDIT,      USES_FL,    NORECORD,   ' ',    "EDIT",     YES_L,      X_NEW,   Macro_EDIT,     T_MEDIT,    H_MEDIT},
-    {FN38,  UNI_REV,        USES_FL,    NORECORD,   ' ',    "REV",      YES_L,      X_NEW,   Macro_REV,      T_REV,      H_REV},
-    {FN39,  UNI_DEL,        USES_FL,    NORECORD,   ' ',    "DEL",      YES_L,      X_NEW,   Macro_DEL,      T_DEL,      H_DEL},
-    {FN40,  UNI_FWD,        USES_FL,    NORECORD,   ' ',    "FWD",      YES_L,      X_NEW,   Macro_FWD,      T_FWD,      H_FWD}
+    {FN38,  UNI_FWD,        USES_FL,    NORECORD,   ' ',    "FWD",      YES_L,      X_NEW,   Macro_FWD,      T_FWD,      H_FWD},
+    {FN39,  UNI_REV,        USES_FL,    NORECORD,   ' ',    "REV",      YES_L,      X_NEW,   Macro_REV,      T_REV,      H_REV},
+    {FN40,  UNI_DEL,        USES_FL,    NORECORD,   ' ',    "DEL",      YES_L,      X_NEW,   Macro_DEL,      T_DEL,      H_DEL}
 };
 
 
@@ -245,21 +245,34 @@ void Macro_LblH(void) {}    // Function does nothing but anchors a label
 void Macro_LblI(void) {}    // Function does nothing but anchors a label
 void Macro_LblJ(void) {}    // Function does nothing but anchors a label
 
-void rpn_goto(uint16_t uniqueIdx)
+int FindProgrammingLabel(uint16_t uniqueIdx)
 {
     int j;
+    
+    // ---------------------------------------------------------------------
+    // Scan forwards from the current playpack position and wrap as needed.
+    // This mimics the behavior of most of the classic HP calculators.
+    // ---------------------------------------------------------------------
+    for (j = 0; j < playBackEndIdx; j++)
+    {
+        int idx = (j+currentPlaybackIdx) % playBackEndIdx;
+        if (playBackMap[playBack[idx]].uniqueIndex == uniqueIdx)
+        {
+            return idx;  // Label found...
+        }
+    }
+    return -1; // No label found
+}
 
+void rpn_goto(uint16_t uniqueIdx)
+{
     if (macroPlayback == TRUE)
     {
-        // Find the first instance of the label - that's where we jump...
-        for (j = 0; j < playBackEndIdx; j++)
+        int label_idx = FindProgrammingLabel(uniqueIdx);
+        if (label_idx >= 0)
         {
-            if (playBackMap[playBack[j]].uniqueIndex == uniqueIdx)
-            {
-                currentPlaybackIdx = j;
-                ShowTrace();
-                break;
-            }
+            currentPlaybackIdx = label_idx;
+            ShowTrace();
         }
     }
 }
@@ -775,7 +788,6 @@ void Macro_RclInd(void)
 void Macro_GotoInd(void)
 {
     uint16_t uniqueLabel = 0;
-    int j;
 
     if (macroPlayback == TRUE)
     {
@@ -789,6 +801,8 @@ void Macro_GotoInd(void)
         }
         else if (indirectRegister < MAX_LABELS)
         {
+            int label_idx;
+
             switch(indirectRegister)
             {
                 case 0:  uniqueLabel=UNI_LBLA; break;
@@ -802,14 +816,12 @@ void Macro_GotoInd(void)
                 case 8:  uniqueLabel=UNI_LBLI; break;
                 case 9:  uniqueLabel=UNI_LBLJ; break;
             }
-            for (j = 0; j < playBackEndIdx; j++)
+
+            label_idx = FindProgrammingLabel(uniqueLabel);
+            if (label_idx >= 0)
             {
-                if (playBackMap[playBack[j]].uniqueIndex == uniqueLabel)  // Unique Index for label
-                {
-                    currentPlaybackIdx = j;
-                    ShowTrace();
-                    break;
-                }
+                currentPlaybackIdx = label_idx;
+                ShowTrace();
             }
         }
         else
@@ -823,7 +835,6 @@ void Macro_GotoInd(void)
 void Macro_GosubInd(void)
 {
     uint16_t uniqueLabel = 0;
-    int j;
 
     if (macroPlayback == TRUE)
     {
@@ -840,6 +851,8 @@ void Macro_GosubInd(void)
             }
             else if (indirectRegister < MAX_LABELS)
             {
+                int label_idx;
+
                 switch(indirectRegister)
                 {
                     case 0:  uniqueLabel=UNI_LBLA; break;
@@ -853,14 +866,12 @@ void Macro_GosubInd(void)
                     case 8:  uniqueLabel=UNI_LBLI; break;
                     case 9:  uniqueLabel=UNI_LBLJ; break;
                 }
-                for (j = 0; j < playBackEndIdx; j++)
+
+                label_idx = FindProgrammingLabel(uniqueLabel);
+                if (label_idx >= 0)
                 {
-                    if (playBackMap[playBack[j]].uniqueIndex == uniqueLabel)  // Unique Index for label
-                    {
-                        currentPlaybackIdx = j;
-                        ShowTrace();
-                        break;
-                    }
+                    currentPlaybackIdx = label_idx;
+                    ShowTrace();
                 }
             }
             else

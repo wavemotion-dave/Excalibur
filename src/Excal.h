@@ -210,7 +210,7 @@ extern HWND debugTraceWindow;
 
 extern HFONT holdsfont;
 extern HFONT hMainFont;
-extern HFONT hNumberFont;
+extern HFONT hStackFont;
 extern HFONT hFixedFont;
 
 extern uint8_t progMode;
@@ -768,6 +768,14 @@ enum UniqueButtonIndexTag
     UNI_SLOPE,
     UNI_YGUESS,
     UNI_XGUESS,
+    UNI_STATRES1,
+    UNI_STATRES2,
+    UNI_STATRES3,
+    UNI_STATRES4,
+    UNI_STATRES5,
+    UNI_STATRES6,
+    UNI_STATRES7,
+    UNI_STATRES8,
 
     UNI_DEC,
     UNI_HEX,
@@ -888,9 +896,9 @@ enum UniqueButtonIndexTag
     UNI_STEP,
     UNI_DEBUG,
     UNI_MEDIT,
+    UNI_FWD,
     UNI_REV,
     UNI_DEL,
-    UNI_FWD,
 
     UNI_ENDCONST,
     UNI_STARTCONST,

@@ -42,10 +42,10 @@
 
 #define WINDOW_TITLE "Excalibur RPN Calculator"
 
-#define VERSION_STR "v3.XX-05"
+#define VERSION_STR "v3.XX-06"
 
 #define ABOUT_MSG "Excalibur for Windows 32-bit\n"                    \
-                  "Version 3.XX-05  -  May 30, 2026\n\n"              \
+                  "Version 3.XX-06  -  May 30, 2026\n\n"              \
                   "Copyright 1994-2026 David Bernazzani\n\n"          \
                   "Please read the disclaimer and understand the\n"   \
                   "accuracy and precision issues before using.\n\n"   \
@@ -54,7 +54,7 @@
                   "https://github.com/wavemotion-dave/Excalibur"      \
                   "\n\nThis version is BETA - Expect and report Bugs!"
 
-#define CONFIG_VERSION_MAIN 0xF013  // If this changes, we wipe EVERYTHING
+#define CONFIG_VERSION_MAIN 0xF014  // If this changes, we wipe EVERYTHING
 #define CONFIG_VERSION_SUB  0x0001  // If this changes, we reset x,y window position and reset constant tables (currency, physics constants, etc)
 
 #define END_OF_PROGRAM_STR "<End Of Program>"
@@ -212,7 +212,7 @@ int32_t main_cy = 100;
 HWND toolTipWnd;              // window handle from CreateWindow
 HFONT holdsfont;              // handle of original font
 HFONT hMainFont;              // handle of new font for most of the UI
-HFONT hNumberFont;            // handle of new font for the Stack Display (bigger, bolder)
+HFONT hStackFont;             // handle of new font for the Stack Display (bigger, bolder)
 HFONT hFixedFont;             // handle of the new font for dialogs that need fixed pitch
 DLGPROC lpfnMainWndProc;      // Main window procedure/handler
 HINSTANCE hExcaliburInstance; // The global instance of Excalibur (assigned by the OS)
@@ -299,10 +299,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
     AppendMenu(tmpMenuHandle, MF_STRING, IDM_SETTINGS, "Excalibur Settings...");
 
     // The X Y Z T stack values get a slightly larger/bolder font...
-    SendMessage(GetDlgItem(calcMainWindow, RPN_STACK_X), WM_SETFONT, (WPARAM)hNumberFont, FALSE);
-    SendMessage(GetDlgItem(calcMainWindow, RPN_STACK_Y), WM_SETFONT, (WPARAM)hNumberFont, FALSE);
-    SendMessage(GetDlgItem(calcMainWindow, RPN_STACK_Z), WM_SETFONT, (WPARAM)hNumberFont, FALSE);
-    SendMessage(GetDlgItem(calcMainWindow, RPN_STACK_T), WM_SETFONT, (WPARAM)hNumberFont, FALSE);
+    SendMessage(GetDlgItem(calcMainWindow, RPN_STACK_X), WM_SETFONT, (WPARAM)hStackFont, FALSE);
+    SendMessage(GetDlgItem(calcMainWindow, RPN_STACK_Y), WM_SETFONT, (WPARAM)hStackFont, FALSE);
+    SendMessage(GetDlgItem(calcMainWindow, RPN_STACK_Z), WM_SETFONT, (WPARAM)hStackFont, FALSE);
+    SendMessage(GetDlgItem(calcMainWindow, RPN_STACK_T), WM_SETFONT, (WPARAM)hStackFont, FALSE);
 
     // -------------------------------------------------------------------------------------------
     // Every other control gets the standard hMainFont by default... Note, many of these control
@@ -971,7 +971,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
         SaveToDisk();
         DeleteObject(holdsfont);
         DeleteObject(hMainFont);
-        DeleteObject(hNumberFont);
+        DeleteObject(hStackFont);
         DeleteObject(hFixedFont);
         DeleteObject(backgroundBrush);
         DestroyWindow(toolTipWnd);
@@ -1346,7 +1346,7 @@ void ClipboardCopySelection(HWND hwnd, uint8_t copytype)
     }
 }
 
-HFONT GetMainNumberFont(void)
+HFONT GetMainStackFont(void)
 {
     HDC dc;
     int nHeight;
@@ -1435,7 +1435,7 @@ void SetUpFonts(HWND hwnd)
     HDC hDC = GetDC(hwnd);
 
     hMainFont = GetSystemFont();       // Get the font used for buttons and most UI elements (proportional font)
-    hNumberFont = GetMainNumberFont(); // Get the font used for the main stack display of numbers(slightly bigger/bolder)
+    hStackFont = GetMainStackFont(); // Get the font used for the main stack display of numbers(slightly bigger/bolder)
     hFixedFont = GetSystemFontFixed(); // Get the font used for various dialog boxes where the text needs to be aligned in columns
 
     // Install the font in the current display context.
@@ -3688,17 +3688,16 @@ double FromRadians(double t)
     return (temp);
 }
 
-// -------------------------
-// STOre and ReCaL functions
-// -------------------------
+// ---------------------------
+// STO/RCL Register Functions
+// ---------------------------
 
 void RPN_store(void)
 {
-    rpnStoreRecall &= ~REG_EXCHANGE;
+    rpnStoreRecall &= ~(REG_EXCHANGE | REG_RECALL);
     if (rpnStoreRecall & REG_STORE)
     {
-        if (!macroPlayback)
-            UpdateInfoBar(" ");
+        if (!macroPlayback)  UpdateInfoBar(" ");
         rpnStoreRecall = 0x00;
     }
     else
@@ -3710,11 +3709,10 @@ void RPN_store(void)
 
 void RPN_recall(void)
 {
-    rpnStoreRecall &= ~REG_EXCHANGE;
+    rpnStoreRecall &= ~(REG_EXCHANGE | REG_STORE);
     if (rpnStoreRecall & REG_RECALL)
     {
-        if (!macroPlayback)
-            UpdateInfoBar(" ");
+        if (!macroPlayback)  UpdateInfoBar(" ");
         rpnStoreRecall = 0x00;
     }
     else
@@ -3729,8 +3727,7 @@ void RPN_ExchangeReg(void)
     rpnStoreRecall &= ~(REG_STORE | REG_RECALL);
     if (rpnStoreRecall & REG_EXCHANGE)
     {
-        if (!macroPlayback)
-            UpdateInfoBar(" ");
+        if (!macroPlayback)  UpdateInfoBar(" ");
         rpnStoreRecall = 0x00;
     }
     else
