@@ -274,6 +274,11 @@ void rpn_goto(uint16_t uniqueIdx)
             currentPlaybackIdx = label_idx;
             ShowTrace();
         }
+        else
+        {
+            RPN_error("Run Time Error: Label not found - Unable to continue program execution.");
+            currentPlaybackIdx = playBackEndIdx; // end program.
+        }
     }
 }
 
@@ -299,7 +304,7 @@ void RPN_gosub(uint16_t uniqueIdx)
         }
         else
         {
-            RPN_error("Max Program Function Stack Reached - No more Gosubs!");
+            RPN_error("Run Time Error: Max Program Function Stack Reached - No more Gosubs");
             currentPlaybackIdx = playBackEndIdx; // end program.
         }
     }
@@ -823,6 +828,11 @@ void Macro_GotoInd(void)
                 currentPlaybackIdx = label_idx;
                 ShowTrace();
             }
+            else
+            {
+                RPN_error("Run Time Error: Label not found - Unable to continue program execution.");
+                currentPlaybackIdx = playBackEndIdx; // end program.
+            }
         }
         else
         {
@@ -873,6 +883,11 @@ void Macro_GosubInd(void)
                     currentPlaybackIdx = label_idx;
                     ShowTrace();
                 }
+                else
+                {
+                    RPN_error("Run Time Error: Label not found - Unable to continue program execution.");
+                    currentPlaybackIdx = playBackEndIdx; // end program.
+                }
             }
             else
             {
@@ -882,7 +897,7 @@ void Macro_GosubInd(void)
         }
         else
         {
-            RPN_error("Max Program Function Stack Reached - No more Gosubs!");
+            RPN_error("Run Time Error: Max Program Function Stack Reached - No more Gosubs");
             currentPlaybackIdx = playBackEndIdx; // end program.
         }
     }
