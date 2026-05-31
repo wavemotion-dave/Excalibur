@@ -6038,7 +6038,7 @@ void RPN_endConst(void)
                        "Key !      Factorial of X                Key ^      Raise Y to X power\n"   \
                        "ENTER      Enter number to Stack         Key N      Change Sign (Negate)\n" \
                        "\n"                                                                         \
-                       "DP         Decimal Point. Press twice for fraction.\n"                      \
+                       "DP         Decimal Point. Press twice for fraction entry.\n"                \
                        "BKSP       Erases last character, otherwise clears X.\n"                    \
                        "F1-F10     First column of the currently selected function bank.\n"         \
                        "SHIFT  FN  Second column of the currently selected function bank.\n"        \

@@ -796,15 +796,7 @@ void Macro_GotoInd(void)
 
     if (macroPlayback == TRUE)
     {
-        if (indirectRegister < 0)
-        {
-            // ---------------------------------------------------------------------
-            // This is a backwards jump... but never earlier than start of program.
-            // ---------------------------------------------------------------------
-            currentPlaybackIdx += (int16_t)indirectRegister;
-            if (currentPlaybackIdx < 0) currentPlaybackIdx = 0;
-        }
-        else if (indirectRegister < MAX_LABELS)
+        if ((indirectRegister >= 0) && (indirectRegister < MAX_LABELS))
         {
             int label_idx;
 
@@ -851,15 +843,7 @@ void Macro_GosubInd(void)
         if (MacroStackIdx < MAX_MACRO_STACK - 1)
         {
             MacroStack[MacroStackIdx++] = currentPlaybackIdx;
-            if (indirectRegister < 0)
-            {
-                // ---------------------------------------------------------------------
-                // This is a backwards gosub... but never earlier than start of program.
-                // ---------------------------------------------------------------------
-                currentPlaybackIdx += (int16_t)indirectRegister;
-                if (currentPlaybackIdx < 0) currentPlaybackIdx = 0;
-            }
-            else if (indirectRegister < MAX_LABELS)
+            if ((indirectRegister >= 0) && (indirectRegister < MAX_LABELS))
             {
                 int label_idx;
 
@@ -914,7 +898,8 @@ void Macro_Halt(void)
 
 BOOL CALLBACK inputDebugValue(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
 {
-    char tmp[64];
+    static char tmp[64];
+    
     switch(wMessage)
     {
     case WM_INITDIALOG:
@@ -929,6 +914,7 @@ BOOL CALLBACK inputDebugValue(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lP
         case(IDOK):           // OK
             GetDlgItemText(hDlg, IDC_EDIT1, tmp, 63);
             tmp[63] = CNULL;
+            trim(tmp);
             debugValue = atof(tmp);
             EndDialog(hDlg, FALSE);
             return TRUE;
