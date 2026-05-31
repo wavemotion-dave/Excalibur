@@ -5,7 +5,7 @@ At one time, Excalibur had extensive help and an RPN tutorial that was largely n
 * Internally uses IEEE double precision floating point for rough accuracy out to about 15 places. Excalibur will show up to 13 significant digits - reserving the last two for internal rounding.
 * Uses a classic HP 4-deep RPN stack (X, Y, Z, T). In settings you can change this to 8-deep (adding A, B, C, D).
 * Default for ENTER key is to duplicate the X register into Y like the classic HP calculators. In settings, you can switch to eRPN (Entry RPN) for a more RPL-like entry.
-* Excalibur has 3 different layouts. The classic layout by default and in settings you can switch to classic-HP left-positioned Operators (-+×÷) or to a smaller 4-banger (it's a bit more than that!) layout.
+* Excalibur has 3 different layouts. The classic layout by default and in settings you can switch to classic-HP left-positioned Operators (-+×÷) or to a smaller 4-banger (it's a bit more than that!) layout. It should become obvious that the insipriation for the layout is the Voyager series of calculators.
 * Setting the format of numbers is done with the 'Disp' button near the middle-top row. This is the equivalent of the FIX, SCI, ENG handling of HP calculators.
 * By default, the Change-Sign (CHS) and Exponent (EEX) keys are in the old HP naming style. You can change them to more modern equivalents in settings.
 * Things like Angle Mode (degrees, radians, gradients) or the use of comma vs decimal point for separators are found in the Settings menu.
@@ -14,9 +14,9 @@ At one time, Excalibur had extensive help and an RPN tutorial that was largely n
 * TVM (Time-Value Money) on the Financial bank is handled quite like the HP-12C (with the exception that the 12-multiply and 12-divide functions do not automatically store into n/i registers).
 * Base (HEX, DEC, OCT, BIN) operations and word size are handled quite like the HP-16C (though 64-bit words are supported on Excalibur).
 * Many of the Scientific bank functions are inspired by the HP-11C and HP-15C though Matrix and Vector Support are not included (I found calculator entry of these to be cumbersome and if you're using Excalibur, you're on a computer with better tools).
-* If you want to see what's going on "under the hood" with memory, use the 'Show' button to the left of the main keypad.
-* Programming is non-merged keystroke based much like the earliest HP calculators. You can have up to 40 different programs and each program can have up to 400 steps (total of 16K worth of programming steps).
 * Complex Number support uses register pairs to represent the Real and Imaginary parts of the number. X=Real, Y=Imaginary, Z=Real, T=Imaginary. The 8-deep stack helps if you need the headroom.
+* If you want to see what's going on "under the hood" with memory, use the 'Show' button to the left of the main keypad.
+* Programming is non-merged keystroke based much like the earliest HP calculators. You can have up to 40 different programs and each program can have up to 256 steps (total of 10K worth of programming steps). Why not more? It would have been trivial to bump these up to gargantuan values but I want to encourage simplicity - if you're writing an Excalibur program more than a couple hundred lines long, you're probably using the wrong tool.
 * Excalibur passes the Turing-Complete test as a general computational device given the ability to handle logic conditions and branching.
 * Right-clicking on any Excalibur key/button will produce a short bit of context sensitive help.
 * To see a list of common keyboard keys that you can press to activate common functions of the calculator - see  the 'Help' menu.
@@ -96,7 +96,7 @@ Checksum: 0864<br>
 
 The conditional you see above (X<=Y?) is typical of many of the programming keys (found on the Program I and Program II banks). This particular command will compare X and Y… if X is less than or equal to Y the next statement is executed (the condition is TRUE). If X is greater than Y the next statement is skipped (condition is FALSE). Therefore, the code will either execute Goto A (if X is less than or equal to Y) or it will execute Goto B (if X is greater than Y).
 
-There are 10 different labels that can be used with Excalibur labeled A-J.
+There are 10 different labels that can be used with Excalibur labeled A-J. You can re-use labels... the calculator always looks for a label starting with the current program step and searching forward in memory and will wrap-around to the start of the program memory if needed.
 
 **Looping**
 
@@ -178,14 +178,7 @@ If you want to see the program played out slowly so you can try and debug it, yo
 
 **Indirect Addressing**
 
-One of the most powerful programming techniques is the use of indirect addressing. Indirect addressing allows variable branch labels and register access. To indirectly address one of the 26 storage registers, use the StoXth and RclXth keys.  These use the X register as the index to determine which storage register should be used. For example, entering 1 in X and pressing StoXth will store the current Y value to the first register (the R0 register).  Using StoXth and RclXth all 100 registers can be addressed (R00 through R99). StoXth and RclXth both drop the stack so the index value is no longer on the stack at the end of the operation.  For example, if you wanted to store the value 123 to the R26 register, key in the following sequence:
-
-123<br>
-ENTER<br>
-26<br>
-StoXth<br>
-
-This will drop the stack and use 26 as the index to the register that should be used to STO the 123 value from the stack.
+One of the most powerful programming techniques is the use of indirect addressing. The I register holds the key to indirect addressing. If the I register holds the value 35, then pressing Sto(i) would store the X register value into register 35. There are a number of dedicated keys on Program Bank II that let you directly manipulate the I register as well as indirectly get at storage pointed to by the I register.
 
 Perhaps of greater importance to programmers using Excalibur, labels can also be indirectly addressed. Excalibur uses a special Indirect Register called 'i' which is an integer based internal register. To store a number into the indirect register use the "Sto i" key. To recall the indirect register to the stack, use the "Rcl i" key. The number in the Indirect Register represents a program label with 0=label A, 1=label B, 9=label J.  Using the Goto(i) or Gsb(i) keys will jump to the label indicaetd by the value of the Indirect register. If you try to jump to a label that doesn't exist (outside A-J), you will get a run-time error when your program executes.
 

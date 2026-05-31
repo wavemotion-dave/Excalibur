@@ -981,23 +981,23 @@ extern uint32_t userTicks;
 #define RPN_PROGII                      207
 #define RPN_CUST                        208
 
-#define STATUS_BAR                      300
-#define FUNC_BAR                        301
-#define TIME_BAR                        302
-#define REC_BAR                         303
-#define INFO_BAR                        304
-#define ANGLE_BAR                       305
-#define COMPSCI_BAR                     306
-#define RPN_CARRY                       307
-#define RPN_OVERFLOW                    308
+#define STATUS_BAR                      220
+#define FUNC_BAR                        221
+#define TIME_BAR                        222
+#define REC_BAR                         223
+#define INFO_BAR                        224
+#define ANGLE_BAR                       225
+#define COMPSCI_BAR                     226
+#define RPN_CARRY                       227
+#define RPN_OVERFLOW                    228
 
-#define RPN_STACK                       400
-#define RPN_X_LABEL                     401
-#define RPN_Y_LABEL                     402
-#define RPN_Z_LABEL                     403
-#define RPN_T_LABEL                     404
+#define RPN_STACK                       250
+#define RPN_X_LABEL                     251
+#define RPN_Y_LABEL                     252
+#define RPN_Z_LABEL                     253
+#define RPN_T_LABEL                     254
 
-#define RPN_END_OF_LIST                 999
+#define RPN_END_OF_LIST                 299
 
 // Offset these function IDs to keep them grouped easily
 #define FN1                             1001
