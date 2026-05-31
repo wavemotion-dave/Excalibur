@@ -21,7 +21,8 @@ fixes and small improvements. There are a handful of new functions but more impo
 always better. To that end, the 3.XX series has a stronger focus on core function, not added formulas. I've also decided not to follow
 the growing trend of putting functions behind sub-menus or shifted versions of primary keys. With Excalibur, each key has a dedicated
 purpose - with the exception of the INV key to run conversions in both directions and the HYP key for the Hyperbolic trig functions.
-This is my daily-driver computational device when I'm sitting at the computer - and I don't want clutter to get in the way of crunching numbers.
+This is my daily-driver computational device when I'm sitting at the computer - and I don't want too much friction between me and the 
+number crunching.
 
 One thing that hasn't changed with 3.XX is that it's bullet simple to install and run. It's a single executable that will run equally 
 well under any 32-bit version of Windows (I've tested it on Windows 98 up through Windows 11) as well as perfectly fine in Linux wine 
