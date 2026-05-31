@@ -45,7 +45,7 @@
 #define VERSION_STR "v3.XX-06"
 
 #define ABOUT_MSG "Excalibur for Windows 32-bit\n"                    \
-                  "Version 3.XX-06  -  May 31, 2026\n\n"              \
+                  "Version 3.XX-06  -  June 1, 2026\n\n"              \
                   "Copyright 1994-2026 David Bernazzani\n\n"          \
                   "Please read the disclaimer and understand the\n"   \
                   "accuracy and precision issues before using.\n\n"   \
@@ -54,7 +54,7 @@
                   "https://github.com/wavemotion-dave/Excalibur"      \
                   "\n\nThis version is BETA - Expect and report Bugs!"
 
-#define CONFIG_VERSION_MAIN 0xF015  // If this changes, we wipe EVERYTHING
+#define CONFIG_VERSION_MAIN 0xF017  // If this changes, we wipe EVERYTHING
 #define CONFIG_VERSION_SUB  0x0001  // If this changes, we reset x,y window position and reset constant tables (currency, physics constants, etc)
 
 #define END_OF_PROGRAM_STR "<End Of Program>"
@@ -107,9 +107,9 @@ uint8_t reservedOpt3 = 0;
 uint8_t reservedOpt4 = 0;
 uint8_t reservedOpt5 = 1;   // With a different default... just in case
 
-char macroName[MAX_MACROS][MAX_MACRO_FUNC_TEXT];
-char macro_short_names[MAX_MACROS][7];
-char clipboardBuffer[MAX_IMPORT_CLIPBOARD_SIZE + 1];
+char macroName[MAX_MACROS][MAX_MACRO_FUNC_TEXT+1];
+char macro_short_names[MAX_MACROS][MAX_SHORT_NAME_TEXT+1];
+char clipboardBuffer[MAX_IMPORT_CLIPBOARD_SIZE+1];
 char statusBar[32];
 char helpTitle[64];
 char helpMsg[256];
@@ -3981,19 +3981,15 @@ void SaveToDisk(void)
         fwrite(&LASTXL,             sizeof(LASTXL),             1, outfile);
         fwrite(&LASTYL,             sizeof(LASTYL),             1, outfile);
 
+        fwrite(&indirectRegister,   sizeof(indirectRegister),   1, outfile);
+        fwrite(&traceDelayValueMs,  sizeof(traceDelayValueMs),  1, outfile);
+
         fwrite(&STO,                sizeof(STO),                1, outfile);
         fwrite(&STOL,               sizeof(STOL),               1, outfile);
         fwrite(&SUM,                sizeof(SUM),                1, outfile);
         fwrite(&FIN,                sizeof(FIN),                1, outfile);
         fwrite(&cashFlow,           sizeof(cashFlow),           1, outfile);
         fwrite(&CFn,                sizeof(CFn),                1, outfile);
-
-        fwrite(&playBack,           sizeof(playBack),           1, outfile);
-        fwrite(&playBackSave,       sizeof(playBackSave),       1, outfile);
-        fwrite(&playBackEndIdx,     sizeof(playBackEndIdx),     1, outfile);
-        fwrite(&playBackIdxSave,    sizeof(playBackIdxSave),    1, outfile);
-        fwrite(&macroName,          sizeof(macroName),          1, outfile);
-        fwrite(&macro_short_names,  sizeof(macro_short_names),  1, outfile);
 
         fwrite(&currency1index,     sizeof(currency1index),     1, outfile);
         fwrite(&currency2index,     sizeof(currency2index),     1, outfile);
@@ -4006,8 +4002,13 @@ void SaveToDisk(void)
         fwrite(&lastConstBank,      sizeof(lastConstBank),      1, outfile);
         fwrite(&excaliburNotes,     sizeof(excaliburNotes),     1, outfile);
         fwrite(&lastChosenMacro,    sizeof(lastChosenMacro),    1, outfile);
-        fwrite(&traceDelayValueMs,  sizeof(traceDelayValueMs),  1, outfile);
-        fwrite(&indirectRegister,   sizeof(indirectRegister),   1, outfile);
+
+        fwrite(&playBack,           sizeof(playBack),           1, outfile);
+        fwrite(&playBackSave,       sizeof(playBackSave),       1, outfile);
+        fwrite(&playBackEndIdx,     sizeof(playBackEndIdx),     1, outfile);
+        fwrite(&playBackIdxSave,    sizeof(playBackIdxSave),    1, outfile);
+        fwrite(&macroName,          sizeof(macroName),          1, outfile);
+        fwrite(&macro_short_names,  sizeof(macro_short_names),  1, outfile);
 
         fwrite(&reserved, RESERVED_SIZE, 1, outfile);
 
@@ -4101,19 +4102,15 @@ void ReadFromDisk(void)
         fread(&LASTXL,             sizeof(LASTXL),             1, infile);
         fread(&LASTYL,             sizeof(LASTYL),             1, infile);
 
+        fread(&indirectRegister,    sizeof(indirectRegister),    1, infile);
+        fread(&traceDelayValueMs,   sizeof(traceDelayValueMs),   1, infile);
+
         fread(&STO,                sizeof(STO),                1, infile);
         fread(&STOL,               sizeof(STOL),               1, infile);
         fread(&SUM,                sizeof(SUM),                1, infile);
         fread(&FIN,                sizeof(FIN),                1, infile);
         fread(&cashFlow,           sizeof(cashFlow),           1, infile);
         fread(&CFn,                sizeof(CFn),                1, infile);
-
-        fread(&playBack,           sizeof(playBack),           1, infile);
-        fread(&playBackSave,       sizeof(playBackSave),       1, infile);
-        fread(&playBackEndIdx,     sizeof(playBackEndIdx),     1, infile);
-        fread(&playBackIdxSave,    sizeof(playBackIdxSave),    1, infile);
-        fread(&macroName,          sizeof(macroName),          1, infile);
-        fread(&macro_short_names,  sizeof(macro_short_names),  1, infile);
 
         fread(&currency1index,     sizeof(currency1index),     1, infile);
         fread(&currency2index,     sizeof(currency2index),     1, infile);
@@ -4135,8 +4132,13 @@ void ReadFromDisk(void)
         fread(&lastConstBank,       sizeof(lastConstBank),       1, infile);
         fread(excaliburNotes,       sizeof(excaliburNotes),      1, infile);
         fread(&lastChosenMacro,     sizeof(lastChosenMacro),     1, infile);
-        fread(&traceDelayValueMs,   sizeof(traceDelayValueMs),   1, infile);
-        fread(&indirectRegister,    sizeof(indirectRegister),    1, infile);
+
+        fread(&playBack,           sizeof(playBack),           1, infile);
+        fread(&playBackSave,       sizeof(playBackSave),       1, infile);
+        fread(&playBackEndIdx,     sizeof(playBackEndIdx),     1, infile);
+        fread(&playBackIdxSave,    sizeof(playBackIdxSave),    1, infile);
+        fread(&macroName,          sizeof(macroName),          1, infile);
+        fread(&macro_short_names,  sizeof(macro_short_names),  1, infile);
 
         fread(&reserved, RESERVED_SIZE, 1, infile);
 
@@ -4216,8 +4218,8 @@ void ProcessCustomSave(void)
 }
 
 BOOL CALLBACK fnDIALOG_MACRONAME(HWND, UINT, WPARAM, LPARAM);
-char macName[31];
-char macShortName[7];
+char macName[MAX_MACRO_FUNC_TEXT+1];
+char macShortName[MAX_SHORT_NAME_TEXT+1];
 void GetMacroName(void)
 {
     DLGPROC lpfnDIALOG_MACRO;
@@ -4245,10 +4247,10 @@ BOOL CALLBACK fnDIALOG_MACRONAME(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
         switch (wParam)
         {
         case (IDOK): // OK
-            GetDlgItemText(hDlg, IDC_EDIT1, macName, 50);
-            macName[64] = '\0';
-            GetDlgItemText(hDlg, IDC_EDIT2, macShortName, 7);
-            macShortName[6] = '\0';
+            GetDlgItemText(hDlg, IDC_EDIT1, macName, MAX_MACRO_FUNC_TEXT);
+            macName[MAX_MACRO_FUNC_TEXT] = '\0';
+            GetDlgItemText(hDlg, IDC_EDIT2, macShortName, MAX_SHORT_NAME_TEXT);
+            macShortName[MAX_SHORT_NAME_TEXT] = '\0';
             EndDialog(hDlg, FALSE);
             return TRUE;
             break;
@@ -5730,7 +5732,10 @@ void RPN_Playback(void)
         }
 
         idx = playBack[currentPlaybackIdx];
-        callButtonFunc_playback(idx);
+        if (playBackMap[idx].routine != NULL)
+        {
+            callButtonFunc_playback(idx);
+        }
     }
 
     SetWindowText(GetDlgItem(calcMainWindow, RPN_PLAYBACK), "Run"); // Reset button text

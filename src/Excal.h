@@ -434,12 +434,13 @@ extern void turnOnNumLock(void);
 
 #define MAX_STACK_STRLEN    29
 
-#define MAX_REC_PLAYBACK    400     // Maximum number of program steps per program
+#define MAX_REC_PLAYBACK    256     // Maximum number of program steps per program
 #define MAX_MACROS          40      // Maximum number of total programs (each getting the max steps)
 #define MAX_MACRO_FUNC_TEXT 30      // Maximum macro text that can be assigned to any key
+#define MAX_SHORT_NAME_TEXT  6      // Program short names must be able to fit on button labels
 #define MAX_LABELS          10      // Labels A=0 through J=9 for a total of 10 labels
 
-// Add to the end of this list but *NEVER* remove entries or else you will need to update excalibur config file...
+// Add to the end of this list but *NEVER* remove entries or else you will invalidate existing saved programs (and will need to redo the config)
 enum UniqueButtonIndexTag
 {
     UNI_UNUSED = 0,
@@ -826,8 +827,8 @@ struct playbackStruct
 
 extern struct playbackStruct playBackMap[UNI_MAX + 1];
 
-extern char macroName[MAX_MACROS][MAX_MACRO_FUNC_TEXT];
-extern char macro_short_names[MAX_MACROS][7];
+extern char macroName[MAX_MACROS][MAX_MACRO_FUNC_TEXT+1];
+extern char macro_short_names[MAX_MACROS][MAX_SHORT_NAME_TEXT+1];
 
 #define COPY_X_TO_CLIPBOARD         0
 #define COPY_ALL_TO_CLIPBOARD       1
