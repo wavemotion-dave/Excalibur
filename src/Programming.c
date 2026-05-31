@@ -125,65 +125,67 @@ extern void Macro_DSZi(void);
 extern void Macro_DSZ2i(void);
 extern void Macro_Sto2i(void);
 extern void Macro_Rcl2i(void);
+extern void Macro_Sto2x(void);
+extern void Macro_Rcl2x(void);
 extern void Macro_Beep(void);
 
 struct funcStruct Program1_funcs[MAX_FUNCS] =
 {
-    {FN1,   UNI_LBLA,       USES_FL,    ALLOWREC,   ' ',    "Lbl A",        YES_L,  X_NEW,   Macro_LblA,     T_LBLA,     H_LABELS},
-    {FN2,   UNI_GOTOA,      USES_FL,    ALLOWREC,   ' ',    "Goto A",       YES_L,  X_NEW,   Macro_GotoA,    T_GOTOA,    H_GOTOS},
-    {FN3,   UNI_GSBA,       USES_FL,    ALLOWREC,   ' ',    "Gsb A",        YES_L,  X_NEW,   Macro_GsbA,     T_GSBA,     H_GOSUBS},
-    {FN4,   UNI_LOOPA,      USES_FL,    ALLOWREC,   ' ',    "Loop A",       YES_L,  X_NEW,   Macro_LoopA,    T_LOOPA,    H_LOOPA},
+    {FN1,   UNI_LBLA,       USES_FL,    ALLOWREC,   ' ',    "Lbl A",    YES_L,      X_NEW,   Macro_LblA,     T_LBLA,     H_LABELS},
+    {FN2,   UNI_GOTOA,      USES_FL,    ALLOWREC,   ' ',    "Goto A",   YES_L,      X_NEW,   Macro_GotoA,    T_GOTOA,    H_GOTOS},
+    {FN3,   UNI_GSBA,       USES_FL,    ALLOWREC,   ' ',    "Gsb A",    YES_L,      X_NEW,   Macro_GsbA,     T_GSBA,     H_GOSUBS},
+    {FN4,   UNI_LOOPA,      USES_FL,    ALLOWREC,   ' ',    "Loop A",   YES_L,      X_NEW,   Macro_LoopA,    T_LOOPA,    H_LOOPA},
 
-    {FN5,   UNI_LBLB,       USES_FL,    ALLOWREC,   ' ',    "Lbl B",        YES_L,  X_NEW,   Macro_LblB,     T_LBLB,     H_LABELS},
-    {FN6,   UNI_GOTOB,      USES_FL,    ALLOWREC,   ' ',    "Goto B",       YES_L,  X_NEW,   Macro_GotoB,    T_GOTOB,    H_GOTOS},
-    {FN7,   UNI_GSBB,       USES_FL,    ALLOWREC,   ' ',    "Gsb B",        YES_L,  X_NEW,   Macro_GsbB,     T_GSBB,     H_GOSUBS},
-    {FN8,   UNI_LOOPB,      USES_FL,    ALLOWREC,   ' ',    "Loop B",       YES_L,  X_NEW,   Macro_LoopB,    T_LOOPB,    H_LOOPB},
+    {FN5,   UNI_LBLB,       USES_FL,    ALLOWREC,   ' ',    "Lbl B",    YES_L,      X_NEW,   Macro_LblB,     T_LBLB,     H_LABELS},
+    {FN6,   UNI_GOTOB,      USES_FL,    ALLOWREC,   ' ',    "Goto B",   YES_L,      X_NEW,   Macro_GotoB,    T_GOTOB,    H_GOTOS},
+    {FN7,   UNI_GSBB,       USES_FL,    ALLOWREC,   ' ',    "Gsb B",    YES_L,      X_NEW,   Macro_GsbB,     T_GSBB,     H_GOSUBS},
+    {FN8,   UNI_LOOPB,      USES_FL,    ALLOWREC,   ' ',    "Loop B",   YES_L,      X_NEW,   Macro_LoopB,    T_LOOPB,    H_LOOPB},
 
-    {FN9,   UNI_LBLC,       USES_FL,    ALLOWREC,   ' ',    "Lbl C",        YES_L,  X_NEW,   Macro_LblC,     T_LBLC,     H_LABELS},
-    {FN10,  UNI_GOTOC,      USES_FL,    ALLOWREC,   ' ',    "Goto C",       YES_L,  X_NEW,   Macro_GotoC,    T_GOTOC,    H_GOTOS},
-    {FN11,  UNI_GSBC,       USES_FL,    ALLOWREC,   ' ',    "Gsb C",        YES_L,  X_NEW,   Macro_GsbC,     T_GSBC,     H_GOSUBS},
-    {FN12,  UNI_LOOPC,      USES_FL,    ALLOWREC,   ' ',    "Loop C",       YES_L,  X_NEW,   Macro_LoopC,    T_LOOPC,    H_LOOPC},
+    {FN9,   UNI_LBLC,       USES_FL,    ALLOWREC,   ' ',    "Lbl C",    YES_L,      X_NEW,   Macro_LblC,     T_LBLC,     H_LABELS},
+    {FN10,  UNI_GOTOC,      USES_FL,    ALLOWREC,   ' ',    "Goto C",   YES_L,      X_NEW,   Macro_GotoC,    T_GOTOC,    H_GOTOS},
+    {FN11,  UNI_GSBC,       USES_FL,    ALLOWREC,   ' ',    "Gsb C",    YES_L,      X_NEW,   Macro_GsbC,     T_GSBC,     H_GOSUBS},
+    {FN12,  UNI_LOOPC,      USES_FL,    ALLOWREC,   ' ',    "Loop C",   YES_L,      X_NEW,   Macro_LoopC,    T_LOOPC,    H_LOOPC},
 
-    {FN13,  UNI_LBLD,       USES_FL,    ALLOWREC,   ' ',    "Lbl D",        YES_L,  X_NEW,   Macro_LblD,     T_LBLD,     H_LABELS},
-    {FN14,  UNI_GOTOD,      USES_FL,    ALLOWREC,   ' ',    "Goto D",       YES_L,  X_NEW,   Macro_GotoD,    T_GOTOD,    H_GOTOS},
-    {FN15,  UNI_GSBD,       USES_FL,    ALLOWREC,   ' ',    "Gsb D",        YES_L,  X_NEW,   Macro_GsbD,     T_GSBD,     H_GOSUBS},
-    {FN16,  UNI_LOOPD,      USES_FL,    ALLOWREC,   ' ',    "Loop D",       YES_L,  X_NEW,   Macro_LoopD,    T_LOOPD,    H_LOOPD},
+    {FN13,  UNI_LBLD,       USES_FL,    ALLOWREC,   ' ',    "Lbl D",    YES_L,      X_NEW,   Macro_LblD,     T_LBLD,     H_LABELS},
+    {FN14,  UNI_GOTOD,      USES_FL,    ALLOWREC,   ' ',    "Goto D",   YES_L,      X_NEW,   Macro_GotoD,    T_GOTOD,    H_GOTOS},
+    {FN15,  UNI_GSBD,       USES_FL,    ALLOWREC,   ' ',    "Gsb D",    YES_L,      X_NEW,   Macro_GsbD,     T_GSBD,     H_GOSUBS},
+    {FN16,  UNI_LOOPD,      USES_FL,    ALLOWREC,   ' ',    "Loop D",   YES_L,      X_NEW,   Macro_LoopD,    T_LOOPD,    H_LOOPD},
 
-    {FN17,  UNI_LBLE,       USES_FL,    ALLOWREC,   ' ',    "Lbl E",        YES_L,  X_NEW,   Macro_LblE,     T_LBLE,     H_LABELS},
-    {FN18,  UNI_GOTOE,      USES_FL,    ALLOWREC,   ' ',    "Goto E",       YES_L,  X_NEW,   Macro_GotoE,    T_GOTOE,    H_GOTOS},
-    {FN19,  UNI_GSBE,       USES_FL,    ALLOWREC,   ' ',    "Gsb E",        YES_L,  X_NEW,   Macro_GsbE,     T_GSBE,     H_GOSUBS},
-    {FN20,  UNI_LOOPE,      USES_FL,    ALLOWREC,   ' ',    "Loop E",       YES_L,  X_NEW,   Macro_LoopE,    T_LOOPE,    H_LOOPE},
+    {FN17,  UNI_LBLE,       USES_FL,    ALLOWREC,   ' ',    "Lbl E",    YES_L,      X_NEW,   Macro_LblE,     T_LBLE,     H_LABELS},
+    {FN18,  UNI_GOTOE,      USES_FL,    ALLOWREC,   ' ',    "Goto E",   YES_L,      X_NEW,   Macro_GotoE,    T_GOTOE,    H_GOTOS},
+    {FN19,  UNI_GSBE,       USES_FL,    ALLOWREC,   ' ',    "Gsb E",    YES_L,      X_NEW,   Macro_GsbE,     T_GSBE,     H_GOSUBS},
+    {FN20,  UNI_LOOPE,      USES_FL,    ALLOWREC,   ' ',    "Loop E",   YES_L,      X_NEW,   Macro_LoopE,    T_LOOPE,    H_LOOPE},
 
-    {FN21,  UNI_LBLF,       USES_FL,    ALLOWREC,   ' ',    "Lbl F",        YES_L,  X_NEW,   Macro_LblF,     T_LBLF,     H_LABELS},
-    {FN22,  UNI_GOTOF,      USES_FL,    ALLOWREC,   ' ',    "Goto F",       YES_L,  X_NEW,   Macro_GotoF,    T_GOTOF,    H_GOTOS},
-    {FN23,  UNI_GSBF,       USES_FL,    ALLOWREC,   ' ',    "Gsb F",        YES_L,  X_NEW,   Macro_GsbF,     T_GSBF,     H_GOSUBS},
-    {FN24,  UNI_LOOPF,      USES_FL,    ALLOWREC,   ' ',    "Loop F",       YES_L,  X_NEW,   Macro_LoopF,    T_LOOPF,    H_LOOPF},
+    {FN21,  UNI_LBLF,       USES_FL,    ALLOWREC,   ' ',    "Lbl F",    YES_L,      X_NEW,   Macro_LblF,     T_LBLF,     H_LABELS},
+    {FN22,  UNI_GOTOF,      USES_FL,    ALLOWREC,   ' ',    "Goto F",   YES_L,      X_NEW,   Macro_GotoF,    T_GOTOF,    H_GOTOS},
+    {FN23,  UNI_GSBF,       USES_FL,    ALLOWREC,   ' ',    "Gsb F",    YES_L,      X_NEW,   Macro_GsbF,     T_GSBF,     H_GOSUBS},
+    {FN24,  UNI_LOOPF,      USES_FL,    ALLOWREC,   ' ',    "Loop F",   YES_L,      X_NEW,   Macro_LoopF,    T_LOOPF,    H_LOOPF},
 
-    {FN25,  UNI_LBLG,       USES_FL,    ALLOWREC,   ' ',    "Lbl G",        YES_L,  X_NEW,   Macro_LblG,     T_LBLG,     H_LABELS},
-    {FN26,  UNI_GOTOG,      USES_FL,    ALLOWREC,   ' ',    "Goto G",       YES_L,  X_NEW,   Macro_GotoG,    T_GOTOG,    H_GOTOS},
-    {FN27,  UNI_GSBG,       USES_FL,    ALLOWREC,   ' ',    "Gsb G",        YES_L,  X_NEW,   Macro_GsbG,     T_GSBG,     H_GOSUBS},
-    {FN28,  UNI_LOOPG,      USES_FL,    ALLOWREC,   ' ',    "Loop G",       YES_L,  X_NEW,   Macro_LoopG,    T_LOOPG,    H_LOOPG},
+    {FN25,  UNI_LBLG,       USES_FL,    ALLOWREC,   ' ',    "Lbl G",    YES_L,      X_NEW,   Macro_LblG,     T_LBLG,     H_LABELS},
+    {FN26,  UNI_GOTOG,      USES_FL,    ALLOWREC,   ' ',    "Goto G",   YES_L,      X_NEW,   Macro_GotoG,    T_GOTOG,    H_GOTOS},
+    {FN27,  UNI_GSBG,       USES_FL,    ALLOWREC,   ' ',    "Gsb G",    YES_L,      X_NEW,   Macro_GsbG,     T_GSBG,     H_GOSUBS},
+    {FN28,  UNI_LOOPG,      USES_FL,    ALLOWREC,   ' ',    "Loop G",   YES_L,      X_NEW,   Macro_LoopG,    T_LOOPG,    H_LOOPG},
 
-    {FN29,  UNI_LBLH,       USES_FL,    ALLOWREC,   ' ',    "Lbl H",        YES_L,  X_NEW,   Macro_LblH,     T_LBLH,     H_LABELS},
-    {FN30,  UNI_GOTOH,      USES_FL,    ALLOWREC,   ' ',    "Goto H",       YES_L,  X_NEW,   Macro_GotoH,    T_GOTOH,    H_GOTOS},
-    {FN31,  UNI_GSBH,       USES_FL,    ALLOWREC,   ' ',    "Gsb H",        YES_L,  X_NEW,   Macro_GsbH,     T_GSBH,     H_GOSUBS},
-    {FN32,  UNI_LOOPH,      USES_FL,    ALLOWREC,   ' ',    "Loop H",       YES_L,  X_NEW,   Macro_LoopH,    T_LOOPH,    H_LOOPH},
+    {FN29,  UNI_LBLH,       USES_FL,    ALLOWREC,   ' ',    "Lbl H",    YES_L,      X_NEW,   Macro_LblH,     T_LBLH,     H_LABELS},
+    {FN30,  UNI_GOTOH,      USES_FL,    ALLOWREC,   ' ',    "Goto H",   YES_L,      X_NEW,   Macro_GotoH,    T_GOTOH,    H_GOTOS},
+    {FN31,  UNI_GSBH,       USES_FL,    ALLOWREC,   ' ',    "Gsb H",    YES_L,      X_NEW,   Macro_GsbH,     T_GSBH,     H_GOSUBS},
+    {FN32,  UNI_LOOPH,      USES_FL,    ALLOWREC,   ' ',    "Loop H",   YES_L,      X_NEW,   Macro_LoopH,    T_LOOPH,    H_LOOPH},
 
-    {FN33,  UNI_LBLI,       USES_FL,    ALLOWREC,   ' ',    "Lbl I",        YES_L,  X_NEW,   Macro_LblI,     T_LBLI,     H_LABELS},
-    {FN34,  UNI_GOTOI,      USES_FL,    ALLOWREC,   ' ',    "Goto I",       YES_L,  X_NEW,   Macro_GotoI,    T_GOTOI,    H_GOTOS},
-    {FN35,  UNI_GSBI,       USES_FL,    ALLOWREC,   ' ',    "Gsb I",        YES_L,  X_NEW,   Macro_GsbI,     T_GSBI,     H_GOSUBS},
-    {FN36,  UNI_LOOPI,      USES_FL,    ALLOWREC,   ' ',    "Loop I",       YES_L,  X_NEW,   Macro_LoopI,    T_LOOPI,    H_LOOPI},
+    {FN33,  UNI_LBLI,       USES_FL,    ALLOWREC,   ' ',    "Lbl I",    YES_L,      X_NEW,   Macro_LblI,     T_LBLI,     H_LABELS},
+    {FN34,  UNI_GOTOI,      USES_FL,    ALLOWREC,   ' ',    "Goto I",   YES_L,      X_NEW,   Macro_GotoI,    T_GOTOI,    H_GOTOS},
+    {FN35,  UNI_GSBI,       USES_FL,    ALLOWREC,   ' ',    "Gsb I",    YES_L,      X_NEW,   Macro_GsbI,     T_GSBI,     H_GOSUBS},
+    {FN36,  UNI_HALT,       USES_FL,    ALLOWREC,   ' ',    "Halt",     YES_L,      X_NEW,   Macro_Halt,     T_HALT,     H_HALT},
 
     {FN37,  UNI_LBLJ,       USES_FL,    ALLOWREC,   ' ',    "Lbl J",    YES_L,      X_NEW,   Macro_LblJ,     T_LBLJ,     H_LABELS},
     {FN38,  UNI_GOTOJ,      USES_FL,    ALLOWREC,   ' ',    "Goto J",   YES_L,      X_NEW,   Macro_GotoJ,    T_GOTOJ,    H_GOTOS},
     {FN39,  UNI_GSBJ,       USES_FL,    ALLOWREC,   ' ',    "Gsb J",    YES_L,      X_NEW,   Macro_GsbJ,     T_GSBJ,     H_GOSUBS},
-    {FN40,  UNI_LOOPJ,      USES_FL,    ALLOWREC,   ' ',    "Loop J",   YES_L,      X_NEW,   Macro_LoopJ,    T_LOOPJ,    H_LOOPJ}
+    {FN40,  UNI_RET,        USES_FL,    ALLOWREC,   ' ',    "Return",   YES_L,      X_NEW,   Macro_Return,   T_RETURN,   H_RETURN}
 };
 
 struct funcStruct Program2_funcs[MAX_FUNCS] =
 {
-    {FN1,   UNI_RET,        USES_FL,    ALLOWREC,   ' ',    "Return",   YES_L,      X_NEW,   Macro_Return,   T_RETURN,   H_RETURN},
-    {FN2,   UNI_HALT,       USES_FL,    ALLOWREC,   ' ',    "Halt",     YES_L,      X_NEW,   Macro_Halt,     T_HALT,     H_HALT},
+    {FN1,   UNI_GOTOIND,    USES_FL,    ALLOWREC,   ' ',    "Goto(i)",  YES_L,      X_NEW,   Macro_GotoInd,  T_GOTOIND,  H_GOTOIND},
+    {FN2,   UNI_GOSUBIND,   USES_FL,    ALLOWREC,   ' ',    "Gsb(i)",   YES_L,      X_NEW,   Macro_GosubInd, T_GSBIND,   H_GSBIND},
     {FN3,   UNI_PAUSE,      USES_FL,    ALLOWREC,   ' ',    "Pause",    YES_L,      X_NEW,   Macro_Pause,    T_PAUSE,    H_PAUSE},
     {FN4,   UNI_BEEP,       USES_FL,    ALLOWREC,   ' ',    "Beep",     YES_L,      X_NEW,   Macro_Beep,     T_BEEP,     H_BEEP},
 
@@ -219,8 +221,8 @@ struct funcStruct Program2_funcs[MAX_FUNCS] =
 
     {FN29,  UNI_STO2I,      USES_FL,    ALLOWREC,   ' ',    "Sto(i)",   YES_L,      X_NEW,   Macro_Sto2i,    T_STO2I,    H_STO2I},
     {FN30,  UNI_RCL2I,      USES_FL,    ALLOWREC,   ' ',    "Rcl(i)",   YES_L,      X_NEW,   Macro_Rcl2i,    T_RCL2I,    H_RCL2I},
-    {FN31,  UNI_GOTOIND,    USES_FL,    ALLOWREC,   ' ',    "Goto(i)",  YES_L,      X_NEW,   Macro_GotoInd,  T_GOTOIND,  H_GOTOIND},
-    {FN32,  UNI_GOSUBIND,   USES_FL,    ALLOWREC,   ' ',    "Gsb(i)",   YES_L,      X_NEW,   Macro_GosubInd, T_GSBIND,   H_GSBIND},
+    {FN31,  UNI_STO2X,      USES_FL,    ALLOWREC,   ' ',    "Sto(x)",   YES_L,      X_NEW,   Macro_Sto2x,    T_STO2X,    H_STO2X},
+    {FN32,  UNI_RCL2X,      USES_FL,    ALLOWREC,   ' ',    "Rcl(x)",   YES_L,      X_NEW,   Macro_Rcl2x,    T_RCL2X,    H_RCL2X},
 
     {FN33,  UNI_EXCHXI,     USES_FL,    ALLOWREC,   ' ',    "X«»i",     YES_L,      X_NEW,   Macro_ExchXi,   T_EXCHXI,   H_EXCHXI},
     {FN34,  UNI_TRACE,      USES_FL,    NORECORD,   ' ',    "TRACE",    YES_L,      X_NEW,   Macro_Trace,    T_TRACE,    H_TRACE},
@@ -1502,6 +1504,79 @@ void Macro_Rcl2i(void)
             else
             {
                 StackPushL(STOL[indirectRegister]);
+            }        
+        }
+    }
+    else
+    {
+        RPN_error("Register Out Of Range(R0 to R99, XYZT, ABCD)");
+    }
+}
+
+void Macro_Sto2x(void)
+{
+    int32_t x = PopStackInteger();
+    
+    if ((x >= 0) && (x < MAX_STO+8))
+    {
+        if (x >= MAX_STO) 
+        {
+            if (progMode == PROG_FLOAT) 
+            {
+                STACK[STK_X+x-MAX_STO] = STACK[STK_X]; 
+            }
+            else 
+            {
+                STACKL[STK_X+x-MAX_STO] = STACKL[STK_X];
+            }
+        }
+        else  // Must be one of the registers R00-R99
+        {
+            if (progMode == PROG_FLOAT)
+            {
+                STO[x] = STACK[STK_X];
+            }
+            else
+            {
+                STOL[x] = STACKL[STK_X];
+            }
+        }
+    }
+    else
+    {
+        RPN_error("Register Out Of Range(R0 to R99, XYZT, ABCD)");
+    }
+}
+
+void Macro_Rcl2x(void)
+{
+    int32_t x = PopStackInteger();
+    
+    if ((x >= 0) && (x < MAX_STO+8))
+    {
+        if (x >= MAX_STO)
+        {
+            if (x == MAX_STO+0) 
+            {
+                if (progMode == PROG_FLOAT)
+                {
+                    StackPush(STACK[STK_X+x-MAX_STO]); 
+                }
+                else
+                {
+                    StackPushL(STACKL[STK_X+x-MAX_STO]);
+                }
+            }
+        }
+        else  // Must be one of the registers R00-R99
+        {
+            if (progMode == PROG_FLOAT)
+            {
+                StackPush(STO[x]);
+            }
+            else
+            {
+                StackPushL(STOL[x]);
             }        
         }
     }

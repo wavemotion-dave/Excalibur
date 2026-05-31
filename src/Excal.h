@@ -792,6 +792,8 @@ enum UniqueButtonIndexTag
     UNI_XNEZ,
     UNI_STOIND,
     UNI_RCLIND,
+    UNI_STO2X,
+    UNI_RCL2X,
     UNI_DSZI,
     UNI_DSZ2I,
     UNI_STO2I,
@@ -1773,10 +1775,14 @@ extern uint32_t userTicks;
 #define H_MTON_LB       "Convert Metric Tons to Lbs"
 #define T_CLEARF        "Clear All 32 Flags"
 #define H_CLEARF        "Clear programming flags register to 0x00000000"
-#define T_STO2I         "Store Indirectly"
+#define T_STO2I         "Store (i)"
 #define H_STO2I         "Stores X to the register (R0-R99) pointed to by the Indirect (i) register"
-#define T_RCL2I         "Recall Indirectly"
+#define T_RCL2I         "Recall (i)"
 #define H_RCL2I         "Recalls value from the register (R0-R99) pointed to by the Indirect (i) register"
+#define T_STO2X         "Store (x)"
+#define H_STO2X         "Stores Y to the register (R0-R99) pointed to by the (X) register"
+#define T_RCL2X         "Recall (x)"
+#define H_RCL2X         "Recalls value from the register (R0-R99) pointed to by (X) register"
 #define T_CSINH         "Complex sinh"
 #define H_CSINH         "Complex sinh (X=Real, Y=Imaginary)"
 #define T_CCOSH         "Complex cosh"
