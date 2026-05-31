@@ -198,10 +198,13 @@ void FIN_clearReg(void)
     CFn = 0;
     memset(cashFlow, 0x00, sizeof(cashFlow));
 
-    GetDlgItemText(calcMainWindow, RPN_STACK_X, savedStr, MAX_STACK_STRLEN);
-    SetDlgItemText(calcMainWindow, RPN_STACK_X, "  ...FINANCIAL CLEAR...  ");
-    sleep_and_peek(500);
-    GetDlgItemText(calcMainWindow, RPN_STACK_X, savedStr, MAX_STACK_STRLEN);
+    if (!macroPlayback)
+    {
+        GetDlgItemText(calcMainWindow, RPN_STACK_X, savedStr, MAX_STACK_STRLEN);
+        SetDlgItemText(calcMainWindow, RPN_STACK_X, "  ...FINANCIAL CLEAR...  ");
+        sleep_and_peek(500);
+        GetDlgItemText(calcMainWindow, RPN_STACK_X, savedStr, MAX_STACK_STRLEN);
+    }
 }
 
 void FIN_12div(void)

@@ -434,109 +434,16 @@ extern void turnOnNumLock(void);
 
 #define MAX_STACK_STRLEN    29
 
-#define MAX_FUNCTIONS       400     // Total Excalibur function keys across all banks
 #define MAX_REC_PLAYBACK    400     // Maximum number of program steps per program
 #define MAX_MACROS          40      // Maximum number of total programs (each getting the max steps)
 #define MAX_MACRO_FUNC_TEXT 30      // Maximum macro text that can be assigned to any key
 #define MAX_LABELS          10      // Labels A=0 through J=9 for a total of 10 labels
 
-struct playbackStruct
-{
-    uint16_t    uniqueIndex;
-    uint8_t     useFloatsLongs;
-    uint8_t     allowRecord;
-    uint8_t     saveLastX;
-    uint8_t     newXedit;
-    func_t      routine;
-    const char *funcText;
-};
-
-extern struct playbackStruct playBackMap[MAX_FUNCTIONS + 1];
-
-extern char macroName[MAX_MACROS][MAX_MACRO_FUNC_TEXT];
-extern char macro_short_names[MAX_MACROS][7];
-
-#define COPY_X_TO_CLIPBOARD         0
-#define COPY_ALL_TO_CLIPBOARD       1
-#define COPY_X_FROM_CLIPBOARD       2
-#define COPY_MACRO_TO_CLIPBOARD     3
-
-extern int16_t playBackSave[MAX_MACROS][MAX_REC_PLAYBACK + 1];
-extern int16_t playBackIdxSave[MAX_MACROS];
-extern int16_t playBack[MAX_REC_PLAYBACK + 1];
-extern int16_t playBackEndIdx;
-extern uint8_t progModeCarry;
-extern uint8_t progModeOverflow;
-extern uint8_t recModeON;
-extern uint16_t lastUniqueIndex;
-
-#define MAX_CONST_BANKS     5
-#define MAX_CONSTS          64
-struct constTableStruct
-{
-    uint8_t includeInList;
-    char    name[26];
-    char    units[11];
-    double  value;
-};
-
-extern struct constTableStruct constants[MAX_CONST_BANKS][MAX_CONSTS];
-
-#define MAX_CURRENCY_CONV 50
-struct CurrencyStruct
-{
-    char Country[20];
-    double conv;
-};
-
-extern struct CurrencyStruct CurrencyConv[MAX_CURRENCY_CONV];
-
-extern int32_t currency1index;
-extern int32_t currency2index;
-
-extern uint8_t extendedStack;
-extern uint8_t popFillZero;
-extern int32_t lastChosenConst;
-extern int32_t lastConstBank;
-extern char constantBankNames[MAX_CONST_BANKS][15];
-
-extern uint8_t depreciationType;
-
-#define MAX_STO 100
-extern double STO[MAX_STO];
-extern PROG_LONG STOL[MAX_STO];
-
-extern uint8_t macroPlayback;
-extern int16_t currentPlaybackIdx;
-
-#define MAX_MACRO_STACK 1000
-extern short int MacroStack[MAX_MACRO_STACK];
-extern short int MacroStackIdx;
-extern unsigned int progFlags;
-extern uint8_t traceMacroPlayback;
-extern uint16_t traceDelayValueMs;
-
-extern void blinkXDisplay(uint8_t no_peek);
-extern void blinkStack(uint8_t no_peek);
-extern void endRunningMacro(void);
-extern void UpdateDebugRegs(void);
-extern void UpdateDebugProgram(int resetProgramList);
-extern void RPN_Playback(void);
-extern void sleep_and_peek(int timeMs);
-extern void ShowTrace(void);
-
-extern LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
-extern LRESULT CALLBACK tooltipWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
-extern void CreateToolTipWindow(HWND hwnd, HINSTANCE hInstance);
-extern void CreateDebugWindow(HWND hwnd, HINSTANCE hInstance);
-extern void RPN_SingleStep(void);
-extern void MemoryInit(void);
-extern void trim(char *str);
-
 // Add to the end of this list but *NEVER* remove entries or else you will need to update excalibur config file...
 enum UniqueButtonIndexTag
 {
-    UNI_DIG0 = 100,
+    UNI_UNUSED = 0,
+    UNI_DIG0,
     UNI_DIG1,
     UNI_DIG2,
     UNI_DIG3,
@@ -580,7 +487,6 @@ enum UniqueButtonIndexTag
     UNI_SQRT,
     UNI_LN,
     UNI_LOG,
-    UNI_UNUSED,
 
     UNI_SCI,
     UNI_SCI2,
@@ -904,7 +810,101 @@ enum UniqueButtonIndexTag
     UNI_STARTCONST,
 
     UNI_ADD_NEW_HERE,
+    UNI_MAX
 };
+
+struct playbackStruct
+{
+    uint16_t    uniqueIndex;
+    uint8_t     useFloatsLongs;
+    uint8_t     allowRecord;
+    uint8_t     saveLastX;
+    uint8_t     newXedit;
+    func_t      routine;
+    const char *funcText;
+};
+
+extern struct playbackStruct playBackMap[UNI_MAX + 1];
+
+extern char macroName[MAX_MACROS][MAX_MACRO_FUNC_TEXT];
+extern char macro_short_names[MAX_MACROS][7];
+
+#define COPY_X_TO_CLIPBOARD         0
+#define COPY_ALL_TO_CLIPBOARD       1
+#define COPY_X_FROM_CLIPBOARD       2
+#define COPY_MACRO_TO_CLIPBOARD     3
+
+extern int16_t playBackSave[MAX_MACROS][MAX_REC_PLAYBACK + 1];
+extern int16_t playBackIdxSave[MAX_MACROS];
+extern int16_t playBack[MAX_REC_PLAYBACK + 1];
+extern int16_t playBackEndIdx;
+extern uint8_t progModeCarry;
+extern uint8_t progModeOverflow;
+extern uint8_t recModeON;
+extern uint16_t lastUniqueIndex;
+
+#define MAX_CONST_BANKS     5
+#define MAX_CONSTS          64
+struct constTableStruct
+{
+    uint8_t includeInList;
+    char    name[26];
+    char    units[11];
+    double  value;
+};
+
+extern struct constTableStruct constants[MAX_CONST_BANKS][MAX_CONSTS];
+
+#define MAX_CURRENCY_CONV 50
+struct CurrencyStruct
+{
+    char Country[20];
+    double conv;
+};
+
+extern struct CurrencyStruct CurrencyConv[MAX_CURRENCY_CONV];
+
+extern int32_t currency1index;
+extern int32_t currency2index;
+
+extern uint8_t extendedStack;
+extern uint8_t popFillZero;
+extern int32_t lastChosenConst;
+extern int32_t lastConstBank;
+extern char constantBankNames[MAX_CONST_BANKS][15];
+
+extern uint8_t depreciationType;
+
+#define MAX_STO 100
+extern double STO[MAX_STO];
+extern PROG_LONG STOL[MAX_STO];
+
+extern uint8_t macroPlayback;
+extern int16_t currentPlaybackIdx;
+
+#define MAX_MACRO_STACK 1024
+extern short int MacroStack[MAX_MACRO_STACK];
+extern short int MacroStackIdx;
+extern unsigned int progFlags;
+extern uint8_t traceMacroPlayback;
+extern uint16_t traceDelayValueMs;
+
+extern void blinkXDisplay(uint8_t no_peek);
+extern void blinkStack(uint8_t no_peek);
+extern void endRunningMacro(void);
+extern void UpdateDebugRegs(void);
+extern void UpdateDebugProgram(int resetProgramList);
+extern void RPN_Playback(void);
+extern void sleep_and_peek(int timeMs);
+extern void ShowTrace(void);
+
+extern LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
+extern LRESULT CALLBACK tooltipWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+extern void CreateToolTipWindow(HWND hwnd, HINSTANCE hInstance);
+extern void CreateDebugWindow(HWND hwnd, HINSTANCE hInstance);
+extern void RPN_SingleStep(void);
+extern void MemoryInit(void);
+extern void trim(char *str);
 
 extern struct funcStruct RPNkeys[];
 

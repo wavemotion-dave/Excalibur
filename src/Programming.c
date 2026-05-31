@@ -1336,7 +1336,7 @@ void DecrementAndLoop(int index, uint16_t uniqueLabel)
     {
         if (progMode == PROG_FLOAT)
         {
-            STO[index] = (float) ( ((int)STO[index]) - 1);
+            STO[index] -= 1.0;
             if ((int64_t) STO[index] > 0)
             {
                 rpn_goto(uniqueLabel);
@@ -1344,7 +1344,7 @@ void DecrementAndLoop(int index, uint16_t uniqueLabel)
         }
         else
         {
-            STOL[index] = (PROG_LONG) ( ((int)STOL[index]) - 1);
+            STOL[index]--;
             if (STOL[index] > 0L)
             {
                 rpn_goto(uniqueLabel);

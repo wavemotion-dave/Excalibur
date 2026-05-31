@@ -45,7 +45,7 @@
 #define VERSION_STR "v3.XX-06"
 
 #define ABOUT_MSG "Excalibur for Windows 32-bit\n"                    \
-                  "Version 3.XX-06  -  May 30, 2026\n\n"              \
+                  "Version 3.XX-06  -  May 31, 2026\n\n"              \
                   "Copyright 1994-2026 David Bernazzani\n\n"          \
                   "Please read the disclaimer and understand the\n"   \
                   "accuracy and precision issues before using.\n\n"   \
@@ -54,7 +54,7 @@
                   "https://github.com/wavemotion-dave/Excalibur"      \
                   "\n\nThis version is BETA - Expect and report Bugs!"
 
-#define CONFIG_VERSION_MAIN 0xF014  // If this changes, we wipe EVERYTHING
+#define CONFIG_VERSION_MAIN 0xF015  // If this changes, we wipe EVERYTHING
 #define CONFIG_VERSION_SUB  0x0001  // If this changes, we reset x,y window position and reset constant tables (currency, physics constants, etc)
 
 #define END_OF_PROGRAM_STR "<End Of Program>"
@@ -87,7 +87,6 @@ uint8_t numberDisplayMode = SEPARATOR_COMMA_DP;
 uint8_t lastProgMode = PROG_FLOAT;
 uint16_t traceDelayValueMs = 500;
 
-int16_t totalMappedButtonFuncs = 0;
 uint32_t lastTickCount = 0;
 uint32_t ticksUsed = 0;
 
@@ -173,7 +172,7 @@ char        excaliburNotes[NOTES_SIZE]; // A small scratchpad for the user to jo
 // program line that was recorded with a unique index. It also contains some info about whether
 // the function uses floats or longs, whether it should be allowed to be recorded in macros, etc.
 // ---------------------------------------------------------------------------------------------
-struct playbackStruct playBackMap[MAX_FUNCTIONS + 1];
+struct playbackStruct playBackMap[UNI_MAX + 1];
 
 extern void RPN_digit0(void);
 extern void RPN_digit1(void);
@@ -1005,7 +1004,7 @@ void SelectNewBank(struct funcStruct *funcs)
                 if (funcs == (struct funcStruct *)&Conversion_funcs)  SaveProgramStep(UNI_CONV);
                 if (funcs == (struct funcStruct *)&Statistics_funcs)  SaveProgramStep(UNI_STAT);
                 if (funcs == (struct funcStruct *)&Custom_funcs)      SaveProgramStep(UNI_CUSTOM);
-            } 
+            }
 
             lastProgMode = progMode; // Remember if the user switches back...
             LongsToFloats();
@@ -1281,7 +1280,7 @@ void ClipboardCopySelection(HWND hwnd, uint8_t copytype)
         lstrcpyn(tmp2, lpMem, MAX_STACK_STRLEN);
         GlobalUnlock(hMem);
         CloseClipboard();
-        
+
         // -------------------------------------------------------
         // If we are pasting from clipboard, look at display mode
         // to see if we need to manipulate commas and DPs.
@@ -1630,7 +1629,7 @@ void MemoryInit(void)
     indirectRegister = 0;
     progModeOverflow = 0;
     progModeCarry = 0;
-    
+
     // Mark unused constants as not included to be shown...
     for (k = 0; k < MAX_CONST_BANKS; k++)
     {
@@ -1663,7 +1662,7 @@ void MemoryInit(void)
 }
 
 // ---------------------------------------------------------------------
-// Called after the config file is read - sets up various key windows 
+// Called after the config file is read - sets up various key windows
 // attributes based on user preferences.
 // ---------------------------------------------------------------------
 void ExcalInit(void)
@@ -1735,7 +1734,7 @@ void ShowStatus(void)
             SetDlgItemText(calcMainWindow, RPN_OVERFLOW, " ");
 
         if (progModeCarry == 1)
-            SetDlgItemText(calcMainWindow, RPN_CARRY, "C");       
+            SetDlgItemText(calcMainWindow, RPN_CARRY, "C");
         else
             SetDlgItemText(calcMainWindow, RPN_CARRY, " ");
     }
@@ -1871,7 +1870,7 @@ void RPN_fact(void)
 }
 
 // --------------------------------------------------------------------------------
-// This is where the smoke-and-mirrors happens with our use of double precision 
+// This is where the smoke-and-mirrors happens with our use of double precision
 // floating-point numbers. Here we will convert the floating number to a string
 // with 1 less digit than double precision allows... and then convert it back
 // to a floating point value. This hides all sorts of small inconsistencies that
@@ -2578,10 +2577,13 @@ void RPN_clearStack(void)
             memset(FIN, 0x00, sizeof(FIN));
             CFn = 0;
 
-            GetDlgItemText(calcMainWindow, RPN_STACK_X, savedStr, MAX_STACK_STRLEN);
-            SetDlgItemText(calcMainWindow, RPN_STACK_X, "  ...MEMORY CLEAR...  ");
-            sleep_and_peek(500);
-            GetDlgItemText(calcMainWindow, RPN_STACK_X, savedStr, MAX_STACK_STRLEN);
+            if (!macroPlayback)
+            {
+                GetDlgItemText(calcMainWindow, RPN_STACK_X, savedStr, MAX_STACK_STRLEN);
+                SetDlgItemText(calcMainWindow, RPN_STACK_X, "  ...MEMORY CLEAR...  ");
+                sleep_and_peek(500);
+                GetDlgItemText(calcMainWindow, RPN_STACK_X, savedStr, MAX_STACK_STRLEN);
+            }
         }
 
         if (progMode)
@@ -2937,7 +2939,7 @@ void RPN_digit(WPARAM key)
         else
             STACK[STK_X] = 0.0;
     }
-    
+
     STACKL[STK_X] = ConvertCompSciStrTo64(Xstr);
     RPN_ClearModifiers(!macroPlayback);
     Xedit = X_EDIT;
@@ -3282,7 +3284,7 @@ void RPN_minus(void)
             {
                 progModeOverflow = 0;
             }
-            
+
             if (r < a) progModeCarry = 1; else progModeCarry = 0;
         }
         else // Unsigned - carry same as overflow
@@ -3298,7 +3300,7 @@ void RPN_minus(void)
             {
                 progModeOverflow = 0;
                 progModeCarry = 0;
-            }            
+            }
         }
 
         StackPushL(yl - xl);
@@ -3310,7 +3312,7 @@ uint8_t will_unsigned_multiply_overflow(uint64_t a, uint64_t b) {
     if (a == 0 || b == 0) {
         return 0;
     }
-    
+
     // UINT64_MAX is (2^64 - 1)
     return (b > (UINT64_MAX / a)) ? 1:0;
 }
@@ -3319,7 +3321,7 @@ uint8_t will_signed_multiply_overflow(int64_t a, int64_t b) {
     // Base cases for 0 and 1
     if (a == 0 || b == 0) return 0;
     if (a == 1 || b == 1) return 0;
-    
+
     // Handle the dangerous -1 edge case because INT64_MIN / -1 overflows
     if (a == -1) return (b == INT64_MIN) ? 1:0;
     if (b == -1) return (a == INT64_MIN) ? 1:0;
@@ -3610,7 +3612,7 @@ void RPN_rotateStackDn(void)
             STACK[STK_T] = STACK[STK_A];
             STACK[STK_A] = STACK[STK_B];
             STACK[STK_B] = STACK[STK_C];
-            STACK[STK_C] = STACK[STK_D];            
+            STACK[STK_C] = STACK[STK_D];
             STACK[STK_D] = temp;
         }
         else
@@ -3633,7 +3635,7 @@ void RPN_rotateStackDn(void)
             STACKL[STK_T] = STACKL[STK_A];
             STACKL[STK_A] = STACKL[STK_B];
             STACKL[STK_B] = STACKL[STK_C];
-            STACKL[STK_C] = STACKL[STK_D];            
+            STACKL[STK_C] = STACKL[STK_D];
             STACKL[STK_D] = tempL;
         }
         else
@@ -4326,7 +4328,7 @@ void CopyBufferToCurrentMacro(char *clipboardBuffer)
             done = 0;
             tmpBidx = 0;
             found = 0;
-            for (i = 0; i < totalMappedButtonFuncs; i++) // Look up the macro by name in the mapped buttons table
+            for (i = 0; i < UNI_MAX; i++) // Look up the macro by name in the mapped buttons table
             {
                 maxLen = max(strlen(&tmpB[preambleIndex]), strlen(playBackMap[i].funcText));
                 if ((tmpB[preambleIndex] != CNULL) && (strncmp(&tmpB[preambleIndex], playBackMap[i].funcText, maxLen) == 0))
@@ -4883,7 +4885,7 @@ BOOL CALLBACK fnDIALOG_SettingsProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
             {
                 angleMode = ANGLE_GRAD;
             }
-            
+
             bs = SendMessage(GetDlgItem(hDlg, 109), BM_GETCHECK, (WORD)0, (DWORD)0L);
             if (bs != 0L)
                 useSeparator = 1;
@@ -4908,7 +4910,7 @@ BOOL CALLBACK fnDIALOG_SettingsProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
                 numberDisplayMode = SEPARATOR_COMMA_DP;
                 SetDlgItemText(calcMainWindow, RPN_DIGIT_DP, ".");
             }
-            
+
             bs = SendMessage(GetDlgItem(hDlg, 117), BM_GETCHECK, (WORD)0, (DWORD)0L);
             if (bs != 0L)
             {
@@ -4959,7 +4961,7 @@ BOOL CALLBACK fnDIALOG_SettingsProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
             ShowStatus();
             ShowStack();
             return TRUE;
-            
+
         case (102): // CANCEL
             EndDialog(hDlg, FALSE);
             return TRUE;
@@ -5313,211 +5315,185 @@ void RPN_SelectProgII(void)
     SelectNewBank((struct funcStruct *)&Program2_funcs);
 }
 
-// -----------------------------------------------------------------------------
-// Good old bubble sort... not the most efficient but this is only done once at
-// startup and the list is small and nearly sorted so this will be plenty fast.
-// -----------------------------------------------------------------------------
-void sortPlaybackList(void)
-{
-    int i, j;
-    uint8_t exchangeMade;
-    struct playbackStruct tmpPlayBack;
-
-    for (i = 0; i < totalMappedButtonFuncs; i++)
-    {
-        exchangeMade = FALSE;
-        for (j = 0; j < (totalMappedButtonFuncs - i - 1); j++)
-        {
-            if (playBackMap[j].uniqueIndex > playBackMap[j + 1].uniqueIndex)
-            {
-                // Need to swap...
-                memcpy(&tmpPlayBack, &playBackMap[j], sizeof(tmpPlayBack));
-                memcpy(&playBackMap[j], &playBackMap[j + 1], sizeof(tmpPlayBack));
-                memcpy(&playBackMap[j + 1], &tmpPlayBack, sizeof(tmpPlayBack));
-                exchangeMade = TRUE; // At least one swap was performed
-            }
-        }
-        if (exchangeMade == FALSE)
-            break; // We are Sorted!
-    }
-}
-
+// --------------------------------------------------------------------------------------
+// This function creates a master list of all unique indexes in the system and their
+// associated functions, help strings, etc. This allows program playback to be quite
+// fast as we only need to save the unique index for each keystroke we want to playback.
+// --------------------------------------------------------------------------------------
 void mapButtonFuncs(void)
 {
-    int i, j;
+    uint8_t found;
+    int16_t i, idx;
 
-    j = 0;
-    i = 0;
+    memset(playBackMap, 0x00, sizeof(playBackMap));
 
-    do // We do a do-while so we include RPN_LAST_KEY (and a single UNI_UNUSED controlID) in the map.
+    for (idx = 0; idx < UNI_MAX; idx++)
     {
-        playBackMap[j].saveLastX = RPNkeys[i].saveLastX;
-        playBackMap[j].newXedit = RPNkeys[i].newXedit;
-        playBackMap[j].routine = RPNkeys[i].routine;
-        playBackMap[j].funcText = RPNkeys[i].keyTitle;
-        playBackMap[j].uniqueIndex = RPNkeys[i].uniqueIndex;
-        playBackMap[j].useFloatsLongs = RPNkeys[i].useFloatsLongs;
-        playBackMap[j].allowRecord = RPNkeys[i].allowRecord;
-        if (j < MAX_FUNCTIONS)
-            j++;
-        i++;
-    } while (RPNkeys[i - 1].controlID != RPN_LAST_KEY);
+        playBackMap[idx].uniqueIndex  = idx;
+        playBackMap[idx].routine      = NULL;
+        playBackMap[idx].funcText     = "Unused";
 
-    for (i = 0; i < MAX_FUNCS; i++)
-    {
-        playBackMap[j].saveLastX = Scientific_funcs[i].saveLastX;
-        playBackMap[j].newXedit = Scientific_funcs[i].newXedit;
-        playBackMap[j].routine = Scientific_funcs[i].routine;
-        playBackMap[j].funcText = Scientific_funcs[i].keyTitle;
-        playBackMap[j].uniqueIndex = Scientific_funcs[i].uniqueIndex;
-        playBackMap[j].useFloatsLongs = Scientific_funcs[i].useFloatsLongs;
-        playBackMap[j].allowRecord = Scientific_funcs[i].allowRecord;
-        if (j < MAX_FUNCTIONS)
-            j++;
-    }
+        found = 0;
 
-    for (i = 0; i < MAX_FUNCS; i++)
-    {
-        playBackMap[j].saveLastX = Scientific2_funcs[i].saveLastX;
-        playBackMap[j].newXedit = Scientific2_funcs[i].newXedit;
-        playBackMap[j].routine = Scientific2_funcs[i].routine;
-        playBackMap[j].funcText = Scientific2_funcs[i].keyTitle;
-        playBackMap[j].uniqueIndex = Scientific2_funcs[i].uniqueIndex;
-        playBackMap[j].useFloatsLongs = Scientific2_funcs[i].useFloatsLongs;
-        playBackMap[j].allowRecord = Scientific2_funcs[i].allowRecord;
-        if (j < MAX_FUNCTIONS)
-            j++;
-    }
-
-    for (i = 0; i < MAX_FUNCS; i++)
-    {
-        playBackMap[j].saveLastX = Financial_funcs[i].saveLastX;
-        playBackMap[j].newXedit = Financial_funcs[i].newXedit;
-        playBackMap[j].routine = Financial_funcs[i].routine;
-        playBackMap[j].funcText = Financial_funcs[i].keyTitle;
-        playBackMap[j].uniqueIndex = Financial_funcs[i].uniqueIndex;
-        playBackMap[j].useFloatsLongs = Financial_funcs[i].useFloatsLongs;
-        playBackMap[j].allowRecord = Financial_funcs[i].allowRecord;
-        if (j < MAX_FUNCTIONS)
-            j++;
-    }
-
-    for (i = 0; i < MAX_FUNCS; i++)
-    {
-        playBackMap[j].saveLastX = Conversion_funcs[i].saveLastX;
-        playBackMap[j].newXedit = Conversion_funcs[i].newXedit;
-        playBackMap[j].routine = Conversion_funcs[i].routine;
-        playBackMap[j].funcText = Conversion_funcs[i].keyTitle;
-        playBackMap[j].uniqueIndex = Conversion_funcs[i].uniqueIndex;
-        playBackMap[j].useFloatsLongs = Conversion_funcs[i].useFloatsLongs;
-        playBackMap[j].allowRecord = Conversion_funcs[i].allowRecord;
-        if (j < MAX_FUNCTIONS)
-            j++;
-    }
-
-    for (i = 0; i < MAX_FUNCS; i++)
-    {
-        if (Statistics_funcs[i].uniqueIndex != UNI_UNUSED)
+        // ------------------------------------------------------------------------------
+        // Now go and find the first instance of the unique index in our function tables.
+        // ------------------------------------------------------------------------------
+        i = 0;
+        do // We do a do-while so we include RPN_LAST_KEY (and a single UNI_UNUSED controlID) in the map.
         {
-            playBackMap[j].saveLastX = Statistics_funcs[i].saveLastX;
-            playBackMap[j].newXedit = Statistics_funcs[i].newXedit;
-            playBackMap[j].routine = Statistics_funcs[i].routine;
-            playBackMap[j].funcText = Statistics_funcs[i].keyTitle;
-            playBackMap[j].uniqueIndex = Statistics_funcs[i].uniqueIndex;
-            playBackMap[j].useFloatsLongs = Statistics_funcs[i].useFloatsLongs;
-            playBackMap[j].allowRecord = Statistics_funcs[i].allowRecord;
-            if (j < MAX_FUNCTIONS)
-                j++;
+            if (RPNkeys[i].uniqueIndex == idx)
+            {
+                playBackMap[idx].saveLastX          = RPNkeys[i].saveLastX;
+                playBackMap[idx].newXedit           = RPNkeys[i].newXedit;
+                playBackMap[idx].routine            = RPNkeys[i].routine;
+                playBackMap[idx].funcText           = RPNkeys[i].keyTitle;
+                playBackMap[idx].useFloatsLongs     = RPNkeys[i].useFloatsLongs;
+                playBackMap[idx].allowRecord        = RPNkeys[i].allowRecord;
+                found = 1;
+                break;
+            }
+            i++;
+        } while (RPNkeys[i - 1].controlID != RPN_LAST_KEY);
+
+        // --------------------------------------------------------------------
+        // If not found in the main set of keys, search each bank of functions.
+        // --------------------------------------------------------------------
+        if (!found)
+        {
+            for (i = 0; i < MAX_FUNCS; i++)
+            {
+                if (Scientific_funcs[i].uniqueIndex == idx)
+                {
+                    playBackMap[idx].saveLastX      = Scientific_funcs[i].saveLastX;
+                    playBackMap[idx].newXedit       = Scientific_funcs[i].newXedit;
+                    playBackMap[idx].routine        = Scientific_funcs[i].routine;
+                    playBackMap[idx].funcText       = Scientific_funcs[i].keyTitle;
+                    playBackMap[idx].useFloatsLongs = Scientific_funcs[i].useFloatsLongs;
+                    playBackMap[idx].allowRecord    = Scientific_funcs[i].allowRecord;
+                    found = 1;
+                    break;
+                }
+
+                if (Scientific2_funcs[i].uniqueIndex == idx)
+                {
+                    playBackMap[idx].saveLastX      = Scientific2_funcs[i].saveLastX;
+                    playBackMap[idx].newXedit       = Scientific2_funcs[i].newXedit;
+                    playBackMap[idx].routine        = Scientific2_funcs[i].routine;
+                    playBackMap[idx].funcText       = Scientific2_funcs[i].keyTitle;
+                    playBackMap[idx].useFloatsLongs = Scientific2_funcs[i].useFloatsLongs;
+                    playBackMap[idx].allowRecord    = Scientific2_funcs[i].allowRecord;
+                    found = 1;
+                    break;
+                }
+
+                if (Financial_funcs[i].uniqueIndex == idx)
+                {
+                    playBackMap[idx].saveLastX      = Financial_funcs[i].saveLastX;
+                    playBackMap[idx].newXedit       = Financial_funcs[i].newXedit;
+                    playBackMap[idx].routine        = Financial_funcs[i].routine;
+                    playBackMap[idx].funcText       = Financial_funcs[i].keyTitle;
+                    playBackMap[idx].useFloatsLongs = Financial_funcs[i].useFloatsLongs;
+                    playBackMap[idx].allowRecord    = Financial_funcs[i].allowRecord;
+                    found = 1;
+                    break;
+                }
+
+                if (Conversion_funcs[i].uniqueIndex == idx)
+                {
+                    playBackMap[idx].saveLastX      = Conversion_funcs[i].saveLastX;
+                    playBackMap[idx].newXedit       = Conversion_funcs[i].newXedit;
+                    playBackMap[idx].routine        = Conversion_funcs[i].routine;
+                    playBackMap[idx].funcText       = Conversion_funcs[i].keyTitle;
+                    playBackMap[idx].useFloatsLongs = Conversion_funcs[i].useFloatsLongs;
+                    playBackMap[idx].allowRecord    = Conversion_funcs[i].allowRecord;
+                    found = 1;
+                    break;
+                }
+
+                if (Statistics_funcs[i].uniqueIndex == idx)
+                {
+                    playBackMap[idx].saveLastX      = Statistics_funcs[i].saveLastX;
+                    playBackMap[idx].newXedit       = Statistics_funcs[i].newXedit;
+                    playBackMap[idx].routine        = Statistics_funcs[i].routine;
+                    playBackMap[idx].funcText       = Statistics_funcs[i].keyTitle;
+                    playBackMap[idx].useFloatsLongs = Statistics_funcs[i].useFloatsLongs;
+                    playBackMap[idx].allowRecord    = Statistics_funcs[i].allowRecord;
+                    found = 1;
+                    break;
+                }
+
+                if (CompSci_funcs[i].uniqueIndex == idx)
+                {
+                    playBackMap[idx].saveLastX      = CompSci_funcs[i].saveLastX;
+                    playBackMap[idx].newXedit       = CompSci_funcs[i].newXedit;
+                    playBackMap[idx].routine        = CompSci_funcs[i].routine;
+                    playBackMap[idx].funcText       = CompSci_funcs[i].keyTitle;
+                    playBackMap[idx].useFloatsLongs = CompSci_funcs[i].useFloatsLongs;
+                    playBackMap[idx].allowRecord    = CompSci_funcs[i].allowRecord;
+                    found = 1;
+                    break;
+                }
+
+                if (Program1_funcs[i].uniqueIndex == idx)
+                {
+                    playBackMap[idx].saveLastX      = Program1_funcs[i].saveLastX;
+                    playBackMap[idx].newXedit       = Program1_funcs[i].newXedit;
+                    playBackMap[idx].routine        = Program1_funcs[i].routine;
+                    playBackMap[idx].funcText       = Program1_funcs[i].keyTitle;
+                    playBackMap[idx].useFloatsLongs = Program1_funcs[i].useFloatsLongs;
+                    playBackMap[idx].allowRecord    = Program1_funcs[i].allowRecord;
+                    found = 1;
+                    break;
+                }
+
+                if (Program2_funcs[i].uniqueIndex == idx)
+                {
+                    playBackMap[idx].saveLastX      = Program2_funcs[i].saveLastX;
+                    playBackMap[idx].newXedit       = Program2_funcs[i].newXedit;
+                    playBackMap[idx].routine        = Program2_funcs[i].routine;
+                    playBackMap[idx].funcText       = Program2_funcs[i].keyTitle;
+                    playBackMap[idx].useFloatsLongs = Program2_funcs[i].useFloatsLongs;
+                    playBackMap[idx].allowRecord    = Program2_funcs[i].allowRecord;
+                    found = 1;
+                    break;
+                }
+            }
         }
-    }
-
-    for (i = 0; i < MAX_FUNCS; i++)
-    {
-        playBackMap[j].saveLastX = CompSci_funcs[i].saveLastX;
-        playBackMap[j].newXedit = CompSci_funcs[i].newXedit;
-        playBackMap[j].routine = CompSci_funcs[i].routine;
-        playBackMap[j].funcText = CompSci_funcs[i].keyTitle;
-        playBackMap[j].uniqueIndex = CompSci_funcs[i].uniqueIndex;
-        playBackMap[j].useFloatsLongs = CompSci_funcs[i].useFloatsLongs;
-        playBackMap[j].allowRecord = CompSci_funcs[i].allowRecord;
-        if (j < MAX_FUNCTIONS)
-            j++;
-    }
-
-    for (i = 0; i < MAX_FUNCS; i++)
-    {
-        playBackMap[j].saveLastX = Program1_funcs[i].saveLastX;
-        playBackMap[j].newXedit = Program1_funcs[i].newXedit;
-        playBackMap[j].routine = Program1_funcs[i].routine;
-        playBackMap[j].funcText = Program1_funcs[i].keyTitle;
-        playBackMap[j].uniqueIndex = Program1_funcs[i].uniqueIndex;
-        playBackMap[j].useFloatsLongs = Program1_funcs[i].useFloatsLongs;
-        playBackMap[j].allowRecord = Program1_funcs[i].allowRecord;
-        if (j < MAX_FUNCTIONS)
-            j++;
-    }
-
-    for (i = 0; i < MAX_FUNCS; i++)
-    {
-        playBackMap[j].saveLastX = Program2_funcs[i].saveLastX;
-        playBackMap[j].newXedit = Program2_funcs[i].newXedit;
-        playBackMap[j].routine = Program2_funcs[i].routine;
-        playBackMap[j].funcText = Program2_funcs[i].keyTitle;
-        playBackMap[j].uniqueIndex = Program2_funcs[i].uniqueIndex;
-        playBackMap[j].useFloatsLongs = Program2_funcs[i].useFloatsLongs;
-        playBackMap[j].allowRecord = Program2_funcs[i].allowRecord;
-        if (j < MAX_FUNCTIONS)
-            j++;
-    }
-
-    totalMappedButtonFuncs = j;
-
-    if (totalMappedButtonFuncs >= MAX_FUNCTIONS)
-    {
-        MessageBox(calcMainWindow, "Error - Maximum number of mapped functions exists!", "Excalibur Fatal Error", MB_OK);
-    }
-    else // Sort the list based on unique index for fast lookup during recording and playback.
-    {
-        sortPlaybackList();
     }
 }
 
 void SaveProgramStep(uint16_t uniqueIndex)
 {
-    int i, k;
+    int k;
 
-    i = 0;
-    while (i < totalMappedButtonFuncs)
+    // -------------------------------------------------
+    // Make sure there is room for this program step...
+    // -------------------------------------------------
+    if (playBackEndIdx < (MAX_REC_PLAYBACK - 1))
     {
-        if (uniqueIndex == playBackMap[i].uniqueIndex) // We always look up the function based on unique index!
+        if (currentPlaybackIdx != playBackEndIdx) // Insert at current position!
         {
-            if (playBackEndIdx < (MAX_REC_PLAYBACK - 1))
+            // ------------------------------------------------------
+            // Shift instructions down and make room for the new one.
+            // ------------------------------------------------------
+            for (k = playBackEndIdx; k >= currentPlaybackIdx; k--)
             {
-                if (currentPlaybackIdx != playBackEndIdx) // Insert at current position!
-                {
-                    for (k = playBackEndIdx; k >= currentPlaybackIdx; k--)
-                    {
-                        playBack[k + 1] = playBack[k];
-                    }
-                    playBackEndIdx++;
-                    playBack[currentPlaybackIdx] = i;
-                    currentPlaybackIdx++;
-                }
-                else // Insert at end!
-                {
-                    playBack[currentPlaybackIdx] = i;
-                    playBackEndIdx++;
-                    currentPlaybackIdx++;
-                }
+                playBack[k + 1] = playBack[k];
             }
-            else
-            {
-                MessageBox(calcMainWindow, "Maximum program length has been reached.", "Excalibur Program Error", MB_OK);
-            }
-
-            break;
+            playBackEndIdx++;
+            playBack[currentPlaybackIdx] = uniqueIndex;
+            currentPlaybackIdx++;
         }
-        i++;
+        else // Insert at end!
+        {
+            playBack[currentPlaybackIdx] = uniqueIndex;
+            playBackEndIdx++;
+            currentPlaybackIdx++;
+        }
+    }
+    else
+    {
+        MessageBox(calcMainWindow, "Maximum program length has been reached.", "Excalibur Program Error", MB_OK);
     }
 }
 
@@ -5537,9 +5513,9 @@ void callButtonFunc(void (*routine)(void), char useFloatsLongs, char allowRecord
 
     if (saveLastX == YES_L)
     {
-        LASTX = STACK[STK_X];
+        LASTX  = STACK[STK_X];
         LASTXL = STACKL[STK_X];
-        LASTY = STACK[STK_Y];
+        LASTY  = STACK[STK_Y];
         LASTYL = STACKL[STK_Y];
     }
 
@@ -5579,8 +5555,14 @@ void callButtonFunc(void (*routine)(void), char useFloatsLongs, char allowRecord
 // -------------------------------------------------------------------------------------------------
 // This version is streamlined for use when a macro is playing back for relatively blazing speed...
 // -------------------------------------------------------------------------------------------------
-void callButtonFunc_fast(void (*routine)(void), char useFloatsLongs, uint16_t uniqueIndex, char saveLastX, char newXedit)
+void callButtonFunc_playback(int idx)
 {
+    void (*routine)(void)   = playBackMap[idx].routine;
+    uint8_t  useFloatsLongs = playBackMap[idx].useFloatsLongs;
+    uint16_t uniqueIndex    = playBackMap[idx].uniqueIndex;
+    uint8_t  saveLastX      = playBackMap[idx].saveLastX;
+    uint8_t  newXedit       = playBackMap[idx].newXedit;
+
     if (progMode != PROG_FLOAT) // Always ensure floats are "in-sync" with longs before any press!
     {
         LongsToFloats();
@@ -5588,9 +5570,9 @@ void callButtonFunc_fast(void (*routine)(void), char useFloatsLongs, uint16_t un
 
     if (saveLastX == YES_L)
     {
-        LASTX = STACK[STK_X];
+        LASTX  = STACK[STK_X];
         LASTXL = STACKL[STK_X];
-        LASTY = STACK[STK_Y];
+        LASTY  = STACK[STK_Y];
         LASTYL = STACKL[STK_Y];
     }
 
@@ -5644,7 +5626,7 @@ void ShowTrace(void)
 {
     MSG msg;
 
-    if (traceMacroPlayback == TRUE)    
+    if (traceMacroPlayback == TRUE)
     {
         showTrace = TRUE;
         ShowStack();
@@ -5739,19 +5721,16 @@ void RPN_Playback(void)
                     UpdateInfoBar("Run...");
             }
         }
-
-        // -----------------------------------------------------------
-        // Show the trace of the step that is about to be executed...
-        // -----------------------------------------------------------
-        ShowTrace();
+        else
+        {
+            // -----------------------------------------------------------
+            // Show the trace of the step that is about to be executed...
+            // -----------------------------------------------------------
+            ShowTrace();
+        }
 
         idx = playBack[currentPlaybackIdx];
-
-        if (playBackMap[idx].routine != NULL)
-        {
-            callButtonFunc_fast(playBackMap[idx].routine, playBackMap[idx].useFloatsLongs,
-                                playBackMap[idx].uniqueIndex, playBackMap[idx].saveLastX, playBackMap[idx].newXedit);
-        }
+        callButtonFunc_playback(idx);
     }
 
     SetWindowText(GetDlgItem(calcMainWindow, RPN_PLAYBACK), "Run"); // Reset button text
@@ -5868,7 +5847,7 @@ void RPN_inverse(void)
     else    // Inverse makes no sense in integer mode... will always be zero.
     {
         StackPopL();
-        StackPushL(0L);        
+        StackPushL(0L);
     }
 }
 
@@ -5948,7 +5927,7 @@ void blinkStack(uint8_t no_peek)
         GetDlgItemText(calcMainWindow, RPN_STACK_Y, tmp2, MAX_STACK_STRLEN);
         GetDlgItemText(calcMainWindow, RPN_STACK_Z, tmp3, MAX_STACK_STRLEN);
         GetDlgItemText(calcMainWindow, RPN_STACK_T, tmp4, MAX_STACK_STRLEN);
-        
+
         SetDlgItemText(calcMainWindow, RPN_STACK_X, " ");
         SetDlgItemText(calcMainWindow, RPN_STACK_Y, " ");
         SetDlgItemText(calcMainWindow, RPN_STACK_Z, " ");
