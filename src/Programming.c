@@ -45,6 +45,14 @@ double  debugValue = 0.0;
 uint8_t dinputDebugInProgress = 0;
 uint8_t RegisterToInput = 0;
 
+#define LOOP_REG_H   0
+#define LOOP_REG_HC  1
+#define LOOP_REG_I   2
+#define LOOP_REG_IC  3
+#define LOOP_REG_J   4
+#define LOOP_REG_JC  5
+int32_t LOOPS[6] = {0,0,0,0,0,0};
+
 extern void Macro_ExchXi(void);
 extern void Macro_Jump(void);
 extern void Macro_LblH(void);
@@ -90,6 +98,12 @@ extern void Macro_GsbD(void);
 extern void Macro_GsbE(void);
 extern void Macro_GsbF(void);
 extern void Macro_GsbG(void);
+extern void Macro_STOH(void);
+extern void Macro_STOI(void);
+extern void Macro_STOJ(void);
+extern void Macro_STOHC(void);
+extern void Macro_STOIC(void);
+extern void Macro_STOJC(void);
 extern void Macro_Return(void);
 extern void Macro_SFx(void);
 extern void Macro_CFx(void);
@@ -111,13 +125,6 @@ extern void Macro_REV(void);
 extern void Macro_EDIT(void);
 extern void Macro_Debug(void);
 extern void Macro_Step(void);
-extern void Macro_LoopA(void);
-extern void Macro_LoopB(void);
-extern void Macro_LoopC(void);
-extern void Macro_LoopD(void);
-extern void Macro_LoopE(void);
-extern void Macro_LoopF(void);
-extern void Macro_LoopG(void);
 extern void Macro_LoopH(void);
 extern void Macro_LoopI(void);
 extern void Macro_LoopJ(void);
@@ -134,37 +141,37 @@ struct funcStruct Program1_funcs[MAX_FUNCS] =
     {FN1,   UNI_LBLA,       USES_FL,    ALLOWREC,   ' ',    "Lbl A",    YES_L,      X_NEW,   Macro_LblA,     T_LBLA,     H_LABELS},
     {FN2,   UNI_GOTOA,      USES_FL,    ALLOWREC,   ' ',    "Goto A",   YES_L,      X_NEW,   Macro_GotoA,    T_GOTOA,    H_GOTOS},
     {FN3,   UNI_GSBA,       USES_FL,    ALLOWREC,   ' ',    "Gsb A",    YES_L,      X_NEW,   Macro_GsbA,     T_GSBA,     H_GOSUBS},
-    {FN4,   UNI_LOOPA,      USES_FL,    ALLOWREC,   ' ',    "Loop A",   YES_L,      X_NEW,   Macro_LoopA,    T_LOOPA,    H_LOOPA},
+    {FN4,   UNI_RET,        USES_FL,    ALLOWREC,   ' ',    "Return",   YES_L,      X_NEW,   Macro_Return,   T_RETURN,   H_RETURN},
 
     {FN5,   UNI_LBLB,       USES_FL,    ALLOWREC,   ' ',    "Lbl B",    YES_L,      X_NEW,   Macro_LblB,     T_LBLB,     H_LABELS},
     {FN6,   UNI_GOTOB,      USES_FL,    ALLOWREC,   ' ',    "Goto B",   YES_L,      X_NEW,   Macro_GotoB,    T_GOTOB,    H_GOTOS},
     {FN7,   UNI_GSBB,       USES_FL,    ALLOWREC,   ' ',    "Gsb B",    YES_L,      X_NEW,   Macro_GsbB,     T_GSBB,     H_GOSUBS},
-    {FN8,   UNI_LOOPB,      USES_FL,    ALLOWREC,   ' ',    "Loop B",   YES_L,      X_NEW,   Macro_LoopB,    T_LOOPB,    H_LOOPB},
+    {FN8,   UNI_SETH,       USES_FL,    ALLOWREC,   ' ',    "Set H",    YES_L,      X_NEW,   Macro_STOH,     T_SETH,     H_SETH},
 
     {FN9,   UNI_LBLC,       USES_FL,    ALLOWREC,   ' ',    "Lbl C",    YES_L,      X_NEW,   Macro_LblC,     T_LBLC,     H_LABELS},
     {FN10,  UNI_GOTOC,      USES_FL,    ALLOWREC,   ' ',    "Goto C",   YES_L,      X_NEW,   Macro_GotoC,    T_GOTOC,    H_GOTOS},
     {FN11,  UNI_GSBC,       USES_FL,    ALLOWREC,   ' ',    "Gsb C",    YES_L,      X_NEW,   Macro_GsbC,     T_GSBC,     H_GOSUBS},
-    {FN12,  UNI_LOOPC,      USES_FL,    ALLOWREC,   ' ',    "Loop C",   YES_L,      X_NEW,   Macro_LoopC,    T_LOOPC,    H_LOOPC},
+    {FN12,  UNI_SETHC,      USES_FL,    ALLOWREC,   ' ',    "Set H'",   YES_L,      X_NEW,   Macro_STOHC,    T_SETHC,    H_SETHC},
 
     {FN13,  UNI_LBLD,       USES_FL,    ALLOWREC,   ' ',    "Lbl D",    YES_L,      X_NEW,   Macro_LblD,     T_LBLD,     H_LABELS},
     {FN14,  UNI_GOTOD,      USES_FL,    ALLOWREC,   ' ',    "Goto D",   YES_L,      X_NEW,   Macro_GotoD,    T_GOTOD,    H_GOTOS},
     {FN15,  UNI_GSBD,       USES_FL,    ALLOWREC,   ' ',    "Gsb D",    YES_L,      X_NEW,   Macro_GsbD,     T_GSBD,     H_GOSUBS},
-    {FN16,  UNI_LOOPD,      USES_FL,    ALLOWREC,   ' ',    "Loop D",   YES_L,      X_NEW,   Macro_LoopD,    T_LOOPD,    H_LOOPD},
+    {FN16,  UNI_SETI,       USES_FL,    ALLOWREC,   ' ',    "Set I",    YES_L,      X_NEW,   Macro_STOI,     T_SETI,     H_SETI},
 
     {FN17,  UNI_LBLE,       USES_FL,    ALLOWREC,   ' ',    "Lbl E",    YES_L,      X_NEW,   Macro_LblE,     T_LBLE,     H_LABELS},
     {FN18,  UNI_GOTOE,      USES_FL,    ALLOWREC,   ' ',    "Goto E",   YES_L,      X_NEW,   Macro_GotoE,    T_GOTOE,    H_GOTOS},
     {FN19,  UNI_GSBE,       USES_FL,    ALLOWREC,   ' ',    "Gsb E",    YES_L,      X_NEW,   Macro_GsbE,     T_GSBE,     H_GOSUBS},
-    {FN20,  UNI_LOOPE,      USES_FL,    ALLOWREC,   ' ',    "Loop E",   YES_L,      X_NEW,   Macro_LoopE,    T_LOOPE,    H_LOOPE},
+    {FN20,  UNI_SETIC,      USES_FL,    ALLOWREC,   ' ',    "Set I'",   YES_L,      X_NEW,   Macro_STOIC,    T_SETIC,    H_SETIC},
 
     {FN21,  UNI_LBLF,       USES_FL,    ALLOWREC,   ' ',    "Lbl F",    YES_L,      X_NEW,   Macro_LblF,     T_LBLF,     H_LABELS},
     {FN22,  UNI_GOTOF,      USES_FL,    ALLOWREC,   ' ',    "Goto F",   YES_L,      X_NEW,   Macro_GotoF,    T_GOTOF,    H_GOTOS},
     {FN23,  UNI_GSBF,       USES_FL,    ALLOWREC,   ' ',    "Gsb F",    YES_L,      X_NEW,   Macro_GsbF,     T_GSBF,     H_GOSUBS},
-    {FN24,  UNI_LOOPF,      USES_FL,    ALLOWREC,   ' ',    "Loop F",   YES_L,      X_NEW,   Macro_LoopF,    T_LOOPF,    H_LOOPF},
+    {FN24,  UNI_SETJ,       USES_FL,    ALLOWREC,   ' ',    "Set J" ,   YES_L,      X_NEW,   Macro_STOJ,     T_SETJ,     H_SETJ},
 
     {FN25,  UNI_LBLG,       USES_FL,    ALLOWREC,   ' ',    "Lbl G",    YES_L,      X_NEW,   Macro_LblG,     T_LBLG,     H_LABELS},
     {FN26,  UNI_GOTOG,      USES_FL,    ALLOWREC,   ' ',    "Goto G",   YES_L,      X_NEW,   Macro_GotoG,    T_GOTOG,    H_GOTOS},
     {FN27,  UNI_GSBG,       USES_FL,    ALLOWREC,   ' ',    "Gsb G",    YES_L,      X_NEW,   Macro_GsbG,     T_GSBG,     H_GOSUBS},
-    {FN28,  UNI_LOOPG,      USES_FL,    ALLOWREC,   ' ',    "Loop G",   YES_L,      X_NEW,   Macro_LoopG,    T_LOOPG,    H_LOOPG},
+    {FN28,  UNI_SETJC,      USES_FL,    ALLOWREC,   ' ',    "Set J'",   YES_L,      X_NEW,   Macro_STOJC,    T_SETJC,    H_SETJC},
 
     {FN29,  UNI_LBLH,       USES_FL,    ALLOWREC,   ' ',    "Lbl H",    YES_L,      X_NEW,   Macro_LblH,     T_LBLH,     H_LABELS},
     {FN30,  UNI_GOTOH,      USES_FL,    ALLOWREC,   ' ',    "Goto H",   YES_L,      X_NEW,   Macro_GotoH,    T_GOTOH,    H_GOTOS},
@@ -174,12 +181,13 @@ struct funcStruct Program1_funcs[MAX_FUNCS] =
     {FN33,  UNI_LBLI,       USES_FL,    ALLOWREC,   ' ',    "Lbl I",    YES_L,      X_NEW,   Macro_LblI,     T_LBLI,     H_LABELS},
     {FN34,  UNI_GOTOI,      USES_FL,    ALLOWREC,   ' ',    "Goto I",   YES_L,      X_NEW,   Macro_GotoI,    T_GOTOI,    H_GOTOS},
     {FN35,  UNI_GSBI,       USES_FL,    ALLOWREC,   ' ',    "Gsb I",    YES_L,      X_NEW,   Macro_GsbI,     T_GSBI,     H_GOSUBS},
-    {FN36,  UNI_HALT,       USES_FL,    ALLOWREC,   ' ',    "Halt",     YES_L,      X_NEW,   Macro_Halt,     T_HALT,     H_HALT},
+    {FN36,  UNI_LOOPI,      USES_FL,    ALLOWREC,   ' ',    "Loop I",   YES_L,      X_NEW,   Macro_LoopI,    T_LOOPI,    H_LOOPI},
 
     {FN37,  UNI_LBLJ,       USES_FL,    ALLOWREC,   ' ',    "Lbl J",    YES_L,      X_NEW,   Macro_LblJ,     T_LBLJ,     H_LABELS},
     {FN38,  UNI_GOTOJ,      USES_FL,    ALLOWREC,   ' ',    "Goto J",   YES_L,      X_NEW,   Macro_GotoJ,    T_GOTOJ,    H_GOTOS},
     {FN39,  UNI_GSBJ,       USES_FL,    ALLOWREC,   ' ',    "Gsb J",    YES_L,      X_NEW,   Macro_GsbJ,     T_GSBJ,     H_GOSUBS},
-    {FN40,  UNI_RET,        USES_FL,    ALLOWREC,   ' ',    "Return",   YES_L,      X_NEW,   Macro_Return,   T_RETURN,   H_RETURN}
+    {FN40,  UNI_LOOPJ,      USES_FL,    ALLOWREC,   ' ',    "Loop J",   YES_L,      X_NEW,   Macro_LoopJ,    T_LOOPJ,    H_LOOPJ}
+
 };
 
 struct funcStruct Program2_funcs[MAX_FUNCS] =
@@ -187,12 +195,12 @@ struct funcStruct Program2_funcs[MAX_FUNCS] =
     {FN1,   UNI_GOTOIND,    USES_FL,    ALLOWREC,   ' ',    "Goto(i)",  YES_L,      X_NEW,   Macro_GotoInd,  T_GOTOIND,  H_GOTOIND},
     {FN2,   UNI_GOSUBIND,   USES_FL,    ALLOWREC,   ' ',    "Gsb(i)",   YES_L,      X_NEW,   Macro_GosubInd, T_GSBIND,   H_GSBIND},
     {FN3,   UNI_PAUSE,      USES_FL,    ALLOWREC,   ' ',    "Pause",    YES_L,      X_NEW,   Macro_Pause,    T_PAUSE,    H_PAUSE},
-    {FN4,   UNI_BEEP,       USES_FL,    ALLOWREC,   ' ',    "Beep",     YES_L,      X_NEW,   Macro_Beep,     T_BEEP,     H_BEEP},
+    {FN4,   UNI_HALT,       USES_FL,    ALLOWREC,   ' ',    "Halt",     YES_L,      X_NEW,   Macro_Halt,     T_HALT,     H_HALT},
 
     {FN5,   UNI_INPA,       USES_FL,    ALLOWREC,   ' ',    "Inp R0",   YES_L,      X_NEW,   Macro_InpA,     T_INPA,     H_INPA},
     {FN6,   UNI_INPB,       USES_FL,    ALLOWREC,   ' ',    "Inp R1",   YES_L,      X_NEW,   Macro_InpB,     T_INPB,     H_INPB},
     {FN7,   UNI_INPC,       USES_FL,    ALLOWREC,   ' ',    "Inp R2",   YES_L,      X_NEW,   Macro_InpC,     T_INPC,     H_INPC},
-    {FN8,   UNI_INPD,       USES_FL,    ALLOWREC,   ' ',    "Inp R3",   YES_L,      X_NEW,   Macro_InpD,     T_INPD,     H_INPD},
+    {FN8,   UNI_BEEP,       USES_FL,    ALLOWREC,   ' ',    "Beep",     YES_L,      X_NEW,   Macro_Beep,     T_BEEP,     H_BEEP},
 
     {FN9,   UNI_SFX,        USES_FL,    ALLOWREC,   ' ',    "SFx",      YES_L,      X_NEW,   Macro_SFx,      T_SFX,      H_SFX},
     {FN10,  UNI_CFX,        USES_FL,    ALLOWREC,   ' ',    "CFx",      YES_L,      X_NEW,   Macro_CFx,      T_CFX,      H_CFX},
@@ -247,30 +255,47 @@ void Macro_LblH(void) {}    // Function does nothing but anchors a label
 void Macro_LblI(void) {}    // Function does nothing but anchors a label
 void Macro_LblJ(void) {}    // Function does nothing but anchors a label
 
-int FindProgrammingLabel(uint16_t uniqueIdx)
+int FindProgrammingLabel(uint16_t label, uint8_t forwards)
 {
     int j;
-    
-    // ---------------------------------------------------------------------
-    // Scan forwards from the current playpack position and wrap as needed.
-    // This mimics the behavior of most of the classic HP calculators.
-    // ---------------------------------------------------------------------
-    for (j = 0; j < playBackEndIdx; j++)
+
+    if (forwards)
     {
-        int idx = (j+currentPlaybackIdx) % playBackEndIdx;
-        if (playBackMap[playBack[idx]].uniqueIndex == uniqueIdx)
+        // ---------------------------------------------------------------------
+        // Scan forwards from the current playpack position and wrap as needed.
+        // This is the same way many classic HP calculators do the search.
+        // ---------------------------------------------------------------------
+        for (j = 0; j < playBackEndIdx; j++)
         {
-            return idx;  // Label found...
+            int idx = (currentPlaybackIdx + j) % playBackEndIdx;
+            if (playBackMap[playBack[idx]].uniqueIndex == label)
+            {
+                return idx;  // Label found...
+            }
+        }
+    }
+    else //Scan Backwards... for improved Looping logic
+    {
+        // ---------------------------------------------------------------------
+        // Scan backwards from the current playpack position and wrap as needed.
+        // ---------------------------------------------------------------------
+        for (j = 0; j < playBackEndIdx; j++)
+        {
+            int idx = (currentPlaybackIdx - j) % playBackEndIdx;
+            if (playBackMap[playBack[idx]].uniqueIndex == label)
+            {
+                return idx;  // Label found...
+            }
         }
     }
     return -1; // No label found
 }
 
-void rpn_goto(uint16_t uniqueIdx)
+void rpn_goto(uint16_t uniqueIdx, uint8_t forwards)
 {
     if (macroPlayback == TRUE)
     {
-        int label_idx = FindProgrammingLabel(uniqueIdx);
+        int label_idx = FindProgrammingLabel(uniqueIdx, forwards);
         if (label_idx >= 0)
         {
             currentPlaybackIdx = label_idx;
@@ -284,16 +309,16 @@ void rpn_goto(uint16_t uniqueIdx)
     }
 }
 
-void Macro_GotoA(void)  {rpn_goto(UNI_LBLA);}
-void Macro_GotoB(void)  {rpn_goto(UNI_LBLB);}
-void Macro_GotoC(void)  {rpn_goto(UNI_LBLC);}
-void Macro_GotoD(void)  {rpn_goto(UNI_LBLD);}
-void Macro_GotoE(void)  {rpn_goto(UNI_LBLE);}
-void Macro_GotoF(void)  {rpn_goto(UNI_LBLF);}
-void Macro_GotoG(void)  {rpn_goto(UNI_LBLG);}
-void Macro_GotoH(void)  {rpn_goto(UNI_LBLH);}
-void Macro_GotoI(void)  {rpn_goto(UNI_LBLI);}
-void Macro_GotoJ(void)  {rpn_goto(UNI_LBLJ);}
+void Macro_GotoA(void)  {rpn_goto(UNI_LBLA, 1);}
+void Macro_GotoB(void)  {rpn_goto(UNI_LBLB, 1);}
+void Macro_GotoC(void)  {rpn_goto(UNI_LBLC, 1);}
+void Macro_GotoD(void)  {rpn_goto(UNI_LBLD, 1);}
+void Macro_GotoE(void)  {rpn_goto(UNI_LBLE, 1);}
+void Macro_GotoF(void)  {rpn_goto(UNI_LBLF, 1);}
+void Macro_GotoG(void)  {rpn_goto(UNI_LBLG, 1);}
+void Macro_GotoH(void)  {rpn_goto(UNI_LBLH, 1);}
+void Macro_GotoI(void)  {rpn_goto(UNI_LBLI, 1);}
+void Macro_GotoJ(void)  {rpn_goto(UNI_LBLJ, 1);}
 
 void RPN_gosub(uint16_t uniqueIdx)
 {
@@ -302,7 +327,7 @@ void RPN_gosub(uint16_t uniqueIdx)
         if (MacroStackIdx < MAX_MACRO_STACK - 1)
         {
             MacroStack[MacroStackIdx++] = currentPlaybackIdx;
-            rpn_goto(uniqueIdx);
+            rpn_goto(uniqueIdx, 1);
         }
         else
         {
@@ -393,7 +418,7 @@ void Macro_XEY(void)
     else
     {
         CheckMacroCondition(STACKL[STK_X] == STACKL[STK_Y]);
-    }    
+    }
 }
 
 
@@ -485,7 +510,7 @@ void Macro_TFx(void)
 {
     uint8_t iX = (uint8_t)PopStackInteger();
     uint32_t mask = (0x00000001 << iX);
-    
+
     if (iX == 32) CheckMacroCondition(progModeCarry);
     else
     if (iX == 33) CheckMacroCondition(progModeOverflow);
@@ -816,7 +841,7 @@ void Macro_GotoInd(void)
                 case 9:  uniqueLabel=UNI_LBLJ; break;
             }
 
-            label_idx = FindProgrammingLabel(uniqueLabel);
+            label_idx = FindProgrammingLabel(uniqueLabel, 1);
             if (label_idx >= 0)
             {
                 currentPlaybackIdx = label_idx;
@@ -863,7 +888,7 @@ void Macro_GosubInd(void)
                     case 9:  uniqueLabel=UNI_LBLJ; break;
                 }
 
-                label_idx = FindProgrammingLabel(uniqueLabel);
+                label_idx = FindProgrammingLabel(uniqueLabel, 1);
                 if (label_idx >= 0)
                 {
                     currentPlaybackIdx = label_idx;
@@ -901,7 +926,7 @@ void Macro_Halt(void)
 BOOL CALLBACK inputDebugValue(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
 {
     static char tmp[64];
-    
+
     switch(wMessage)
     {
     case WM_INITDIALOG:
@@ -1151,7 +1176,7 @@ void DebuggerStackVal(char id, enum StackPosition_t pos)
     }
     else
     {
-        MakeCompSciStr(STACKL[pos], tmp2);        
+        MakeCompSciStr(STACKL[pos], tmp2);
         sprintf(tmp, " %c: %-20s", id, tmp2);
     }
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
@@ -1178,7 +1203,7 @@ void UpdateDebugRegs(void)
 
     sprintf(tmp, " ");
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
-    
+
     sprintf(tmp, " Main Stack");
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
@@ -1195,6 +1220,30 @@ void UpdateDebugRegs(void)
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
     sprintf(tmp, " Flags: 0x%08X", progFlags);
+    SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+
+    sprintf(tmp, " H : %d", LOOPS[LOOP_REG_H]);
+    makeInternational(tmp);
+    SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+
+    sprintf(tmp, " H': %d", LOOPS[LOOP_REG_HC]);
+    makeInternational(tmp);
+    SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+
+    sprintf(tmp, " I : %d", LOOPS[LOOP_REG_I]);
+    makeInternational(tmp);
+    SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+
+    sprintf(tmp, " I': %d", LOOPS[LOOP_REG_IC]);
+    makeInternational(tmp);
+    SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+
+    sprintf(tmp, " J : %d", LOOPS[LOOP_REG_J]);
+    makeInternational(tmp);
+    SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
+
+    sprintf(tmp, " J': %d", LOOPS[LOOP_REG_JC]);
+    makeInternational(tmp);
     SendDlgItemMessage(debugTraceWindow, TRACE_REGS1, LB_ADDSTRING, 0, (LONG) ((LPSTR) tmp));
 
     sprintf(tmp, " ");
@@ -1263,7 +1312,7 @@ void UpdateDebugRegs(void)
         if (progMode == PROG_FLOAT)
         {
             uint8_t *ptr = (uint8_t *)STO;
-            for (i = 0; i < sizeof(STO); i++)    
+            for (i = 0; i < sizeof(STO); i++)
             {
                 checksum += *ptr++;
             }
@@ -1271,7 +1320,7 @@ void UpdateDebugRegs(void)
         else
         {
             uint8_t *ptr = (uint8_t *)STOL;
-            for (i = 0; i < sizeof(STOL); i++)    
+            for (i = 0; i < sizeof(STOL); i++)
             {
                 checksum += *ptr++;
             }
@@ -1329,259 +1378,266 @@ void UpdateDebugProgram(int resetProgramList)
     }
 }
 
-// --------------------------------------------------------------------------------------
-// Handles both floating point and PROG_LONG Registers depending on which mode we are in.
-// --------------------------------------------------------------------------------------
-void DecrementAndLoop(int index, uint16_t uniqueLabel)
+void Macro_STOH(void)
 {
-    if (macroPlayback == TRUE)
-    {
-        if (progMode == PROG_FLOAT)
-        {
-            STO[index] -= 1.0;
-            if ((int64_t) STO[index] > 0)
-            {
-                rpn_goto(uniqueLabel);
-            }
-        }
-        else
-        {
-            STOL[index]--;
-            if (STOL[index] > 0L)
-            {
-                rpn_goto(uniqueLabel);
-            }
-        }
-    }
+    LOOPS[LOOP_REG_H] = PopStackInteger();
 }
 
-void Macro_LoopA(void)
+void Macro_STOI(void)
 {
-    DecrementAndLoop(0, UNI_LBLA);
+    LOOPS[LOOP_REG_I] = PopStackInteger();
 }
 
-void Macro_LoopB(void)
+void Macro_STOJ(void)
 {
-    DecrementAndLoop(1, UNI_LBLB);
+    LOOPS[LOOP_REG_J] = PopStackInteger();
 }
 
-void Macro_LoopC(void)
+void Macro_STOHC(void)
 {
-    DecrementAndLoop(2, UNI_LBLC);
+    LOOPS[LOOP_REG_HC] = PopStackInteger();
 }
 
-void Macro_LoopD(void)
+void Macro_STOIC(void)
 {
-    DecrementAndLoop(3, UNI_LBLD);
+    LOOPS[LOOP_REG_IC] = PopStackInteger();
 }
 
-void Macro_LoopE(void)
+void Macro_STOJC(void)
 {
-    DecrementAndLoop(4, UNI_LBLE);
-}
-
-void Macro_LoopF(void)
-{
-    DecrementAndLoop(5, UNI_LBLF);
-}
-
-void Macro_LoopG(void)
-{
-    DecrementAndLoop(6, UNI_LBLG);
+    LOOPS[LOOP_REG_JC] = PopStackInteger();
 }
 
 void Macro_LoopH(void)
 {
-    DecrementAndLoop(7, UNI_LBLH);
+    // If we are less than the target, drive towards it
+    if (LOOPS[LOOP_REG_H] < LOOPS[LOOP_REG_HC])
+    {
+        if (++LOOPS[LOOP_REG_H] < LOOPS[LOOP_REG_HC])
+        {
+            rpn_goto(UNI_LBLH, 0); // Jump BACKWARDS
+        }
+    }
+    // If we are greater than the target, drive towards it
+    else if (LOOPS[LOOP_REG_H] > LOOPS[LOOP_REG_HC])
+    {
+        if (--LOOPS[LOOP_REG_H] > LOOPS[LOOP_REG_HC])
+        {
+            rpn_goto(UNI_LBLH, 0); // Jump BACKWARDS
+        }
+    }
+    // else were are at target - do not branch
 }
 
 void Macro_LoopI(void)
 {
-    DecrementAndLoop(8, UNI_LBLI);
+    // If we are less than the target, drive towards it
+    if (LOOPS[LOOP_REG_I] < LOOPS[LOOP_REG_IC])
+    {
+        if (++LOOPS[LOOP_REG_I] < LOOPS[LOOP_REG_IC])
+        {
+            rpn_goto(UNI_LBLI, 0); // Jump BACKWARDS
+        }
+    }
+    // If we are greater than the target, drive towards it
+    else if (LOOPS[LOOP_REG_I] > LOOPS[LOOP_REG_IC])
+    {
+        if (--LOOPS[LOOP_REG_I] > LOOPS[LOOP_REG_IC])
+        {
+            rpn_goto(UNI_LBLI, 0); // Jump BACKWARDS
+        }
+    }
+    // else were are at target - do not branch
 }
 
 void Macro_LoopJ(void)
 {
-    DecrementAndLoop(9, UNI_LBLJ);
+    // If we are less than the target, drive towards it
+    if (LOOPS[LOOP_REG_J] < LOOPS[LOOP_REG_JC])
+    {
+        if (++LOOPS[LOOP_REG_J] < LOOPS[LOOP_REG_JC])
+        {
+            rpn_goto(UNI_LBLJ, 0); // Jump BACKWARDS
+        }
+    }
+    // If we are greater than the target, drive towards it
+    else if (LOOPS[LOOP_REG_J] > LOOPS[LOOP_REG_JC])
+    {
+        if (--LOOPS[LOOP_REG_J] > LOOPS[LOOP_REG_JC])
+        {
+            rpn_goto(UNI_LBLJ, 0); // Jump BACKWARDS
+        }
+    }
+    // else were are at target - do not branch
 }
 
 void Macro_DSZi(void)
 {
-    if (macroPlayback == TRUE)
+    if (indirectRegister > 0)
     {
-        if (indirectRegister > 0)
+        // When we reach zero, we skip the next instruction
+        if (--indirectRegister == 0)
         {
-            if (--indirectRegister == 0)
-            {
-                currentPlaybackIdx++;
-            }
+            if (macroPlayback == TRUE) currentPlaybackIdx++;
         }
     }
 }
 
 void Macro_DSZ2i(void)
 {
-    if (macroPlayback == TRUE)
+    if ((indirectRegister >= 0) && (indirectRegister < MAX_STO+14))
     {
-        if ((indirectRegister >= 0) && (indirectRegister < MAX_STO))
+        if (indirectRegister >= MAX_STO+8) // Loop Counters
+        {
+            if (--LOOPS[indirectRegister - (MAX_STO+8)] == 0)
+            {
+                if (macroPlayback == TRUE) currentPlaybackIdx++;
+            }
+        }
+        else if (indirectRegister >= MAX_STO) // Stack Contents
+        {
+            if (progMode == PROG_FLOAT)
+            {
+                if ((int64_t)--STACK[indirectRegister-MAX_STO] == 0)
+                {
+                    if (macroPlayback == TRUE) currentPlaybackIdx++;
+                }
+            }
+            else
+            {
+                if (STACKL[indirectRegister-MAX_STO] == 0)
+                {
+                    if (macroPlayback == TRUE) currentPlaybackIdx++;
+                }
+            }
+        }
+        else // It's one of the normal R00-R99 registers
         {
             if (progMode == PROG_FLOAT)
             {
                 if ((int64_t)--STO[indirectRegister] == 0)
                 {
-                    currentPlaybackIdx++;
+                    if (macroPlayback == TRUE) currentPlaybackIdx++;
                 }
             }
             else
             {
                 if (STOL[indirectRegister] == 0)
                 {
-                    currentPlaybackIdx++;
+                    if (macroPlayback == TRUE) currentPlaybackIdx++;
                 }
             }
         }
     }
 }
 
-void Macro_Sto2i(void)
+void StoreIndirect(int32_t reg)
 {
-    if ((indirectRegister >= 0) && (indirectRegister < MAX_STO+8))
+    if ((reg >= 0) && (reg < MAX_STO+114))
     {
-        if (indirectRegister >= MAX_STO) 
+        if (reg >= MAX_STO+8) // Loop Contents
         {
-            if (progMode == PROG_FLOAT) 
+            if (progMode == PROG_FLOAT)
             {
-                STACK[STK_X+indirectRegister-MAX_STO] = STACK[STK_X]; 
+                LOOPS[reg-(MAX_STO+8)] = (int32_t)STACK[STK_X];
             }
-            else 
+            else
             {
-                STACKL[STK_X+indirectRegister-MAX_STO] = STACKL[STK_X];
+                LOOPS[reg-(MAX_STO+8)] = (int32_t)STACKL[STK_X];
+            }
+        }
+        else if (reg >= MAX_STO) // Stack Contents
+        {
+            if (progMode == PROG_FLOAT)
+            {
+                STACK[STK_X+reg-MAX_STO] = STACK[STK_X];
+            }
+            else
+            {
+                STACKL[STK_X+reg-MAX_STO] = STACKL[STK_X];
             }
         }
         else  // Must be one of the registers R00-R99
         {
             if (progMode == PROG_FLOAT)
             {
-                STO[indirectRegister] = STACK[STK_X];
+                STO[reg] = STACK[STK_X];
             }
             else
             {
-                STOL[indirectRegister] = STACKL[STK_X];
+                STOL[reg] = STACKL[STK_X];
             }
         }
         blinkXDisplay(FALSE);
     }
     else
     {
-        RPN_error("Register Out Of Range(R0 to R99, XYZT, ABCD)");
+        RPN_error("Indirect Register Out Of Range(R0 to R99, XYZT, ABCD, H'I'J')");
     }
 }
 
-void Macro_Rcl2i(void)
+void RecallIndirect(int32_t reg)
 {
-    if ((indirectRegister >= 0) && (indirectRegister < MAX_STO+8))
+    if ((reg >= 0) && (reg < MAX_STO+14))
     {
-        if (indirectRegister >= MAX_STO)
+        if (reg >= MAX_STO+8) // Loop Counters
         {
-            if (indirectRegister == MAX_STO+0) 
+            if (progMode == PROG_FLOAT)
             {
-                if (progMode == PROG_FLOAT)
-                {
-                    StackPush(STACK[STK_X+indirectRegister-MAX_STO]); 
-                }
-                else
-                {
-                    StackPushL(STACKL[STK_X+indirectRegister-MAX_STO]);
-                }
+                StackPush(LOOPS[reg-(MAX_STO+8)]);
+            }
+            else
+            {
+                StackPushL(LOOPS[reg-(MAX_STO+8)]);
+            }
+        }
+        else if (reg >= MAX_STO)  // Stack Contents
+        {
+            if (progMode == PROG_FLOAT)
+            {
+                StackPush(STACK[STK_X+reg-MAX_STO]);
+            }
+            else
+            {
+                StackPushL(STACKL[STK_X+reg-MAX_STO]);
             }
         }
         else  // Must be one of the registers R00-R99
         {
             if (progMode == PROG_FLOAT)
             {
-                StackPush(STO[indirectRegister]);
+                StackPush(STO[reg]);
             }
             else
             {
-                StackPushL(STOL[indirectRegister]);
-            }        
+                StackPushL(STOL[reg]);
+            }
         }
     }
     else
     {
-        RPN_error("Register Out Of Range(R0 to R99, XYZT, ABCD)");
-    }
+        RPN_error("Indirect Register Out Of Range(R0 to R99, XYZT, ABCD, H'I'J')");
+    }    
+}
+
+void Macro_Sto2i(void)
+{
+    StoreIndirect(indirectRegister);
 }
 
 void Macro_Sto2x(void)
 {
     int32_t x = PopStackInteger();
-    
-    if ((x >= 0) && (x < MAX_STO+8))
-    {
-        if (x >= MAX_STO) 
-        {
-            if (progMode == PROG_FLOAT) 
-            {
-                STACK[STK_X+x-MAX_STO] = STACK[STK_X]; 
-            }
-            else 
-            {
-                STACKL[STK_X+x-MAX_STO] = STACKL[STK_X];
-            }
-        }
-        else  // Must be one of the registers R00-R99
-        {
-            if (progMode == PROG_FLOAT)
-            {
-                STO[x] = STACK[STK_X];
-            }
-            else
-            {
-                STOL[x] = STACKL[STK_X];
-            }
-        }
-    }
-    else
-    {
-        RPN_error("Register Out Of Range(R0 to R99, XYZT, ABCD)");
-    }
+    StoreIndirect(x);
+}
+
+void Macro_Rcl2i(void)
+{
+    RecallIndirect(indirectRegister);
 }
 
 void Macro_Rcl2x(void)
 {
     int32_t x = PopStackInteger();
-    
-    if ((x >= 0) && (x < MAX_STO+8))
-    {
-        if (x >= MAX_STO)
-        {
-            if (x == MAX_STO+0) 
-            {
-                if (progMode == PROG_FLOAT)
-                {
-                    StackPush(STACK[STK_X+x-MAX_STO]); 
-                }
-                else
-                {
-                    StackPushL(STACKL[STK_X+x-MAX_STO]);
-                }
-            }
-        }
-        else  // Must be one of the registers R00-R99
-        {
-            if (progMode == PROG_FLOAT)
-            {
-                StackPush(STO[x]);
-            }
-            else
-            {
-                StackPushL(STOL[x]);
-            }        
-        }
-    }
-    else
-    {
-        RPN_error("Register Out Of Range(R0 to R99, XYZT, ABCD)");
-    }
+    RecallIndirect(x);
 }

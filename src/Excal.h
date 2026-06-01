@@ -725,46 +725,45 @@ enum UniqueButtonIndexTag
     UNI_MIRROR,
     UNI_IEEE,
 
-    UNI_LBLA,
     UNI_GOTOA,
-    UNI_GSBA,
-    UNI_LOOPA,
-    UNI_LBLB,
     UNI_GOTOB,
-    UNI_GSBB,
-    UNI_LOOPB,
-    UNI_LBLC,
     UNI_GOTOC,
-    UNI_GSBC,
-    UNI_LOOPC,
-    UNI_LBLD,
     UNI_GOTOD,
-    UNI_GSBD,
-    UNI_LOOPD,
-    UNI_LBLE,
     UNI_GOTOE,
-    UNI_GSBE,
-    UNI_LOOPE,
-    UNI_LBLF,
     UNI_GOTOF,
-    UNI_GSBF,
-    UNI_LOOPF,
-    UNI_LBLG,
     UNI_GOTOG,
-    UNI_GSBG,
-    UNI_LOOPG,
-    UNI_LBLH,
     UNI_GOTOH,
-    UNI_GSBH,
-    UNI_LOOPH,
-    UNI_LBLI,
     UNI_GOTOI,
-    UNI_GSBI,
-    UNI_LOOPI,
-    UNI_LBLJ,
     UNI_GOTOJ,
+    UNI_GSBA,
+    UNI_GSBB,
+    UNI_GSBC,
+    UNI_GSBD,
+    UNI_GSBE,
+    UNI_GSBF,
+    UNI_GSBG,
+    UNI_GSBH,
+    UNI_GSBI,
     UNI_GSBJ,
+    UNI_LBLA,
+    UNI_LBLB,
+    UNI_LBLC,
+    UNI_LBLD,
+    UNI_LBLE,
+    UNI_LBLF,
+    UNI_LBLG,
+    UNI_LBLH,
+    UNI_LBLI,
+    UNI_LBLJ,
+    UNI_LOOPH,
+    UNI_LOOPI,
     UNI_LOOPJ,
+    UNI_SETH,
+    UNI_SETHC,
+    UNI_SETI,
+    UNI_SETIC,
+    UNI_SETJ,
+    UNI_SETJC,
 
     UNI_RET,
     UNI_HALT,
@@ -773,7 +772,6 @@ enum UniqueButtonIndexTag
     UNI_INPA,
     UNI_INPB,
     UNI_INPC,
-    UNI_INPD,
     UNI_SFX,
     UNI_CFX,
     UNI_TFX,
@@ -881,6 +879,7 @@ extern uint8_t depreciationType;
 #define MAX_STO 100
 extern double STO[MAX_STO];
 extern PROG_LONG STOL[MAX_STO];
+extern int32_t LOOPS[6];
 
 extern uint8_t macroPlayback;
 extern int16_t currentPlaybackIdx;
@@ -1733,26 +1732,31 @@ extern uint32_t userTicks;
 #define H_DEBUG         "Enter Program Debug Mode"
 #define T_BEEP          "Beep"
 #define H_BEEP          "Emit a single beep tone."
-#define T_LOOPA         "Loop A"
-#define H_LOOPA         "Decrement R0 register, if above zero branch to A."
-#define T_LOOPB         "Loop B"
-#define H_LOOPB         "Decrement R1 register, if above zero branch to B."
-#define T_LOOPC         "Loop C"
-#define H_LOOPC         "Decrement R2 register, if above zero branch to C."
-#define T_LOOPD         "Loop D"
-#define H_LOOPD         "Decrement R3 register, if above zero branch to D."
-#define T_LOOPE         "Loop E"
-#define H_LOOPE         "Decrement R4 register, if above zero branch to E."
-#define T_LOOPF         "Loop F"
-#define H_LOOPF         "Decrement R5 register, if above zero branch to F."
-#define T_LOOPG         "Loop G"
-#define H_LOOPG         "Decrement R6 register, if above zero branch to G."
+
+#define T_SETH          "Set H Counter"
+#define H_SETH          "Set the value for the H loop-counting register - this is the current/starting loop counter value."
+
+#define T_SETI          "Set I Counter"
+#define H_SETI          "Set the value for the I loop-counting register - this is the current/starting loop counter value."
+
+#define T_SETJ          "Set J Counter"
+#define H_SETJ          "Set the value for the J loop-counting register - this is the current/starting loop counter value."
+
+#define T_SETHC         "Set H Target"
+#define H_SETHC         "Set the value for the target H loop-counting register - this is the value the loop will drive towards."
+
+#define T_SETIC         "Set I Target"
+#define H_SETIC         "Set the value for the target I loop-counting register - this is the value the loop will drive towards."
+
+#define T_SETJC         "Set J Target"
+#define H_SETJC         "Set the value for the target J loop-counting register - this is the value the loop will drive towards."
+
 #define T_LOOPH         "Loop H"
-#define H_LOOPH         "Decrement R7 register, if above zero branch to H."
+#define H_LOOPH         "Increment or Decrement the H register towards H'\nIf it hasn't yet reached the target, branch to Label H"
 #define T_LOOPI         "Loop I"
-#define H_LOOPI         "Decrement R8 register, if above zero branch to I."
+#define H_LOOPI         "Increment or Decrement the I register towards I'\nIf it hasn't yet reached the target, branch to Label I"
 #define T_LOOPJ         "Loop J"
-#define H_LOOPJ         "Decrement R9 register, if above zero branch to J."
+#define H_LOOPJ         "Increment or Decrement the J register towards J'\nIf it hasn't yet reached the target, branch to Label J"
 #define T_XLTR0         "X < R0?"
 #define H_XLTR0         "Check if X is less than R0 and skip next instruction if true."
 #define T_XGTR0         "X > R0?"

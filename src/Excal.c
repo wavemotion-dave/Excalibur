@@ -54,7 +54,7 @@
                   "https://github.com/wavemotion-dave/Excalibur"      \
                   "\n\nThis version is BETA - Expect and report Bugs!"
 
-#define CONFIG_VERSION_MAIN 0xF017  // If this changes, we wipe EVERYTHING
+#define CONFIG_VERSION_MAIN 0xF018  // If this changes, we wipe EVERYTHING
 #define CONFIG_VERSION_SUB  0x0001  // If this changes, we reset x,y window position and reset constant tables (currency, physics constants, etc)
 
 #define END_OF_PROGRAM_STR "<End Of Program>"
@@ -1615,6 +1615,8 @@ void MemoryInit(void)
     }
     CFn = 0;
 
+    memset(LOOPS, 0x00, sizeof(LOOPS));
+
     memset(excaliburNotes, 0x00, sizeof(excaliburNotes));
 
     for (i = 0; i < MAX_MACROS; i++)
@@ -2575,6 +2577,7 @@ void RPN_clearStack(void)
             memset(cashFlow, 0x00, sizeof(cashFlow));
             memset(SUM, 0x00, sizeof(SUM));
             memset(FIN, 0x00, sizeof(FIN));
+            memset(LOOPS, 0x00, sizeof(LOOPS));
             CFn = 0;
 
             if (!macroPlayback)
@@ -3990,6 +3993,7 @@ void SaveToDisk(void)
         fwrite(&FIN,                sizeof(FIN),                1, outfile);
         fwrite(&cashFlow,           sizeof(cashFlow),           1, outfile);
         fwrite(&CFn,                sizeof(CFn),                1, outfile);
+        fwrite(&LOOPS,              sizeof(LOOPS),              1, outfile);
 
         fwrite(&currency1index,     sizeof(currency1index),     1, outfile);
         fwrite(&currency2index,     sizeof(currency2index),     1, outfile);
@@ -4111,6 +4115,7 @@ void ReadFromDisk(void)
         fread(&FIN,                sizeof(FIN),                1, infile);
         fread(&cashFlow,           sizeof(cashFlow),           1, infile);
         fread(&CFn,                sizeof(CFn),                1, infile);
+        fread(&LOOPS,              sizeof(LOOPS),              1, infile);
 
         fread(&currency1index,     sizeof(currency1index),     1, infile);
         fread(&currency2index,     sizeof(currency2index),     1, infile);
