@@ -35,7 +35,7 @@ The 3.XX series is still in BETA but is quite functional. You can find a link to
 the **Releases** section to the right of this page. If you find a problem, please report it via the Github Issues tracker at the top
 of this page (or contact me at daveber --AT-- gmail DOT com).
 
-<img width="786" height="449" alt="image" src="https://github.com/user-attachments/assets/f347d9e4-cf90-4561-8316-1cb3f1f7805e" />
+<img width="786" height="449" alt="image" src="https://github.com/user-attachments/assets/710ff685-e0a4-4c8f-b30a-927fb0814331" />
 <br>
 <br>
 
