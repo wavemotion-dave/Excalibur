@@ -54,6 +54,7 @@ uint8_t RegisterToInput = 0;
 int32_t LOOPS[6] = {0,0,0,0,0,0};
 
 extern void Macro_ExchXi(void);
+extern void Macro_ExchX2i(void);
 extern void Macro_Jump(void);
 extern void Macro_LblH(void);
 extern void Macro_GotoH(void);
@@ -124,7 +125,6 @@ extern void Macro_FWD(void);
 extern void Macro_REV(void);
 extern void Macro_EDIT(void);
 extern void Macro_Debug(void);
-extern void Macro_Step(void);
 extern void Macro_LoopH(void);
 extern void Macro_LoopI(void);
 extern void Macro_LoopJ(void);
@@ -135,6 +135,8 @@ extern void Macro_Rcl2i(void);
 extern void Macro_Sto2x(void);
 extern void Macro_Rcl2x(void);
 extern void Macro_Beep(void);
+extern void RecallIndirect(int32_t reg);
+extern void StoreIndirect(int32_t reg);
 
 struct funcStruct Program1_funcs[MAX_FUNCS] =
 {
@@ -224,8 +226,8 @@ struct funcStruct Program2_funcs[MAX_FUNCS] =
 
     {FN25,  UNI_STOIND,     USES_FL,    ALLOWREC,   ' ',    "Sto i",    YES_L,      X_NEW,   Macro_StoInd,   T_STOIND,   H_STOIND},
     {FN26,  UNI_RCLIND,     USES_FL,    ALLOWREC,   ' ',    "Rcl i",    YES_L,      X_NEW,   Macro_RclInd,   T_RCLIND,   H_RCLIND},
-    {FN27,  UNI_DSZI,       USES_FL,    ALLOWREC,   ' ',    "DSZ i",    YES_L,      X_NULL,  Macro_DSZi,     T_DSZ,      H_DSZ},
-    {FN28,  UNI_DSZ2I,      USES_FL,    ALLOWREC,   ' ',    "DSZ(i)",   YES_L,      X_NULL,  Macro_DSZ2i,    T_DSZ2I,    H_DSZ2I},
+    {FN27,  UNI_DSZI,       USES_FL,    ALLOWREC,   ' ',    "DSZ i",    YES_L,      X_NEW,   Macro_DSZi,     T_DSZ,      H_DSZ},
+    {FN28,  UNI_DSZ2I,      USES_FL,    ALLOWREC,   ' ',    "DSZ(i)",   YES_L,      X_NEW,   Macro_DSZ2i,    T_DSZ2I,    H_DSZ2I},
 
     {FN29,  UNI_STO2I,      USES_FL,    ALLOWREC,   ' ',    "Sto(i)",   YES_L,      X_NEW,   Macro_Sto2i,    T_STO2I,    H_STO2I},
     {FN30,  UNI_RCL2I,      USES_FL,    ALLOWREC,   ' ',    "Rcl(i)",   YES_L,      X_NEW,   Macro_Rcl2i,    T_RCL2I,    H_RCL2I},
@@ -233,14 +235,14 @@ struct funcStruct Program2_funcs[MAX_FUNCS] =
     {FN32,  UNI_RCL2X,      USES_FL,    ALLOWREC,   ' ',    "Rcl(x)",   YES_L,      X_NEW,   Macro_Rcl2x,    T_RCL2X,    H_RCL2X},
 
     {FN33,  UNI_EXCHXI,     USES_FL,    ALLOWREC,   ' ',    "X«»i",     YES_L,      X_NEW,   Macro_ExchXi,   T_EXCHXI,   H_EXCHXI},
-    {FN34,  UNI_TRACE,      USES_FL,    NORECORD,   ' ',    "TRACE",    YES_L,      X_NEW,   Macro_Trace,    T_TRACE,    H_TRACE},
-    {FN35,  UNI_STEP,       USES_FL,    NORECORD,   ' ',    "SST",      YES_L,      X_NULL,  Macro_Step,     T_STEP,     H_STEP},
-    {FN36,  UNI_DEBUG,      USES_FL,    NORECORD,   ' ',    "DEBUG",    YES_L,      X_NEW,   Macro_Debug,    T_DEBUG,    H_DEBUG},
+    {FN34,  UNI_EXCHX2I,    USES_FL,    ALLOWREC,   ' ',    "X«»(i)",   YES_L,      X_NEW,   Macro_ExchX2i,  T_EXCHX2I,  H_EXCHX2I},
+    {FN35,  UNI_TRACE,      USES_FL,    NORECORD,   ' ',    "TRACE",    YES_L,      X_NULL,  Macro_Trace,    T_TRACE,    H_TRACE},
+    {FN36,  UNI_DEBUG,      USES_FL,    NORECORD,   ' ',    "DEBUG",    YES_L,      X_NULL,  Macro_Debug,    T_DEBUG,    H_DEBUG},
 
-    {FN37,  UNI_MEDIT,      USES_FL,    NORECORD,   ' ',    "EDIT",     YES_L,      X_NEW,   Macro_EDIT,     T_MEDIT,    H_MEDIT},
-    {FN38,  UNI_FWD,        USES_FL,    NORECORD,   ' ',    "FWD",      YES_L,      X_NEW,   Macro_FWD,      T_FWD,      H_FWD},
-    {FN39,  UNI_REV,        USES_FL,    NORECORD,   ' ',    "REV",      YES_L,      X_NEW,   Macro_REV,      T_REV,      H_REV},
-    {FN40,  UNI_DEL,        USES_FL,    NORECORD,   ' ',    "DEL",      YES_L,      X_NEW,   Macro_DEL,      T_DEL,      H_DEL}
+    {FN37,  UNI_MEDIT,      USES_FL,    NORECORD,   ' ',    "PEDIT",    YES_L,      X_NULL,  Macro_EDIT,     T_MEDIT,    H_MEDIT},
+    {FN38,  UNI_FWD,        USES_FL,    NORECORD,   ' ',    "FWD",      YES_L,      X_NULL,  Macro_FWD,      T_FWD,      H_FWD},
+    {FN39,  UNI_REV,        USES_FL,    NORECORD,   ' ',    "REV",      YES_L,      X_NULL,  Macro_REV,      T_REV,      H_REV},
+    {FN40,  UNI_DEL,        USES_FL,    NORECORD,   ' ',    "DEL",      YES_L,      X_NULL,  Macro_DEL,      T_DEL,      H_DEL}
 };
 
 
@@ -709,23 +711,6 @@ void Macro_Trace(void)
     }
 }
 
-void Macro_Step(void)
-{
-    if (recModeON == 0)         // Single Step...
-    {
-        RPN_SingleStep();
-        if (currentPlaybackIdx < playBackEndIdx)
-        {
-            currentPlaybackIdx++;
-        }
-        else
-        {
-            currentPlaybackIdx=0;
-        }
-    }
-}
-
-
 void Macro_EDIT(void)
 {
     if (recModeON == 0)
@@ -782,6 +767,26 @@ void Macro_ExchXi(void)
     {
         indirectRegister = (int32_t)STACKL[STK_X];
         STACKL[STK_X] = (PROG_LONG)temp;
+    }
+}
+
+void Macro_ExchX2i(void)
+{
+    // TODO - extended registers?
+    if (indirectRegister >= 0 && indirectRegister < MAX_STO)
+    {
+        if (progMode == PROG_FLOAT)
+        {
+            double temp = STACK[STK_X];
+            STACK[STK_X] = STO[indirectRegister];
+            STO[indirectRegister] = temp;
+        }
+        else
+        {
+            PROG_LONG temp = STACKL[STK_X];
+            STACKL[STK_X] = STOL[indirectRegister];
+            STOL[indirectRegister] = temp;
+        }
     }
 }
 

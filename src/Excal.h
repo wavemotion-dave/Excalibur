@@ -334,6 +334,7 @@ extern void RPN_lastX(void);
 extern void RPN_store(void);
 extern void RPN_recall(void);
 extern void RPN_ExchangeReg(void);
+extern void RPN_Step(void);
 extern int GetMenuType(struct funcStruct *cFunc);
 extern void SetMenuType(int type);
 extern void SaveToDisk(void);
@@ -483,8 +484,6 @@ enum UniqueButtonIndexTag
     UNI_INVX,
     UNI_REC,
     UNI_EXREG,
-    UNI_COPY,
-    UNI_PASTE,
     UNI_SQRT,
     UNI_LN,
     UNI_LOG,
@@ -799,6 +798,7 @@ enum UniqueButtonIndexTag
     UNI_GOTOIND,
     UNI_GOSUBIND,
     UNI_EXCHXI,
+    UNI_EXCHX2I,
     UNI_TRACE,
     UNI_STEP,
     UNI_DEBUG,
@@ -966,8 +966,8 @@ extern uint32_t userTicks;
 #define RPN_INV                         137
 #define RPN_REC                         139
 #define RPN_EXREG                       140
-#define RPN_COPY                        141
-#define RPN_PASTE                       142
+#define RPN_STEP                        141
+#define RPN_CONST                       142
 #define RPN_SQRT                        143
 #define RPN_LN                          144
 #define RPN_LOG                         145
@@ -1726,31 +1726,24 @@ extern uint32_t userTicks;
 #define H_RCLIND        "Recalls the Indirect (i) register to the X register."
 #define T_HALT          "Halt Program"
 #define H_HALT          "Halts Program Execution"
-#define T_STEP          "Single Step Program"
-#define H_STEP          "Single Step Program"
+#define T_EXCHX2I       "Exchange X and (i)"
+#define H_EXCHX2I       "Exchange the value in X with the register pointed to by the Indirect (i) register."
 #define T_DEBUG         "Debug Program"
 #define H_DEBUG         "Enter Program Debug Mode"
 #define T_BEEP          "Beep"
 #define H_BEEP          "Emit a single beep tone."
-
 #define T_SETH          "Set H Counter"
 #define H_SETH          "Set the value for the H loop-counting register - this is the current/starting loop counter value."
-
 #define T_SETI          "Set I Counter"
 #define H_SETI          "Set the value for the I loop-counting register - this is the current/starting loop counter value."
-
 #define T_SETJ          "Set J Counter"
 #define H_SETJ          "Set the value for the J loop-counting register - this is the current/starting loop counter value."
-
 #define T_SETHC         "Set H Target"
 #define H_SETHC         "Set the value for the target H loop-counting register - this is the value the loop will drive towards."
-
 #define T_SETIC         "Set I Target"
 #define H_SETIC         "Set the value for the target I loop-counting register - this is the value the loop will drive towards."
-
 #define T_SETJC         "Set J Target"
 #define H_SETJC         "Set the value for the target J loop-counting register - this is the value the loop will drive towards."
-
 #define T_LOOPH         "Loop H"
 #define H_LOOPH         "Increment or Decrement the H register towards H'\nIf it hasn't yet reached the target, branch to Label H"
 #define T_LOOPI         "Loop I"
@@ -1768,7 +1761,7 @@ extern uint32_t userTicks;
 #define T_DSZ           "Decrement i Skip if Zero"
 #define H_DSZ           "Decrement the Indirect (i) Register and skip next instruction if zero."
 #define T_DSZ2I         "Decrement (i) Skip if Zero"
-#define H_DSZ2I         "Decrement the Register pointed to by the Indirect (i) Register and skip next instruction if zero."
+#define H_DSZ2I         "Decrement the Register pointed to by the Indirect (i) Register and skip next instruction if zero..\n\n0-99 = Register R00-R99\n100-107 = XYZT, ABCD\n108-113 = H'I'J'"
 #define T_TIMERPUSH     "Timer Push"
 #define H_TIMERPUSH     "Pushes current timer value onto the stack."
 #define T_STON_LB       "Short Tons to Lbs"
@@ -1780,13 +1773,13 @@ extern uint32_t userTicks;
 #define T_CLEARF        "Clear All 32 Flags"
 #define H_CLEARF        "Clear programming flags register to 0x00000000"
 #define T_STO2I         "Store (i)"
-#define H_STO2I         "Stores X to the register (R0-R99) pointed to by the Indirect (i) register"
+#define H_STO2I         "Stores X to the register pointed to by the Indirect (i) register.\n\n0-99 = Register R00-R99\n100-107 = XYZT, ABCD\n108-113 = H'I'J'"
 #define T_RCL2I         "Recall (i)"
-#define H_RCL2I         "Recalls value from the register (R0-R99) pointed to by the Indirect (i) register"
+#define H_RCL2I         "Recalls value from the register pointed to by the Indirect (i) register.\n\n0-99 = Register R00-R99\n100-107 = XYZT, ABCD\n108-113 = H'I'J'"
 #define T_STO2X         "Store (x)"
-#define H_STO2X         "Stores Y to the register (R0-R99) pointed to by the (X) register"
+#define H_STO2X         "Stores Y to the register pointed to by the (X) register (drops X).\n\n0-99 = Register R00-R99\n100-107 = XYZT, ABCD\n108-113 = H'I'J'"
 #define T_RCL2X         "Recall (x)"
-#define H_RCL2X         "Recalls value from the register (R0-R99) pointed to by (X) register"
+#define H_RCL2X         "Recalls value from the register pointed to by (X) register (drops X).\n\n0-99 = Register R00-R99\n100-107 = XYZT, ABCD\n108-113 = H'I'J'"
 #define T_CSINH         "Complex sinh"
 #define H_CSINH         "Complex sinh (X=Real, Y=Imaginary)"
 #define T_CCOSH         "Complex cosh"

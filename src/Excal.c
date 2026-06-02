@@ -42,10 +42,10 @@
 
 #define WINDOW_TITLE "Excalibur RPN Calculator"
 
-#define VERSION_STR "v3.XX-06"
+#define VERSION_STR "v3.XX-07"
 
 #define ABOUT_MSG "Excalibur for Windows 32-bit\n"                    \
-                  "Version 3.XX-06  -  June 1, 2026\n\n"              \
+                  "Version 3.XX-07  -  June 2, 2026\n\n"              \
                   "Copyright 1994-2026 David Bernazzani\n\n"          \
                   "Please read the disclaimer and understand the\n"   \
                   "accuracy and precision issues before using.\n\n"   \
@@ -1933,8 +1933,8 @@ struct funcStruct RPNkeys[] = {
     {RPN_INV,       UNI_INVX,   USES_FL, ALLOWREC, 'i', "", YES_L,  X_NEW,      RPN_inverse,        "Inverse X",            "Computes the inverse of X"},
     {RPN_REC,       UNI_REC,    USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_Record,         "Record Mode On/Off",   "When ON - Records button presses for playback."},
     {RPN_EXREG,     UNI_EXREG,  USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_ExchangeReg,    "Exchange X with Reg",  "Exchange X with one of the Registers (next digit/dp selects R0-R19)"},
-    {RPN_COPY,      UNI_COPY,   USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_Copy,           "Copy X Register",      "Copy X register to the clipboard"},
-    {RPN_PASTE,     UNI_PASTE,  USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_Paste,          "Paste X Register",     "Paste X register from the clipboard"},
+    {RPN_STEP,      UNI_STEP,   USES_FL, NORECORD, 'z', "", NO_L,   X_NULL,     RPN_Step,           "Single Step",          "Single Step the current program"},
+    {RPN_CONST,     UNI_CONST,  USES_FL, NORECORD, 'k', "", YES_L,  X_NEW,      RPN_const,          "Constants",            "Display a set of universal and user-defined constants"},
     {RPN_SQRT,      UNI_SQRT,   USES_FL, ALLOWREC, 'q', "", YES_L,  X_NEW,      SCI_sqrt,           "Square Root",          "Computes the Square Root of the value in X"},
     {RPN_LN,        UNI_LN,     USES_FL, ALLOWREC, 'g', "", YES_L,  X_NEW,      SCI_ln,             "Natural Logarithm",    "Computes the natural logarithm (base e) of X"},
     {RPN_LOG,       UNI_LOG,    USES_FL, ALLOWREC, ' ', "", YES_L,  X_NEW,      SCI_log,            "Base 10 Logarithm",    "Raises the base 10 logarithm of X"},
@@ -1988,8 +1988,8 @@ struct keyPosStruct RPNkeyPos[] = {
     {RPN_INV,       0,          0},
     {RPN_REC,       0,          0},
     {RPN_EXREG,     0,          0},
-    {RPN_COPY,      0,          0},
-    {RPN_PASTE,     0,          0},
+    {RPN_STEP,      0,          0},
+    {RPN_CONST,     0,          0},
     {RPN_SQRT,      0,          0},
     {RPN_LN,        0,          0},
     {RPN_LOG,       0,          0},
@@ -2383,11 +2383,11 @@ void ShowStack(void)
     {
         if (currentPlaybackIdx >= playBackEndIdx)
         {
-            sprintf(tmpStr, "%03d-<End Of Program>", currentPlaybackIdx);
+            sprintf(tmpStr, "%03d-<End Of Program>", currentPlaybackIdx+1);
         }
         else
         {
-            sprintf(tmpStr, "%03d-%s", currentPlaybackIdx, playBackMap[playBack[currentPlaybackIdx]].funcText);
+            sprintf(tmpStr, "%03d-%s", currentPlaybackIdx+1, playBackMap[playBack[currentPlaybackIdx]].funcText);
         }
 
         tmpStr[MAX_STACK_STRLEN] = CNULL;
@@ -5629,6 +5629,23 @@ void RPN_Record(void)
     ShowStatus();
 }
 
+void RPN_Step(void)
+{
+    if (recModeON == 0)         // Single Step...
+    {
+        RPN_SingleStep();
+        if (currentPlaybackIdx < playBackEndIdx)
+        {
+            currentPlaybackIdx++;
+        }
+        else
+        {
+            currentPlaybackIdx=0;
+        }
+    }
+}
+
+
 void ShowTrace(void)
 {
     MSG msg;
@@ -5686,12 +5703,20 @@ void RPN_Playback(void)
 
     SetWindowText(GetDlgItem(calcMainWindow, RPN_PLAYBACK), "Stop");
 
+    // ------------------------------------------------------------------------------
+    // If the macro is at the end, start over... otherwise use the last known index.
+    // ------------------------------------------------------------------------------
+    if (currentPlaybackIdx >= playBackEndIdx)
+    {
+        currentPlaybackIdx = 0;
+    }
+
     // ------------------------------------------------------------------------------------------------
     // This is the main macro playback loop... it has been somewhat optimized so that we push through
     // as many recorded keystrokes as possible. On a fairly pedestrian i5 computer (circa 2018), this
     // will run about 1 million 'Excalibur Instructions' per second. Good enough.
     // ------------------------------------------------------------------------------------------------
-    for (currentPlaybackIdx = 0; currentPlaybackIdx < playBackEndIdx; currentPlaybackIdx++)
+    for (; currentPlaybackIdx < playBackEndIdx; currentPlaybackIdx++)
     {
         static int dampenSystemProcessing = 0;
 
@@ -5767,7 +5792,7 @@ void RPN_SingleStep(void)
     // -----------------------------------------------------------
     ShowTrace();
 
-    if (currentPlaybackIdx == playBackEndIdx) // We may have ended the macro!!
+    if (currentPlaybackIdx >= playBackEndIdx) // We may have ended the macro!!
     {
         Xedit = X_NEW;
     }
