@@ -101,32 +101,7 @@ There are 10 different labels that can be used with Excalibur labeled A-J. You c
 
 **Looping**
 
-Looping is simply a branch to an earlier instruction that is predicated on the outcome of a conditional test. We loop for several reasons - but mainly to count or sum a series of numbers or calculations. Here is a program to compute a simple summation sequence of 0+1+2+3+4...X. If you enter and X of 6 you should get 0+1+2+3+4+5+6 for a total of 21. The program looks as follows:
-
-001 - Digit 0<br>
-002 - Store Register<br>
-003 - Digit 0<br>
-004 - Drop Stack<br>
-005 - Label A<br>
-006 - Enter<br>
-007 - Enter<br>
-008 - Recall Register<br>
-009 - Digit 0<br>
-010 - Plus<br>
-011 - Store Register<br>
-012 - Digit 0<br>
-013 - Drop Stack<br>
-014 - Digit 1<br>
-015 - Minus<br>
-016 - X > 0?<br>
-017 - Goto A<br>
-018 - Clear Stack<br>
-019 - Recall Register<br>
-020 - Digit 0<br>
-021 - \<End Of Program\><br>
-<br>
-Checksum: 0465<br>
-<br>
+Looping is simply a branch to an earlier instruction that is predicated on the outcome of a conditional test. We loop for several reasons - but mainly to count or sum a series of numbers or calculations. Looping during programming uses three specialized registers H, H', I, I', J, J'. The first of those pairs is the current counter. The second (with the ') is the target. The loop will automatically increment or decrement by 1 to drive towards the target. The Loop H, Loop I and Loop J will perform the increment/decrement and will jump to the associated label if we have not yet reached the target.
 
 WARNING - If you ever goto an earlier programming step and do not provide a way to break the looping cycle you will end up with an infinite loop. It is also possible that given the speed at which Excalibur executes instructions (which is many thousands of instructions per second) extremely long loops could take significant time. During this time, the program will show the word "Run..." in the status bar and will be otherwise oblivious to normal keystrokes or mouse clicks. To interrupt an infinite loop you should click the Play key or press the ESC key and the program will return to the non-running state.
 
