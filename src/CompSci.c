@@ -304,33 +304,40 @@ void StackPushL(PROG_LONG temp)
     STACKL[STK_Y] = MaskStack(STACKL[STK_X]);
     STACKL[STK_X] = MaskStack(temp);
 
-    LongsToFloats();
+    LongsToFloats(); // Keep the floating stack up-to-date
 }
 
 PROG_LONG StackPopL(void)
 {
     PROG_LONG temp;
+    
     stackPops++;
+
     temp = MaskStack(STACKL[STK_X]);
     STACKL[STK_X] = MaskStack(STACKL[STK_Y]);
     STACKL[STK_Y] = MaskStack(STACKL[STK_Z]);
     STACKL[STK_Z] = MaskStack(STACKL[STK_T]);
+    
     if (extendedStack)
     {
         STACKL[STK_T] = MaskStack(STACKL[STK_A]);
         STACKL[STK_A] = MaskStack(STACKL[STK_B]);
         STACKL[STK_B] = MaskStack(STACKL[STK_C]);
         STACKL[STK_C] = MaskStack(STACKL[STK_D]);
-        if (popFillZero != 0)
+        if (popFillZero)
+        {
             STACKL[STK_D] = MaskStack(0L);
+        }
     }
     else
     {
-        if (popFillZero != 0)
+        if (popFillZero)
+        {
             STACKL[STK_T] = MaskStack(0L);
+        }
     }
 
-    LongsToFloats();
+    LongsToFloats(); // Keep the floating stack up-to-date
 
     return(temp);
 }
@@ -381,24 +388,24 @@ void PROG_dec(void)
     STACKL[STK_T] = MaskStack(STACKL[STK_T]);
 }
 
-void PROG_hexA(void)
+void process_hex_digit(char *hexDigit)
 {
     if (progMode == PROG_HEX)
     {
         if (Xedit == X_NEW)
         {
             StackPushL(0L);
-            strcpy(Xstr, "A");
+            strcpy(Xstr, hexDigit);
         }
         else if (Xedit == X_ENTER)
         {
-            sprintf(Xstr, "A");
+            sprintf(Xstr, hexDigit);
         }
         else
         {
-            if (allowDigitBasedOnMaxStringSize(Xstr, 'A'))
+            if (allowDigitBasedOnMaxStringSize(Xstr, hexDigit[0]))
             {
-                strcat(Xstr, "A");
+                strcat(Xstr, hexDigit);
             }
         }
         STACKL[STK_X] = ConvertCompSciStrTo64(Xstr);
@@ -406,138 +413,18 @@ void PROG_hexA(void)
     }
 }
 
-void PROG_hexB(void)
-{
-    if (progMode == PROG_HEX)
-    {
-        if (Xedit == X_NEW)
-        {
-            StackPushL(0L);
-            strcpy(Xstr, "B");
-        }
-        else if (Xedit == X_ENTER)
-        {
-            sprintf(Xstr, "B");
-        }
-        else
-        {
-            if (allowDigitBasedOnMaxStringSize(Xstr, 'B'))
-            {
-                strcat(Xstr, "B");
-            }
-        }
-        STACKL[STK_X] = ConvertCompSciStrTo64(Xstr);
-        Xedit = X_EDIT;
-    }
-}
+void PROG_hexA(void) { process_hex_digit("A"); }
+void PROG_hexB(void) { process_hex_digit("B"); }
+void PROG_hexC(void) { process_hex_digit("C"); }
+void PROG_hexD(void) { process_hex_digit("D"); }
+void PROG_hexE(void) { process_hex_digit("E"); }
+void PROG_hexF(void) { process_hex_digit("F"); }
 
-void PROG_hexC(void)
-{
-    if (progMode == PROG_HEX)
-    {
-        if (Xedit == X_NEW)
-        {
-            StackPushL(0L);
-            strcpy(Xstr, "C");
-        }
-        else if (Xedit == X_ENTER)
-        {
-            sprintf(Xstr, "C");
-        }
-        else
-        {
-            if (allowDigitBasedOnMaxStringSize(Xstr, 'C'))
-            {
-                strcat(Xstr, "C");
-            }
-        }
-
-        STACKL[STK_X] = ConvertCompSciStrTo64(Xstr);
-        Xedit = X_EDIT;
-    }
-}
-
-void PROG_hexD(void)
-{
-    if (progMode == PROG_HEX)
-    {
-        if (Xedit == X_NEW)
-        {
-            StackPushL(0L);
-            strcpy(Xstr, "D");
-        }
-        else if (Xedit == X_ENTER)
-        {
-            sprintf(Xstr, "D");
-        }
-        else
-        {
-            if (allowDigitBasedOnMaxStringSize(Xstr, 'D'))
-            {
-                strcat(Xstr, "D");
-            }
-        }
-
-        STACKL[STK_X] = ConvertCompSciStrTo64(Xstr);
-        Xedit = X_EDIT;
-    }
-}
-
-void PROG_hexE(void)
-{
-    if (progMode == PROG_HEX)
-    {
-        if (Xedit == X_NEW)
-        {
-            StackPushL(0L);
-            strcpy(Xstr, "E");
-        }
-        else if (Xedit == X_ENTER)
-        {
-            sprintf(Xstr, "E");
-        }
-        else
-        {
-            if (allowDigitBasedOnMaxStringSize(Xstr, 'E'))
-            {
-                strcat(Xstr, "E");
-            }
-        }
-        STACKL[STK_X] = ConvertCompSciStrTo64(Xstr);
-        Xedit = X_EDIT;
-    }
-}
-
-void PROG_hexF(void)
-{
-    if (progMode == PROG_HEX)
-    {
-        if (Xedit == X_NEW)
-        {
-            StackPushL(0L);
-            strcpy(Xstr, "F");
-        }
-        else if (Xedit == X_ENTER)
-        {
-            sprintf(Xstr, "F");
-        }
-        else
-        {
-            if (allowDigitBasedOnMaxStringSize(Xstr, 'F'))
-            {
-                strcat(Xstr, "F");
-            }
-        }
-        STACKL[STK_X] = ConvertCompSciStrTo64(Xstr);
-        Xedit = X_EDIT;
-    }
-}
 
 void PROG_and(void)
 {
     StackPushL(StackPopL() & StackPopL());
 }
-
 
 void PROG_or(void)
 {

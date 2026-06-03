@@ -45,7 +45,7 @@
 #define VERSION_STR "v3.XX-07"
 
 #define ABOUT_MSG "Excalibur for Windows 32-bit\n"                    \
-                  "Version 3.XX-07  -  June 2, 2026\n\n"              \
+                  "Version 3.XX-07  -  June 3, 2026\n\n"              \
                   "Copyright 1994-2026 David Bernazzani\n\n"          \
                   "Please read the disclaimer and understand the\n"   \
                   "accuracy and precision issues before using.\n\n"   \
@@ -5469,6 +5469,11 @@ void mapButtonFuncs(void)
     }
 }
 
+// -------------------------------------------------------------------------------
+// This function will save the unique index for the button just pressed into the 
+// programming playback array at the current step position. This allows us to
+// record a sequence of keystrokes and then play back when the user presses 'Run'
+// -------------------------------------------------------------------------------
 void SaveProgramStep(uint16_t uniqueIndex)
 {
     int k;
@@ -5491,7 +5496,7 @@ void SaveProgramStep(uint16_t uniqueIndex)
             playBack[currentPlaybackIdx] = uniqueIndex;
             currentPlaybackIdx++;
         }
-        else // Insert at end!
+        else // Insert at end... this is normally where it goes when recording.
         {
             playBack[currentPlaybackIdx] = uniqueIndex;
             playBackEndIdx++;
@@ -5504,20 +5509,28 @@ void SaveProgramStep(uint16_t uniqueIndex)
     }
 }
 
+// ------------------------------------------------------------------------
+// This is the core function called when any recognized button is pressed.
+// This calls the specific button handler, makes sure the Stack is correct
+// and saves the keystroke into the Programming buffer if needed.
+// ------------------------------------------------------------------------
 void callButtonFunc(void (*routine)(void), char useFloatsLongs, char allowRecord,
                     uint16_t uniqueIndex, char saveLastX, char newXedit, int UpdateInfoBar)
 {
-    if (IsWindowVisible(toolTipWnd)) // A button press reset's the window!
+    if (IsWindowVisible(toolTipWnd)) // A button press hides the tooltip window
     {
         ShowWindow(toolTipWnd, SW_HIDE);
         toolTipCounter = 0;
     }
 
-    if (progMode != PROG_FLOAT) // Always ensure floats are "in-sync" with longs before any press!
+    if (progMode != PROG_FLOAT) // Always ensure floats are "in-sync" with longs before any press
     {
         LongsToFloats();
     }
 
+    // -------------------------------------------------------------------------------------
+    // See if we should save the registers for this function - this goes into LASTX / LASTY
+    // -------------------------------------------------------------------------------------
     if (saveLastX == YES_L)
     {
         LASTX  = STACK[STK_X];
@@ -5526,8 +5539,10 @@ void callButtonFunc(void (*routine)(void), char useFloatsLongs, char allowRecord
         LASTYL = STACKL[STK_Y];
     }
 
+    // -----------------------------------------------------------------------------
     // Before we call the button function we need to ensure both stacks look right.
     // This will help with Macro programming between stacks!
+    // -----------------------------------------------------------------------------
     if (useFloatsLongs == USES_L && progMode == PROG_FLOAT)
     {
         progMode = PROG_DEC;
@@ -5543,15 +5558,28 @@ void callButtonFunc(void (*routine)(void), char useFloatsLongs, char allowRecord
         ShowStatus();
     }
 
-    routine(); // This calls the actual button routine to perform things like SIN, COS, CLX, etc
+    // --------------------------------------------------------------------------------
+    // This calls the actual button routine to perform things like SIN, COS, CLX, etc
+    // --------------------------------------------------------------------------------
+    routine();
 
+    // --------------------------------------------------------------------------
+    // Useful to save the last index so we can look for repeated presses
+    // (this is quite handy for the Financial functions and n,i,PV,PMT,FV entry)
+    // --------------------------------------------------------------------------
     lastUniqueIndex = uniqueIndex;
 
+    // --------------------------------------------------------------------------------------
+    // Decide if we are going to record this keystroke into our programming playback buffer.
+    // --------------------------------------------------------------------------------------
     if ((recModeON == 1) && (allowRecord == ALLOWREC))
     {
         SaveProgramStep(uniqueIndex);
     }
 
+    // ------------------------------------------------------------------------------
+    // Decide if we should terminate the entry on the stack (X_NULL leaves it alone)
+    // ------------------------------------------------------------------------------
     if (newXedit != X_NULL)
     {
         Xedit = newXedit;
@@ -5570,7 +5598,7 @@ void callButtonFunc_playback(int idx)
     uint8_t  saveLastX      = playBackMap[idx].saveLastX;
     uint8_t  newXedit       = playBackMap[idx].newXedit;
 
-    if (progMode != PROG_FLOAT) // Always ensure floats are "in-sync" with longs before any press!
+    if (progMode != PROG_FLOAT)
     {
         LongsToFloats();
     }
@@ -5583,10 +5611,6 @@ void callButtonFunc_playback(int idx)
         LASTYL = STACKL[STK_Y];
     }
 
-    // -----------------------------------------------------------------------------
-    // Before we call the button function we need to ensure both stacks look right.
-    // This will help with Macro programming between stacks!
-    // -----------------------------------------------------------------------------
     if (useFloatsLongs == USES_L && progMode == PROG_FLOAT)
     {
         progMode = PROG_DEC;
