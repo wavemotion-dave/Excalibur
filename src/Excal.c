@@ -54,7 +54,7 @@
                   "https://github.com/wavemotion-dave/Excalibur"      \
                   "\n\nThis version is BETA - Expect and report Bugs!"
 
-#define CONFIG_VERSION_MAIN 0xF019  // If this changes, we wipe EVERYTHING
+#define CONFIG_VERSION_MAIN 0xF01A  // If this changes, we wipe EVERYTHING
 #define CONFIG_VERSION_SUB  0x0001  // If this changes, we reset x,y window position and reset constant tables (currency, physics constants, etc)
 
 #define END_OF_PROGRAM_STR "<End Of Program>"
@@ -107,6 +107,8 @@ uint8_t reservedOpt5 = 1;   // With a different default... just in case
 
 char macroName[MAX_MACROS][MAX_MACRO_FUNC_TEXT+1];
 char macro_short_names[MAX_MACROS][MAX_SHORT_NAME_TEXT+1];
+char macro_input_labels[MAX_MACROS][3][MAX_INPUT_INST_TEXT+1];
+char current_macro_inputs[3][MAX_INPUT_INST_TEXT+1];
 char clipboardBuffer[MAX_IMPORT_CLIPBOARD_SIZE+1];
 char statusBar[32];
 char helpTitle[64];
@@ -258,7 +260,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
     RegisterClassEx(&wndclass);
 
-    MemoryInit();
+    MemoryInit();   // Ensure the main memory of Excalibur is in a good state - we will read config right after.
     ReadFromDisk(); // We need to know the footprint... so we need to read the config before we create the window.
 
     // This is the main Excalibur dialog window!
@@ -1591,6 +1593,37 @@ void LongsToFloats(void)
     }
 }
 
+// ----------------------------------------------------------------------------------------
+// This clears the current program as well as all saved programs. A wipe of program memory.
+// ----------------------------------------------------------------------------------------
+void ClearAllPrograms(void)
+{
+    int i;
+
+    for (i = 0; i < MAX_MACROS; i++)
+    {
+        strcpy(macroName[i], "Not Currently Defined");
+        sprintf(macro_short_names[i], "P%02d", i + 1);
+        strcpy(macro_input_labels[i][0], "Enter R0:");
+        strcpy(macro_input_labels[i][1], "Enter R1:");
+        strcpy(macro_input_labels[i][2], "Enter R2:");
+        playBackIdxSave[i] = 0;
+    }
+
+    strcpy(current_macro_inputs[0], "Enter R0:");
+    strcpy(current_macro_inputs[1], "Enter R1:");
+    strcpy(current_macro_inputs[2], "Enter R2:");
+
+    memset(playBack, 0x00, sizeof(playBack));
+
+    playBackEndIdx = 0;
+    currentPlaybackIdx = 0;
+    indirectRegister = 0;
+    progModeOverflow = 0;
+    progModeCarry = 0;
+    lastChosenMacro = 0;
+}
+
 // ------------------------------------------------------------------------------------
 // Make sure all of the key memory areas are initialized when the program is launched.
 // Most of this will be overwritten by what is read from the config file.
@@ -1599,6 +1632,7 @@ void MemoryInit(void)
 {
     int i, j, k;
 
+    // Clear both the floating point and integer stacks
     for (i = 0; i < MAX_STACK; i++)
     {
         STACK[i] = 0.0;
@@ -1611,6 +1645,7 @@ void MemoryInit(void)
         STOL[i] = 0L;
     }
 
+    // Clear the financial registers
     for (i = 0; i < FIN_REG_MAX; i++)
     {
         FIN[i] = 0.0;
@@ -1622,22 +1657,14 @@ void MemoryInit(void)
     }
     CFn = 0;
 
+    // Set the loop registers to zeros
     memset(LOOPS, 0x00, sizeof(LOOPS));
 
+    // Set the mini notepad to blank
     memset(excaliburNotes, 0x00, sizeof(excaliburNotes));
 
-    for (i = 0; i < MAX_MACROS; i++)
-    {
-        strcpy(macroName[i], "Not Currently Defined");
-        sprintf(macro_short_names[i], "P%02d", i + 1);
-        playBackIdxSave[i] = 0;
-    }
-
-    playBackEndIdx = 0;
-    currentPlaybackIdx = 0;
-    indirectRegister = 0;
-    progModeOverflow = 0;
-    progModeCarry = 0;
+    // Clear all memory programs
+    ClearAllPrograms();
 
     // Mark unused constants as not included to be shown...
     for (k = 0; k < MAX_CONST_BANKS; k++)
@@ -1655,7 +1682,7 @@ void MemoryInit(void)
         }
     }
 
-    // Get regional time setting for 24-hour format!
+    // Get regional time setting for 24-hour format...
     GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_ITIME, tmpStr, 5);
     tmpStr[4] = CNULL;
     if (atoi(tmpStr) == 1)
@@ -2326,7 +2353,7 @@ void MakeEngineeringFormat(double val, char *outstr)
     sprintf(sp, "%d", exponent);
 }
 
-void FormatNumberForStack(double val, char *outstr)
+void FormatNumberForStack(double val, char *outstr, uint8_t useCommas)
 {
     char sciStr[64];
     char str[64];
@@ -2356,7 +2383,7 @@ void FormatNumberForStack(double val, char *outstr)
     if (sci_format != 'Z') // ENGINEERING FORMAT
     {
         sprintf(outstr, str, val);
-        PutCommas(outstr);
+        if (useCommas) PutCommas(outstr);
         for (i = strlen(outstr) - 1; i > 0; i--) // Remove trailing spaces...
         {
             if (outstr[i] == ' ')
@@ -2411,7 +2438,7 @@ void ShowStack(void)
         }
         else
         {
-            FormatNumberForStack(STACK[STK_X], tmpStr);
+            FormatNumberForStack(STACK[STK_X], tmpStr, TRUE);
         }
 
         if (rightAlignStack == 1)
@@ -2424,7 +2451,7 @@ void ShowStack(void)
             SetDlgItemText(calcMainWindow, RPN_STACK_X, tmpStr);
         }
 
-        FormatNumberForStack(STACK[STK_Y], tmpStr);
+        FormatNumberForStack(STACK[STK_Y], tmpStr, TRUE);
         if (rightAlignStack == 1)
         {
             sprintf(stackStr, (bExactFont ? "%24s" : "%22s"), tmpStr);
@@ -2437,7 +2464,7 @@ void ShowStack(void)
 
         if (recModeON == 0 && showTrace == FALSE)
         {
-            FormatNumberForStack(STACK[STK_Z], tmpStr);
+            FormatNumberForStack(STACK[STK_Z], tmpStr, TRUE);
             if (rightAlignStack == 1)
             {
                 sprintf(stackStr, (bExactFont ? "%24s" : "%22s"), tmpStr);
@@ -2448,7 +2475,7 @@ void ShowStack(void)
                 SetDlgItemText(calcMainWindow, RPN_STACK_Z, tmpStr);
             }
 
-            FormatNumberForStack(STACK[STK_T], tmpStr);
+            FormatNumberForStack(STACK[STK_T], tmpStr, TRUE);
             if (rightAlignStack == 1)
             {
                 sprintf(stackStr, (bExactFont ? "%24s" : "%22s"), tmpStr);
@@ -2500,7 +2527,7 @@ void ShowStack(void)
 }
 
 // -----------------------------------------------------------------------------------------
-// The heart of the RPN system is the Stack. Here we push a value onto the stack into 
+// The heart of the RPN system is the Stack. Here we push a value onto the stack into
 // the X register, which in turn pushes up YZT. The extended stack is handled here as well.
 // -----------------------------------------------------------------------------------------
 void StackPush(double temp)
@@ -3996,94 +4023,96 @@ void SaveToDisk(void)
 
     if (outfile)
     {
-        fwrite(&configVersionMain,  sizeof(configVersionMain),  1, outfile);
-        fwrite(&configVersionSub,   sizeof(configVersionSub),   1, outfile);
+        fwrite(&configVersionMain,      sizeof(configVersionMain),      1, outfile);
+        fwrite(&configVersionSub,       sizeof(configVersionSub),       1, outfile);
 
-        fwrite(&main_x,             sizeof(main_x),             1, outfile);
-        fwrite(&main_y,             sizeof(main_y),             1, outfile);
-        fwrite(&main_cx,            sizeof(main_cx),            1, outfile);
-        fwrite(&main_cy,            sizeof(main_cy),            1, outfile);
+        fwrite(&main_x,                 sizeof(main_x),                 1, outfile);
+        fwrite(&main_y,                 sizeof(main_y),                 1, outfile);
+        fwrite(&main_cx,                sizeof(main_cx),                1, outfile);
+        fwrite(&main_cy,                sizeof(main_cy),                1, outfile);
 
-        fwrite(&menuCurrentFuncs,   sizeof(menuCurrentFuncs),   1, outfile);
-        fwrite(&menuLastFuncs,      sizeof(menuLastFuncs),      1, outfile);
-        fwrite(&progMode,           sizeof(progMode),           1, outfile);
-        fwrite(&alwaysOnTop,        sizeof(alwaysOnTop),        1, outfile);
-        fwrite(&decimal_places,     sizeof(decimal_places),     1, outfile);
-        fwrite(&sci_format,         sizeof(sci_format),         1, outfile);
-        fwrite(&numberDisplayMode,  sizeof(numberDisplayMode),  1, outfile);
-        fwrite(&lastProgMode,       sizeof(lastProgMode),       1, outfile);
-        fwrite(&padZeros,           sizeof(padZeros),           1, outfile);
-        fwrite(&wordSize,           sizeof(wordSize),           1, outfile);
-        fwrite(&wordMode,           sizeof(wordMode),           1, outfile);
-        fwrite(&hexSpacing,         sizeof(hexSpacing),         1, outfile);
-        fwrite(&wordSizeMask,       sizeof(wordSizeMask),       1, outfile);
-        fwrite(&angleMode,          sizeof(angleMode),          1, outfile);
-        fwrite(&taxConstant,        sizeof(taxConstant),        1, outfile);
-        fwrite(&useSeparator,       sizeof(useSeparator),       1, outfile);
-        fwrite(&eexMode,            sizeof(eexMode),            1, outfile);
-        fwrite(&numLockMode,        sizeof(numLockMode),        1, outfile);
-        fwrite(&toolTipsOn,         sizeof(toolTipsOn),         1, outfile);
-        fwrite(&payMode,            sizeof(payMode),            1, outfile);
-        fwrite(&dateMode,           sizeof(dateMode),           1, outfile);
-        fwrite(&depreciationType,   sizeof(depreciationType),   1, outfile);
-        fwrite(&stackPushes,        sizeof(stackPushes),        1, outfile);
-        fwrite(&stackPops,          sizeof(stackPops),          1, outfile);
-        fwrite(&inFocusTime,        sizeof(inFocusTime),        1, outfile);
-        fwrite(customSave,          sizeof(customSave),         1, outfile);
-        fwrite(&extendedStack,      sizeof(extendedStack),      1, outfile);
-        fwrite(&footPrint,          sizeof(footPrint),          1, outfile);
-        fwrite(&popFillZero,        sizeof(popFillZero),        1, outfile);
-        fwrite(&rightAlignStack,    sizeof(rightAlignStack),    1, outfile);
-        fwrite(&progFlags,          sizeof(progFlags),          1, outfile);
-        fwrite(&progModeCarry,      sizeof(progModeCarry),      1, outfile);
-        fwrite(&progModeOverflow,   sizeof(progModeOverflow),   1, outfile);
-        fwrite(&showXMinimized,     sizeof(showXMinimized),     1, outfile);
-        fwrite(&eRPN,               sizeof(eRPN),               1, outfile);
-        fwrite(&rotateThroughCarry, sizeof(rotateThroughCarry), 1, outfile);
-        fwrite(&ClearStackOnExit,   sizeof(ClearStackOnExit),   1, outfile);
-        fwrite(&reservedOpt1,       sizeof(reservedOpt1),       1, outfile);
-        fwrite(&reservedOpt2,       sizeof(reservedOpt2),       1, outfile);
-        fwrite(&reservedOpt3,       sizeof(reservedOpt3),       1, outfile);
-        fwrite(&reservedOpt4,       sizeof(reservedOpt4),       1, outfile);
-        fwrite(&reservedOpt5,       sizeof(reservedOpt5),       1, outfile);
+        fwrite(&menuCurrentFuncs,       sizeof(menuCurrentFuncs),       1, outfile);
+        fwrite(&menuLastFuncs,          sizeof(menuLastFuncs),          1, outfile);
+        fwrite(&progMode,               sizeof(progMode),               1, outfile);
+        fwrite(&alwaysOnTop,            sizeof(alwaysOnTop),            1, outfile);
+        fwrite(&decimal_places,         sizeof(decimal_places),         1, outfile);
+        fwrite(&sci_format,             sizeof(sci_format),             1, outfile);
+        fwrite(&numberDisplayMode,      sizeof(numberDisplayMode),      1, outfile);
+        fwrite(&lastProgMode,           sizeof(lastProgMode),           1, outfile);
+        fwrite(&padZeros,               sizeof(padZeros),               1, outfile);
+        fwrite(&wordSize,               sizeof(wordSize),               1, outfile);
+        fwrite(&wordMode,               sizeof(wordMode),               1, outfile);
+        fwrite(&hexSpacing,             sizeof(hexSpacing),             1, outfile);
+        fwrite(&wordSizeMask,           sizeof(wordSizeMask),           1, outfile);
+        fwrite(&angleMode,              sizeof(angleMode),              1, outfile);
+        fwrite(&taxConstant,            sizeof(taxConstant),            1, outfile);
+        fwrite(&useSeparator,           sizeof(useSeparator),           1, outfile);
+        fwrite(&eexMode,                sizeof(eexMode),                1, outfile);
+        fwrite(&numLockMode,            sizeof(numLockMode),            1, outfile);
+        fwrite(&toolTipsOn,             sizeof(toolTipsOn),             1, outfile);
+        fwrite(&payMode,                sizeof(payMode),                1, outfile);
+        fwrite(&dateMode,               sizeof(dateMode),               1, outfile);
+        fwrite(&depreciationType,       sizeof(depreciationType),       1, outfile);
+        fwrite(&stackPushes,            sizeof(stackPushes),            1, outfile);
+        fwrite(&stackPops,              sizeof(stackPops),              1, outfile);
+        fwrite(&inFocusTime,            sizeof(inFocusTime),            1, outfile);
+        fwrite(customSave,              sizeof(customSave),             1, outfile);
+        fwrite(&extendedStack,          sizeof(extendedStack),          1, outfile);
+        fwrite(&footPrint,              sizeof(footPrint),              1, outfile);
+        fwrite(&popFillZero,            sizeof(popFillZero),            1, outfile);
+        fwrite(&rightAlignStack,        sizeof(rightAlignStack),        1, outfile);
+        fwrite(&progFlags,              sizeof(progFlags),              1, outfile);
+        fwrite(&progModeCarry,          sizeof(progModeCarry),          1, outfile);
+        fwrite(&progModeOverflow,       sizeof(progModeOverflow),       1, outfile);
+        fwrite(&showXMinimized,         sizeof(showXMinimized),         1, outfile);
+        fwrite(&eRPN,                   sizeof(eRPN),                   1, outfile);
+        fwrite(&rotateThroughCarry,     sizeof(rotateThroughCarry),     1, outfile);
+        fwrite(&ClearStackOnExit,       sizeof(ClearStackOnExit),       1, outfile);
+        fwrite(&reservedOpt1,           sizeof(reservedOpt1),           1, outfile);
+        fwrite(&reservedOpt2,           sizeof(reservedOpt2),           1, outfile);
+        fwrite(&reservedOpt3,           sizeof(reservedOpt3),           1, outfile);
+        fwrite(&reservedOpt4,           sizeof(reservedOpt4),           1, outfile);
+        fwrite(&reservedOpt5,           sizeof(reservedOpt5),           1, outfile);
 
-        fwrite(STACK,               sizeof(STACK),              1, outfile);
-        fwrite(STACKL,              sizeof(STACKL),             1, outfile);
-        fwrite(&LASTX,              sizeof(LASTX),              1, outfile);
-        fwrite(&LASTY,              sizeof(LASTY),              1, outfile);
-        fwrite(&lastFloat,          sizeof(lastFloat),          1, outfile);
-        fwrite(&LASTXL,             sizeof(LASTXL),             1, outfile);
-        fwrite(&LASTYL,             sizeof(LASTYL),             1, outfile);
+        fwrite(STACK,                   sizeof(STACK),                  1, outfile);
+        fwrite(STACKL,                  sizeof(STACKL),                 1, outfile);
+        fwrite(&LASTX,                  sizeof(LASTX),                  1, outfile);
+        fwrite(&LASTY,                  sizeof(LASTY),                  1, outfile);
+        fwrite(&lastFloat,              sizeof(lastFloat),              1, outfile);
+        fwrite(&LASTXL,                 sizeof(LASTXL),                 1, outfile);
+        fwrite(&LASTYL,                 sizeof(LASTYL),                 1, outfile);
 
-        fwrite(&indirectRegister,   sizeof(indirectRegister),   1, outfile);
-        fwrite(&traceDelayValueMs,  sizeof(traceDelayValueMs),  1, outfile);
+        fwrite(&indirectRegister,       sizeof(indirectRegister),       1, outfile);
+        fwrite(&traceDelayValueMs,      sizeof(traceDelayValueMs),      1, outfile);
 
-        fwrite(&STO,                sizeof(STO),                1, outfile);
-        fwrite(&STOL,               sizeof(STOL),               1, outfile);
-        fwrite(&SUM,                sizeof(SUM),                1, outfile);
-        fwrite(&FIN,                sizeof(FIN),                1, outfile);
-        fwrite(&cashFlow,           sizeof(cashFlow),           1, outfile);
-        fwrite(&CFn,                sizeof(CFn),                1, outfile);
-        fwrite(&LOOPS,              sizeof(LOOPS),              1, outfile);
+        fwrite(&STO,                    sizeof(STO),                    1, outfile);
+        fwrite(&STOL,                   sizeof(STOL),                   1, outfile);
+        fwrite(&SUM,                    sizeof(SUM),                    1, outfile);
+        fwrite(&FIN,                    sizeof(FIN),                    1, outfile);
+        fwrite(&cashFlow,               sizeof(cashFlow),               1, outfile);
+        fwrite(&CFn,                    sizeof(CFn),                    1, outfile);
+        fwrite(&LOOPS,                  sizeof(LOOPS),                  1, outfile);
 
-        fwrite(&currency1index,     sizeof(currency1index),     1, outfile);
-        fwrite(&currency2index,     sizeof(currency2index),     1, outfile);
+        fwrite(&currency1index,         sizeof(currency1index),         1, outfile);
+        fwrite(&currency2index,         sizeof(currency2index),         1, outfile);
 
-        fwrite(&constants,          sizeof(constants),          1, outfile);
-        fwrite(&constantBankNames,  sizeof(constantBankNames),  1, outfile);
-        fwrite(&CurrencyConv,       sizeof(CurrencyConv),       1, outfile);
+        fwrite(&constants,              sizeof(constants),              1, outfile);
+        fwrite(&constantBankNames,      sizeof(constantBankNames),      1, outfile);
+        fwrite(&CurrencyConv,           sizeof(CurrencyConv),           1, outfile);
 
-        fwrite(&lastChosenConst,    sizeof(lastChosenConst),    1, outfile);
-        fwrite(&lastConstBank,      sizeof(lastConstBank),      1, outfile);
-        fwrite(&excaliburNotes,     sizeof(excaliburNotes),     1, outfile);
-        fwrite(&lastChosenMacro,    sizeof(lastChosenMacro),    1, outfile);
+        fwrite(&lastChosenConst,        sizeof(lastChosenConst),        1, outfile);
+        fwrite(&lastConstBank,          sizeof(lastConstBank),          1, outfile);
+        fwrite(&excaliburNotes,         sizeof(excaliburNotes),         1, outfile);
+        fwrite(&lastChosenMacro,        sizeof(lastChosenMacro),        1, outfile);
 
-        fwrite(&playBack,           sizeof(playBack),           1, outfile);
-        fwrite(&playBackSave,       sizeof(playBackSave),       1, outfile);
-        fwrite(&playBackEndIdx,     sizeof(playBackEndIdx),     1, outfile);
-        fwrite(&playBackIdxSave,    sizeof(playBackIdxSave),    1, outfile);
-        fwrite(&macroName,          sizeof(macroName),          1, outfile);
-        fwrite(&macro_short_names,  sizeof(macro_short_names),  1, outfile);
+        fwrite(&playBack,               sizeof(playBack),               1, outfile);
+        fwrite(&playBackSave,           sizeof(playBackSave),           1, outfile);
+        fwrite(&playBackEndIdx,         sizeof(playBackEndIdx),         1, outfile);
+        fwrite(&playBackIdxSave,        sizeof(playBackIdxSave),        1, outfile);
+        fwrite(&macroName,              sizeof(macroName),              1, outfile);
+        fwrite(&macro_short_names,      sizeof(macro_short_names),      1, outfile);
+        fwrite(&macro_input_labels,     sizeof(macro_input_labels),     1, outfile);
+        fwrite(&current_macro_inputs,   sizeof(current_macro_inputs),   1, outfile);
 
         fwrite(&reserved, RESERVED_SIZE, 1, outfile);
 
@@ -4121,100 +4150,102 @@ void ReadFromDisk(void)
             return;
         }
 
-        fread(&main_x,             sizeof(main_x),             1, infile);
-        fread(&main_y,             sizeof(main_y),             1, infile);
-        fread(&main_cx,            sizeof(main_cx),            1, infile);
-        fread(&main_cy,            sizeof(main_cy),            1, infile);
+        fread(&main_x,                  sizeof(main_x),             1, infile);
+        fread(&main_y,                  sizeof(main_y),             1, infile);
+        fread(&main_cx,                 sizeof(main_cx),            1, infile);
+        fread(&main_cy,                 sizeof(main_cy),            1, infile);
 
-        fread(&menuCurrentFuncs,   sizeof(menuCurrentFuncs),   1, infile);
-        fread(&menuLastFuncs,      sizeof(menuLastFuncs),      1, infile);
-        fread(&progMode,           sizeof(progMode),           1, infile);
-        fread(&alwaysOnTop,        sizeof(alwaysOnTop),        1, infile);
-        fread(&decimal_places,     sizeof(decimal_places),     1, infile);
-        fread(&sci_format,         sizeof(sci_format),         1, infile);
-        fread(&numberDisplayMode,  sizeof(numberDisplayMode),  1, infile);
-        fread(&lastProgMode,       sizeof(lastProgMode),       1, infile);
-        fread(&padZeros,           sizeof(padZeros),           1, infile);
-        fread(&wordSize,           sizeof(wordSize),           1, infile);
-        fread(&wordMode,           sizeof(wordMode),           1, infile);
-        fread(&hexSpacing,         sizeof(hexSpacing),         1, infile);
-        fread(&wordSizeMask,       sizeof(wordSizeMask),       1, infile);
-        fread(&angleMode,          sizeof(angleMode),          1, infile);
-        fread(&taxConstant,        sizeof(taxConstant),        1, infile);
-        fread(&useSeparator,       sizeof(useSeparator),       1, infile);
-        fread(&eexMode,            sizeof(eexMode),            1, infile);
-        fread(&numLockMode,        sizeof(numLockMode),        1, infile);
-        fread(&toolTipsOn,         sizeof(toolTipsOn),         1, infile);
-        fread(&payMode,            sizeof(payMode),            1, infile);
-        fread(&dateMode,           sizeof(dateMode),           1, infile);
-        fread(&depreciationType,   sizeof(depreciationType),   1, infile);
-        fread(&stackPushes,        sizeof(stackPushes),        1, infile);
-        fread(&stackPops,          sizeof(stackPops),          1, infile);
-        fread(&inFocusTime,        sizeof(inFocusTime),        1, infile);
-        fread(customSave,          sizeof(customSave),         1, infile);
-        fread(&extendedStack,      sizeof(extendedStack),      1, infile);
-        fread(&footPrint,          sizeof(footPrint),          1, infile);
-        fread(&popFillZero,        sizeof(popFillZero),        1, infile);
-        fread(&rightAlignStack,    sizeof(rightAlignStack),    1, infile);
-        fread(&progFlags,          sizeof(progFlags),          1, infile);
-        fread(&progModeCarry,      sizeof(progModeCarry),      1, infile);
-        fread(&progModeOverflow,   sizeof(progModeOverflow),   1, infile);
-        fread(&showXMinimized,     sizeof(showXMinimized),     1, infile);
-        fread(&eRPN,               sizeof(eRPN),               1, infile);
-        fread(&rotateThroughCarry, sizeof(rotateThroughCarry), 1, infile);
-        fread(&ClearStackOnExit,   sizeof(ClearStackOnExit),   1, infile);
-        fread(&reservedOpt1,       sizeof(reservedOpt1),       1, infile);
-        fread(&reservedOpt2,       sizeof(reservedOpt2),       1, infile);
-        fread(&reservedOpt3,       sizeof(reservedOpt3),       1, infile);
-        fread(&reservedOpt4,       sizeof(reservedOpt4),       1, infile);
-        fread(&reservedOpt5,       sizeof(reservedOpt5),       1, infile);
+        fread(&menuCurrentFuncs,        sizeof(menuCurrentFuncs),   1, infile);
+        fread(&menuLastFuncs,           sizeof(menuLastFuncs),      1, infile);
+        fread(&progMode,                sizeof(progMode),           1, infile);
+        fread(&alwaysOnTop,             sizeof(alwaysOnTop),        1, infile);
+        fread(&decimal_places,          sizeof(decimal_places),     1, infile);
+        fread(&sci_format,              sizeof(sci_format),         1, infile);
+        fread(&numberDisplayMode,       sizeof(numberDisplayMode),  1, infile);
+        fread(&lastProgMode,            sizeof(lastProgMode),       1, infile);
+        fread(&padZeros,                sizeof(padZeros),           1, infile);
+        fread(&wordSize,                sizeof(wordSize),           1, infile);
+        fread(&wordMode,                sizeof(wordMode),           1, infile);
+        fread(&hexSpacing,              sizeof(hexSpacing),         1, infile);
+        fread(&wordSizeMask,            sizeof(wordSizeMask),       1, infile);
+        fread(&angleMode,               sizeof(angleMode),          1, infile);
+        fread(&taxConstant,             sizeof(taxConstant),        1, infile);
+        fread(&useSeparator,            sizeof(useSeparator),       1, infile);
+        fread(&eexMode,                 sizeof(eexMode),            1, infile);
+        fread(&numLockMode,             sizeof(numLockMode),        1, infile);
+        fread(&toolTipsOn,              sizeof(toolTipsOn),         1, infile);
+        fread(&payMode,                 sizeof(payMode),            1, infile);
+        fread(&dateMode,                sizeof(dateMode),           1, infile);
+        fread(&depreciationType,        sizeof(depreciationType),   1, infile);
+        fread(&stackPushes,             sizeof(stackPushes),        1, infile);
+        fread(&stackPops,               sizeof(stackPops),          1, infile);
+        fread(&inFocusTime,             sizeof(inFocusTime),        1, infile);
+        fread(customSave,               sizeof(customSave),         1, infile);
+        fread(&extendedStack,           sizeof(extendedStack),      1, infile);
+        fread(&footPrint,               sizeof(footPrint),          1, infile);
+        fread(&popFillZero,             sizeof(popFillZero),        1, infile);
+        fread(&rightAlignStack,         sizeof(rightAlignStack),    1, infile);
+        fread(&progFlags,               sizeof(progFlags),          1, infile);
+        fread(&progModeCarry,           sizeof(progModeCarry),      1, infile);
+        fread(&progModeOverflow,        sizeof(progModeOverflow),   1, infile);
+        fread(&showXMinimized,          sizeof(showXMinimized),     1, infile);
+        fread(&eRPN,                    sizeof(eRPN),               1, infile);
+        fread(&rotateThroughCarry,      sizeof(rotateThroughCarry), 1, infile);
+        fread(&ClearStackOnExit,        sizeof(ClearStackOnExit),   1, infile);
+        fread(&reservedOpt1,            sizeof(reservedOpt1),       1, infile);
+        fread(&reservedOpt2,            sizeof(reservedOpt2),       1, infile);
+        fread(&reservedOpt3,            sizeof(reservedOpt3),       1, infile);
+        fread(&reservedOpt4,            sizeof(reservedOpt4),       1, infile);
+        fread(&reservedOpt5,            sizeof(reservedOpt5),       1, infile);
 
-        fread(STACK,               sizeof(STACK),              1, infile);
-        fread(STACKL,              sizeof(STACKL),             1, infile);
-        fread(&LASTX,              sizeof(LASTX),              1, infile);
-        fread(&LASTY,              sizeof(LASTY),              1, infile);
-        fread(&lastFloat,          sizeof(lastFloat),          1, infile);
-        fread(&LASTXL,             sizeof(LASTXL),             1, infile);
-        fread(&LASTYL,             sizeof(LASTYL),             1, infile);
+        fread(STACK,                    sizeof(STACK),              1, infile);
+        fread(STACKL,                   sizeof(STACKL),             1, infile);
+        fread(&LASTX,                   sizeof(LASTX),              1, infile);
+        fread(&LASTY,                   sizeof(LASTY),              1, infile);
+        fread(&lastFloat,               sizeof(lastFloat),          1, infile);
+        fread(&LASTXL,                  sizeof(LASTXL),             1, infile);
+        fread(&LASTYL,                  sizeof(LASTYL),             1, infile);
 
-        fread(&indirectRegister,    sizeof(indirectRegister),    1, infile);
-        fread(&traceDelayValueMs,   sizeof(traceDelayValueMs),   1, infile);
+        fread(&indirectRegister,        sizeof(indirectRegister),   1, infile);
+        fread(&traceDelayValueMs,       sizeof(traceDelayValueMs),  1, infile);
 
-        fread(&STO,                sizeof(STO),                1, infile);
-        fread(&STOL,               sizeof(STOL),               1, infile);
-        fread(&SUM,                sizeof(SUM),                1, infile);
-        fread(&FIN,                sizeof(FIN),                1, infile);
-        fread(&cashFlow,           sizeof(cashFlow),           1, infile);
-        fread(&CFn,                sizeof(CFn),                1, infile);
-        fread(&LOOPS,              sizeof(LOOPS),              1, infile);
+        fread(&STO,                     sizeof(STO),                1, infile);
+        fread(&STOL,                    sizeof(STOL),               1, infile);
+        fread(&SUM,                     sizeof(SUM),                1, infile);
+        fread(&FIN,                     sizeof(FIN),                1, infile);
+        fread(&cashFlow,                sizeof(cashFlow),           1, infile);
+        fread(&CFn,                     sizeof(CFn),                1, infile);
+        fread(&LOOPS,                   sizeof(LOOPS),              1, infile);
 
-        fread(&currency1index,     sizeof(currency1index),     1, infile);
-        fread(&currency2index,     sizeof(currency2index),     1, infile);
+        fread(&currency1index,          sizeof(currency1index),     1, infile);
+        fread(&currency2index,          sizeof(currency2index),     1, infile);
 
         if (configVersionSub != CONFIG_VERSION_SUB) // Skip these if sub-ver changed
         {
-            fseek(infile, sizeof(constants), SEEK_CUR);
+            fseek(infile, sizeof(constants),         SEEK_CUR);
             fseek(infile, sizeof(constantBankNames), SEEK_CUR);
-            fseek(infile, sizeof(CurrencyConv), SEEK_CUR);
+            fseek(infile, sizeof(CurrencyConv),      SEEK_CUR);
         }
         else
         {
-            fread(&constants,       sizeof(constants),           1, infile);
-            fread(&constantBankNames, sizeof(constantBankNames), 1, infile);
-            fread(&CurrencyConv,    sizeof(CurrencyConv),        1, infile);
+            fread(&constants,           sizeof(constants),              1, infile);
+            fread(&constantBankNames,   sizeof(constantBankNames),      1, infile);
+            fread(&CurrencyConv,        sizeof(CurrencyConv),           1, infile);
         }
 
-        fread(&lastChosenConst,     sizeof(lastChosenConst),     1, infile);
-        fread(&lastConstBank,       sizeof(lastConstBank),       1, infile);
-        fread(excaliburNotes,       sizeof(excaliburNotes),      1, infile);
-        fread(&lastChosenMacro,     sizeof(lastChosenMacro),     1, infile);
+        fread(&lastChosenConst,         sizeof(lastChosenConst),        1, infile);
+        fread(&lastConstBank,           sizeof(lastConstBank),          1, infile);
+        fread(excaliburNotes,           sizeof(excaliburNotes),         1, infile);
+        fread(&lastChosenMacro,         sizeof(lastChosenMacro),        1, infile);
 
-        fread(&playBack,           sizeof(playBack),           1, infile);
-        fread(&playBackSave,       sizeof(playBackSave),       1, infile);
-        fread(&playBackEndIdx,     sizeof(playBackEndIdx),     1, infile);
-        fread(&playBackIdxSave,    sizeof(playBackIdxSave),    1, infile);
-        fread(&macroName,          sizeof(macroName),          1, infile);
-        fread(&macro_short_names,  sizeof(macro_short_names),  1, infile);
+        fread(&playBack,                sizeof(playBack),               1, infile);
+        fread(&playBackSave,            sizeof(playBackSave),           1, infile);
+        fread(&playBackEndIdx,          sizeof(playBackEndIdx),         1, infile);
+        fread(&playBackIdxSave,         sizeof(playBackIdxSave),        1, infile);
+        fread(&macroName,               sizeof(macroName),              1, infile);
+        fread(&macro_short_names,       sizeof(macro_short_names),      1, infile);
+        fread(&macro_input_labels,      sizeof(macro_input_labels),     1, infile);
+        fread(&current_macro_inputs,    sizeof(current_macro_inputs),   1, infile);
 
         fread(&reserved, RESERVED_SIZE, 1, infile);
 
@@ -4302,7 +4333,7 @@ void GetMacroName(void)
 
     lpfnDIALOG_MACRO = (DLGPROC)MakeProcInstance((FARPROC)fnDIALOG_MACRONAME, hExcaliburInstance);
 
-    if ((DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_MACRO_NAME", calcMainWindow, lpfnDIALOG_MACRO)) == -1)
+    if ((DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_PROGRAM_NAME", calcMainWindow, lpfnDIALOG_MACRO)) == -1)
     {
         MessageBox(NULL, "Unable to display dialog", "System Error", MB_SYSTEMMODAL | MB_ICONHAND | MB_OK);
     }
@@ -4511,7 +4542,7 @@ void DoMacroSaveRecall(void)
 
     lpfnDIALOG_MACRO = (DLGPROC)MakeProcInstance((FARPROC)fnDIALOG_MACRO, hExcaliburInstance);
 
-    if ((DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_MACRO_SAVE", calcMainWindow, lpfnDIALOG_MACRO)) == -1)
+    if ((DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_PROGRAM_MANAGER", calcMainWindow, lpfnDIALOG_MACRO)) == -1)
     {
         MessageBox(NULL, "Unable to display dialog", "System Error", MB_SYSTEMMODAL | MB_ICONHAND | MB_OK);
     }
@@ -4532,13 +4563,16 @@ BOOL CALLBACK fnDIALOG_MACRO(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
     switch (wMessage)
     {
     case WM_INITDIALOG:
-        SendMessage(GetDlgItem(hDlg, 101), LB_SETTABSTOPS, 1, (DWORD)lbTabStops);
-        SendMessage(GetDlgItem(hDlg, 101), LB_RESETCONTENT, 0, 0);
+        SendMessage(GetDlgItem(hDlg, IDC_LIST0), LB_SETTABSTOPS, 1, (DWORD)lbTabStops);
+        SendMessage(GetDlgItem(hDlg, IDC_LIST0), LB_RESETCONTENT, 0, 0);
+        SendMessage(GetDlgItem(hDlg, IDC_LIST1), LB_RESETCONTENT, 0, 0);
         SendMessage(GetDlgItem(hDlg, IDC_LIST2), LB_RESETCONTENT, 0, 0);
 
         chksum = 0x0000;
         for (i = 0; i < playBackEndIdx; i++)
+        {
             chksum += playBack[i];
+        }
         sprintf(tmpStr, "Checksum: %04X", chksum);
         SetDlgItemText(hDlg, IDC_CHECKSUM2, tmpStr);
 
@@ -4553,26 +4587,28 @@ BOOL CALLBACK fnDIALOG_MACRO(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
         for (i = 0; i < MAX_MACROS; i++)
         {
             sprintf(tmpStr, "%-6s:\t%s", macro_short_names[i], macroName[i]);
-            SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG)((LPSTR)tmpStr));
+            SendDlgItemMessage(hDlg, IDC_LIST0, LB_ADDSTRING, 0, (LONG)((LPSTR)tmpStr));
         }
-        SendDlgItemMessage(hDlg, 101, LB_SETCURSEL, lastChosenMacro, 0);
-        SetFocus(GetDlgItem(hDlg, 101));
+        SendDlgItemMessage(hDlg, IDC_LIST0, LB_SETCURSEL, lastChosenMacro, 0);
+        SetFocus(GetDlgItem(hDlg, IDC_LIST0));
         return TRUE;
 
     case WM_COMMAND:
 
         switch (LOWORD(wParam))
         {
-        case (101): // double click?!?
+        case (IDC_LIST0): // Did we click in the saved program list box?
             if (HIWORD(wParam) != LBN_DBLCLK)
             {
                 SendDlgItemMessage(hDlg, IDC_LIST1, LB_RESETCONTENT, 0, 0);
-                item = SendDlgItemMessage(hDlg, 101, LB_GETCURSEL, 0, 0L);
+                item = SendDlgItemMessage(hDlg, IDC_LIST0, LB_GETCURSEL, 0, 0L);
                 lastChosenMacro = item;
 
                 chksum = 0x0000;
                 for (i = 0; i < playBackIdxSave[item]; i++)
+                {
                     chksum += playBackSave[item][i];
+                }
                 sprintf(tmpStr, "Checksum: %04X", chksum);
                 SetDlgItemText(hDlg, IDC_CHECKSUM1, tmpStr);
 
@@ -4587,8 +4623,9 @@ BOOL CALLBACK fnDIALOG_MACRO(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
             }
             return TRUE;
             break;
-        case (102): // Save
-            item = SendDlgItemMessage(hDlg, 101, LB_GETCURSEL, 0, 0L);
+
+        case (102): // Save button
+            item = SendDlgItemMessage(hDlg, IDC_LIST0, LB_GETCURSEL, 0, 0L);
             if (item == (LRESULT)LB_ERR)
             {
                 MessageBox(hDlg, "No Item Selected In The List Box", "Excalibur User Error", MB_OK);
@@ -4596,6 +4633,7 @@ BOOL CALLBACK fnDIALOG_MACRO(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
             }
             else
             {
+                memcpy(macro_input_labels[item], current_macro_inputs, sizeof(current_macro_inputs));
                 strcpy(macName, macroName[item]);
                 strcpy(macShortName, macro_short_names[item]);
                 GetMacroName();
@@ -4606,7 +4644,7 @@ BOOL CALLBACK fnDIALOG_MACRO(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
                     memcpy(playBackSave[item], playBack, sizeof(playBack));
                     playBackIdxSave[item] = playBackEndIdx;
                     lastChosenMacro = item;
-                    SendMessage(GetDlgItem(hDlg, 101), LB_RESETCONTENT, 0, 0);
+                    SendMessage(GetDlgItem(hDlg, IDC_LIST0), LB_RESETCONTENT, 0, 0);
                     chksum = 0x0000;
                     for (i = 0; i < playBackEndIdx; i++)
                         chksum += playBack[i];
@@ -4616,17 +4654,17 @@ BOOL CALLBACK fnDIALOG_MACRO(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
                     for (i = 0; i < MAX_MACROS; i++)
                     {
                         sprintf(tmpStr, "%-6s:\t%s", macro_short_names[i], macroName[i]);
-                        SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG)((LPSTR)tmpStr));
+                        SendDlgItemMessage(hDlg, IDC_LIST0, LB_ADDSTRING, 0, (LONG)((LPSTR)tmpStr));
                     }
-                    SendDlgItemMessage(hDlg, 101, LB_SETCURSEL, lastChosenMacro, 0);
-                    SetFocus(GetDlgItem(hDlg, 101));
+                    SendDlgItemMessage(hDlg, IDC_LIST0, LB_SETCURSEL, lastChosenMacro, 0);
+                    SetFocus(GetDlgItem(hDlg, IDC_LIST0));
                 }
             }
             return TRUE;
             break;
 
-        case (103): // Recall
-            item = SendDlgItemMessage(hDlg, 101, LB_GETCURSEL, 0, 0L);
+        case (103): // Recall button
+            item = SendDlgItemMessage(hDlg, IDC_LIST0, LB_GETCURSEL, 0, 0L);
             if (item == (LRESULT)LB_ERR)
             {
                 MessageBox(hDlg, "No Item Selected In The List Box", "Excalibur User Error", MB_OK);
@@ -4641,9 +4679,14 @@ BOOL CALLBACK fnDIALOG_MACRO(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
             SendMessage(GetDlgItem(hDlg, IDC_LIST2), LB_RESETCONTENT, 0, 0);
             chksum = 0x0000;
             for (i = 0; i < playBackEndIdx; i++)
+            {
                 chksum += playBack[i];
+            }
             sprintf(tmpStr, "Checksum: %04X", chksum);
             SetDlgItemText(hDlg, IDC_CHECKSUM2, tmpStr);
+
+            memcpy(current_macro_inputs, macro_input_labels[item], sizeof(current_macro_inputs));
+
             for (i = 0; i < playBackEndIdx; i++)
             {
                 sprintf(tmpStr, "%03d - %s", i + 1, playBackMap[playBack[i]].funcText);
@@ -4655,30 +4698,40 @@ BOOL CALLBACK fnDIALOG_MACRO(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
             return TRUE;
             break;
 
-        case (104): // Clear All
+        case (104): // Clear All button
             if (MessageBox(hDlg, "Are you sure you wish to clear all programs?", "Excalibur For Windows", MB_ICONQUESTION | MB_YESNO) == IDYES)
             {
-                for (i = 0; i < MAX_MACROS; i++)
-                    SendDlgItemMessage(hDlg, 101, LB_DELETESTRING, 0, 0);
+                ClearAllPrograms(); // Wipe all programs - current and saved
+
+                SendDlgItemMessage(hDlg, IDC_LIST0, LB_RESETCONTENT, 0, 0);
+
                 for (i = 0; i < MAX_MACROS; i++)
                 {
-                    playBackIdxSave[i] = 0;
-                    strcpy(macroName[i], "Not Currently Defined");
-                    sprintf(macro_short_names[i], "P%02d", i + 1);
                     sprintf(tmpStr, "%-6s:\t%s", macro_short_names[i], macroName[i]);
-                    SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG)((LPSTR)tmpStr));
+                    SendDlgItemMessage(hDlg, IDC_LIST0, LB_ADDSTRING, 0, (LONG)((LPSTR)tmpStr));
                 }
+
+                SendMessage(GetDlgItem(hDlg, IDC_LIST2), LB_RESETCONTENT, 0, 0);
                 chksum = 0x0000;
+                for (i = 0; i < playBackEndIdx; i++)
+                    chksum += playBack[i];
                 sprintf(tmpStr, "Checksum: %04X", chksum);
-                SetDlgItemText(hDlg, IDC_CHECKSUM1, tmpStr);
-                lastChosenMacro = 0;
-                SendDlgItemMessage(hDlg, 101, LB_SETCURSEL, lastChosenMacro, 0);
-                SetFocus(GetDlgItem(hDlg, 101));
+                SetDlgItemText(hDlg, IDC_CHECKSUM2, tmpStr);
+                for (i = 0; i < playBackEndIdx; i++)
+                {
+                    sprintf(tmpStr, "%03d - %s", i + 1, playBackMap[playBack[i]].funcText);
+                    SendDlgItemMessage(hDlg, IDC_LIST2, LB_ADDSTRING, 0, (LONG)((LPSTR)tmpStr));
+                }
+                sprintf(tmpStr, "%03d - <End Of Program>", i + 1);
+                SendDlgItemMessage(hDlg, IDC_LIST2, LB_ADDSTRING, 0, (LONG)((LPSTR)tmpStr));
+
+                SendDlgItemMessage(hDlg, IDC_LIST0, LB_SETCURSEL, lastChosenMacro, 0);
+                SetFocus(GetDlgItem(hDlg, IDC_LIST0));
             }
             return TRUE;
 
-        case (106): // Delete Macro
-            item = SendDlgItemMessage(hDlg, 101, LB_GETCURSEL, 0, 0L);
+        case (106): // Delete Program button
+            item = SendDlgItemMessage(hDlg, IDC_LIST0, LB_GETCURSEL, 0, 0L);
             if (item == (LRESULT)LB_ERR)
             {
                 MessageBox(hDlg, "No Item Selected In The List Box", "Excalibur User Error", MB_OK);
@@ -4689,11 +4742,11 @@ BOOL CALLBACK fnDIALOG_MACRO(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
                 playBackIdxSave[item] = 0;
                 strcpy(macroName[item], "Not Currently Defined");
                 sprintf(macro_short_names[item], "P%02d", item + 1);
-                SendMessage(GetDlgItem(hDlg, 101), LB_RESETCONTENT, 0, 0);
+                SendMessage(GetDlgItem(hDlg, IDC_LIST0), LB_RESETCONTENT, 0, 0);
                 for (i = 0; i < MAX_MACROS; i++)
                 {
                     sprintf(tmpStr, "%-6s:\t%s", macro_short_names[i], macroName[i]);
-                    SendDlgItemMessage(hDlg, 101, LB_ADDSTRING, 0, (LONG)((LPSTR)tmpStr));
+                    SendDlgItemMessage(hDlg, IDC_LIST0, LB_ADDSTRING, 0, (LONG)((LPSTR)tmpStr));
                 }
                 chksum = 0x0000;
                 for (i = 0; i < playBackIdxSave[item]; i++)
@@ -4701,8 +4754,8 @@ BOOL CALLBACK fnDIALOG_MACRO(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
                 sprintf(tmpStr, "Checksum: %04X", chksum);
                 SetDlgItemText(hDlg, IDC_CHECKSUM1, tmpStr);
 
-                SendDlgItemMessage(hDlg, 101, LB_SETCURSEL, lastChosenMacro, 0);
-                SetFocus(GetDlgItem(hDlg, 101));
+                SendDlgItemMessage(hDlg, IDC_LIST0, LB_SETCURSEL, lastChosenMacro, 0);
+                SetFocus(GetDlgItem(hDlg, IDC_LIST0));
             }
             return TRUE;
 
@@ -4739,7 +4792,7 @@ BOOL CALLBACK fnDIALOG_MACRO(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
             cptr = GlobalLock(tptr);
             lstrcpy(cptr, "");
 
-            item = SendDlgItemMessage(hDlg, 101, LB_GETCURSEL, 0, 0L);
+            item = SendDlgItemMessage(hDlg, IDC_LIST0, LB_GETCURSEL, 0, 0L);
 
             sprintf(tmpStr, "Macro Name:  %s", macro_short_names[item]);
             lstrcat(cptr, (LPSTR)tmpStr);
@@ -4781,7 +4834,7 @@ BOOL CALLBACK fnDIALOG_MACRO(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
             MessageBox(hDlg, "The currently loaded program has been saved to the clipboard.", "Excalibur For Windows", MB_ICONINFORMATION | MB_OK);
             return TRUE;
 
-        case (105): // Cancel
+        case (105): // Cancel button
             EndDialog(hDlg, FALSE);
             return TRUE;
 

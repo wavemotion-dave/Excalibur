@@ -13,6 +13,7 @@
 #define IDC_CHECK2                      2008
 #define IDC_CHECK3                      2011
 #define IDC_CHECK4                      2014
+#define IDC_LIST0                       2015
 #define IDC_LIST1                       2016
 #define IDC_LIST2                       2017
 #define IDC_CHECKSUM1                   2018

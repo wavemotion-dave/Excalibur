@@ -115,10 +115,9 @@ extern void Macro_XGTR0(void);
 extern void Macro_XLTR1(void);
 extern void Macro_XGTR1(void);
 extern void Macro_Pause(void);
-extern void Macro_InpA(void);
-extern void Macro_InpB(void);
-extern void Macro_InpC(void);
-extern void Macro_InpD(void);
+extern void Macro_InpR0(void);
+extern void Macro_InpR1(void);
+extern void Macro_InpR2(void);
 extern void Macro_Trace(void);
 extern void Macro_DEL(void);
 extern void Macro_FWD(void);
@@ -199,9 +198,9 @@ struct funcStruct Program2_funcs[MAX_FUNCS] =
     {FN3,   UNI_PAUSE,      USES_FL,    ALLOWREC,   ' ',    "Pause",    YES_L,      X_NEW,   Macro_Pause,    T_PAUSE,    H_PAUSE},
     {FN4,   UNI_HALT,       USES_FL,    ALLOWREC,   ' ',    "Halt",     YES_L,      X_NEW,   Macro_Halt,     T_HALT,     H_HALT},
 
-    {FN5,   UNI_INPA,       USES_FL,    ALLOWREC,   ' ',    "Inp R0",   YES_L,      X_NEW,   Macro_InpA,     T_INPA,     H_INPA},
-    {FN6,   UNI_INPB,       USES_FL,    ALLOWREC,   ' ',    "Inp R1",   YES_L,      X_NEW,   Macro_InpB,     T_INPB,     H_INPB},
-    {FN7,   UNI_INPC,       USES_FL,    ALLOWREC,   ' ',    "Inp R2",   YES_L,      X_NEW,   Macro_InpC,     T_INPC,     H_INPC},
+    {FN5,   UNI_INPR0,      USES_FL,    ALLOWREC,   ' ',    "Inp R0",   YES_L,      X_NEW,   Macro_InpR0,    T_INPR0,    H_INPR0},
+    {FN6,   UNI_INPR1,      USES_FL,    ALLOWREC,   ' ',    "Inp R1",   YES_L,      X_NEW,   Macro_InpR1,    T_INPR1,    H_INPR1},
+    {FN7,   UNI_INPR2,      USES_FL,    ALLOWREC,   ' ',    "Inp R2",   YES_L,      X_NEW,   Macro_InpR2,    T_INPR2,    H_INPR2},
     {FN8,   UNI_BEEP,       USES_FL,    ALLOWREC,   ' ',    "Beep",     YES_L,      X_NEW,   Macro_Beep,     T_BEEP,     H_BEEP},
 
     {FN9,   UNI_SFX,        USES_FL,    ALLOWREC,   ' ',    "SFx",      YES_L,      X_NEW,   Macro_SFx,      T_SFX,      H_SFX},
@@ -599,9 +598,14 @@ BOOL CALLBACK inputRegisterProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM 
     {
     case WM_INITDIALOG:
         if (progMode == PROG_FLOAT)
-            FormatNumberForStack(STO[RegisterToInput], tmp);
+        {
+            FormatNumberForStack(STO[RegisterToInput], tmp, FALSE);
+        }
         else
-            MakeCompSciStr(STOL[RegisterToInput], tmp);
+        {
+            sprintf(tmp, "%I64d", STOL[RegisterToInput]);
+        }
+        SetDlgItemText(hDlg, IDC_INPUT_REG, current_macro_inputs[RegisterToInput]);
         SetDlgItemText(hDlg, IDC_EDIT1, tmp);
         SetFocus(GetDlgItem(hDlg, IDC_EDIT1));
         return TRUE;
@@ -630,27 +634,57 @@ BOOL CALLBACK inputRegisterProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM 
     return FALSE;
 }
 
-void Macro_InpA(void)
+BOOL CALLBACK inputRegisterPromptProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
+{
+    char tmp[32];
+    switch(wMessage)
+    {
+    case WM_INITDIALOG:
+        SetDlgItemText(hDlg, IDC_EDIT1, current_macro_inputs[RegisterToInput]);
+        SetFocus(GetDlgItem(hDlg, IDC_EDIT1));
+        return TRUE;
+
+    case WM_COMMAND:
+        switch(wParam)
+        {
+        case(IDOK):
+            GetDlgItemText(hDlg, IDC_EDIT1, tmp, 20);
+            tmp[20] = CNULL;
+            strcpy(current_macro_inputs[RegisterToInput], tmp);
+            EndDialog(hDlg, FALSE);
+            return TRUE;
+            break;
+
+        default:
+            return FALSE;
+        }
+    }
+    return FALSE;
+}
+
+void InputRegisterPrompt(void)
+{
+    DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_INPUT_REG_PROMPT", calcMainWindow, inputRegisterPromptProc);
+}
+
+void Macro_InpR0(void)
 {
     RegisterToInput = 0;
+    if (recModeON) InputRegisterPrompt();
     DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_INPUT_REG", calcMainWindow, inputRegisterProc);
 }
 
-void Macro_InpB(void)
+void Macro_InpR1(void)
 {
     RegisterToInput = 1;
+    if (recModeON) InputRegisterPrompt();
     DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_INPUT_REG", calcMainWindow, inputRegisterProc);
 }
 
-void Macro_InpC(void)
+void Macro_InpR2(void)
 {
     RegisterToInput = 2;
-    DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_INPUT_REG", calcMainWindow, inputRegisterProc);
-}
-
-void Macro_InpD(void)
-{
-    RegisterToInput = 3;
+    if (recModeON) InputRegisterPrompt();
     DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_INPUT_REG", calcMainWindow, inputRegisterProc);
 }
 
@@ -935,7 +969,7 @@ BOOL CALLBACK inputDebugValue(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lP
     switch(wMessage)
     {
     case WM_INITDIALOG:
-        FormatNumberForStack(debugValue, tmp);
+        FormatNumberForStack(debugValue, tmp, FALSE);
         SetDlgItemText(hDlg, IDC_EDIT1, tmp);
         SetFocus(GetDlgItem(hDlg, IDC_EDIT1));
         return TRUE;

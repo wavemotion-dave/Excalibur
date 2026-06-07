@@ -299,7 +299,7 @@ extern int ProcessKeyHit(WPARAM key);
 extern char Radix(int progM);
 extern void PutCommas(char *str);
 extern void MakeEngineeringFormat(double val, char *Fstr);
-extern void FormatNumberForStack(double val, char *Fstr);
+extern void FormatNumberForStack(double val, char *Fstr, uint8_t useCommas);
 extern void ShowStack(void);
 extern void StackPush(double temp);
 extern double StackPop(void);
@@ -445,6 +445,7 @@ extern void turnOnNumLock(void);
 #define MAX_MACRO_FUNC_TEXT 30      // Maximum macro text that can be assigned to any key
 #define MAX_SHORT_NAME_TEXT  6      // Program short names must be able to fit on button labels
 #define MAX_LABELS          10      // Labels A=0 through J=9 for a total of 10 labels
+#define MAX_INPUT_INST_TEXT 20      // R1, R2 and R3 can have short input instruction prompts
 
 // Add to the end of this list but *NEVER* remove entries or else you will invalidate existing saved programs (and will need to redo the config)
 enum UniqueButtonIndexTag
@@ -773,9 +774,9 @@ enum UniqueButtonIndexTag
     UNI_HALT,
     UNI_PAUSE,
     UNI_BEEP,
-    UNI_INPA,
-    UNI_INPB,
-    UNI_INPC,
+    UNI_INPR0,
+    UNI_INPR1,
+    UNI_INPR2,
     UNI_SFX,
     UNI_CFX,
     UNI_TFX,
@@ -834,6 +835,8 @@ extern struct playbackStruct playBackMap[UNI_MAX + 1];
 
 extern char macroName[MAX_MACROS][MAX_MACRO_FUNC_TEXT+1];
 extern char macro_short_names[MAX_MACROS][MAX_SHORT_NAME_TEXT+1];
+extern char macro_input_labels[MAX_MACROS][3][MAX_INPUT_INST_TEXT+1];
+extern char current_macro_inputs[3][MAX_INPUT_INST_TEXT+1];
 
 #define COPY_X_TO_CLIPBOARD         0
 #define COPY_ALL_TO_CLIPBOARD       1
@@ -1696,10 +1699,12 @@ extern uint32_t userTicks;
 #define H_TFX           "Test Flag X (32 user flags - X must be whole number). If TRUE, execute next program line, else skip next line."
 #define T_PAUSE         "Pause Program"
 #define H_PAUSE         "Pause Program 1 second to show stack."
-#define T_INPA          "Input R0"
-#define H_INPA          "Prompt user for R0 register value."
-#define T_INPB          "Input R1"
-#define H_INPB          "Prompt user for R1 register value."
+#define T_INPR0         "Input R0"
+#define H_INPR0         "Prompt user for R0 register value (if recording a program, will also ask for an input prompt)."
+#define T_INPR1         "Input R1"
+#define H_INPR1         "Prompt user for R1 register value. (if recording a program, will also ask for an input prompt)."
+#define T_INPR2         "Input R2"
+#define H_INPR2         "Prompt user for R2 register value. (if recording a program, will also ask for an input prompt)."
 #define T_TRACE         "Trace Program"
 #define H_TRACE         "Auto Trace Program - Trace Delay is configured on File/Settings"
 #define T_FWD           "Forward Step"
@@ -1717,10 +1722,6 @@ extern uint32_t userTicks;
 #define T_LBLJ          "Label J"
 #define T_GOTOJ         "Goto J"
 #define T_GSBJ          "Gosub J"
-#define T_INPC          "Input R2"
-#define H_INPC          "Prompt user for R2 register value."
-#define T_INPD          "Input R3"
-#define H_INPD          "Prompt user for R3 register value."
 #define T_STOIND        "Store Indirect Register"
 #define H_STOIND        "Stores X value to the Indirect Register (i)"
 #define T_GOTOIND       "Goto Indirect"
@@ -1816,6 +1817,7 @@ extern uint32_t userTicks;
 // DEBUG OUTPUT WINDOW - Control IDs and function declarations
 // ========================================================================================
 #define IDC_DEBUG_EDIT      3100
+#define IDC_INPUT_REG       3101
 
 // Debug output window functions
 extern void CreateDebugOutputWindow(HWND hParent, HINSTANCE hInstance);
