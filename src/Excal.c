@@ -42,10 +42,10 @@
 
 #define WINDOW_TITLE "Excalibur RPN Calculator"
 
-#define VERSION_STR "v3.XX-07"
+#define VERSION_STR "v3.XX-08"
 
 #define ABOUT_MSG "Excalibur for Windows 32-bit\n"                    \
-                  "Version 3.XX-07  -  June 7, 2026\n\n"              \
+                  "Version 3.XX-08  -  June 7, 2026\n\n"              \
                   "Copyright 1994-2026 David Bernazzani\n\n"          \
                   "Please read the disclaimer and understand the\n"   \
                   "accuracy and precision issues before using.\n\n"   \
