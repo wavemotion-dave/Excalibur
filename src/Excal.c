@@ -2499,6 +2499,10 @@ void ShowStack(void)
     }
 }
 
+// -----------------------------------------------------------------------------------------
+// The heart of the RPN system is the Stack. Here we push a value onto the stack into 
+// the X register, which in turn pushes up YZT. The extended stack is handled here as well.
+// -----------------------------------------------------------------------------------------
 void StackPush(double temp)
 {
     stackPushes++;
@@ -2532,6 +2536,10 @@ void StackPush(double temp)
     FloatsToLongs();
 }
 
+// -------------------------------------------------------------------------------------------------
+// The heart of the RPN system is the Stack. Here we pop a value from the stack from the X register,
+// which in turn causes YZT to drop one level. The extended stack is handled here as well.
+// -------------------------------------------------------------------------------------------------
 double StackPop(void)
 {
     double temp;
@@ -2561,9 +2569,9 @@ double StackPop(void)
     return (temp);
 }
 
-// -----------------------
-// Basic keypad keypresses
-// -----------------------
+// -----------------------------------------------------------------------
+// Basic keypad keypresses - this is the stuff that is not bank-specific.
+// -----------------------------------------------------------------------
 void RPN_clearStack(void)
 {
     // Check if we should clear all registers
@@ -2750,10 +2758,11 @@ void RPN_digit(WPARAM key)
 {
     double tmp1, tmp2, tmp3;
 
-    // ---------------------------------------------------------
+    // -----------------------------------------------------------
     // Handle Store and Recall of Registers. This also handles
-    // the possibility of Store and Recall Arithmetic.
-    // ---------------------------------------------------------
+    // the possibility of Store and Recall Arithmetic as well
+    // as STOMIN and STOMAX if the RDn or RUp keys were involved.
+    // -----------------------------------------------------------
     if (rpnStoreRecall)
     {
         uint8_t reg = (key - RPN_DIGIT_0) + (rpnStoreRecall & REG_DP ? 10 : 0);
