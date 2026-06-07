@@ -5309,7 +5309,9 @@ BOOL CALLBACK fnDIALOG_ShowMemory(HWND hDlg, UINT wMessage, WPARAM wParam, LPARA
         {
             for (i=0; i<MAX_STACK; i++)
             {
-                MakeCompSciStr(STACKL[i], tmp);
+                char tmp2[64];
+                MakeCompSciStr(STACKL[i], tmp2);
+                sprintf(tmp, "%s%c", tmp2, Radix(progMode));
                 SetDlgItemText(hDlg, IDC_SHOW_X+i, tmp);
             }
         }
@@ -5327,9 +5329,12 @@ BOOL CALLBACK fnDIALOG_ShowMemory(HWND hDlg, UINT wMessage, WPARAM wParam, LPARA
             }
             else
             {
+                char tmp2[64];
                 sprintf(tmp, "L%02d", i);
                 SetDlgItemText(hDlg, IDC_SHOW_LBL_R00+i, tmp);
-                MakeCompSciStr(STOL[i], tmp);
+
+                MakeCompSciStr(STOL[i], tmp2);
+                sprintf(tmp, "%s%c", tmp2, Radix(progMode));            
             }
             SetDlgItemText(hDlg, IDC_SHOW_R00+i, tmp);
         }

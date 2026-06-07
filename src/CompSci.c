@@ -268,7 +268,10 @@ void MakeCompSciStr(PROG_LONG val, char *tmpL)
 PROG_LONG ConvertCompSciStrTo64(char *str)
 {
     char *tmpPtr;
-    return(strtoi64(str, &tmpPtr, progMode));
+    if (str[0] == '0' && toupper(str[1]) == 'X') // If user entered 0x we treat as HEX
+        return(strtoi64(str, &tmpPtr, PROG_HEX));
+    else
+        return(strtoi64(str, &tmpPtr, progMode)); // Otherwise use the selected Comp-Sci mode
 }
 
 PROG_LONG MaskStack(PROG_LONG lng)

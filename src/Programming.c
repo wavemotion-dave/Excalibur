@@ -603,7 +603,14 @@ BOOL CALLBACK inputRegisterProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM 
         }
         else
         {
-            sprintf(tmp, "%I64d", STOL[RegisterToInput]);
+            if (progMode == PROG_HEX)
+            {
+                sprintf(tmp, "0x%I64X", STOL[RegisterToInput]);
+            }
+            else
+            {
+                sprintf(tmp, "%I64d", STOL[RegisterToInput]);
+            }
         }
         SetDlgItemText(hDlg, IDC_INPUT_REG, current_macro_inputs[RegisterToInput]);
         SetDlgItemText(hDlg, IDC_EDIT1, tmp);
@@ -637,6 +644,7 @@ BOOL CALLBACK inputRegisterProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM 
 BOOL CALLBACK inputRegisterPromptProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
 {
     char tmp[32];
+
     switch(wMessage)
     {
     case WM_INITDIALOG:
@@ -981,10 +989,22 @@ BOOL CALLBACK inputDebugValue(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lP
             GetDlgItemText(hDlg, IDC_EDIT1, tmp, 63);
             tmp[63] = CNULL;
             trim(tmp);
-            debugValue = atof(tmp);
+            if (progMode == PROG_FLOAT)
+            {
+                debugValue = atof(tmp);
+            }
+            else
+            {
+                // Not perfect - it means in Comp-Sci mode we can't enter values bigger than 32-bits
+                if (wordMode == COMPSCI_SIGNED)
+                    debugValue = (double)(int32_t)ConvertCompSciStrTo64(tmp);
+                else
+                    debugValue = (double)(uint32_t)ConvertCompSciStrTo64(tmp);                
+            }
             EndDialog(hDlg, FALSE);
             return TRUE;
             break;
+
         case(IDCANCEL):       // Cancel
             EndDialog(hDlg, FALSE);
             return TRUE;
@@ -1092,39 +1112,67 @@ BOOL CALLBACK debugWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam
                                 debugValue = (double) indirectRegister;
                                 indirectRegister = (int32_t)getNewDebugVal();
                                 break;
+                            case 13:
+                                debugValue = (double) progFlags;
+                                progFlags = (uint32_t)getNewDebugVal();
+                                break;
+                            case 14:
+                                debugValue = (double) LOOPS[LOOP_REG_H];
+                                LOOPS[LOOP_REG_H] = (int32_t)getNewDebugVal();
+                                break;
+                            case 15:
+                                debugValue = (double) LOOPS[LOOP_REG_HC];
+                                LOOPS[LOOP_REG_HC] = (int32_t)getNewDebugVal();
+                                break;
                             case 16:
+                                debugValue = (double) LOOPS[LOOP_REG_I];
+                                LOOPS[LOOP_REG_I] = (int32_t)getNewDebugVal();
+                                break;
+                            case 17:
+                                debugValue = (double) LOOPS[LOOP_REG_IC];
+                                LOOPS[LOOP_REG_IC] = (int32_t)getNewDebugVal();
+                                break;
+                            case 18:
+                                debugValue = (double) LOOPS[LOOP_REG_J];
+                                LOOPS[LOOP_REG_J] = (int32_t)getNewDebugVal();
+                                break;
+                            case 19:
+                                debugValue = (double) LOOPS[LOOP_REG_JC];
+                                LOOPS[LOOP_REG_JC] = (int32_t)getNewDebugVal();
+                                break;
+                            case 22:
                                 debugValue = FIN[FIN_REG_n];
                                 FIN[FIN_REG_n] = getNewDebugVal();
                                 break;
-                            case 17:
+                            case 23:
                                 debugValue = FIN[FIN_REG_i];
                                 FIN[FIN_REG_i] = getNewDebugVal();
                                 break;
-                            case 18:
+                            case 24:
                                 debugValue = FIN[FIN_REG_PV];
                                 FIN[FIN_REG_PV] = getNewDebugVal();
                                 break;
-                            case 19:
+                            case 25:
                                 debugValue = FIN[FIN_REG_PMT];
                                 FIN[FIN_REG_PMT] = getNewDebugVal();
                                 break;
-                            case 20:
+                            case 26:
                                 debugValue = FIN[FIN_REG_FV];
                                 FIN[FIN_REG_FV] = getNewDebugVal();
                                 break;
-                            case 21:
+                            case 27:
                                 debugValue = FIN[FIN_REG_MUC];
                                 FIN[FIN_REG_MUC] = getNewDebugVal();
                                 break;
-                            case 22:
+                            case 28:
                                 debugValue = FIN[FIN_REG_MUP];
                                 FIN[FIN_REG_MUP] = getNewDebugVal();
                                 break;
-                            case 23:
+                            case 29:
                                 debugValue = FIN[FIN_REG_COST];
                                 FIN[FIN_REG_COST] = getNewDebugVal();
                                 break;
-                            case 24:
+                            case 30:
                                 debugValue = FIN[FIN_REG_PRICE];
                                 FIN[FIN_REG_PRICE] = getNewDebugVal();
                                 break;
