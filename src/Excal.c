@@ -45,7 +45,7 @@
 #define VERSION_STR "v3.XX-07"
 
 #define ABOUT_MSG "Excalibur for Windows 32-bit\n"                    \
-                  "Version 3.XX-07  -  June 3, 2026\n\n"              \
+                  "Version 3.XX-07  -  June 7, 2026\n\n"              \
                   "Copyright 1994-2026 David Bernazzani\n\n"          \
                   "Please read the disclaimer and understand the\n"   \
                   "accuracy and precision issues before using.\n\n"   \
@@ -54,37 +54,35 @@
                   "https://github.com/wavemotion-dave/Excalibur"      \
                   "\n\nThis version is BETA - Expect and report Bugs!"
 
-#define CONFIG_VERSION_MAIN 0xF018  // If this changes, we wipe EVERYTHING
+#define CONFIG_VERSION_MAIN 0xF019  // If this changes, we wipe EVERYTHING
 #define CONFIG_VERSION_SUB  0x0001  // If this changes, we reset x,y window position and reset constant tables (currency, physics constants, etc)
 
 #define END_OF_PROGRAM_STR "<End Of Program>"
 #define PROGRAM_ASSIGNED_KEY_STR "Program Assigned Key"
 
-int16_t playBackSave[MAX_MACROS][MAX_REC_PLAYBACK + 1];
-int16_t playBackIdxSave[MAX_MACROS];
-uint8_t recModeON = 0;
-uint8_t macroPlayback = FALSE;
-
-uint8_t modifiers = 0x00;
-
-int16_t playBack[MAX_REC_PLAYBACK + 1];
-int16_t playBackEndIdx = 0;
-int16_t currentPlaybackIdx = 0;
-uint8_t showTrace = FALSE;
-uint8_t toolTipCounter = 0;
-uint8_t bExactFont = TRUE;
-int16_t MacroStack[MAX_MACRO_STACK];
-int16_t MacroStackIdx = 0;
+int16_t  playBackSave[MAX_MACROS][MAX_REC_PLAYBACK + 1];
+int16_t  playBackIdxSave[MAX_MACROS];
+uint8_t  recModeON = 0;
+uint8_t  macroPlayback = FALSE;
+uint8_t  modifiers = 0x00;
+int16_t  playBack[MAX_REC_PLAYBACK + 1];
+int16_t  playBackEndIdx = 0;
+int16_t  currentPlaybackIdx = 0;
+uint8_t  showTrace = FALSE;
+uint8_t  toolTipCounter = 0;
+uint8_t  bExactFont = TRUE;
+int16_t  MacroStack[MAX_MACRO_STACK];
+int16_t  MacroStackIdx = 0;
 uint32_t progFlags = 0x00000000;
-uint8_t rpnStoreRecall = 0x00;
+uint16_t rpnStoreRecall = 0x0000;
 
 uint32_t wordSize = 32;
 uint64_t wordSizeMask = (uint64_t) 0xFFFFFFFFL;
-uint8_t padZeros = COMPSCI_NOPADZEROS;
-uint8_t wordMode = COMPSCI_SIGNED;
-uint8_t hexSpacing = HEX_SPACE_NONE;
-uint8_t numberDisplayMode = SEPARATOR_COMMA_DP;
-uint8_t lastProgMode = PROG_FLOAT;
+uint8_t  padZeros = COMPSCI_NOPADZEROS;
+uint8_t  wordMode = COMPSCI_SIGNED;
+uint8_t  hexSpacing = HEX_SPACE_NONE;
+uint8_t  numberDisplayMode = SEPARATOR_COMMA_DP;
+uint8_t  lastProgMode = PROG_FLOAT;
 uint16_t traceDelayValueMs = 500;
 
 uint32_t lastTickCount = 0;
@@ -320,11 +318,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
         SendMessage(GetDlgItem(calcMainWindow, id), WM_SETFONT, (WPARAM)hMainFont, FALSE);
     }
 
-    ExcalInit();                                    // Setup based on configuration read from disk.
-    ShowWindow(calcMainWindow, iCmdShow);           // Now show the window the way it was asked to be displayed.
-    CreateToolTipWindow(calcMainWindow, hInstance); // Create the tool-tip window that goes with buttons.
-    CreateDebugWindow(calcMainWindow, hInstance);   // Create the debug window for program traceback, register view, etc.
-    SelectNewBank(currentFuncs);                    // Make sure the right bank is selected
+    ExcalInit();                                        // Setup based on configuration read from disk.
+    InitDebugOutput();                                  // Initialize debug output system.
+    ShowWindow(calcMainWindow, iCmdShow);               // Now show the window the way it was asked to be displayed.
+    CreateToolTipWindow(calcMainWindow, hInstance);     // Create the tool-tip window that goes with buttons.
+    CreateDebugWindow(calcMainWindow, hInstance);       // Create the debug window for program traceback, register view, etc.
+    CreateDebugOutputWindow(calcMainWindow, hInstance); // Create the debug output window (only if ENABLE_DEBUG_WINDOW is defined).
+    SelectNewBank(currentFuncs);                        // Make sure the right bank is selected
 
     // -------------------------------------------------------------------------------
     // This is our main loop that runs forever... processing and dispatching messages
@@ -455,7 +455,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
         }
 
     case WM_COMMAND:
-        if (macroPlayback == TRUE) // If we get a playback over a playback we stop the playback!
+        if (macroPlayback == TRUE) // If we get any user activity over a playback we stop the playback!
         {
             endRunningMacro();
             ShowStatus();
@@ -576,7 +576,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
         break;
 
     case WM_CONTEXTMENU:           // Right mouse button - context sensitive help!
-        if (macroPlayback == TRUE) // If we get a playback over a playback we stop the playback!
+        if (macroPlayback == TRUE) // If we get any user activity over a playback we stop the playback!
         {
             endRunningMacro();
             ShowStatus();
@@ -910,7 +910,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
         break;
 
     case WM_CHAR:
-        if (macroPlayback == TRUE) // If we get a playback over a playback we stop the playback!
+        if (macroPlayback == TRUE) // If we get any user activity over a playback we stop the playback!
         {
             endRunningMacro();
             ShowStatus();
@@ -968,6 +968,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
     case WM_DESTROY:
         endRunningMacro();
         SaveToDisk();
+        CleanupDebugOutput();
         DeleteObject(holdsfont);
         DeleteObject(hMainFont);
         DeleteObject(hStackFont);
@@ -1356,7 +1357,7 @@ HFONT GetMainStackFont(void)
     nHeight = -MulDiv(12, GetDeviceCaps(dc, LOGPIXELSY), 72);
 
     font = CreateFont(nHeight, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE,
-                      DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
+                      ANSI_CHARSET, OUT_DEFAULT_PRECIS,
                       CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FF_DONTCARE | FIXED_PITCH, "Consolas");
 
     font = SelectObject(dc, font);
@@ -1395,7 +1396,7 @@ HFONT GetSystemFont(void)
     nHeight = -MulDiv(10, GetDeviceCaps(dc, LOGPIXELSY), 72);
 
     font = CreateFont(nHeight, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE,
-                      DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
+                      ANSI_CHARSET, OUT_DEFAULT_PRECIS,
                       CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FF_SWISS | VARIABLE_PITCH, "System");
 
     font = SelectObject(dc, font);
@@ -1417,7 +1418,7 @@ HFONT GetSystemFontFixed(void)
     nHeight = -MulDiv(12, GetDeviceCaps(dc, LOGPIXELSY), 72);
 
     font = CreateFont(nHeight, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
-                      DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
+                      ANSI_CHARSET, OUT_DEFAULT_PRECIS,
                       CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH, "System");
 
     font = SelectObject(dc, font);
@@ -1452,7 +1453,7 @@ void NotImp(void)
 __inline void RPN_ClearModifiers(int updateSpare)
 {
     modifiers = 0x00;
-    rpnStoreRecall = 0x00;
+    rpnStoreRecall = 0x0000;
     if (updateSpare)
         UpdateInfoBar(" ");
 }
@@ -1460,6 +1461,7 @@ __inline void RPN_ClearModifiers(int updateSpare)
 void UpdateInfoBar_StoreRecall(void)
 {
     char tmpStr[16];
+
     if (rpnStoreRecall && !macroPlayback)
     {
         if (rpnStoreRecall & REG_STORE)
@@ -1474,6 +1476,7 @@ void UpdateInfoBar_StoreRecall(void)
         {
             strcpy(tmpStr, "EXCH");
         }
+
         if (rpnStoreRecall & REG_PLUS)
             strcat(tmpStr, "+");
         if (rpnStoreRecall & REG_MINUS)
@@ -1482,6 +1485,10 @@ void UpdateInfoBar_StoreRecall(void)
             strcat(tmpStr, "×");
         if (rpnStoreRecall & REG_DIVIDE)
             strcat(tmpStr, "÷");
+        if (rpnStoreRecall & REG_STOMIN)
+            strcat(tmpStr, "<");
+        if (rpnStoreRecall & REG_STOMAX)
+            strcat(tmpStr, ">");
 
         if (rpnStoreRecall & REG_DP)
             strcat(tmpStr, " ·");
@@ -1913,11 +1920,11 @@ struct funcStruct RPNkeys[] = {
 
     {RPN_EXCH_X_Y,  UNI_XCH,    USES_FL, ALLOWREC, 'x', "", NO_L,   X_NEW,      RPN_exchange_x_y,   "Exchange X and Y",     "Exchanges the contents of the X and Y registers"},
     {RPN_NEGATE,    UNI_CHS,    USES_FL, ALLOWREC, 'n', "", NO_L,   X_NULL,     RPN_negate_x,       "Change Sign",          "Used to change the sign of X"},
-    {RPN_E,         UNI_E,      USES_FL, ALLOWREC, 'e', "", NO_L,   X_NULL,     RPN_Ex,             "Exponent",             "Used to produce an exponential number(e.g. 3.45e+12)"},
+    {RPN_E,         UNI_E,      USES_FL, ALLOWREC, 'e', "", NO_L,   X_NULL,     RPN_Eex,            "Exponent",             "Used to produce an exponential number(e.g. 3.45e+12)"},
     {RPN_STO,       UNI_STO,    USES_FL, ALLOWREC, 's', "", NO_L,   X_NULL,     RPN_store,          "Store Register",       "Used to store X to one of the registers (next digit/dp selects R0-R19). Register Arithmetic is also supported."},
     {RPN_RCL,       UNI_RCL,    USES_FL, ALLOWREC, 'r', "", NO_L,   X_NULL,     RPN_recall,         "Recall Register",      "Used to recall one of registers to X (next digit/dp selects R0-R19). Register Arithmetic is also supported."},
-    {RPN_R_UP,      UNI_RUP,    USES_FL, ALLOWREC, 38,  "", NO_L,   X_NEW,      RPN_rotateStackUp,  "Rotate Stack Up",      "Rotates the contents of the stack up"},
-    {RPN_R_DN,      UNI_RDN,    USES_FL, ALLOWREC, 40,  "", NO_L,   X_NEW,      RPN_rotateStackDn,  "Rotate Stack Down",    "Rotates the contents of the stack down"},
+    {RPN_R_UP,      UNI_RUP,    USES_FL, ALLOWREC, 38,  "", NO_L,   X_NULL,     RPN_rotateStackUp,  "Rotate Stack Up",      "Rotates the contents of the stack up"},
+    {RPN_R_DN,      UNI_RDN,    USES_FL, ALLOWREC, 40,  "", NO_L,   X_NULL,     RPN_rotateStackDn,  "Rotate Stack Down",    "Rotates the contents of the stack down"},
     {RPN_LASTX,     UNI_LSTX,   USES_FL, ALLOWREC, 'l', "", NO_L,   X_NEW,      RPN_lastX,          "Last X",               "Retrieves the last value of X before the last operation occurred"},
     {RPN_MODE,      UNI_MODE,   USES_FL, ALLOWREC, 'm', "", NO_L,   X_NEW,      RPN_mode,           "Display Mode",         "Used to select the display mode for the stack"},
     {RPN_BKSP,      UNI_BKSP,   USES_FL, ALLOWREC,  8,  "", NO_L,   X_NULL,     RPN_backspace,      "Backspace",            "Used to correct mistakes in number entry"},
@@ -2560,7 +2567,7 @@ double StackPop(void)
 void RPN_clearStack(void)
 {
     // Check if we should clear all registers
-    if (rpnStoreRecall & 0x03)
+    if (rpnStoreRecall & 0x0003)
     {
         memset(STO, 0x00, sizeof(STO));
         memset(STOL, 0x00, sizeof(STOL));
@@ -2708,7 +2715,7 @@ void RPN_dp(void)
     Xedit = X_EDIT;
 }
 
-void RPN_Ex(void)
+void RPN_Eex(void)
 {
     char *ptr;
 
@@ -2792,6 +2799,42 @@ void RPN_digit(WPARAM key)
                     if (STACKL[STK_X] != 0L)
                     {
                         STOL[reg] /= STACKL[STK_X];
+                    }
+                }
+            }
+            // Store or Recall MAX/MIN via STO+RUp and STO+RDn
+            else if (rpnStoreRecall & REG_STOMAX)
+            {
+                if (progMode == PROG_FLOAT)
+                {
+                    if (STACK[STK_X] > STO[reg])
+                    {
+                        STO[reg] = STACK[STK_X];
+                    }
+                }
+                else
+                {
+                    if (STACKL[STK_X] > STOL[reg])
+                    {
+                        STOL[reg] = STACKL[STK_X];
+                    }
+                }
+            }
+            // Store or Recall MAX/MIN via STO+RUp and STO+RDn
+            else if (rpnStoreRecall & REG_STOMIN)
+            {
+                if (progMode == PROG_FLOAT)
+                {
+                    if (STACK[STK_X] < STO[reg])
+                    {
+                        STO[reg] = STACK[STK_X];
+                    }
+                }
+                else
+                {
+                    if (STACKL[STK_X] < STOL[reg])
+                    {
+                        STOL[reg] = STACKL[STK_X];
                     }
                 }
             }
@@ -3195,7 +3238,7 @@ void RPN_plus(void)
 
     if (rpnStoreRecall & 0x03)
     {
-        rpnStoreRecall &= 0x0F;
+        rpnStoreRecall &= 0x000F;
         rpnStoreRecall |= REG_PLUS;
         UpdateInfoBar_StoreRecall();
         return;
@@ -3257,7 +3300,7 @@ void RPN_minus(void)
 
     if (rpnStoreRecall & 0x03)
     {
-        rpnStoreRecall &= 0x0F;
+        rpnStoreRecall &= 0x000F;
         rpnStoreRecall |= REG_MINUS;
         UpdateInfoBar_StoreRecall();
         return;
@@ -3358,7 +3401,7 @@ void RPN_multiply(void)
 
     if (rpnStoreRecall & 0x03)
     {
-        rpnStoreRecall &= 0x0F;
+        rpnStoreRecall &= 0x000F;
         rpnStoreRecall |= REG_MULTIPLY;
         UpdateInfoBar_StoreRecall();
         return;
@@ -3409,7 +3452,7 @@ void RPN_divide(void)
 
     if (rpnStoreRecall & 0x03)
     {
-        rpnStoreRecall &= 0x0F;
+        rpnStoreRecall &= 0x000F;
         rpnStoreRecall |= REG_DIVIDE;
         UpdateInfoBar_StoreRecall();
         return;
@@ -3549,7 +3592,17 @@ void RPN_rotateStackUp(void)
     double temp;
     PROG_LONG tempL;
 
+    if (rpnStoreRecall)
+    {
+        rpnStoreRecall |= REG_STOMAX;
+        rpnStoreRecall &= ~(REG_PLUS | REG_MINUS | REG_DIVIDE | REG_MULTIPLY);
+        UpdateInfoBar_StoreRecall();
+        return;
+    }
+
     Xedit = X_NEW;
+
+    // Otherwise rotate the stack as asked for...
     if (progMode == PROG_FLOAT)
     {
         if (extendedStack)
@@ -3603,7 +3656,16 @@ void RPN_rotateStackDn(void)
     double temp;
     PROG_LONG tempL;
 
+    if (rpnStoreRecall)
+    {
+        rpnStoreRecall |= REG_STOMIN;
+        rpnStoreRecall &= ~(REG_PLUS | REG_MINUS | REG_DIVIDE | REG_MULTIPLY);
+        UpdateInfoBar_StoreRecall();
+        return;
+    }
+
     Xedit = X_NEW;
+
     if (progMode == PROG_FLOAT)
     {
         if (extendedStack)
@@ -5470,7 +5532,7 @@ void mapButtonFuncs(void)
 }
 
 // -------------------------------------------------------------------------------
-// This function will save the unique index for the button just pressed into the 
+// This function will save the unique index for the button just pressed into the
 // programming playback array at the current step position. This allows us to
 // record a sequence of keystrokes and then play back when the user presses 'Run'
 // -------------------------------------------------------------------------------

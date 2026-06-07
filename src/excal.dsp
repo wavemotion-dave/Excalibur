@@ -91,15 +91,15 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;hpj;bat;for;f90"
 # Begin Source File
 
-SOURCE=.\Financial.c
-# End Source File
-# Begin Source File
-
 SOURCE=.\ComplexMath.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=.\CompSci.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\Constants.c
 # End Source File
 # Begin Source File
 
@@ -111,19 +111,7 @@ SOURCE=.\Custom.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\Constants.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\Programming.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\Scientific.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\Statistics.c
+SOURCE=.\DebugOutput.c
 # End Source File
 # Begin Source File
 
@@ -139,6 +127,22 @@ SOURCE=.\Excal.rc
 
 !ENDIF 
 
+# End Source File
+# Begin Source File
+
+SOURCE=.\Financial.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\Programming.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\Scientific.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\Statistics.c
 # End Source File
 # End Group
 # Begin Group "Header Files"

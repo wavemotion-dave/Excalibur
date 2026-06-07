@@ -140,8 +140,9 @@ extern struct funcStruct MacroFuncs[];
 #define NOTES_SIZE  8196
 
 #define UINT64_MAX (uint64_t)0xFFFFFFFFFFFFFFFF
-#define INT64_MAX (int64_t)0x7FFFFFFFFFFFFFFF
-#define INT64_MIN (int64_t)0x8000000000000000
+#define UINT64_MIN (uint64_t)0x0000000000000000
+#define INT64_MAX   (int64_t)0x7FFFFFFFFFFFFFFF
+#define INT64_MIN   (int64_t)0x8000000000000000
 
 // ---------------------------
 // Defines for the main dialog
@@ -214,6 +215,7 @@ extern HFONT hStackFont;
 extern HFONT hFixedFont;
 
 extern uint8_t progMode;
+
 #define PROG_FLOAT      0       // For normal floating-point handling
 #define PROG_DEC        10      // Comp-Sci DEC mode
 #define PROG_HEX        16      // Comp-Sci HEX mode
@@ -231,31 +233,32 @@ extern uint8_t progMode;
 #define SUM_RES3        8       // Summation Register - Reserved for future use
 #define SUM_RES4        9       // Summation Register - Reserved for future use
 #define SUM_MAX         10      // Total number of Summation Registers
+
 extern double SUM[SUM_MAX];
 
 #define MAX_CF          100
 extern double cashFlow[MAX_CF];
 extern uint8_t CFn;
 extern uint8_t binMode;
-
-#define FIN_REG_MAX     9
-extern double FIN[FIN_REG_MAX];
 extern uint8_t payMode;
 extern uint8_t dateMode;
 
-// TVM Registers
-#define FIN_REG_n      0
-#define FIN_REG_i      1
-#define FIN_REG_PV     2
-#define FIN_REG_PMT    3
-#define FIN_REG_FV     4
+// TVM and other Financial Registers
+enum FinancialRegs_t
+{
+    FIN_REG_n = 0,
+    FIN_REG_i,
+    FIN_REG_PV,
+    FIN_REG_PMT,
+    FIN_REG_FV,
+    FIN_REG_MUC,
+    FIN_REG_MUP,
+    FIN_REG_COST,
+    FIN_REG_PRICE,
+    FIN_REG_MAX
+};
 
-// Markup Registers
-#define FIN_REG_MUC    5
-#define FIN_REG_MUP    6
-#define FIN_REG_COST   7
-#define FIN_REG_PRICE  8
-
+extern double FIN[FIN_REG_MAX];
 
 // Programming mode defines
 extern uint8_t  padZeros;
@@ -318,7 +321,7 @@ extern void RPN_clearL(void);
 extern void RPN_const(void);
 extern void RPN_enter(void);
 extern void RPN_dp(void);
-extern void RPN_Ex(void);
+extern void RPN_Eex(void);
 extern void RPN_digit(WPARAM key);
 extern void RPN_mode(void);
 extern void RPN_backspace(void);
@@ -413,15 +416,17 @@ extern uint64_t stackPops;
 #define M_PI              3.14159265358979
 #define CNULL            '\0'
 
-#define REG_STORE         0x01
-#define REG_RECALL        0x02
-#define REG_EXCHANGE      0x04
-#define REG_DP            0x08
-#define REG_PLUS          0x10
-#define REG_MINUS         0x20
-#define REG_MULTIPLY      0x40
-#define REG_DIVIDE        0x80
-extern uint8_t rpnStoreRecall;
+#define REG_STORE         0x0001
+#define REG_RECALL        0x0002
+#define REG_EXCHANGE      0x0004
+#define REG_DP            0x0008
+#define REG_PLUS          0x0010
+#define REG_MINUS         0x0020
+#define REG_MULTIPLY      0x0040
+#define REG_DIVIDE        0x0080
+#define REG_STOMIN        0x0100
+#define REG_STOMAX        0x0200
+extern uint16_t rpnStoreRecall;
 
 #define MOD_HYPERBOLIC    0x01
 #define MOD_INVERSE       0x02
@@ -1806,5 +1811,17 @@ extern uint32_t userTicks;
 #define H_MPA_PSI       "Convert from Megapascals to PSI"
 #define T_CONST         "Constants"
 #define H_CONST         "Select from a number of scientific universal constants"
+
+// ========================================================================================
+// DEBUG OUTPUT WINDOW - Control IDs and function declarations
+// ========================================================================================
+#define IDC_DEBUG_EDIT      3100
+
+// Debug output window functions
+extern void CreateDebugOutputWindow(HWND hParent, HINSTANCE hInstance);
+extern void InitDebugOutput(void);
+extern void CleanupDebugOutput(void);
+extern void ClearDebugOutput(void);
+extern int dprintf(const char *format, ...);
 
 #include "resource.h"
