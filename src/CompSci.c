@@ -202,12 +202,14 @@ void MakeCompSciStr(PROG_LONG val, char *tmpL)
     else if (progMode == PROG_BIN)
     {
         if (binMode == 1)       // Show upper 
-            val = val >> 16;
+        {
+            val = val >> 16;    //TODO: For now, only 32-bit bin
+        }
 
         _i64toa(val & (PROG_LONG) 0x0000FFFF, temp4, progMode);
         if (padZeros == 1)
         {
-            temp[17] = CNULL; //TODO: For now, only 32-bit bin
+            temp[17] = CNULL;
             if (wordSize == 8)
                 sprintf(temp, "%08s", temp4);
             else
@@ -852,10 +854,9 @@ void PROG_MaskL(void)
     StackPushL(mask);
 }
 
-
 void PROG_2sComp(void)
 {
-    RPN_negate_x();
+    RPN_negate_x(); // 2's complement is same as CHS
 }
 
 
@@ -1033,52 +1034,6 @@ void PROG_Mirror(void)
     StackPushL((PROG_LONG) newVal);
 }
 
-void PROG_MinW(void)
-{
-    if (wordMode == COMPSCI_SIGNED)
-    {
-        if (wordSize == 8)
-            StackPushL((PROG_LONG) 0x80);
-        else if (wordSize == 16)
-            StackPushL((PROG_LONG) 0x8000);
-        else if (wordSize == 32)
-            StackPushL((PROG_LONG) 0x80000000);
-        else
-            StackPushL((PROG_LONG) 0x8000000000000000);
-    }
-    else
-    {
-        StackPushL((PROG_LONG) 0x00000000);
-    }
-}
-
-void PROG_MaxW(void)
-{
-    if (wordMode == COMPSCI_SIGNED)
-    {
-        if (wordSize == 8)
-            StackPushL((PROG_LONG) 0x7F);
-        else if (wordSize == 16)
-            StackPushL((PROG_LONG) 0x7FFF);
-        else if (wordSize == 32)
-            StackPushL((PROG_LONG) 0x7FFFFFFF);
-        else
-            StackPushL((PROG_LONG) 0x7FFFFFFFFFFFFFFF);
-    }
-    else
-    {
-        if (wordSize == 8)
-            StackPushL((PROG_LONG) 0xFF);
-        else if (wordSize == 16)
-            StackPushL((PROG_LONG) 0xFFFF);
-        else if (wordSize == 32)
-            StackPushL((PROG_LONG) 0xFFFFFFFF);
-        else
-            StackPushL((PROG_LONG) 0xFFFFFFFFFFFFFFFF);
-    }
-}
-
-
 PROG_LONG smallestProgVal(void)
 {
     if (wordMode == COMPSCI_SIGNED)
@@ -1124,11 +1079,21 @@ PROG_LONG biggestProgVal(void)
     }
 }
 
-//
-// * Converts a 64-bit unsigned integer to a null-terminated binary string.
-// * @param n: The 64-bit integer to convert.
-// * @param out_str: A pointer to a char array of at least 65 bytes.
-// 
+void PROG_MinW(void)
+{
+    StackPushL(smallestProgVal());
+}
+
+void PROG_MaxW(void)
+{
+    StackPushL(biggestProgVal());
+}
+
+// --------------------------------------------------------------------------
+// Converts a 64-bit unsigned integer to a null-terminated binary string.
+// @param n: The 64-bit integer to convert.
+// @param out_str: A pointer to a char array of at least 65 bytes.
+// --------------------------------------------------------------------------
 void int64_to_binary_str(uint64_t n, char *out_str, uint8_t bits)
 {
     int i;
@@ -1245,4 +1210,3 @@ void Prog_IEEE(void)
 {
     DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_IEEE", calcMainWindow, DlgProcIEEE);
 }
-

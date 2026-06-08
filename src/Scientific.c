@@ -629,7 +629,10 @@ void SCI_LCM(void)
     if (try_value != 0)
         most_tries = (MAXLONG / try_value) - 2;
     else
-        return;                 // tbd error ?!?
+    {
+        RPN_error("LCM:  Unable to compute the LCM");
+        return;
+    }
 
     orig_value = try_value;
     t1 = t2 = 0L;

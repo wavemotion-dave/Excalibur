@@ -162,6 +162,8 @@ extern struct funcStruct MacroFuncs[];
 #define TIMER_SLOW              2
 #define TIMER_FAST              3
 
+#define CSIDL_LOCAL_APPDATA     0x001c
+
 // ----------
 // PROTOTYPES
 // ----------

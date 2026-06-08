@@ -3964,8 +3964,11 @@ void SetLastMenuType(int type)
     }
 }
 
-#define RESERVED_SIZE 1024
-#define CSIDL_LOCAL_APPDATA 0x001c
+// --------------------------------------------------------------
+// We reserve a bit of space at the end of the .cfg file
+// so we can expand into it without resetting the whole config.
+// --------------------------------------------------------------
+#define RESERVED_SIZE 4096
 char reserved[RESERVED_SIZE];
 
 char *GetConfigurationDirectory(void)
@@ -4114,7 +4117,7 @@ void SaveToDisk(void)
         fwrite(&macro_input_labels,     sizeof(macro_input_labels),     1, outfile);
         fwrite(&current_macro_inputs,   sizeof(current_macro_inputs),   1, outfile);
 
-        fwrite(&reserved, RESERVED_SIZE, 1, outfile);
+        fwrite(&reserved,               RESERVED_SIZE,                  1, outfile);
 
         fclose(outfile);
     }
@@ -4247,7 +4250,7 @@ void ReadFromDisk(void)
         fread(&macro_input_labels,      sizeof(macro_input_labels),     1, infile);
         fread(&current_macro_inputs,    sizeof(current_macro_inputs),   1, infile);
 
-        fread(&reserved, RESERVED_SIZE, 1, infile);
+        fread(&reserved,                RESERVED_SIZE,                  1, infile);
 
         SetMenuType(menuCurrentFuncs);
         SetLastMenuType(menuLastFuncs);
@@ -5379,7 +5382,10 @@ BOOL CALLBACK fnDIALOG_ShowMemory(HWND hDlg, UINT wMessage, WPARAM wParam, LPARA
     return FALSE;
 }
 
-
+// ----------------------------------------------------------------------------------------
+// User has asked to edit the value showing in the X register. We set the flags and 
+// string back up as if they were editing just past the last digit of that existing value.
+// ----------------------------------------------------------------------------------------
 void RPN_edit(void)
 {
     int i, j;
@@ -5406,6 +5412,10 @@ void RPN_edit(void)
     }
 }
 
+// ------------------------------------------------------------------------
+// Various bank selections - these are the radio buttons down the middle 
+// of the classic calculator layout - we switch the 40 function keys here.
+// ------------------------------------------------------------------------
 void RPN_SelectSci(void)
 {
     SelectNewBank((struct funcStruct *)&Scientific_funcs);
@@ -5798,7 +5808,6 @@ void RPN_Step(void)
     }
 }
 
-
 void ShowTrace(void)
 {
     MSG msg;
@@ -6141,52 +6150,52 @@ void blinkStack(uint8_t no_peek)
 
 void RPN_digit0(void)
 {
-    RPN_digit(101);
+    RPN_digit(RPN_DIGIT_0);
 }
 
 void RPN_digit1(void)
 {
-    RPN_digit(102);
+    RPN_digit(RPN_DIGIT_1);
 }
 
 void RPN_digit2(void)
 {
-    RPN_digit(103);
+    RPN_digit(RPN_DIGIT_2);
 }
 
 void RPN_digit3(void)
 {
-    RPN_digit(104);
+    RPN_digit(RPN_DIGIT_3);
 }
 
 void RPN_digit4(void)
 {
-    RPN_digit(105);
+    RPN_digit(RPN_DIGIT_4);
 }
 
 void RPN_digit5(void)
 {
-    RPN_digit(106);
+    RPN_digit(RPN_DIGIT_5);
 }
 
 void RPN_digit6(void)
 {
-    RPN_digit(107);
+    RPN_digit(RPN_DIGIT_6);
 }
 
 void RPN_digit7(void)
 {
-    RPN_digit(108);
+    RPN_digit(RPN_DIGIT_7);
 }
 
 void RPN_digit8(void)
 {
-    RPN_digit(109);
+    RPN_digit(RPN_DIGIT_8);
 }
 
 void RPN_digit9(void)
 {
-    RPN_digit(110);
+    RPN_digit(RPN_DIGIT_9);
 }
 
 void RPN_endConst(void)
@@ -6279,10 +6288,12 @@ BOOL CALLBACK HelpDialog(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
     return FALSE;
 }
 
+// ------------------------------------------------------------------
 // Handle several math errors caused by passing a negative argument
 // to log or log10(_DOMAIN errors). When this happens, _matherr
 // returns the natural or base-10 logarithm of the absolute value
 // of the argument and suppresses the usual error message.
+// ------------------------------------------------------------------
 int _matherr(struct _exception *except)
 {
     // Handle _OVERFLOW and _UNDERFLOW
@@ -6321,11 +6332,10 @@ int _matherr(struct _exception *except)
     }
 }
 
-void SetNumLock(BOOL bState)
+void SetNumLock2k(void)
 {
     GetKeyboardState((LPBYTE)keyStateBuf);
-    if ((bState && !(keyStateBuf[VK_NUMLOCK] & 1)) ||
-        (!bState && (keyStateBuf[VK_NUMLOCK] & 1)))
+    if (!(keyStateBuf[VK_NUMLOCK] & 1)) 
     {
         // Simulate a key press
         keybd_event(VK_NUMLOCK, 0x45, KEYEVENTF_EXTENDEDKEY | 0, 0);
@@ -6344,7 +6354,7 @@ void turnOnNumLock(void)
     retVal = GetVersionEx((LPOSVERSIONINFO)&ver);
     if ((retVal == 0) || ver.dwMajorVersion > 4) // Windows 2k or XP, etc.
     {
-        SetNumLock(TRUE);
+        SetNumLock2k();
     }
     else // Windows 9x
     {

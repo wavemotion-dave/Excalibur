@@ -292,6 +292,8 @@ int FindProgrammingLabel(uint16_t label, uint8_t forwards)
     return -1; // No label found
 }
 
+#define BACKWARDS 0
+#define FORWARDS  1
 void rpn_goto(uint16_t uniqueIdx, uint8_t forwards)
 {
     if (macroPlayback == TRUE)
@@ -310,16 +312,16 @@ void rpn_goto(uint16_t uniqueIdx, uint8_t forwards)
     }
 }
 
-void Macro_GotoA(void)  {rpn_goto(UNI_LBLA, 1);}
-void Macro_GotoB(void)  {rpn_goto(UNI_LBLB, 1);}
-void Macro_GotoC(void)  {rpn_goto(UNI_LBLC, 1);}
-void Macro_GotoD(void)  {rpn_goto(UNI_LBLD, 1);}
-void Macro_GotoE(void)  {rpn_goto(UNI_LBLE, 1);}
-void Macro_GotoF(void)  {rpn_goto(UNI_LBLF, 1);}
-void Macro_GotoG(void)  {rpn_goto(UNI_LBLG, 1);}
-void Macro_GotoH(void)  {rpn_goto(UNI_LBLH, 1);}
-void Macro_GotoI(void)  {rpn_goto(UNI_LBLI, 1);}
-void Macro_GotoJ(void)  {rpn_goto(UNI_LBLJ, 1);}
+void Macro_GotoA(void)  {rpn_goto(UNI_LBLA, FORWARDS);}
+void Macro_GotoB(void)  {rpn_goto(UNI_LBLB, FORWARDS);}
+void Macro_GotoC(void)  {rpn_goto(UNI_LBLC, FORWARDS);}
+void Macro_GotoD(void)  {rpn_goto(UNI_LBLD, FORWARDS);}
+void Macro_GotoE(void)  {rpn_goto(UNI_LBLE, FORWARDS);}
+void Macro_GotoF(void)  {rpn_goto(UNI_LBLF, FORWARDS);}
+void Macro_GotoG(void)  {rpn_goto(UNI_LBLG, FORWARDS);}
+void Macro_GotoH(void)  {rpn_goto(UNI_LBLH, FORWARDS);}
+void Macro_GotoI(void)  {rpn_goto(UNI_LBLI, FORWARDS);}
+void Macro_GotoJ(void)  {rpn_goto(UNI_LBLJ, FORWARDS);}
 
 void RPN_gosub(uint16_t uniqueIdx)
 {
@@ -328,7 +330,7 @@ void RPN_gosub(uint16_t uniqueIdx)
         if (MacroStackIdx < MAX_MACRO_STACK - 1)
         {
             MacroStack[MacroStackIdx++] = currentPlaybackIdx;
-            rpn_goto(uniqueIdx, 1);
+            rpn_goto(uniqueIdx, FORWARDS);
         }
         else
         {
@@ -477,9 +479,13 @@ void Macro_Return(void)
     if (macroPlayback == TRUE)
     {
         if (MacroStackIdx > 0)
+        {
             currentPlaybackIdx = MacroStack[--MacroStackIdx];
+        }
         else
-            currentPlaybackIdx = playBackEndIdx;      // Jump to end of program...
+        {
+            endRunningMacro();  // End the program if we are at the top layer already
+        }
     }
 }
 
@@ -489,11 +495,18 @@ void Macro_SFx(void)
     uint8_t iX = (uint8_t)PopStackInteger();
     uint32_t mask = (0x00000001 << iX);
 
-    if (iX == 32) progModeCarry = 1;
+    if (iX == 32)
+    {
+        progModeCarry = 1;
+    }
+    else if (iX == 33)
+    {
+        progModeOverflow = 1;
+    }
     else
-    if (iX == 33) progModeOverflow = 1;
-    else progFlags = progFlags | mask;
-
+    {
+        progFlags = progFlags | mask;
+    }
 }
 
 void Macro_CFx(void)
@@ -501,10 +514,18 @@ void Macro_CFx(void)
     uint8_t iX = (uint8_t)PopStackInteger();
     uint32_t mask = (0x00000001 << iX);
 
-    if (iX == 32) progModeCarry = 0;
+    if (iX == 32)
+    {
+        progModeCarry = 0;
+    }
+    else if (iX == 33)
+    {
+        progModeOverflow = 0;
+    }
     else
-    if (iX == 33) progModeOverflow = 0;
-    else progFlags = progFlags & ~mask;
+    {
+        progFlags = progFlags & ~mask;
+    }
 }
 
 void Macro_TFx(void)
@@ -512,10 +533,18 @@ void Macro_TFx(void)
     uint8_t iX = (uint8_t)PopStackInteger();
     uint32_t mask = (0x00000001 << iX);
 
-    if (iX == 32) CheckMacroCondition(progModeCarry);
+    if (iX == 32)
+    {
+        CheckMacroCondition(progModeCarry);
+    }
+    else if (iX == 33)
+    {
+        CheckMacroCondition(progModeOverflow);
+    }
     else
-    if (iX == 33) CheckMacroCondition(progModeOverflow);
-    else CheckMacroCondition(progFlags & mask);
+    {
+        CheckMacroCondition(progFlags & mask);
+    }
 }
 
 void Macro_XLTR0(void)
@@ -889,6 +918,7 @@ void Macro_GotoInd(void)
             }
 
             label_idx = FindProgrammingLabel(uniqueLabel, 1);
+
             if (label_idx >= 0)
             {
                 currentPlaybackIdx = label_idx;
@@ -936,6 +966,7 @@ void Macro_GosubInd(void)
                 }
 
                 label_idx = FindProgrammingLabel(uniqueLabel, 1);
+
                 if (label_idx >= 0)
                 {
                     currentPlaybackIdx = label_idx;
@@ -1009,6 +1040,7 @@ BOOL CALLBACK inputDebugValue(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lP
             EndDialog(hDlg, FALSE);
             return TRUE;
             break;
+        
         default:
             return FALSE;
         }
@@ -1502,7 +1534,7 @@ void Macro_LoopH(void)
     {
         if (++LOOPS[LOOP_REG_H] < LOOPS[LOOP_REG_HC])
         {
-            rpn_goto(UNI_LBLH, 0); // Jump BACKWARDS
+            rpn_goto(UNI_LBLH, BACKWARDS); // Jump BACKWARDS
         }
     }
     // If we are greater than the target, drive towards it
@@ -1510,7 +1542,7 @@ void Macro_LoopH(void)
     {
         if (--LOOPS[LOOP_REG_H] > LOOPS[LOOP_REG_HC])
         {
-            rpn_goto(UNI_LBLH, 0); // Jump BACKWARDS
+            rpn_goto(UNI_LBLH, BACKWARDS); // Jump BACKWARDS
         }
     }
     // else were are at target - do not branch
@@ -1523,7 +1555,7 @@ void Macro_LoopI(void)
     {
         if (++LOOPS[LOOP_REG_I] < LOOPS[LOOP_REG_IC])
         {
-            rpn_goto(UNI_LBLI, 0); // Jump BACKWARDS
+            rpn_goto(UNI_LBLI, BACKWARDS); // Jump BACKWARDS
         }
     }
     // If we are greater than the target, drive towards it
@@ -1531,7 +1563,7 @@ void Macro_LoopI(void)
     {
         if (--LOOPS[LOOP_REG_I] > LOOPS[LOOP_REG_IC])
         {
-            rpn_goto(UNI_LBLI, 0); // Jump BACKWARDS
+            rpn_goto(UNI_LBLI, BACKWARDS); // Jump BACKWARDS
         }
     }
     // else were are at target - do not branch
@@ -1544,7 +1576,7 @@ void Macro_LoopJ(void)
     {
         if (++LOOPS[LOOP_REG_J] < LOOPS[LOOP_REG_JC])
         {
-            rpn_goto(UNI_LBLJ, 0); // Jump BACKWARDS
+            rpn_goto(UNI_LBLJ, BACKWARDS); // Jump BACKWARDS
         }
     }
     // If we are greater than the target, drive towards it
@@ -1552,7 +1584,7 @@ void Macro_LoopJ(void)
     {
         if (--LOOPS[LOOP_REG_J] > LOOPS[LOOP_REG_JC])
         {
-            rpn_goto(UNI_LBLJ, 0); // Jump BACKWARDS
+            rpn_goto(UNI_LBLJ, BACKWARDS); // Jump BACKWARDS
         }
     }
     // else were are at target - do not branch

@@ -58,6 +58,22 @@ extern void STAT_m(void);
 extern void STAT_xGuess(void);
 extern void STAT_yGuess(void);
 
+// These are somewhat common for statistics, so we include them for 
+// improved proximity and avoid the user having to jump banks.
+extern void SCI_square(void);
+extern void SCI_sqrt(void);
+extern void SCI_inverse(void);
+extern void SCI_exp(void);
+extern void SCI_ln(void);
+extern void SCI_log(void);
+extern void SCI_pow(void);
+extern void SCI_xfact(void);
+extern void SCI_10x(void);
+extern void SCI_Cnr(void);
+extern void SCI_Pnr(void);
+extern void SCI_abs(void);
+
+
 struct funcStruct Statistics_funcs[MAX_FUNCS] = {
     {FN1,   UNI_SUMPLUS,    USES_F,     ALLOWREC, ' ',   "SUM+",  YES_L,   X_ENTER, STAT_sumPlus,  T_SUMP,    H_SUMP},
     {FN2,   UNI_SUMMINUS,   USES_F,     ALLOWREC, ' ',   "SUM-",  YES_L,   X_ENTER, STAT_sumMinus, T_SUMM,    H_SUMM},
@@ -79,18 +95,18 @@ struct funcStruct Statistics_funcs[MAX_FUNCS] = {
     {FN18,  UNI_SLOPE,      USES_F,     ALLOWREC, ' ',   "m",     YES_L,   X_NEW,   STAT_m,        T_SLOPE,   H_SLOPE},
     {FN19,  UNI_YGUESS,     USES_F,     ALLOWREC, ' ',   "y",     YES_L,   X_NEW,   STAT_yGuess,   T_ESTY,    H_ESTY},
     {FN20,  UNI_XGUESS,     USES_F,     ALLOWREC, ' ',   "x",     YES_L,   X_NEW,   STAT_xGuess,   T_ESTX,    H_ESTX},
-    {FN21,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ',   " ",     YES_L,   X_NEW,   NULL,          T_NULL,    H_NULL},
-    {FN22,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ',   " ",     YES_L,   X_NEW,   NULL,          T_NULL,    H_NULL},
-    {FN23,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ',   " ",     YES_L,   X_NEW,   NULL,          T_NULL,    H_NULL},
-    {FN24,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ',   " ",     YES_L,   X_NEW,   NULL,          T_NULL,    H_NULL},
-    {FN25,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ',   " ",     YES_L,   X_NEW,   NULL,          T_NULL,    H_NULL},
-    {FN26,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ',   " ",     YES_L,   X_NEW,   NULL,          T_NULL,    H_NULL},
-    {FN27,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ',   " ",     YES_L,   X_NEW,   NULL,          T_NULL,    H_NULL},
-    {FN28,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ',   " ",     YES_L,   X_NEW,   NULL,          T_NULL,    H_NULL},
-    {FN29,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ',   " ",     YES_L,   X_NEW,   NULL,          T_NULL,    H_NULL},
-    {FN30,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ',   " ",     YES_L,   X_NEW,   NULL,          T_NULL,    H_NULL},
-    {FN31,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ',   " ",     YES_L,   X_NEW,   NULL,          T_NULL,    H_NULL},
-    {FN32,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ',   " ",     YES_L,   X_NEW,   NULL,          T_NULL,    H_NULL},
+    {FN21,  UNI_ABS,        USES_F,     ALLOWREC, ' ',   "ABS",   YES_L,   X_NEW,   SCI_abs,       T_ABS,     H_ABS},
+    {FN22,  UNI_XX,         USES_F,     ALLOWREC, ' ',   "X²",    YES_L,   X_NEW,   SCI_square,    T_XX,      H_XX},
+    {FN23,  UNI_SQRT,       USES_F,     ALLOWREC, ' ',   "SQRT",  YES_L,   X_NEW,   SCI_sqrt,      T_SQRT,    H_SQRT},
+    {FN24,  UNI_INV,        USES_F,     ALLOWREC, ' ',   "1/X",   YES_L,   X_NEW,   SCI_inverse,   T_INV,     H_INV},
+    {FN25,  UNI_POW,        USES_FL,    ALLOWREC, ' ',   "Y^X",   YES_L,   X_NEW,   SCI_pow,       T_POW,     H_POW},
+    {FN26,  UNI_EXP,        USES_F,     ALLOWREC, ' ',   "e^X",   YES_L,   X_NEW,   SCI_exp,       T_EXP,     H_EXP},
+    {FN27,  UNI_LN,         USES_F,     ALLOWREC, ' ',   "LN",    YES_L,   X_NEW,   SCI_ln,        T_LN,      H_LN},
+    {FN28,  UNI_LOG,        USES_F,     ALLOWREC, ' ',   "LOG",   YES_L,   X_NEW,   SCI_log,       T_LOG,     H_LOG},
+    {FN29,  UNI_FACT,       USES_FL,    ALLOWREC, ' ',   "X!",    YES_L,   X_NEW,   SCI_xfact,     T_FACT,    H_FACT},
+    {FN30,  UNI_POW10,      USES_F,     ALLOWREC, ' ',   "10^X",  YES_L,   X_NEW,   SCI_10x,       T_POW10,   H_POW10},
+    {FN31,  UNI_COMB,       USES_F,     ALLOWREC, ' ',   "Cn,r",  YES_L,   X_NEW,   SCI_Cnr,       T_COMB,    H_COMB},
+    {FN32,  UNI_PERM,       USES_F,     ALLOWREC, ' ',   "Pn,r",  YES_L,   X_NEW,   SCI_Pnr,       T_PERM,    H_PERM},
     {FN33,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ',   " ",     YES_L,   X_NEW,   NULL,          T_NULL,    H_NULL},
     {FN34,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ',   " ",     YES_L,   X_NEW,   NULL,          T_NULL,    H_NULL},
     {FN35,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ',   " ",     YES_L,   X_NEW,   NULL,          T_NULL,    H_NULL},
