@@ -678,10 +678,8 @@ BEGIN
                     WS_TABSTOP,16,144,54,10
     CONTROL         "Clear On Exit",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,16,155,57,10
-    CONTROL         "+/-      E",111,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
-                    WS_TABSTOP,178,21,43,10
-    CONTROL         "CHS  EEX",112,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,
-                    178,32,48,10
+    CONTROL         "+/-      E",111,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP, 178,32,48,10 
+    CONTROL         "CHS  EEX",112,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP, 178,21,43,10
     CONTROL         "ON",114,"Button",BS_AUTORADIOBUTTON | WS_GROUP | 
                     WS_TABSTOP,178,64,33,10
     CONTROL         "OFF",115,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,178,
@@ -692,7 +690,7 @@ BEGIN
     PUSHBUTTON      "Cancel",102,173,181,52,14
     GROUPBOX        "Angle Mode",IDC_STATIC,9,7,78,42
     GROUPBOX        "Num Lock",IDC_STATIC,93,7,72,42
-    GROUPBOX        "Key Settings",IDC_STATIC,171,7,72,42
+    GROUPBOX        "Key Labels",IDC_STATIC,171,7,72,42
     GROUPBOX        "Number Separator",IDC_STATIC,93,54,72,49
     GROUPBOX        "Separator Display",IDC_STATIC,9,54,78,32
     GROUPBOX        "Tool Tips",IDC_STATIC,171,54,72,42
