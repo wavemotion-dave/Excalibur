@@ -328,7 +328,7 @@ extern void RPN_clearL(void);
 extern void RPN_const(void);
 extern void RPN_enter(void);
 extern void RPN_dp(void);
-extern void RPN_Eex(void);
+extern void RPN_EEX(void);
 extern void RPN_digit(WPARAM key);
 extern void RPN_mode(void);
 extern void RPN_backspace(void);
@@ -371,7 +371,6 @@ extern void RPN_mode(void);
 extern void RPN_backspace(void);
 extern void RPN_store(void);
 extern void RPN_recall(void);
-extern void RPN_Eex(void);
 extern void RPN_clearX(void);
 extern void RPN_drop(void);
 extern void RPN_larg(void);
@@ -426,8 +425,9 @@ extern uint64_t stackPops;
 #define REG_MINUS         0x0020
 #define REG_MULTIPLY      0x0040
 #define REG_DIVIDE        0x0080
-#define REG_STOMIN        0x0100
-#define REG_STOMAX        0x0200
+#define REG_EEX           0x0100
+#define REG_STOMIN        0x0200
+#define REG_STOMAX        0x0400
 extern uint16_t rpnStoreRecall;
 
 #define MOD_HYPERBOLIC    0x01
@@ -1265,7 +1265,7 @@ extern uint32_t userTicks;
 #define T_ABS           "Absolute Value"
 #define H_ABS           "Computes the absolute value of X"
 #define T_XX            "X Squared"
-#define H_XX            "Computes X*X"
+#define H_XX            "Computes the square of X (i.e. X*X)"
 #define T_SQRT          "Square Root"
 #define H_SQRT          "Computes the square root of X"
 #define T_INV           "Inverse"
@@ -1282,10 +1282,10 @@ extern uint32_t userTicks;
 #define H_FACT          "Computes the factorial of X (for X <= 170)"
 #define T_POW           "Power"
 #define H_POW           "Raise Y to the X power"
-#define T_INT           "Integer"
-#define H_INT           "Computes the integer portion of X./nFor example: INT(23.45) is 23."
-#define T_FRAC          "Fraction"
-#define H_FRAC          "Computes the fractional portion of X./nFor example: FRAC(23.45) is 0.45."
+#define T_INT           "Integer Portion"
+#define H_INT           "Returns the integer portion of X./nFor example: INT(23.45) is 23."
+#define T_FRAC          "Fractional Portion"
+#define H_FRAC          "Returns the fractional portion of X./nFor example: FRAC(23.45) is 0.45."
 #define T_RAND          "Random Number"
 #define H_RAND          "Produces a random number between 0.0 and 1.0 to 7 decimal places."
 #define T_COMB          "Combinations"
@@ -1460,7 +1460,7 @@ extern uint32_t userTicks;
 #define T_HEXD          "HEX D"
 #define T_HEXE          "HEX E"
 #define T_HEXF          "HEX F"
-#define H_HEXDIG        "Used to enter the Hexadecimal digits"
+#define H_HEXDIG        "Used to enter the Hexadecimal digits (calculator must be in HEX mode)"
 #define T_AND           "AND"
 #define H_AND           "Computes the logical AND of X and Y."
 #define T_OR            "OR"
@@ -1493,8 +1493,6 @@ extern uint32_t userTicks;
 #define H_SLM           "Shifts the number in Y left X places."
 #define T_SRM           "Shift Right Multiple"
 #define H_SRM           "Shifts the number in Y right X places."
-#define T_CIRCA         "Circle Area"
-#define H_CIRCA         "Computes the area of a circle with radius X."
 #define T_QUAD          "Quadratic Formula"
 #define H_QUAD          "Computes the two roots of the equation for X,Y and Z - stores the results in X,Y."
 #define T_PYTHAG        "Pythagorean Theorem"
@@ -1577,6 +1575,8 @@ extern uint32_t userTicks;
 #define H_TIMERSTOP     "Stops the stopwatch timer."
 #define T_TIMERCLEAR    "Clear Timer"
 #define H_TIMERCLEAR    "Clears the stopwatch timer."
+#define T_TIMERPUSH     "Timer Push"
+#define H_TIMERPUSH     "Pushes current stopwatch timer value onto the stack."
 #define T_ASTRO         "Astronomy Tables"
 #define H_ASTRO         "Display Astronomy Tables"
 #define T_IEEE          "IEEE Floating Point Representation"
@@ -1682,7 +1682,7 @@ extern uint32_t userTicks;
 #define T_GOTOF         "Goto F"
 #define T_GOTOG         "Goto G"
 #define T_GOTOH         "Goto H"
-#define H_GOTOS         "Goto Label. Program will branch to the specified label (if it exists)."
+#define H_GOTOS         "Goto Label. Program will branch to the specified label (if it exists).\nGoto will search forward from the current program step - wrapping as needed."
 #define T_GSBA          "Gosub A"
 #define T_GSBB          "Gosub B"
 #define T_GSBC          "Gosub C"
@@ -1690,7 +1690,7 @@ extern uint32_t userTicks;
 #define T_GSBE          "Gosub E"
 #define T_GSBF          "Gosub F"
 #define T_GSBG          "Gosub G"
-#define H_GOSUBS        "Gosub to Label - Execute program until a Return is hit."
+#define H_GOSUBS        "Gosub to Label - Execute program until a Return is hit.\nGosub will search forward from the current program step - wrapping as needed."
 #define T_RETURN        "Return"
 #define H_RETURN        "Return from current Gosub function."
 #define T_SFX           "Set Flag X"
@@ -1753,11 +1753,11 @@ extern uint32_t userTicks;
 #define T_SETJC         "Set J Target"
 #define H_SETJC         "Set the value for the target J loop-counting register - this is the value the loop will drive towards."
 #define T_LOOPH         "Loop H"
-#define H_LOOPH         "Increment or Decrement the H register towards H'\nIf it hasn't yet reached the target, branch to Label H"
+#define H_LOOPH         "Increment or Decrement the H register towards H'\nIf it hasn't yet reached the target, branch to Label H.\nLoop looks backwards from the current program step - wrapping as needed."
 #define T_LOOPI         "Loop I"
-#define H_LOOPI         "Increment or Decrement the I register towards I'\nIf it hasn't yet reached the target, branch to Label I"
+#define H_LOOPI         "Increment or Decrement the I register towards I'\nIf it hasn't yet reached the target, branch to Label I.\nLoop looks backwards from the current program step - wrapping as needed."
 #define T_LOOPJ         "Loop J"
-#define H_LOOPJ         "Increment or Decrement the J register towards J'\nIf it hasn't yet reached the target, branch to Label J"
+#define H_LOOPJ         "Increment or Decrement the J register towards J'\nIf it hasn't yet reached the target, branch to Label J.\nLoop looks backwards from the current program step - wrapping as needed."
 #define T_XLTR0         "X < R0?"
 #define H_XLTR0         "Check if X is less than R0 and skip next instruction if true."
 #define T_XGTR0         "X > R0?"
@@ -1770,8 +1770,6 @@ extern uint32_t userTicks;
 #define H_DSZ           "Decrement the Indirect (i) Register and skip next instruction if zero."
 #define T_DSZ2I         "Decrement (i) Skip if Zero"
 #define H_DSZ2I         "Decrement the Register pointed to by the Indirect (i) Register and skip next instruction if zero..\n\n0-99 = Register R00-R99\n100-107 = XYZT, ABCD\n108-113 = H'I'J'"
-#define T_TIMERPUSH     "Timer Push"
-#define H_TIMERPUSH     "Pushes current timer value onto the stack."
 #define T_STON_LB       "Short Tons to Lbs"
 #define H_STON_LB       "Convert Short Tons to Lbs"
 #define T_LTON_LB       "Long Tons to Lbs"

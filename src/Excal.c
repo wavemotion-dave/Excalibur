@@ -1492,8 +1492,16 @@ void UpdateInfoBar_StoreRecall(void)
         if (rpnStoreRecall & REG_STOMAX)
             strcat(tmpStr, ">");
 
-        if (rpnStoreRecall & REG_DP)
+        if (rpnStoreRecall & REG_EEX)
+        {
+            strcat(tmpStr, " e");
+            if (rpnStoreRecall & REG_DP) strcat(tmpStr, "·");
+            
+        }
+        else if (rpnStoreRecall & REG_DP)
+        {
             strcat(tmpStr, " ·");
+        }
 
         UpdateInfoBar(tmpStr);
     }
@@ -1947,9 +1955,9 @@ struct funcStruct RPNkeys[] = {
 
     {RPN_EXCH_X_Y,  UNI_XCH,    USES_FL, ALLOWREC, 'x', "", NO_L,   X_NEW,      RPN_exchange_x_y,   "Exchange X and Y",     "Exchanges the contents of the X and Y registers"},
     {RPN_NEGATE,    UNI_CHS,    USES_FL, ALLOWREC, 'n', "", NO_L,   X_NULL,     RPN_negate_x,       "Change Sign",          "Used to change the sign of X"},
-    {RPN_E,         UNI_E,      USES_FL, ALLOWREC, 'e', "", NO_L,   X_NULL,     RPN_Eex,            "Exponent",             "Used to produce an exponential number(e.g. 3.45e+12)"},
-    {RPN_STO,       UNI_STO,    USES_FL, ALLOWREC, 's', "", NO_L,   X_NULL,     RPN_store,          "Store Register",       "Used to store X to one of the registers (next digit/dp selects R0-R19). Register Arithmetic is also supported."},
-    {RPN_RCL,       UNI_RCL,    USES_FL, ALLOWREC, 'r', "", NO_L,   X_NULL,     RPN_recall,         "Recall Register",      "Used to recall one of registers to X (next digit/dp selects R0-R19). Register Arithmetic is also supported."},
+    {RPN_E,         UNI_E,      USES_FL, ALLOWREC, 'e', "", NO_L,   X_NULL,     RPN_EEX,            "Exponent",             "Used to produce an exponential number(e.g. 3.45e+12)"},
+    {RPN_STO,       UNI_STO,    USES_FL, ALLOWREC, 's', "", NO_L,   X_NULL,     RPN_store,          "Store Register",       "Used to store X to one of the registers (next digit/dp selects R00-R19).\nRegister Arithmetic is supported.\nEEX can also be used to offset by 20."},
+    {RPN_RCL,       UNI_RCL,    USES_FL, ALLOWREC, 'r', "", NO_L,   X_NULL,     RPN_recall,         "Recall Register",      "Used to recall one of registers to X (next digit/dp selects R00-R19).\nRegister Arithmetic is supported.\nEEX can also be used to offset by 20."},
     {RPN_R_UP,      UNI_RUP,    USES_FL, ALLOWREC, 38,  "", NO_L,   X_NULL,     RPN_rotateStackUp,  "Rotate Stack Up",      "Rotates the contents of the stack up"},
     {RPN_R_DN,      UNI_RDN,    USES_FL, ALLOWREC, 40,  "", NO_L,   X_NULL,     RPN_rotateStackDn,  "Rotate Stack Down",    "Rotates the contents of the stack down"},
     {RPN_LASTX,     UNI_LSTX,   USES_FL, ALLOWREC, 'l', "", NO_L,   X_NEW,      RPN_lastX,          "Last X",               "Retrieves the last value of X before the last operation occurred"},
@@ -2750,9 +2758,16 @@ void RPN_dp(void)
     Xedit = X_EDIT;
 }
 
-void RPN_Eex(void)
+void RPN_EEX(void)
 {
     char *ptr;
+
+    if (rpnStoreRecall)
+    {
+        rpnStoreRecall |= REG_EEX;
+        UpdateInfoBar_StoreRecall();
+        return;
+    }
 
     if (progMode == PROG_FLOAT && strchr(Xstr, 'E') == NULL)
     {
@@ -2793,6 +2808,7 @@ void RPN_digit(WPARAM key)
     if (rpnStoreRecall)
     {
         uint8_t reg = (key - RPN_DIGIT_0) + (rpnStoreRecall & REG_DP ? 10 : 0);
+        if (rpnStoreRecall & REG_EEX) reg += 20;
 
         if (rpnStoreRecall & REG_STORE)
         {

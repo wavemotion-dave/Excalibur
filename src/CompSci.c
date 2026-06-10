@@ -1151,7 +1151,7 @@ BOOL CALLBACK DlgProcIEEE(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam
         if (GetWindowRect(hDlg, &rect))
         {
             int height = rect.bottom - rect.top;
-            MoveWindow(hDlg, main_x+100, main_y+50, lpSize.cx + 40, height, TRUE);
+            MoveWindow(hDlg, main_x+10, main_y+50, lpSize.cx + 40, height, TRUE);
         }        
         SetDlgItemText(hDlg, 101, "32-bit:  Enter Number Above - Click Convert");
         SetDlgItemText(hDlg, 102, "64-bit:  Enter Number Above - Click Convert");
