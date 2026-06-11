@@ -62,11 +62,9 @@ extern void STAT_yGuess(void);
 // improved proximity and avoid the user having to jump banks.
 extern void SCI_square(void);
 extern void SCI_sqrt(void);
-extern void SCI_inverse(void);
 extern void SCI_exp(void);
 extern void SCI_ln(void);
 extern void SCI_log(void);
-extern void SCI_pow(void);
 extern void SCI_xfact(void);
 extern void SCI_10x(void);
 extern void SCI_Cnr(void);
@@ -98,8 +96,8 @@ struct funcStruct Statistics_funcs[MAX_FUNCS] = {
     {FN21,  UNI_ABS,        USES_F,     ALLOWREC, ' ',   "ABS",   YES_L,   X_NEW,   SCI_abs,       T_ABS,     H_ABS},
     {FN22,  UNI_XX,         USES_F,     ALLOWREC, ' ',   "X²",    YES_L,   X_NEW,   SCI_square,    T_XX,      H_XX},
     {FN23,  UNI_SQRT,       USES_F,     ALLOWREC, ' ',   "SQRT",  YES_L,   X_NEW,   SCI_sqrt,      T_SQRT,    H_SQRT},
-    {FN24,  UNI_INV,        USES_F,     ALLOWREC, ' ',   "1/X",   YES_L,   X_NEW,   SCI_inverse,   T_INV,     H_INV},
-    {FN25,  UNI_POW,        USES_FL,    ALLOWREC, ' ',   "Y^X",   YES_L,   X_NEW,   SCI_pow,       T_POW,     H_POW},
+    {FN24,  UNI_INV,        USES_F,     ALLOWREC, ' ',   "1/X",   YES_L,   X_NEW,   RPN_reciprocal,T_INV,     H_INV},
+    {FN25,  UNI_POW,        USES_FL,    ALLOWREC, ' ',   "Y^X",   YES_L,   X_NEW,   RPN_pow,       T_POW,     H_POW},
     {FN26,  UNI_EXP,        USES_F,     ALLOWREC, ' ',   "e^X",   YES_L,   X_NEW,   SCI_exp,       T_EXP,     H_EXP},
     {FN27,  UNI_LN,         USES_F,     ALLOWREC, ' ',   "LN",    YES_L,   X_NEW,   SCI_ln,        T_LN,      H_LN},
     {FN28,  UNI_LOG,        USES_F,     ALLOWREC, ' ',   "LOG",   YES_L,   X_NEW,   SCI_log,       T_LOG,     H_LOG},

@@ -379,7 +379,7 @@ extern void RPN_edit(void);
 extern void RPN_Notes(void);
 extern void RPN_Copy(void);
 extern void RPN_Paste(void);
-extern void RPN_inverse(void);
+extern void RPN_reciprocal(void);
 extern void RPN_pow(void);
 extern void SCI_sqrt(void);
 extern void SCI_ln(void);
@@ -1268,8 +1268,8 @@ extern uint32_t userTicks;
 #define H_XX            "Computes the square of X (i.e. X*X)"
 #define T_SQRT          "Square Root"
 #define H_SQRT          "Computes the square root of X"
-#define T_INV           "Inverse"
-#define H_INV           "Computes the inverse of X"
+#define T_INV           "Reciprocal"
+#define H_INV           "Computes the Reciprocal (Mathematical Inverse) of X"
 #define T_POW10         "10 ^ X"
 #define H_POW10         "Raises 10 to the X power"
 #define T_EXP           "Natural Exponential"

@@ -42,10 +42,10 @@
 
 #define WINDOW_TITLE "Excalibur RPN Calculator"
 
-#define VERSION_STR "v3.XX-08"
+#define VERSION_STR "v3.XX-09"
 
 #define ABOUT_MSG "Excalibur for Windows 32-bit\n"                    \
-                  "Version 3.XX-08  -  June 7, 2026\n\n"              \
+                  "Version 3.XX-09  -  June 11, 2026\n\n"             \
                   "Copyright 1994-2026 David Bernazzani\n\n"          \
                   "Please read the disclaimer and understand the\n"   \
                   "accuracy and precision issues before using.\n\n"   \
@@ -54,7 +54,7 @@
                   "https://github.com/wavemotion-dave/Excalibur"      \
                   "\n\nThis version is BETA - Expect and report Bugs!"
 
-#define CONFIG_VERSION_MAIN 0xF01A  // If this changes, we wipe EVERYTHING
+#define CONFIG_VERSION_MAIN 0x0001  // If this changes, we wipe EVERYTHING
 #define CONFIG_VERSION_SUB  0x0001  // If this changes, we reset x,y window position and reset constant tables (currency, physics constants, etc)
 
 #define END_OF_PROGRAM_STR "<End Of Program>"
@@ -1972,7 +1972,7 @@ struct funcStruct RPNkeys[] = {
     {RPN_EDIT,      UNI_EDIT,   USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_edit,           "Edit X Register",      "Used to place the X register back in edit mode if it is not already."},
     {RPN_POW,       UNI_POW,    USES_FL, ALLOWREC, '^', "", YES_L,  X_NEW,      RPN_pow,            "Raise to Power",       "Raise Y to the power of X"},
     {RPN_NOTES,     UNI_NOTES,  USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_Notes,          "Excalibur Notepad",    "Allows simple notes to be stored/saved."},
-    {RPN_INV,       UNI_INVX,   USES_FL, ALLOWREC, 'i', "", YES_L,  X_NEW,      RPN_inverse,        "Inverse X",            "Computes the inverse of X"},
+    {RPN_INV,       UNI_INVX,   USES_FL, ALLOWREC, 'i', "", YES_L,  X_NEW,      RPN_reciprocal,     "Reciprocal X",         "Computes the Reciprocal (Mathematical Inverse) of X"},
     {RPN_REC,       UNI_REC,    USES_FL, NORECORD, ' ', "", NO_L,   X_NULL,     RPN_Record,         "Record Mode On/Off",   "When ON - Records button presses for playback."},
     {RPN_EXREG,     UNI_EXREG,  USES_FL, ALLOWREC, ' ', "", NO_L,   X_NULL,     RPN_ExchangeReg,    "Exchange X with Reg",  "Exchange X with one of the Registers (next digit/dp selects R0-R19)"},
     {RPN_STEP,      UNI_STEP,   USES_FL, NORECORD, 'z', "", NO_L,   X_NULL,     RPN_Step,           "Single Step",          "Single Step the current program"},
@@ -6044,7 +6044,7 @@ void RPN_Paste(void)
     blinkXDisplay(FALSE);
 }
 
-void RPN_inverse(void)
+void RPN_reciprocal(void)
 {
     if (progMode == PROG_FLOAT)
     {
@@ -6057,7 +6057,7 @@ void RPN_inverse(void)
             StackPush(1.0 / StackPop());
         }
     }
-    else    // Inverse makes no sense in integer mode... will always be zero.
+    else    // Reciprocal makes no sense in integer mode... will always be zero.
     {
         StackPopL();
         StackPushL(0L);

@@ -49,11 +49,9 @@ extern void SCI_asin(void);
 extern void SCI_acos(void);
 extern void SCI_atan(void);
 extern void SCI_sqrt(void);
-extern void SCI_inverse(void);
 extern void SCI_exp(void);
 extern void SCI_ln(void);
 extern void SCI_log(void);
-extern void SCI_pow(void);
 extern void SCI_xfact(void);
 extern void SCI_pi(void);
 extern void SCI_sinh(void);
@@ -142,8 +140,8 @@ struct funcStruct Scientific_funcs[MAX_FUNCS] = {
     {FN8,   UNI_ABS,        USES_F,     ALLOWREC,   ' ',    "ABS",      YES_L,  X_NEW,  SCI_abs,                T_ABS,          H_ABS},
     {FN9,   UNI_XX,         USES_F,     ALLOWREC,   ' ',    "X²",       YES_L,  X_NEW,  SCI_square,             T_XX,           H_XX},
     {FN10,  UNI_SQRT,       USES_F,     ALLOWREC,   ' ',    "SQRT",     YES_L,  X_NEW,  SCI_sqrt,               T_SQRT,         H_SQRT},
-    {FN11,  UNI_INV,        USES_F,     ALLOWREC,   ' ',    "1/X",      YES_L,  X_NEW,  SCI_inverse,            T_INV,          H_INV},
-    {FN12,  UNI_POW,        USES_FL,    ALLOWREC,   ' ',    "Y^X",      YES_L,  X_NEW,  SCI_pow,                T_POW,          H_POW},
+    {FN11,  UNI_INV,        USES_F,     ALLOWREC,   ' ',    "1/X",      YES_L,  X_NEW,  RPN_reciprocal,         T_INV,          H_INV},
+    {FN12,  UNI_POW,        USES_FL,    ALLOWREC,   ' ',    "Y^X",      YES_L,  X_NEW,  RPN_pow,                T_POW,          H_POW},
     {FN13,  UNI_EXP,        USES_F,     ALLOWREC,   ' ',    "e^X",      YES_L,  X_NEW,  SCI_exp,                T_EXP,          H_EXP},
     {FN14,  UNI_LN,         USES_F,     ALLOWREC,   ' ',    "LN",       YES_L,  X_NEW,  SCI_ln,                 T_LN,           H_LN},
     {FN15,  UNI_LOG,        USES_F,     ALLOWREC,   ' ',    "LOG",      YES_L,  X_NEW,  SCI_log,                T_LOG,          H_LOG},
@@ -367,18 +365,6 @@ void SCI_sqrt(void)
     }
 }
 
-void SCI_inverse(void)
-{
-    if (STACK[STK_X] == 0.0)
-    {
-        RPN_error("Divide By Zero");
-    }
-    else
-    {
-        StackPush(1.0 / StackPop());
-    }
-}
-
 void SCI_exp(void)
 {
     StackPush(exp(StackPop()));
@@ -432,11 +418,6 @@ void SCI_log(void)
 void SCI_xfact(void)
 {
     RPN_fact();
-}
-
-void SCI_pow(void)
-{
-    RPN_pow();
 }
 
 void SCI_rand(void)
