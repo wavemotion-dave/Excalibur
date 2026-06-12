@@ -45,7 +45,7 @@
 #define VERSION_STR "v3.XX-09"
 
 #define ABOUT_MSG "Excalibur for Windows 32-bit\n"                    \
-                  "Version 3.XX-09  -  June 11, 2026\n\n"             \
+                  "Version 3.XX-09  -  June 12, 2026\n\n"             \
                   "Copyright 1994-2026 David Bernazzani\n\n"          \
                   "Please read the disclaimer and understand the\n"   \
                   "accuracy and precision issues before using.\n\n"   \

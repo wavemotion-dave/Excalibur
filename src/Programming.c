@@ -86,7 +86,7 @@ extern void Macro_GotoF(void);
 extern void Macro_GotoG(void);
 extern void Macro_XLessY(void);
 extern void Macro_XGreaterY(void);
-extern void Macro_XLEZero(void);
+extern void Macro_XLTZero(void);
 extern void Macro_XGTZero(void);
 extern void Macro_XEY(void);
 extern void Macro_XNEY(void);
@@ -218,7 +218,7 @@ struct funcStruct Program2_funcs[MAX_FUNCS] =
     {FN19,  UNI_XEY,        USES_FL,    ALLOWREC,   ' ',    "X=Y?",     YES_L,      X_NEW,   Macro_XEY,      T_XEY,      H_XEY},
     {FN20,  UNI_XNEY,       USES_FL,    ALLOWREC,   ' ',    "X!=Y?",    YES_L,      X_NEW,   Macro_XNEY,     T_XNEY,     H_XNEY},
 
-    {FN21,  UNI_XLEZ,       USES_FL,    ALLOWREC,   ' ',    "X<=0?",    YES_L,      X_NEW,   Macro_XLEZero,  T_XLEZERO,  H_XLEZERO},
+    {FN21,  UNI_XLTZ,       USES_FL,    ALLOWREC,   ' ',    "X<0?",     YES_L,      X_NEW,   Macro_XLTZero,  T_XLTZERO,  H_XLTZERO},
     {FN22,  UNI_XGZ,        USES_FL,    ALLOWREC,   ' ',    "X>0?",     YES_L,      X_NEW,   Macro_XGTZero,  T_XGTZERO,  H_XGTZERO},
     {FN23,  UNI_XEZ,        USES_FL,    ALLOWREC,   ' ',    "X=0?",     YES_L,      X_NEW,   Macro_XEZero,   T_XEZERO,   H_XEZERO},
     {FN24,  UNI_XNEZ,       USES_FL,    ALLOWREC,   ' ',    "X!=0?",    YES_L,      X_NEW,   Macro_XNEZero,  T_XNEZERO,  H_XNEZERO},
@@ -400,15 +400,15 @@ void Macro_XGreaterY(void)
     }
 }
 
-void Macro_XLEZero(void)
+void Macro_XLTZero(void)
 {
     if (progMode == PROG_FLOAT)
     {
-        CheckMacroCondition(STACK[STK_X] <= 0.0);
+        CheckMacroCondition(STACK[STK_X] < 0.0);
     }
     else
     {
-        CheckMacroCondition(STACKL[STK_X] <= 0L);
+        CheckMacroCondition(STACKL[STK_X] < 0L);
     }
 }
 

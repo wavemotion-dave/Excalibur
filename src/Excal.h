@@ -791,7 +791,7 @@ enum UniqueButtonIndexTag
     UNI_XGY,
     UNI_XEY,
     UNI_XNEY,
-    UNI_XLEZ,
+    UNI_XLTZ,
     UNI_XGZ,
     UNI_XEZ,
     UNI_XNEZ,
@@ -1654,8 +1654,8 @@ extern uint32_t userTicks;
 #define H_MACXLY        "Compares X against Y. If X is less than or equal to Y execute the next program step, else skip the next program step."
 #define T_MACXGY        "X > Y?"
 #define H_MACXGY        "Compares X against Y. If X is greater than Y execute the next program step, else skip the next program step."
-#define T_XLEZERO       "X <= 0?"
-#define H_XLEZERO       "Compares X against zero. If X is less than or equal to zero execute the next program step, else skip the next program step."
+#define T_XLTZERO       "X < 0?"
+#define H_XLTZERO       "Compares X against zero. If X is less than zero execute the next program step, else skip the next program step."
 #define T_XGTZERO       "X > 0?"
 #define H_XGTZERO       "Compares X against zero. If X is greater than zero execute the next program step, else skip the next program step."
 #define T_XEY           "X=Y?"
