@@ -45,7 +45,7 @@
 #define VERSION_STR "v3.XX-09"
 
 #define ABOUT_MSG "Excalibur for Windows 32-bit\n"                    \
-                  "Version 3.XX-09  -  June 12, 2026\n\n"             \
+                  "Version 3.XX-09  -  June 13, 2026\n\n"             \
                   "Copyright 1994-2026 David Bernazzani\n\n"          \
                   "Please read the disclaimer and understand the\n"   \
                   "accuracy and precision issues before using.\n\n"   \
@@ -1963,7 +1963,7 @@ struct funcStruct RPNkeys[] = {
     {RPN_LASTX,     UNI_LSTX,   USES_FL, ALLOWREC, 'l', "", NO_L,   X_NEW,      RPN_lastX,          "Last X",               "Retrieves the last value of X before the last operation occurred"},
     {RPN_MODE,      UNI_MODE,   USES_FL, ALLOWREC, 'm', "", NO_L,   X_NEW,      RPN_mode,           "Display Mode",         "Used to select the display mode for the stack"},
     {RPN_BKSP,      UNI_BKSP,   USES_FL, ALLOWREC,  8,  "", NO_L,   X_NULL,     RPN_backspace,      "Backspace",            "Used to correct mistakes in number entry"},
-    {RPN_CLR_STACK, UNI_CLRSTK, USES_FL, ALLOWREC, 'c', "", YES_L,  X_ENTER,    RPN_clearStack,     "Clear Stack",          "Used to clear the entire stack contents. Press twice to clear all registers as well."},
+    {RPN_CLR_STACK, UNI_CLRSTK, USES_FL, ALLOWREC, 'c', "", NO_L,   X_ENTER,    RPN_clearStack,     "Clear Stack",          "Used to clear the entire stack contents. Press twice to clear all registers as well."},
     {RPN_FACT,      UNI_FACT,   USES_FL, ALLOWREC, '!', "", YES_L,  X_NEW,      RPN_fact,           "Factorial X",          "Compute the Factorial of X"},
     {RPN_PLAYBACK,  UNI_PLAY,   USES_FL, NORECORD, 'p', "", NO_L,   X_NEW,      RPN_Playback,       "Run Program",          "Run the the currently loaded program."},
     {RPN_DROP,      UNI_DROP,   USES_FL, ALLOWREC, 'd', "", YES_L,  X_NEW,      RPN_drop,           "Drop Stack",           "Drops the X register and the rest of stack shifts down."},
@@ -2637,6 +2637,13 @@ void RPN_clearStack(void)
                 sleep_and_peek(500);
                 GetDlgItemText(calcMainWindow, RPN_STACK_X, savedStr, MAX_STACK_STRLEN);
             }
+
+            // Like classic HP calculators... LastX is NOT cleared when clearing the stack
+            LASTX = 0.0;
+            LASTY = 0.0;
+
+            LASTXL = 0L;
+            LASTYL = 0L;
         }
 
         if (progMode)
@@ -2652,8 +2659,6 @@ void RPN_clearStack(void)
         STACK[STK_B] = 0.0;
         STACK[STK_C] = 0.0;
         STACK[STK_D] = 0.0;
-        LASTX = 0.0;
-        LASTY = 0.0;
         strcpy(Xstr, "");
     }
     RPN_ClearModifiers(!macroPlayback);
@@ -2669,8 +2674,6 @@ void RPN_clearL(void)
     STACKL[STK_B] = 0L;
     STACKL[STK_C] = 0L;
     STACKL[STK_D] = 0L;
-    LASTXL = 0L;
-    LASTYL = 0L;
     progModeCarry = 0;
     progModeOverflow = 0;
     strcpy(Xstr, "");
@@ -4613,7 +4616,6 @@ BOOL CALLBACK fnDIALOG_MACRO(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
         return TRUE;
 
     case WM_COMMAND:
-
         switch (LOWORD(wParam))
         {
         case (IDC_LIST0): // Did we click in the saved program list box?
@@ -4813,31 +4815,24 @@ BOOL CALLBACK fnDIALOG_MACRO(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lPa
 
             item = SendDlgItemMessage(hDlg, IDC_LIST0, LB_GETCURSEL, 0, 0L);
 
-            sprintf(tmpStr, "Macro Name:  %s", macro_short_names[item]);
+            sprintf(tmpStr, "Macro Name:  %s\r\n", macro_short_names[item]);
             lstrcat(cptr, (LPSTR)tmpStr);
-            lstrcat(cptr, (LPSTR) "\r\n");
 
-            sprintf(tmpStr, "Description: %s", macroName[item]);
+            sprintf(tmpStr, "Description: %s\r\n\r\n", macroName[item]);
             lstrcat(cptr, (LPSTR)tmpStr);
-            lstrcat(cptr, (LPSTR) "\r\n");
-            lstrcat(cptr, (LPSTR) "\r\n");
 
             for (i = 0; i < playBackIdxSave[item]; i++)
             {
-                sprintf(tmpStr, "%03d - %s", i + 1, playBackMap[playBackSave[item][i]].funcText);
+                sprintf(tmpStr, "%03d - %s\r\n", i + 1, playBackMap[playBackSave[item][i]].funcText);
                 lstrcat(cptr, (LPSTR)tmpStr);
-                lstrcat(cptr, (LPSTR) "\r\n");
             }
-            sprintf(tmpStr, "%03d - <End Of Program>", i + 1);
+            sprintf(tmpStr, "%03d - <End Of Program>\r\n", i + 1);
             lstrcat(cptr, (LPSTR)tmpStr);
-            lstrcat(cptr, (LPSTR) "\r\n");
             chksum = 0x0000;
             for (i = 0; i < playBackIdxSave[item]; i++)
                 chksum += playBackSave[item][i];
-            sprintf(tmpStr, "Checksum: %04X", chksum);
-            lstrcat(cptr, (LPSTR) "\r\n");
+            sprintf(tmpStr, "\r\nChecksum: %04X\r\n", chksum);
             lstrcat(cptr, (LPSTR)tmpStr);
-            lstrcat(cptr, (LPSTR) "\r\n");
 
             OpenClipboard(calcMainWindow);
             EmptyClipboard();
@@ -6312,7 +6307,7 @@ BOOL CALLBACK HelpDialog(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM lParam)
 // ------------------------------------------------------------------
 int _matherr(struct _exception *except)
 {
-    // Handle _OVERFLOW and _UNDERFLOW
+    // Handle _OVERFLOW and _UNDERFLOW (though I don't think _UNDERFLOW is actually handled by the floating point library... you just get zero)
     if (except->type == _OVERFLOW)
     {
         MessageBox(calcMainWindow, "Excalibur Function Overflow...", "Excalibur Floating Point", MB_OK);
@@ -6336,8 +6331,14 @@ int _matherr(struct _exception *except)
     }
     else if (except->type == _TLOSS)
     {
-        MessageBox(calcMainWindow,
-                   "Excalibur Function - Total Loss of Significance...", "Excalibur Floating Point", MB_OK);
+        MessageBox(calcMainWindow, "Excalibur Function - Total Loss of Significance...", "Excalibur Floating Point", MB_OK);
+        except->retval = 0.0;
+        endRunningMacro();
+        return 1;
+    }
+    else if (except->type == _SING)
+    {
+        MessageBox(calcMainWindow, "Excalibur Function - Argument Invalid for Function...", "Excalibur Floating Point", MB_OK);
         except->retval = 0.0;
         endRunningMacro();
         return 1;
