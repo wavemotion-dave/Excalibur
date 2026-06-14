@@ -45,7 +45,7 @@
 #define VERSION_STR "v3.XX-09"
 
 #define ABOUT_MSG "Excalibur for Windows 32-bit\n"                    \
-                  "Version 3.XX-09  -  June 13, 2026\n\n"             \
+                  "Version 3.XX-09  -  June 14, 2026\n\n"             \
                   "Copyright 1994-2026 David Bernazzani\n\n"          \
                   "Please read the disclaimer and understand the\n"   \
                   "accuracy and precision issues before using.\n\n"   \
@@ -54,7 +54,7 @@
                   "https://github.com/wavemotion-dave/Excalibur"      \
                   "\n\nThis version is BETA - Expect and report Bugs!"
 
-#define CONFIG_VERSION_MAIN 0x0001  // If this changes, we wipe EVERYTHING
+#define CONFIG_VERSION_MAIN 0x0002  // If this changes, we wipe EVERYTHING
 #define CONFIG_VERSION_SUB  0x0001  // If this changes, we reset x,y window position and reset constant tables (currency, physics constants, etc)
 
 #define END_OF_PROGRAM_STR "<End Of Program>"
@@ -4310,6 +4310,9 @@ void ProcessCustomSave(void)
         saveIdx = Custom_funcs[newIdx].controlID;
         switch (customSave[newIdx].custom_save_idx)
         {
+        case (CUSTOM_SAVE_UNUSED): // Unused
+            memcpy(&Unused_funcs[newIdx], &Unused_funcs[index], sizeof(struct funcStruct));
+            break;
         case (CUSTOM_SAVE_SCI): // Scientific
             memcpy(&Custom_funcs[newIdx], &Scientific_funcs[index], sizeof(struct funcStruct));
             break;

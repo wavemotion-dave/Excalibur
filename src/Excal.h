@@ -127,6 +127,7 @@ extern struct funcStruct Program2_funcs[];
 extern struct funcStruct Statistics_funcs[];
 extern struct funcStruct Custom_funcs[];
 extern struct funcStruct MacroFuncs[];
+extern struct funcStruct Unused_funcs[];
 
 // For record/playback
 #define ALLOWREC    1   // This button can be recorded
@@ -386,6 +387,7 @@ extern void SCI_ln(void);
 extern void SCI_log(void);
 extern void SCI_pow(void);
 
+#define CUSTOM_SAVE_UNUSED    0
 #define CUSTOM_SAVE_SCI       1
 #define CUSTOM_SAVE_SCI2      2
 #define CUSTOM_SAVE_FIN       3
@@ -682,15 +684,14 @@ enum UniqueButtonIndexTag
     UNI_SLOPE,
     UNI_YGUESS,
     UNI_XGUESS,
-    UNI_STATRES1,
-    UNI_STATRES2,
-    UNI_STATRES3,
-    UNI_STATRES4,
-    UNI_STATRES5,
-    UNI_STATRES6,
-    UNI_STATRES7,
-    UNI_STATRES8,
-
+    UNI_CLRR0,
+    UNI_STOR0,
+    UNI_STPR0,
+    UNI_STMR0,
+    UNI_CLRR1,
+    UNI_STOR1,
+    UNI_STPR1,
+    UNI_STMR1,
     UNI_DEC,
     UNI_HEX,
     UNI_BIN,
@@ -1228,6 +1229,7 @@ extern uint32_t userTicks;
 #define IDC_CUSTOM_PB78                 178
 #define IDC_CUSTOM_PB79                 179
 #define IDC_CUSTOM_PB80                 180
+#define IDC_CUSTOM_PB81                 181 // Blank Key
 
 #define IDC_RADIO0                      1000
 #define IDC_RADIO1                      1001
@@ -1332,6 +1334,22 @@ extern uint32_t userTicks;
 #define H_ESTX          "Estimates the X value based on the displayed value and statistical data."
 #define T_ESTY          "Estimate Y"
 #define H_ESTY          "Estimates the Y value based on the displayed value and statistical data."
+#define T_CLR0          "Clear R0"
+#define H_CLR0          "Clear the R0 register."
+#define T_STR0          "Store R0"
+#define H_STR0          "Store X into the R0 register."
+#define T_STPR0         "Store Plus R0"
+#define H_STPR0         "Add X to the R0 register."
+#define T_STMR0         "Store Minus R0"
+#define H_STMR0         "Subtract X from the R0 register"
+#define T_CLR1          "Clear R1"
+#define H_CLR1          "Clear the R1 register."
+#define T_STR1          "Store R1"
+#define H_STR1          "Store X into the R1 register."
+#define T_STPR1         "Store Plus R1"
+#define H_STPR1         "Add X to the R1 register."
+#define T_STMR1         "Store Minus R1"
+#define H_STMR1         "Subtract X from the R1 register"
 #define T_TAX           "Tax Constant"
 #define H_TAX           "Multiplies the number in X by the tax constant (defined in File/Settings)."
 #define T_PERC          "Percent"
@@ -1674,6 +1692,8 @@ extern uint32_t userTicks;
 #define T_LBLF          "Label F"
 #define T_LBLG          "Label G"
 #define T_LBLH          "Label H"
+#define T_LBLI          "Label I"
+#define T_LBLJ          "Label J"
 #define T_GOTOA         "Goto A"
 #define T_GOTOB         "Goto B"
 #define T_GOTOC         "Goto C"
@@ -1682,6 +1702,8 @@ extern uint32_t userTicks;
 #define T_GOTOF         "Goto F"
 #define T_GOTOG         "Goto G"
 #define T_GOTOH         "Goto H"
+#define T_GOTOI         "Goto I"
+#define T_GOTOJ         "Goto J"
 #define H_GOTOS         "Goto Label. Program will branch to the specified label (if it exists).\nGoto will search forward from the current program step - wrapping as needed."
 #define T_GSBA          "Gosub A"
 #define T_GSBB          "Gosub B"
@@ -1690,15 +1712,18 @@ extern uint32_t userTicks;
 #define T_GSBE          "Gosub E"
 #define T_GSBF          "Gosub F"
 #define T_GSBG          "Gosub G"
+#define T_GSBH          "Gosub H"
+#define T_GSBI          "Gosub I"
+#define T_GSBJ          "Gosub J"
 #define H_GOSUBS        "Gosub to Label - Execute program until a Return is hit.\nGosub will search forward from the current program step - wrapping as needed."
 #define T_RETURN        "Return"
 #define H_RETURN        "Return from current Gosub function."
 #define T_SFX           "Set Flag X"
-#define H_SFX           "Set Flag X (32 user flags - X must be whole number)."
+#define H_SFX           "Set Flag X (32 user flags - X must be whole number). This consumes the value in X."
 #define T_CFX           "Clear Flag X"
-#define H_CFX           "Clear Flag X (32 user flags - X must be whole number)."
+#define H_CFX           "Clear Flag X (32 user flags - X must be whole number). This consumes the value in X."
 #define T_TFX           "Test Flag X"
-#define H_TFX           "Test Flag X (32 user flags - X must be whole number). If TRUE, execute next program line, else skip next line."
+#define H_TFX           "Test Flag X (32 user flags - X must be whole number). If TRUE, execute next program line, else skip next line. This consumes the value in X."
 #define T_PAUSE         "Pause Program"
 #define H_PAUSE         "Pause Program 1 second to show stack."
 #define T_INPR0         "Input R0"
@@ -1717,13 +1742,6 @@ extern uint32_t userTicks;
 #define T_DEL           "Delete Step"
 #define H_DEL           "In record mode it will Delete currently shown program line. You can use FWD and REV to get around the program while in record mode."
 #define T_MEDIT         "Edit program."
-#define T_LBLI          "Label I"
-#define T_GOTOI         "Goto I"
-#define T_GSBI          "Gosub I"
-#define T_GSBH          "Gosub H"
-#define T_LBLJ          "Label J"
-#define T_GOTOJ         "Goto J"
-#define T_GSBJ          "Gosub J"
 #define T_STOIND        "Store Indirect Register"
 #define H_STOIND        "Stores X value to the Indirect Register (i)"
 #define T_GOTOIND       "Goto Indirect"

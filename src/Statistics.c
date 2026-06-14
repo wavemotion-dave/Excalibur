@@ -58,6 +58,15 @@ extern void STAT_m(void);
 extern void STAT_xGuess(void);
 extern void STAT_yGuess(void);
 
+extern void STAT_ClearR0(void);
+extern void STAT_StoreR0(void);
+extern void STAT_StoPlusR0(void);
+extern void STAT_StoMinusR0(void);
+extern void STAT_ClearR1(void);
+extern void STAT_StoreR1(void);
+extern void STAT_StoPlusR1(void);
+extern void STAT_StoMinusR1(void);
+
 // These are somewhat common for statistics, so we include them for 
 // improved proximity and avoid the user having to jump banks.
 extern void SCI_square(void);
@@ -73,46 +82,46 @@ extern void SCI_abs(void);
 
 
 struct funcStruct Statistics_funcs[MAX_FUNCS] = {
-    {FN1,   UNI_SUMPLUS,    USES_F,     ALLOWREC, ' ',   "SUM+",  YES_L,   X_ENTER, STAT_sumPlus,  T_SUMP,    H_SUMP},
-    {FN2,   UNI_SUMMINUS,   USES_F,     ALLOWREC, ' ',   "SUM-",  YES_L,   X_ENTER, STAT_sumMinus, T_SUMM,    H_SUMM},
-    {FN3,   UNI_SUMCLR,     USES_F,     ALLOWREC, ' ',   "SCLR",  YES_L,   X_NULL,  STAT_sumCl,    T_SUMC,    H_SUMC},
-    {FN4,   UNI_STATN,      USES_F,     ALLOWREC, ' ',   " N ",   YES_L,   X_NEW,   STAT_n,        T_SUMN,    H_SUMN},
-    {FN5,   UNI_STATSDX,    USES_F,     ALLOWREC, ' ',   "SDX",   YES_L,   X_NEW,   STAT_SdevX,    T_SUMSDX,  H_SUMSDX},
-    {FN6,   UNI_STATPDX,    USES_F,     ALLOWREC, ' ',   "PDX",   YES_L,   X_NEW,   STAT_PdevX,    T_SUMPDX,  H_SUMPDX},
-    {FN7,   UNI_STATSDY,    USES_F,     ALLOWREC, ' ',   "SDY",   YES_L,   X_NEW,   STAT_SdevY,    T_SUMSDX,  H_SUMSDY},
-    {FN8,   UNI_STATPDY,    USES_F,     ALLOWREC, ' ',   "PDY",   YES_L,   X_NEW,   STAT_PdevY,    T_SUMPDX,  H_SUMPDY},
-    {FN9,   UNI_STATAVEX,   USES_F,     ALLOWREC, ' ',   "AVG X", YES_L,   X_NEW,   STAT_aveX,     T_MEANX,   H_MEANX},
-    {FN10,  UNI_STATAVEY,   USES_F,     ALLOWREC, ' ',   "AVG Y", YES_L,   X_NEW,   STAT_aveY,     T_MEANY,   H_MEANY},
-    {FN11,  UNI_SUMX,       USES_F,     ALLOWREC, ' ',   "SUM X", YES_L,   X_NEW,   STAT_sumX,     T_SUMX,    H_SUMX},
-    {FN12,  UNI_SUMY,       USES_F,     ALLOWREC, ' ',   "SUM Y", YES_L,   X_NEW,   STAT_sumY,     T_SUMY,    H_SUMY},
-    {FN13,  UNI_SUMXX,      USES_F,     ALLOWREC, ' ',   "SUM X²",YES_L,   X_NEW,   STAT_sumXsq,   T_SUMXX,   H_SUMXX},
-    {FN14,  UNI_SUMYY,      USES_F,     ALLOWREC, ' ',   "SUM Y²",YES_L,   X_NEW,   STAT_sumYsq,   T_SUMYY,   H_SUMYY},
-    {FN15,  UNI_SUMXY,      USES_F,     ALLOWREC, ' ',   "CORR",  YES_L,   X_NEW,   STAT_sumXY,    T_SUMXY,   H_SUMXY},
-    {FN16,  UNI_CORR,       USES_F,     ALLOWREC, ' ',   "r",     YES_L,   X_NEW,   STAT_r,        T_CORR,    H_CORR},
-    {FN17,  UNI_YINT,       USES_F,     ALLOWREC, ' ',   "b",     YES_L,   X_NEW,   STAT_b,        T_YINT,    H_YINT},
-    {FN18,  UNI_SLOPE,      USES_F,     ALLOWREC, ' ',   "m",     YES_L,   X_NEW,   STAT_m,        T_SLOPE,   H_SLOPE},
-    {FN19,  UNI_YGUESS,     USES_F,     ALLOWREC, ' ',   "y",     YES_L,   X_NEW,   STAT_yGuess,   T_ESTY,    H_ESTY},
-    {FN20,  UNI_XGUESS,     USES_F,     ALLOWREC, ' ',   "x",     YES_L,   X_NEW,   STAT_xGuess,   T_ESTX,    H_ESTX},
-    {FN21,  UNI_ABS,        USES_F,     ALLOWREC, ' ',   "ABS",   YES_L,   X_NEW,   SCI_abs,       T_ABS,     H_ABS},
-    {FN22,  UNI_XX,         USES_F,     ALLOWREC, ' ',   "X²",    YES_L,   X_NEW,   SCI_square,    T_XX,      H_XX},
-    {FN23,  UNI_SQRT,       USES_F,     ALLOWREC, ' ',   "SQRT",  YES_L,   X_NEW,   SCI_sqrt,      T_SQRT,    H_SQRT},
-    {FN24,  UNI_INV,        USES_F,     ALLOWREC, ' ',   "1/X",   YES_L,   X_NEW,   RPN_reciprocal,T_INV,     H_INV},
-    {FN25,  UNI_POW,        USES_FL,    ALLOWREC, ' ',   "Y^X",   YES_L,   X_NEW,   RPN_pow,       T_POW,     H_POW},
-    {FN26,  UNI_EXP,        USES_F,     ALLOWREC, ' ',   "e^X",   YES_L,   X_NEW,   SCI_exp,       T_EXP,     H_EXP},
-    {FN27,  UNI_LN,         USES_F,     ALLOWREC, ' ',   "LN",    YES_L,   X_NEW,   SCI_ln,        T_LN,      H_LN},
-    {FN28,  UNI_LOG,        USES_F,     ALLOWREC, ' ',   "LOG",   YES_L,   X_NEW,   SCI_log,       T_LOG,     H_LOG},
-    {FN29,  UNI_FACT,       USES_FL,    ALLOWREC, ' ',   "X!",    YES_L,   X_NEW,   SCI_xfact,     T_FACT,    H_FACT},
-    {FN30,  UNI_POW10,      USES_F,     ALLOWREC, ' ',   "10^X",  YES_L,   X_NEW,   SCI_10x,       T_POW10,   H_POW10},
-    {FN31,  UNI_COMB,       USES_F,     ALLOWREC, ' ',   "Cn,r",  YES_L,   X_NEW,   SCI_Cnr,       T_COMB,    H_COMB},
-    {FN32,  UNI_PERM,       USES_F,     ALLOWREC, ' ',   "Pn,r",  YES_L,   X_NEW,   SCI_Pnr,       T_PERM,    H_PERM},
-    {FN33,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ',   " ",     YES_L,   X_NEW,   NULL,          T_NULL,    H_NULL},
-    {FN34,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ',   " ",     YES_L,   X_NEW,   NULL,          T_NULL,    H_NULL},
-    {FN35,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ',   " ",     YES_L,   X_NEW,   NULL,          T_NULL,    H_NULL},
-    {FN36,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ',   " ",     YES_L,   X_NEW,   NULL,          T_NULL,    H_NULL},
-    {FN37,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ',   " ",     YES_L,   X_NEW,   NULL,          T_NULL,    H_NULL},
-    {FN38,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ',   " ",     YES_L,   X_NEW,   NULL,          T_NULL,    H_NULL},
-    {FN39,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ',   " ",     YES_L,   X_NEW,   NULL,          T_NULL,    H_NULL},
-    {FN40,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ',   " ",     YES_L,   X_NEW,   NULL,          T_NULL,    H_NULL}
+    {FN1,   UNI_SUMPLUS,    USES_F,     ALLOWREC, ' ',   "SUM+",  YES_L,   X_ENTER, STAT_sumPlus,   T_SUMP,    H_SUMP},
+    {FN2,   UNI_SUMMINUS,   USES_F,     ALLOWREC, ' ',   "SUM-",  YES_L,   X_ENTER, STAT_sumMinus,  T_SUMM,    H_SUMM},
+    {FN3,   UNI_SUMCLR,     USES_F,     ALLOWREC, ' ',   "SCLR",  YES_L,   X_NULL,  STAT_sumCl,     T_SUMC,    H_SUMC},
+    {FN4,   UNI_STATN,      USES_F,     ALLOWREC, ' ',   " N ",   YES_L,   X_NEW,   STAT_n,         T_SUMN,    H_SUMN},
+    {FN5,   UNI_STATSDX,    USES_F,     ALLOWREC, ' ',   "SDX",   YES_L,   X_NEW,   STAT_SdevX,     T_SUMSDX,  H_SUMSDX},
+    {FN6,   UNI_STATPDX,    USES_F,     ALLOWREC, ' ',   "PDX",   YES_L,   X_NEW,   STAT_PdevX,     T_SUMPDX,  H_SUMPDX},
+    {FN7,   UNI_STATSDY,    USES_F,     ALLOWREC, ' ',   "SDY",   YES_L,   X_NEW,   STAT_SdevY,     T_SUMSDX,  H_SUMSDY},
+    {FN8,   UNI_STATPDY,    USES_F,     ALLOWREC, ' ',   "PDY",   YES_L,   X_NEW,   STAT_PdevY,     T_SUMPDX,  H_SUMPDY},
+    {FN9,   UNI_STATAVEX,   USES_F,     ALLOWREC, ' ',   "AVG X", YES_L,   X_NEW,   STAT_aveX,      T_MEANX,   H_MEANX},
+    {FN10,  UNI_STATAVEY,   USES_F,     ALLOWREC, ' ',   "AVG Y", YES_L,   X_NEW,   STAT_aveY,      T_MEANY,   H_MEANY},
+    {FN11,  UNI_SUMX,       USES_F,     ALLOWREC, ' ',   "SUM X", YES_L,   X_NEW,   STAT_sumX,      T_SUMX,    H_SUMX},
+    {FN12,  UNI_SUMY,       USES_F,     ALLOWREC, ' ',   "SUM Y", YES_L,   X_NEW,   STAT_sumY,      T_SUMY,    H_SUMY},
+    {FN13,  UNI_SUMXX,      USES_F,     ALLOWREC, ' ',   "SUM X²",YES_L,   X_NEW,   STAT_sumXsq,    T_SUMXX,   H_SUMXX},
+    {FN14,  UNI_SUMYY,      USES_F,     ALLOWREC, ' ',   "SUM Y²",YES_L,   X_NEW,   STAT_sumYsq,    T_SUMYY,   H_SUMYY},
+    {FN15,  UNI_SUMXY,      USES_F,     ALLOWREC, ' ',   "CORR",  YES_L,   X_NEW,   STAT_sumXY,     T_SUMXY,   H_SUMXY},
+    {FN16,  UNI_CORR,       USES_F,     ALLOWREC, ' ',   "r",     YES_L,   X_NEW,   STAT_r,         T_CORR,    H_CORR},
+    {FN17,  UNI_YINT,       USES_F,     ALLOWREC, ' ',   "b",     YES_L,   X_NEW,   STAT_b,         T_YINT,    H_YINT},
+    {FN18,  UNI_SLOPE,      USES_F,     ALLOWREC, ' ',   "m",     YES_L,   X_NEW,   STAT_m,         T_SLOPE,   H_SLOPE},
+    {FN19,  UNI_YGUESS,     USES_F,     ALLOWREC, ' ',   "y",     YES_L,   X_NEW,   STAT_yGuess,    T_ESTY,    H_ESTY},
+    {FN20,  UNI_XGUESS,     USES_F,     ALLOWREC, ' ',   "x",     YES_L,   X_NEW,   STAT_xGuess,    T_ESTX,    H_ESTX},
+    {FN21,  UNI_ABS,        USES_F,     ALLOWREC, ' ',   "ABS",   YES_L,   X_NEW,   SCI_abs,        T_ABS,     H_ABS},
+    {FN22,  UNI_XX,         USES_F,     ALLOWREC, ' ',   "X²",    YES_L,   X_NEW,   SCI_square,     T_XX,      H_XX},
+    {FN23,  UNI_SQRT,       USES_F,     ALLOWREC, ' ',   "SQRT",  YES_L,   X_NEW,   SCI_sqrt,       T_SQRT,    H_SQRT},
+    {FN24,  UNI_INV,        USES_F,     ALLOWREC, ' ',   "1/X",   YES_L,   X_NEW,   RPN_reciprocal, T_INV,     H_INV},
+    {FN25,  UNI_POW,        USES_FL,    ALLOWREC, ' ',   "Y^X",   YES_L,   X_NEW,   RPN_pow,        T_POW,     H_POW},
+    {FN26,  UNI_EXP,        USES_F,     ALLOWREC, ' ',   "e^X",   YES_L,   X_NEW,   SCI_exp,        T_EXP,     H_EXP},
+    {FN27,  UNI_LN,         USES_F,     ALLOWREC, ' ',   "LN",    YES_L,   X_NEW,   SCI_ln,         T_LN,      H_LN},
+    {FN28,  UNI_LOG,        USES_F,     ALLOWREC, ' ',   "LOG",   YES_L,   X_NEW,   SCI_log,        T_LOG,     H_LOG},
+    {FN29,  UNI_FACT,       USES_FL,    ALLOWREC, ' ',   "X!",    YES_L,   X_NEW,   SCI_xfact,      T_FACT,    H_FACT},
+    {FN30,  UNI_POW10,      USES_F,     ALLOWREC, ' ',   "10^X",  YES_L,   X_NEW,   SCI_10x,        T_POW10,   H_POW10},
+    {FN31,  UNI_COMB,       USES_F,     ALLOWREC, ' ',   "Cn,r",  YES_L,   X_NEW,   SCI_Cnr,        T_COMB,    H_COMB},
+    {FN32,  UNI_PERM,       USES_F,     ALLOWREC, ' ',   "Pn,r",  YES_L,   X_NEW,   SCI_Pnr,        T_PERM,    H_PERM},
+    {FN33,  UNI_CLRR0,      USES_FL,    ALLOWREC, ' ',   "Clr R0",YES_L,   X_NEW,   STAT_ClearR0,   T_CLR0,    H_CLR0},
+    {FN34,  UNI_STOR0,      USES_FL,    ALLOWREC, ' ',   "Sto R0",YES_L,   X_NEW,   STAT_StoreR0,   T_STR0,    H_STR0},
+    {FN35,  UNI_STPR0,      USES_FL,    ALLOWREC, ' ',   "Sto+R0",YES_L,   X_NEW,   STAT_StoPlusR0, T_STPR0,   H_STPR0},
+    {FN36,  UNI_STMR0,      USES_FL,    ALLOWREC, ' ',   "Sto-R0",YES_L,   X_NEW,   STAT_StoMinusR0,T_STMR0,   H_STMR0},
+    {FN37,  UNI_CLRR1,      USES_FL,    ALLOWREC, ' ',   "Clr R1",YES_L,   X_NEW,   STAT_ClearR1,   T_CLR1,    H_CLR1},
+    {FN38,  UNI_STOR1,      USES_FL,    ALLOWREC, ' ',   "Sto R1",YES_L,   X_NEW,   STAT_StoreR1,   T_STR1,    H_STR1},
+    {FN39,  UNI_STPR1,      USES_FL,    ALLOWREC, ' ',   "Sto+R1",YES_L,   X_NEW,   STAT_StoPlusR1, T_STPR1,   H_STPR1},
+    {FN40,  UNI_STMR1,      USES_FL,    ALLOWREC, ' ',   "Sto-R1",YES_L,   X_NEW,   STAT_StoMinusR1,T_STMR1,   H_STMR1}
 };
 
 // ------------- 
@@ -338,3 +347,67 @@ void STAT_xGuess(void)
     StackPush((StackPop() - b) / m);
 }
 
+
+void STAT_ClearR0(void)
+{
+    if (progMode == PROG_FLOAT)
+        STO[0] = 0.0;
+    else
+        STOL[0] = 0L;
+}
+
+void STAT_StoreR0(void)
+{
+    if (progMode == PROG_FLOAT)
+        STO[0] = STACK[STK_X];
+    else
+        STOL[0] = STACKL[STK_X];
+}
+
+void STAT_StoPlusR0(void)
+{
+    if (progMode == PROG_FLOAT)
+        STO[0] += STACK[STK_X];
+    else
+        STOL[0] += STACKL[STK_X];
+}
+
+void STAT_StoMinusR0(void)
+{
+    if (progMode == PROG_FLOAT)
+        STO[0] -= STACK[STK_X];
+    else
+        STOL[0] -= STACKL[STK_X];
+}
+
+void STAT_ClearR1(void)
+{
+    if (progMode == PROG_FLOAT)
+        STO[1] = 0.0;
+    else
+        STOL[1] = 0L;
+}
+
+void STAT_StoreR1(void)
+{
+    if (progMode == PROG_FLOAT)
+        STO[1] = STACK[STK_X];
+    else
+        STOL[1] = STACKL[STK_X];
+}
+
+void STAT_StoPlusR1(void)
+{
+    if (progMode == PROG_FLOAT)
+        STO[1] += STACK[STK_X];
+    else
+        STOL[1] += STACKL[STK_X];
+}
+
+void STAT_StoMinusR1(void)
+{
+    if (progMode == PROG_FLOAT)
+        STO[1] -= STACK[STK_X];
+    else
+        STOL[1] -= STACKL[STK_X];
+}

@@ -39,6 +39,49 @@
 
 struct funcStruct Custom_funcsTmp[MAX_FUNCS];   // so that cancel can be pressed without changes
 
+struct funcStruct Unused_funcs[MAX_FUNCS] = {
+    {FN1,   UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN2,   UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN3,   UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN4,   UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN5,   UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN6,   UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN7,   UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN8,   UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN9,   UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN10,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN11,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN12,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN13,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN14,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN15,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN16,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN17,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN18,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN19,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN20,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN21,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN22,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN23,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN24,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN25,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN26,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN27,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN28,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN29,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN30,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN31,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN32,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN33,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN34,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN35,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN36,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN37,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN38,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN39,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
+    {FN40,  UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL}
+};
+
 struct funcStruct Custom_funcs[MAX_FUNCS] = {
     {FN1,   UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
     {FN2,   UNI_UNUSED,     USES_F,     ALLOWREC, ' ', " ", YES_L, X_NEW, NULL,    T_NULL, H_NULL},
@@ -253,6 +296,12 @@ BOOL CALLBACK CustomDefDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM l
                 customSave[newIdx].func_idx = (int16_t)macroItem;
                 Custom_funcs[newIdx].keyTitle = macroName[macroItem];
             }
+            else if (controlID == 999) // Should we blank the key?
+            {
+                memcpy(&Custom_funcs[newIdx], &Unused_funcs[0], sizeof(struct funcStruct));
+                customSave[newIdx].custom_save_idx = CUSTOM_SAVE_UNUSED;
+                customSave[newIdx].func_idx = 0;
+            }
             else
             {
                 memcpy(&Custom_funcs[newIdx], &customPullFuncs[controlID], sizeof(struct funcStruct));
@@ -263,7 +312,15 @@ BOOL CALLBACK CustomDefDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM l
             processCustomFuncsSolo(hDlg, newIdx);
             SetFocus(hDlg);
         }
+        else if (wParam == IDC_CUSTOM_PB81) // Blank
+        {
+            macroItem = (LRESULT) - 1;
+            controlID = 999;
+            SetDlgItemText(hDlg, IDC_CUSTOM_FUNCNAME, "Blank");
+            SetFocus(hDlg);
+        }
         else
+        {
             switch(wParam)
             {
             case(IDC_CUSTOM_OK):      // OK
@@ -327,6 +384,7 @@ BOOL CALLBACK CustomDefDlgProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM l
                 processCustomFuncs(hDlg);
                 break;
             }
+        }
         break;
 
     case WM_DESTROY:
