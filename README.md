@@ -1,7 +1,7 @@
 # Excalibur RPN Calculator
 
 Designed as an HP-like calculator for Windows.
-Win32-based and will run on any version of Windows from 98 up to Windows 11 and generally runs quite well under Linux wine.
+Win32-based and will run on any version of Windows from 95 up to Windows 11 and generally runs quite well under Linux wine.
 This is not emulation nor simulation of any specific HP model - but will feel familiar to anyone that is well travelled in the HP
 calculator ecosystem.
 
@@ -9,14 +9,14 @@ Excalibur is being released in two major versions.
 
 The **2.XX** series (of which version 2.05 was released in April 2026) is the 'Classic' version which is binary-and-config 
 compatible with the legacy releases from the late 1990s and early 2000s. The only real difference between 2.05 and the legacy
-2.00, 2.01 versions is a few key bug fixes and the  application now renders about 50% larger for a better experience on a modern
+2.00, 2.01 versions is a few long-standing bug fixes and the application now renders about 50% larger for a better experience on a modern
 display. The latest 2.XX versions should also help correct numerous small graphical glitches when running in wine under Linux 
 (e.g. the Comp-Sci handling will now properly display the stack right-shifted looking reasonably the same as it would under Windows).  
 
 The **3.XX** series is the future of Excalibur. It is, at once, both stripped down and re-built back up to provide a more consistent
 experience for the user. It's 50% more lightweight in resources with no dynamic memory use (outside of clipboard handling) - meaning
 it will run perfectly, every time and for as long as you leave the application open. It's faster under the hood with a number of bug 
-fixes and small improvements. There are a handful of new functions but more importantly many old functions have been reworked or removed. 
+fixes and improvements. There are a handful of new functions but more importantly many old functions have been reworked or removed. 
 30 years ago, I was focused on adding as many formulas to the calculator as possible. Though experience I've learned that more is not 
 always better. To that end, the 3.XX series has a stronger focus on core function, not added formulas. I've also decided not to follow
 the growing trend of putting functions behind sub-menus or shifted versions of primary keys. With Excalibur, each key has a dedicated
