@@ -52,6 +52,7 @@ extern void SCI_sqrt(void);
 extern void SCI_exp(void);
 extern void SCI_ln(void);
 extern void SCI_log(void);
+extern void SCI_factors(void);
 extern void SCI_xfact(void);
 extern void SCI_pi(void);
 extern void SCI_sinh(void);
@@ -140,12 +141,12 @@ struct funcStruct Scientific_funcs[MAX_FUNCS] = {
     {FN8,   UNI_ABS,        USES_F,     ALLOWREC,   ' ',    "ABS",      YES_L,  X_NEW,  SCI_abs,                T_ABS,          H_ABS},
     {FN9,   UNI_XX,         USES_F,     ALLOWREC,   ' ',    "X²",       YES_L,  X_NEW,  SCI_square,             T_XX,           H_XX},
     {FN10,  UNI_SQRT,       USES_F,     ALLOWREC,   ' ',    "SQRT",     YES_L,  X_NEW,  SCI_sqrt,               T_SQRT,         H_SQRT},
-    {FN11,  UNI_INV,        USES_F,     ALLOWREC,   ' ',    "1/X",      YES_L,  X_NEW,  RPN_reciprocal,         T_INV,          H_INV},
+    {FN11,  UNI_FACT,       USES_FL,    ALLOWREC,   ' ',    "X!",       YES_L,  X_NEW,  SCI_xfact,              T_FACT,         H_FACT},
     {FN12,  UNI_POW,        USES_FL,    ALLOWREC,   ' ',    "Y^X",      YES_L,  X_NEW,  RPN_pow,                T_POW,          H_POW},
     {FN13,  UNI_EXP,        USES_F,     ALLOWREC,   ' ',    "e^X",      YES_L,  X_NEW,  SCI_exp,                T_EXP,          H_EXP},
     {FN14,  UNI_LN,         USES_F,     ALLOWREC,   ' ',    "LN",       YES_L,  X_NEW,  SCI_ln,                 T_LN,           H_LN},
     {FN15,  UNI_LOG,        USES_F,     ALLOWREC,   ' ',    "LOG",      YES_L,  X_NEW,  SCI_log,                T_LOG,          H_LOG},
-    {FN16,  UNI_FACT,       USES_FL,    ALLOWREC,   ' ',    "X!",       YES_L,  X_NEW,  SCI_xfact,              T_FACT,         H_FACT},
+    {FN16,  UNI_LOG2,       USES_F,     ALLOWREC,   ' ',    "Log2",     YES_L,  X_NEW,  SCI_LogBase2,           T_LOG2,         H_LOG2},
     {FN17,  UNI_POW10,      USES_F,     ALLOWREC,   ' ',    "10^X",     YES_L,  X_NEW,  SCI_10x,                T_POW10,        H_POW10},
     {FN18,  UNI_INT,        USES_F,     ALLOWREC,   ' ',    "INT",      YES_L,  X_NEW,  SCI_int,                T_INT,          H_INT},
     {FN19,  UNI_FRACT,      USES_F,     ALLOWREC,   ' ',    "FRAC",     YES_L,  X_NEW,  SCI_frac,               T_FRAC,         H_FRAC},
@@ -153,7 +154,7 @@ struct funcStruct Scientific_funcs[MAX_FUNCS] = {
     {FN21,  UNI_COMB,       USES_F,     ALLOWREC,   ' ',    "Cn,r",     YES_L,  X_NEW,  SCI_Cnr,                T_COMB,         H_COMB},
     {FN22,  UNI_PERM,       USES_F,     ALLOWREC,   ' ',    "Pn,r",     YES_L,  X_NEW,  SCI_Pnr,                T_PERM,         H_PERM},
     {FN23,  UNI_PI,         USES_F,     ALLOWREC,   ' ',    "PI",       YES_L,  X_NEW,  SCI_pi,                 T_PI,           H_PI},
-    {FN24,  UNI_LOG2,       USES_F,     ALLOWREC,   ' ',    "Log2",     YES_L,  X_NEW,  SCI_LogBase2,           T_LOG2,         H_LOG2},
+    {FN24,  UNI_FACTORS,    USES_F,     ALLOWREC,   ' ',    "Factors",  YES_L,  X_NEW,  SCI_factors,            T_FACTORS,      H_FACTORS},
     {FN25,  UNI_ROUND,      USES_F,     ALLOWREC,   ' ',    "Round",    YES_L,  X_NEW,  SCI_round,              T_ROUND,        H_ROUND},
     {FN26,  UNI_FLOOR,      USES_F,     ALLOWREC,   ' ',    "Floor",    YES_L,  X_NEW,  SCI_floor,              T_FLOOR,        H_FLOOR},
     {FN27,  UNI_CEIL,       USES_F,     ALLOWREC,   ' ',    "Ceil",     YES_L,  X_NEW,  SCI_Ceil,               T_CEIL,         H_CEIL},
@@ -405,6 +406,49 @@ void SCI_ln(void)
             StackPush(log(val));
         }
     }
+}
+
+void SCI_factors(void)
+{
+    static int64_t factors_x = 0;
+    static int64_t lastFactor = 2;
+    int64_t tmp = 0;
+
+    if (lastUniqueIndex != UNI_FACTORS)
+    {
+        factors_x = (int64_t) STACK[STK_X];
+        lastFactor = 2;
+
+        // Set some arbitrary but sensible upper limit
+        if (factors_x > 500000000)
+        {
+            RPN_error("Factors:  Can only compute on values less than 500,000,000");
+            lastUniqueIndex = 0;
+            return;
+        }
+    }
+    else
+    {
+        lastFactor++;
+        tmp = (int64_t) StackPop(); // We replace the last factor
+    }
+    
+    // ---------------------------------------------------------------
+    // Not the most efficient way, but it works and is fast enough...
+    // ---------------------------------------------------------------
+    for (; lastFactor <= (factors_x>>1); lastFactor++)
+    {
+        if ((factors_x % lastFactor) == 0)
+        {
+            StackPush((double)lastFactor);
+            return;
+        }
+    }
+    
+    // No new factor found... just reuse last factor
+    StackPush((double)tmp);
+    blinkXDisplay(TRUE);
+    lastFactor = factors_x;
 }
 
 void SCI_log(void)

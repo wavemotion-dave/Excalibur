@@ -497,6 +497,7 @@ enum UniqueButtonIndexTag
     UNI_SQRT,
     UNI_LN,
     UNI_LOG,
+    UNI_FACTORS,
 
     UNI_SCI,
     UNI_SCI2,
@@ -1282,6 +1283,8 @@ extern uint32_t userTicks;
 #define H_LOG           "Computes the log base 10 of X"
 #define T_FACT          "Factorial"
 #define H_FACT          "Computes the factorial of X (for X <= 170)"
+#define T_FACTORS       "Factors"
+#define H_FACTORS       "Computes the factors of X - press again for next factor."
 #define T_POW           "Power"
 #define H_POW           "Raise Y to the X power"
 #define T_INT           "Integer Portion"
