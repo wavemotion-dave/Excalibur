@@ -242,7 +242,7 @@ extern double SUM[SUM_MAX];
 #define MAX_CF          100
 extern double cashFlow[MAX_CF];
 extern uint8_t CFn;
-extern uint8_t binMode;
+extern uint8_t binOffset;
 extern uint8_t payMode;
 extern uint8_t dateMode;
 
@@ -1505,11 +1505,11 @@ extern uint32_t userTicks;
 #define T_ASCII         "Ascii Chart"
 #define H_ASCII         "Displays the system OEM ASCII chart in all 4 supported bases."
 #define T_MOD           "Modulo"
-#define H_MOD           "Computes Y mod X."
+#define H_MOD           "Computes Y mod X - returns the remainder of the division."
 #define T_BINH          "Binary HI"
-#define H_BINH          "Shows the upper 16 bits in the binary display."
+#define H_BINH          "Shows the next upper chunk of 16 bits in the binary window display."
 #define T_BINL          "Binary LO"
-#define H_BINL          "Shows the lower 16 bits in the binary display (default)."
+#define H_BINL          "Shows the next lower chunk of 16 bits in the binary window display (default)."
 #define T_SLM           "Shift Left Multiple"
 #define H_SLM           "Shifts the number in Y left X places."
 #define T_SRM           "Shift Right Multiple"

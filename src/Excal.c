@@ -1812,10 +1812,9 @@ void ShowStatus(void)
 
         if (progMode == PROG_BIN)
         {
-            if (binMode == 0)
-                strcat(tmpStr, "bin LO");
-            else
-                strcat(tmpStr, "bin HI");
+            char binTmp[8];
+            sprintf(binTmp, "b+%02d", binOffset);
+            strcat(tmpStr, binTmp);
         }
         else
         {
@@ -2238,11 +2237,11 @@ char Radix(int progM)
     return ('*');
 }
 
-char RadixBIN(int progM) // Shows bin HI arrow!
+char RadixBIN(int progM) // Shows bin arrow indicating additional lower-order data available
 {
     if (progM == PROG_BIN)
     {
-        if (binMode == 1)
+        if (binOffset)
             return ('»'); // Right Arrow!
         else
             return (' ');

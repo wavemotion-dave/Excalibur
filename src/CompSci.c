@@ -79,7 +79,7 @@ extern void PROG_MaxW(void);
 extern void PROG_Mirror(void);
 extern void Prog_IEEE(void);
 
-uint8_t binMode = 0;
+uint8_t binOffset = 0; // We need to show more binary digits in windows of 16 bits
 
 struct funcStruct CompSci_funcs[MAX_FUNCS] = {
     {FN1,   UNI_DEC,     USES_L,     ALLOWREC,   ' ',    "DEC",      YES_L,  X_NEW,      PROG_dec,       T_DEC,      H_DEC},
@@ -92,8 +92,8 @@ struct funcStruct CompSci_funcs[MAX_FUNCS] = {
     {FN8,   UNI_HEXD,    USES_L,     ALLOWREC,   'd',    "D",        NO_L,   X_NULL,     PROG_hexD,      T_HEXD,     H_HEXDIG},
     {FN9,   UNI_HEXE,    USES_L,     ALLOWREC,   'e',    "E",        NO_L,   X_NULL,     PROG_hexE,      T_HEXE,     H_HEXDIG},
     {FN10,  UNI_HEXF,    USES_L,     ALLOWREC,   'f',    "F",        NO_L,   X_NULL,     PROG_hexF,      T_HEXF,     H_HEXDIG},
-    {FN11,  UNI_BINLO,   USES_L,     ALLOWREC,   ' ',    "Bin HI",   YES_L,  X_NEW,      PROG_binHi,     T_BINH,     H_BINH},
-    {FN12,  UNI_BINHI,   USES_L,     ALLOWREC,   ' ',    "Bin LO",   YES_L,  X_NEW,      PROG_binLo,     T_BINL,     H_BINL},
+    {FN11,  UNI_BINLO,   USES_L,     ALLOWREC,   ' ',    "Bin «",    YES_L,  X_NEW,      PROG_binHi,     T_BINH,     H_BINH},
+    {FN12,  UNI_BINHI,   USES_L,     ALLOWREC,   ' ',    "Bin »",    YES_L,  X_NEW,      PROG_binLo,     T_BINL,     H_BINL},
     {FN13,  UNI_AND,     USES_L,     ALLOWREC,   ' ',    "AND",      YES_L,  X_NEW,      PROG_and,       T_AND,      H_AND},
     {FN14,  UNI_OR,      USES_L,     ALLOWREC,   ' ',    "OR",       YES_L,  X_NEW,      PROG_or,        T_OR,       H_OR},
     {FN15,  UNI_NOT,     USES_L,     ALLOWREC,   ' ',    "NOT",      YES_L,  X_NEW,      PROG_not,       T_NOT,      H_NOT},
@@ -201,12 +201,9 @@ void MakeCompSciStr(PROG_LONG val, char *tmpL)
     }
     else if (progMode == PROG_BIN)
     {
-        if (binMode == 1)       // Show upper 
-        {
-            val = val >> 16;    //TODO: For now, only 32-bit bin
-        }
+        val = val >> binOffset; // Shift the 16-bits we wish to show
 
-        _i64toa(val & (PROG_LONG) 0x0000FFFF, temp4, progMode);
+        _i64toa(val & 0xFFFF, temp4, progMode);
         if (padZeros == 1)
         {
             temp[17] = CNULL;
@@ -216,12 +213,15 @@ void MakeCompSciStr(PROG_LONG val, char *tmpL)
                 sprintf(temp, "%016s", temp4);
         }
         else
+        {
             sprintf(temp, "%16s", temp4);
+        }
         if ((val & 0xFFFF0000) != 0)
+        {
             for (i = 0; i < (int) strlen(temp); i++)
                 if (temp[i] == ' ')
                     temp[i] = '0';
-
+        }
         j = 0;
         for (i = strlen(temp); i >= 0; i--)
         {
@@ -234,7 +234,9 @@ void MakeCompSciStr(PROG_LONG val, char *tmpL)
             j++;
         }
         if (temp2[j - 1] == ' ')
+        {
             j--;
+        }
         temp2[j] = CNULL;
         for (i = 0; i < j; i++)
         {
@@ -242,7 +244,7 @@ void MakeCompSciStr(PROG_LONG val, char *tmpL)
         }
         temp3[j - 2] = CNULL;
 
-        if ((val & 0xFFFF0000) != 0 || (padZeros == 1 && binMode == 0))
+        if ((val & 0xFFFF0000) != 0 || (padZeros == 1 && binOffset == 0))
             sprintf(tmpL, "«%s", temp3);    // Left Arrow!
         else
         {
@@ -366,7 +368,7 @@ void PROG_bin(void)
 {
     progMode = PROG_BIN;
     lastProgMode = PROG_BIN;
-    binMode = 0;
+    binOffset = 0;
     STACKL[STK_X] = MaskStack(STACKL[STK_X]);
     STACKL[STK_Y] = MaskStack(STACKL[STK_Y]);
     STACKL[STK_Z] = MaskStack(STACKL[STK_Z]);
@@ -676,7 +678,12 @@ BOOL CALLBACK fnDIALOG_ASCIIProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPARAM
 void PROG_binHi(void)
 {
     progMode = PROG_BIN;
-    binMode = 1;
+    if (binOffset == 0)  binOffset = 16;
+    else if (wordSize > 32)
+    {
+        if (binOffset == 16) binOffset = 32;
+        else if (binOffset == 32) binOffset = 48;
+    }
     STACKL[STK_X] = MaskStack(STACKL[STK_X]);
     STACKL[STK_Y] = MaskStack(STACKL[STK_Y]);
     STACKL[STK_Z] = MaskStack(STACKL[STK_Z]);
@@ -686,7 +693,9 @@ void PROG_binHi(void)
 void PROG_binLo(void)
 {
     progMode = PROG_BIN;
-    binMode = 0;
+         if (binOffset == 16) binOffset = 0;
+    else if (binOffset == 32) binOffset = 16;
+    else if (binOffset == 48) binOffset = 32;
     STACKL[STK_X] = MaskStack(STACKL[STK_X]);
     STACKL[STK_Y] = MaskStack(STACKL[STK_Y]);
     STACKL[STK_Z] = MaskStack(STACKL[STK_Z]);
@@ -987,6 +996,7 @@ BOOL CALLBACK fnDIALOG_WordSizeProc(HWND hDlg, UINT wMessage, WPARAM wParam, LPA
             }
 
             EndDialog(hDlg, FALSE);
+            binOffset = 0;
             ShowStatus();
 
             Xedit = X_NEW;
