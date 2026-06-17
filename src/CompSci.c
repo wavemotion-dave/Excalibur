@@ -1220,3 +1220,166 @@ void Prog_IEEE(void)
 {
     DialogBox(hExcaliburInstance, (LPCSTR) "DIALOG_IEEE", calcMainWindow, DlgProcIEEE);
 }
+
+PROG_LONG CompSciAdd(PROG_LONG xl, PROG_LONG yl)
+{
+    if (wordMode == COMPSCI_SIGNED)
+    {
+        int64_t a = (int64_t)xl;
+        int64_t b = (int64_t)yl;
+        int64_t r = a+b;
+        if (((a ^ r) & (b ^ r)) & (1 << (wordSize-1)))
+        {
+            progModeOverflow = 1;
+        }
+        else
+        {
+            progModeOverflow = 0;
+        }
+
+        if (r < a) progModeCarry = 1; else progModeCarry = 0;
+    }
+    else // Unsigned (Carry same as Overflow)
+    {
+        uint64_t a = (uint64_t)xl;
+        uint64_t b = (uint64_t)yl;
+        uint64_t r = (a+b) & wordSizeMask;
+        if (r < a)
+        {
+            progModeOverflow = 1;
+            progModeCarry = 1;
+        }
+        else
+        {
+            progModeOverflow = 0;
+            progModeCarry = 0;
+        }
+    }
+
+    return xl+yl;
+}
+
+PROG_LONG CompSciSub(PROG_LONG xl, PROG_LONG yl)
+{
+    if (wordMode == COMPSCI_SIGNED)
+    {
+        int64_t a = (int64_t)xl;
+        int64_t b = (int64_t)yl;
+        int64_t r = a+b;
+        if (((a ^ b) & (1 << (wordSize-1))) && ((r ^ a) & (1 << (wordSize-1))))
+        {
+            progModeOverflow = 1;
+        }
+        else
+        {
+            progModeOverflow = 0;
+        }
+
+        if (r < a) progModeCarry = 1; else progModeCarry = 0;
+    }
+    else // Unsigned - carry same as overflow
+    {
+        uint64_t a = (uint64_t)xl;
+        uint64_t b = (uint64_t)yl;
+        if (a > b)
+        {
+            progModeOverflow = 1;
+            progModeCarry = 1;
+        }
+        else
+        {
+            progModeOverflow = 0;
+            progModeCarry = 0;
+        }
+    }
+
+    return yl-xl;
+}
+
+uint8_t will_unsigned_multiply_overflow(uint64_t a, uint64_t b) {
+    // 0 multiplied by anything is 0, so it never overflows
+    if (a == 0 || b == 0) {
+        return 0;
+    }
+
+    // UINT64_MAX is (2^64 - 1)
+    return (b > (UINT64_MAX / a)) ? 1:0;
+}
+
+uint8_t will_signed_multiply_overflow(int64_t a, int64_t b) {
+    // Base cases for 0 and 1
+    if (a == 0 || b == 0) return 0;
+    if (a == 1 || b == 1) return 0;
+
+    // Handle the dangerous -1 edge case because INT64_MIN / -1 overflows
+    if (a == -1) return (b == INT64_MIN) ? 1:0;
+    if (b == -1) return (a == INT64_MIN) ? 1:0;
+
+    if (a > 0) {
+        if (b > 0) {
+            // Positive * Positive
+            return (b > (INT64_MAX / a)) ? 1:0;
+        } else {
+            // Positive * Negative
+            return (b < (INT64_MIN / a)) ? 1:0;
+        }
+    } else {
+        if (b > 0) {
+            // Negative * Positive
+            return (a < (INT64_MIN / b)) ? 1:0;
+        } else {
+            // Negative * Negative (result must be <= INT64_MAX)
+            // Since both are negative, 'INT64_MAX / a' is negative.
+            // If b is smaller (more negative) than that, it overflows.
+            return (b < (INT64_MAX / a)) ? 1:0;
+        }
+    }
+}
+
+PROG_LONG CompSciMul(PROG_LONG xl, PROG_LONG yl)
+{
+    progModeOverflow = 0;
+
+    if (wordMode == COMPSCI_SIGNED)
+    {
+        int64_t a = (int64_t)xl;
+        int64_t b = (int64_t)yl;
+        int64_t r = a * b;
+        if (wordSize == 64) progModeOverflow = will_signed_multiply_overflow(a,b);
+        if (wordSize == 32) if ((r > (int32_t)0x7FFFFFFF) || (r < (int32_t)0x80000000)) progModeOverflow = 1;
+        if (wordSize == 16) if ((r > (int16_t)0x7FFF) || (r < (int16_t)0x8000)) progModeOverflow = 1;
+        if (wordSize ==  8) if ((r > (int8_t)0x7F) || (r < (int8_t)0x80)) progModeOverflow = 1;
+    }
+    else
+    {
+        uint64_t a = (uint64_t)xl;
+        uint64_t b = (uint64_t)yl;
+        uint64_t r = a * b;
+        if (wordSize == 64) progModeOverflow = will_unsigned_multiply_overflow(a,b);
+        if (wordSize == 32) if (r > (uint64_t)0xFFFFFFFF) progModeOverflow = 1;
+        if (wordSize == 16) if (r > (uint64_t)0xFFFF) progModeOverflow = 1;
+        if (wordSize ==  8) if (r > (uint64_t)0xFF) progModeOverflow = 1;
+    }
+    
+    return xl * yl;
+}
+
+PROG_LONG CompSciDiv(PROG_LONG xl, PROG_LONG yl)
+{
+    PROG_SIGNEDLONG sxl, syl;
+
+    progModeOverflow = 0;
+    if (wordMode == COMPSCI_SIGNED)
+    {
+        sxl = (PROG_SIGNEDLONG)xl;
+        syl = (PROG_SIGNEDLONG)yl;
+        progModeCarry = (syl % sxl) ? 1:0; // If it doesn't divide evenly... Carry
+        return (syl / sxl);
+    }
+    else
+    {
+        progModeCarry = (yl % xl) ? 1:0; // If it doesn't divide evenly... Carry
+        return (yl / xl);
+    }
+    return 0L; // Never reached
+}

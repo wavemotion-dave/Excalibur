@@ -42,10 +42,10 @@
 
 #define WINDOW_TITLE "Excalibur RPN Calculator"
 
-#define VERSION_STR "v3.XX-09"
+#define VERSION_STR "v3.XX-10"
 
 #define ABOUT_MSG "Excalibur for Windows 32-bit\n"                    \
-                  "Version 3.XX-09  -  June 15, 2026\n\n"             \
+                  "Version 3.XX-10  -  June 17, 2026\n\n"             \
                   "Copyright 1994-2026 David Bernazzani\n\n"          \
                   "Please read the disclaimer and understand the\n"   \
                   "accuracy and precision issues before using.\n\n"   \
@@ -54,7 +54,7 @@
                   "https://github.com/wavemotion-dave/Excalibur"      \
                   "\n\nThis version is BETA - Expect and report Bugs!"
 
-#define CONFIG_VERSION_MAIN 0x0002  // If this changes, we wipe EVERYTHING
+#define CONFIG_VERSION_MAIN 0x0003  // If this changes, we wipe EVERYTHING
 #define CONFIG_VERSION_SUB  0x0001  // If this changes, we reset x,y window position and reset constant tables (currency, physics constants, etc)
 
 #define END_OF_PROGRAM_STR "<End Of Program>"
@@ -2911,21 +2911,21 @@ void RPN_digit(WPARAM key)
                 if (progMode == PROG_FLOAT)
                     STACK[STK_X] = STACK[STK_X] + STO[reg];
                 else
-                    STACKL[STK_X] = STACKL[STK_X] + STOL[reg];
+                    STACKL[STK_X] = CompSciAdd(STOL[reg], STACKL[STK_X]);
             }
             else if (rpnStoreRecall & REG_MINUS)
             {
                 if (progMode == PROG_FLOAT)
                     STACK[STK_X] = STACK[STK_X] - STO[reg];
                 else
-                    STACKL[STK_X] = STACKL[STK_X] - STOL[reg];
+                    STACKL[STK_X] = CompSciSub(STOL[reg], STACKL[STK_X]);
             }
             else if (rpnStoreRecall & REG_MULTIPLY)
             {
                 if (progMode == PROG_FLOAT)
                     STACK[STK_X] = STACK[STK_X] * STO[reg];
                 else
-                    STACKL[STK_X] = STACKL[STK_X] * STOL[reg];
+                    STACKL[STK_X] = CompSciMul(STOL[reg], STACKL[STK_X]);
             }
             else if (rpnStoreRecall & REG_DIVIDE)
             {
@@ -2935,7 +2935,7 @@ void RPN_digit(WPARAM key)
                 }
                 else
                 {
-                    if (STOL[reg] != 0L) STACKL[STK_X] = STACKL[STK_X] / STOL[reg];
+                    if (STOL[reg] != 0L) STACKL[STK_X] = CompSciDiv(STOL[reg], STACKL[STK_X]);
                 }
             }
             else // Normal RCL will lift the stack
@@ -3306,41 +3306,7 @@ void RPN_plus(void)
     {
         xl = StackPopL();
         yl = StackPopL();
-
-        if (wordMode == COMPSCI_SIGNED)
-        {
-            int64_t a = (int64_t)xl;
-            int64_t b = (int64_t)yl;
-            int64_t r = a+b;
-            if (((a ^ r) & (b ^ r)) & (1 << (wordSize-1)))
-            {
-                progModeOverflow = 1;
-            }
-            else
-            {
-                progModeOverflow = 0;
-            }
-
-            if (r < a) progModeCarry = 1; else progModeCarry = 0;
-        }
-        else // Unsigned (Carry same as Overflow)
-        {
-            uint64_t a = (uint64_t)xl;
-            uint64_t b = (uint64_t)yl;
-            uint64_t r = (a+b) & wordSizeMask;
-            if (r < a)
-            {
-                progModeOverflow = 1;
-                progModeCarry = 1;
-            }
-            else
-            {
-                progModeOverflow = 0;
-                progModeCarry = 0;
-            }
-        }
-
-        StackPushL(xl + yl);
+        StackPushL(CompSciAdd(xl, yl));
     }
 }
 
@@ -3370,82 +3336,10 @@ void RPN_minus(void)
     {
         xl = StackPopL();
         yl = StackPopL();
-
-        if (wordMode == COMPSCI_SIGNED)
-        {
-            int64_t a = (int64_t)xl;
-            int64_t b = (int64_t)yl;
-            int64_t r = a+b;
-            if (((a ^ b) & (1 << (wordSize-1))) && ((r ^ a) & (1 << (wordSize-1))))
-            {
-                progModeOverflow = 1;
-            }
-            else
-            {
-                progModeOverflow = 0;
-            }
-
-            if (r < a) progModeCarry = 1; else progModeCarry = 0;
-        }
-        else // Unsigned - carry same as overflow
-        {
-            uint64_t a = (uint64_t)xl;
-            uint64_t b = (uint64_t)yl;
-            if (a > b)
-            {
-                progModeOverflow = 1;
-                progModeCarry = 1;
-            }
-            else
-            {
-                progModeOverflow = 0;
-                progModeCarry = 0;
-            }
-        }
-
-        StackPushL(yl - xl);
+        StackPushL(CompSciSub(xl, yl));
     }
 }
 
-uint8_t will_unsigned_multiply_overflow(uint64_t a, uint64_t b) {
-    // 0 multiplied by anything is 0, so it never overflows
-    if (a == 0 || b == 0) {
-        return 0;
-    }
-
-    // UINT64_MAX is (2^64 - 1)
-    return (b > (UINT64_MAX / a)) ? 1:0;
-}
-
-uint8_t will_signed_multiply_overflow(int64_t a, int64_t b) {
-    // Base cases for 0 and 1
-    if (a == 0 || b == 0) return 0;
-    if (a == 1 || b == 1) return 0;
-
-    // Handle the dangerous -1 edge case because INT64_MIN / -1 overflows
-    if (a == -1) return (b == INT64_MIN) ? 1:0;
-    if (b == -1) return (a == INT64_MIN) ? 1:0;
-
-    if (a > 0) {
-        if (b > 0) {
-            // Positive * Positive
-            return (b > (INT64_MAX / a)) ? 1:0;
-        } else {
-            // Positive * Negative
-            return (b < (INT64_MIN / a)) ? 1:0;
-        }
-    } else {
-        if (b > 0) {
-            // Negative * Positive
-            return (a < (INT64_MIN / b)) ? 1:0;
-        } else {
-            // Negative * Negative (result must be <= INT64_MAX)
-            // Since both are negative, 'INT64_MAX / a' is negative.
-            // If b is smaller (more negative) than that, it overflows.
-            return (b < (INT64_MAX / a)) ? 1:0;
-        }
-    }
-}
 
 void RPN_multiply(void)
 {
@@ -3469,30 +3363,7 @@ void RPN_multiply(void)
     {
         xl = StackPopL();
         yl = StackPopL();
-
-        progModeOverflow = 0;
-        if (wordMode == COMPSCI_SIGNED)
-        {
-            int64_t a = (int64_t)xl;
-            int64_t b = (int64_t)yl;
-            int64_t r = a * b;
-            if (wordSize == 64) progModeOverflow = will_signed_multiply_overflow(a,b);
-            if (wordSize == 32) if ((r > (int32_t)0x7FFFFFFF) || (r < (int32_t)0x80000000)) progModeOverflow = 1;
-            if (wordSize == 16) if ((r > (int16_t)0x7FFF) || (r < (int16_t)0x8000)) progModeOverflow = 1;
-            if (wordSize ==  8) if ((r > (int8_t)0x7F) || (r < (int8_t)0x80)) progModeOverflow = 1;
-        }
-        else
-        {
-            uint64_t a = (uint64_t)xl;
-            uint64_t b = (uint64_t)yl;
-            uint64_t r = a * b;
-            if (wordSize == 64) progModeOverflow = will_unsigned_multiply_overflow(a,b);
-            if (wordSize == 32) if (r > (uint64_t)0xFFFFFFFF) progModeOverflow = 1;
-            if (wordSize == 16) if (r > (uint64_t)0xFFFF) progModeOverflow = 1;
-            if (wordSize ==  8) if (r > (uint64_t)0xFF) progModeOverflow = 1;
-        }
-
-        StackPushL(xl * yl);
+        StackPushL(CompSciMul(xl, yl));
     }
 }
 
@@ -3500,7 +3371,6 @@ void RPN_divide(void)
 {
     double x, y;
     PROG_LONG xl, yl;
-    PROG_SIGNEDLONG sxl, syl;
 
     Xedit = X_NEW;
 
@@ -3534,21 +3404,9 @@ void RPN_divide(void)
         }
         else
         {
-            progModeOverflow = 0;
-            if (wordMode == COMPSCI_SIGNED)
-            {
-                sxl = (PROG_SIGNEDLONG)StackPopL();
-                syl = (PROG_SIGNEDLONG)StackPopL();
-                StackPushL(syl / sxl);
-                progModeCarry = (syl % sxl) ? 1:0; // If it doesn't divide evenly... Carry
-            }
-            else
-            {
-                xl = StackPopL();
-                yl = StackPopL();
-                StackPushL(yl / xl);
-                progModeCarry = (yl % xl) ? 1:0; // If it doesn't divide evenly... Carry
-            }
+            xl = StackPopL();
+            yl = StackPopL();
+            StackPushL(CompSciDiv(xl, yl));
         }
     }
 }
